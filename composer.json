@@ -1,0 +1,34 @@
+{
+    "name": "micheleorselli/arkitect",
+    "description": "Enforce architectural constraints in your PHP applications",
+    "type": "project",
+    "require": {
+        "nikic/php-parser": "^4.3",
+        "symfony/finder": "^5.0",
+        "symfony/event-dispatcher": "^5.0",
+        "symfony/string": "^5.0"
+    },
+    "require-dev": {
+        "roave/security-advisories": "dev-master"
+        ,
+        "phpunit/phpunit": "^8.5",
+        "symfony/var-dumper": "^5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Arkitect\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ArkitectTests\\": "tests/"
+        }
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Michele Orselli",
+            "email": "michele.orselli@gmail.com"
+        }
+    ]
+}
