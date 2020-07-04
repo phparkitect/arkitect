@@ -8,7 +8,7 @@ use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\ParserFactory;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
-class FileParser
+class FileParser implements Parser
 {
     private $parser;
 
@@ -26,8 +26,11 @@ class FileParser
         $this->traverser->addVisitor($this->fileVisitor);
     }
 
-    public function parse(string $filePath, string $fileContent): void
+    public function parse($file): void
     {
+        $filePath = $file->getRelativePath();
+        $fileContent = $file->getContents();
+
         try {
 
             $this->fileVisitor->setCurrentAnalisedFile($filePath);
