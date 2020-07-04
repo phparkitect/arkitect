@@ -2,31 +2,27 @@
 
 namespace Arkitect;
 
+use Arkitect\Analyzer\ClassDescriptionArrayParser;
+use Arkitect\Analyzer\Parser;
 use Arkitect\Analyzer\FileParser;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
 class ClassSet
 {
-    /**
-     * @var Finder
-     */
+
     private $fileIterator;
-
-    /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
-     */
     private $dispatcher;
-
-    /**
-     * @var FileParser
-     */
     private $parser;
 
-    private function __construct()
+    private function __construct(\Iterator $fileIterator, EventDispatcherInterface $dispatcher, Parser $parser)
     {
+        $this->fileIterator = $fileIterator;
+        $this->dispatcher = $dispatcher;
+        $this->parser = $parser;
     }
 
     public static function fromDir(string $directory): self
@@ -39,20 +35,23 @@ class ClassSet
             ->ignoreUnreadableDirs(true)
             ->ignoreVCS(true);
 
-        $set = new self();
-        $set->fileIterator = $finder;
-        $set->dispatcher = new EventDispatcher();
-        $set->parser = new FileParser($set->dispatcher);
+        $eventDispatcher = new EventDispatcher();
 
-        return $set;
+        return new self($finder->getIterator(), $eventDispatcher, new FileParser($eventDispatcher));
+    }
+
+    public static function fromArray(array $classDescriptions)
+    {
+        $eventDispatcher = new EventDispatcher();
+
+        return new self(new \ArrayIterator($classDescriptions), $eventDispatcher, new ClassDescriptionArrayParser($eventDispatcher));
     }
 
     public function run(): void
     {
-        /** @var SplFileInfo $file */
         foreach($this->fileIterator as $file)
         {
-            $this->parser->parse($file->getRelativePath(), $file->getContents());
+            $this->parser->parse($file);
         }
     }
 
@@ -60,4 +59,5 @@ class ClassSet
     {
         $this->dispatcher->addSubscriber($subscriber);
     }
+
 }

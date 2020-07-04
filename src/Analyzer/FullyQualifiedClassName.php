@@ -17,6 +17,13 @@ class FullyQualifiedClassName
      */
     private $class;
 
+    private function __construct(PatternString $fqcnString, PatternString $namespace, PatternString $class)
+    {
+        $this->fqcnString = $fqcnString;
+        $this->namespace = $namespace;
+        $this->class = $class;
+    }
+
     public function toString(): string
     {
         return $this->fqcnString->toString();
@@ -54,11 +61,6 @@ class FullyQualifiedClassName
         $className = array_pop($pieces);
         $namespace = implode('\\', $pieces);
 
-        $f = new self();
-        $f->fqcnString = new PatternString($fqcn);
-        $f->namespace = new PatternString($namespace);
-        $f->class = new PatternString($className);
-
-        return $f;
+        return new self(new PatternString($fqcn), new PatternString($namespace), new PatternString($className));
     }
 }

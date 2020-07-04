@@ -6,6 +6,7 @@ use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FileParser;
 use Arkitect\Testing\EventDispatcherSpy;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Finder\SplFileInfo;
 
 class FileVisitorTest extends TestCase
 {
@@ -32,11 +33,34 @@ class Cat implements AnInterface
 }
 EOF;
 
-        $fp->parse('my/file/path', $code);
+        $fp->parse(new FakeFile('my/file/path', $code));
 
         [$firstEvent, $secondEvent] = $ed->getDispatchedEvents();
 
         $this->assertInstanceOf(ClassDescription::class, $firstEvent->getClassDescription());
         $this->assertInstanceOf(ClassDescription::class, $secondEvent->getClassDescription());
     }
+}
+
+class FakeFile {
+
+    private $path;
+    private $content;
+
+    public function __construct($path, $content)
+    {
+        $this->path = $path;
+        $this->content = $content;
+    }
+
+    public function getRelativePath()
+    {
+        return $this->path;
+    }
+
+    public function getContents()
+    {
+        return $this->content;
+    }
+
 }
