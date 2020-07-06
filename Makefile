@@ -14,4 +14,5 @@ test:
 
 build:
 	composer install
+	php-cs-fixer fix --dry-run
 	vendor/bin/phpunit
