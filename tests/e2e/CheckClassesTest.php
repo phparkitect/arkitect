@@ -7,6 +7,9 @@ use Arkitect\ClassSet;
 use Arkitect\PHPUnit\ArchRuleTestCase;
 use Arkitect\Rules\ArchRule;
 
+/**
+ * @group e2e
+ */
 class CheckClassesTest extends ArchRuleTestCase
 {
     public function test_should_run_checks_on_a_class_set(): void
