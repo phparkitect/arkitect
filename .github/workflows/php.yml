@@ -1,4 +1,4 @@
-name: PHP Composer
+name: Arkitect
 
 on:
   push:
