@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
 
@@ -12,17 +13,17 @@ class ClassDescription
 
     private $interfaces;
 
-    public static function  build(string $FQCN, string $filePath): ClassDescriptionBuilder
-    {
-        return ClassDescriptionBuilder::create($FQCN, $filePath);
-    }
-
     public function __construct(string $fullPath, FullyQualifiedClassName $FQCN, array $dependencies, array $interfaces)
     {
         $this->FQCN = $FQCN;
         $this->fullPath = $fullPath;
         $this->dependencies =  $dependencies;
         $this->interfaces = $interfaces;
+    }
+
+    public static function build(string $FQCN, string $filePath): ClassDescriptionBuilder
+    {
+        return ClassDescriptionBuilder::create($FQCN, $filePath);
     }
 
     public function getName(): string
@@ -91,5 +92,4 @@ class ClassDescription
 
         return (bool) count(array_filter($this->interfaces, $implements));
     }
-
 }

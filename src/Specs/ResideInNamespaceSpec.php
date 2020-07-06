@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 
 namespace Arkitect\Specs;
@@ -11,5 +12,4 @@ class ResideInNamespaceSpec extends BaseSpec
     {
         return $theClass->isInNamespace($this->getPattern());
     }
-
 }

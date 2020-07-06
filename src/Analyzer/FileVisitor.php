@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
 
@@ -28,39 +29,32 @@ class FileVisitor extends NodeVisitorAbstract
     public function enterNode(Node $node)
     {
         if ($node instanceof Node\Stmt\Class_) {
-
             $this->classDescriptionBuilder = ClassDescriptionBuilder::create(
                 $node->namespacedName->toCodeString(),
                 $this->fileCurrentlyAnalized
             );
 
             foreach ($node->implements as $interface) {
-
                 $this->classDescriptionBuilder
                      ->addInterface($interface->toString(), $interface->getLine())
                      ->addDependency(new ClassDependency($interface->toCodeString(), $interface->getLine()));
             }
         }
 
-        if ($node instanceof Node\Expr\Instanceof_)
-        {
+        if ($node instanceof Node\Expr\Instanceof_) {
             $this->classDescriptionBuilder
                 ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
         }
 
-        if ($node instanceof Node\Expr\New_)
-        {
+        if ($node instanceof Node\Expr\New_) {
             $this->classDescriptionBuilder
                 ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
         }
-
-
     }
 
     public function leaveNode(Node $node)
     {
         if ($node instanceof Node\Stmt\Class_) {
-
             $classDescription = $this->classDescriptionBuilder->get();
 
             $this->eventDispatcher->dispatch(new ClassAnalyzed($classDescription));

@@ -1,10 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace Arkitect;
 
 use Arkitect\Analyzer\ClassDescriptionArrayParser;
-use Arkitect\Analyzer\Parser;
 use Arkitect\Analyzer\FileParser;
+use Arkitect\Analyzer\Parser;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -13,7 +14,6 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class ClassSet
 {
-
     private $fileIterator;
     private $dispatcher;
     private $parser;
@@ -49,8 +49,7 @@ class ClassSet
 
     public function run(): void
     {
-        foreach($this->fileIterator as $file)
-        {
+        foreach ($this->fileIterator as $file) {
             $this->parser->parse($file);
         }
     }
@@ -59,5 +58,4 @@ class ClassSet
     {
         $this->dispatcher->addSubscriber($subscriber);
     }
-
 }

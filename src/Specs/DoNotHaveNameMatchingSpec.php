@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Arkitect\Specs;
 
@@ -10,5 +11,4 @@ class DoNotHaveNameMatchingSpec extends BaseSpec
     {
         return !$theClass->nameMatches($this->getPattern());
     }
-
 }

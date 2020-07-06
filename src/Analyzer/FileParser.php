@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
 
@@ -32,13 +33,11 @@ class FileParser implements Parser
         $fileContent = $file->getContents();
 
         try {
-
             $this->fileVisitor->setCurrentAnalisedFile($filePath);
 
             $stmts = $this->parser->parse($fileContent);
 
             $this->traverser->traverse($stmts);
-
         } catch (\Throwable $e) {
             echo 'Parse Error: ', $e->getMessage();
             print_r($e->getTraceAsString());

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Arkitect\Rules;
 
@@ -38,12 +39,7 @@ class ArchRuleGivenClasses
 
     public function check(ClassSet $set): void
     {
-        $checkSub = new class(
-            $this->specsStore,
-            $this->constraintsStore,
-            $this->violationsStore
-        ) implements EventSubscriberInterface {
-
+        $checkSub = new class($this->specsStore, $this->constraintsStore, $this->violationsStore) implements EventSubscriberInterface {
             private $specsStore;
 
             private $constraintsStore;
