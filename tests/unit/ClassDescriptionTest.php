@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArkitectTests;
 
@@ -53,5 +54,4 @@ class ClassDescriptionTest extends TestCase
 
         $this->assertTrue($cd->isInNamespace('Fruit'));
     }
-
 }

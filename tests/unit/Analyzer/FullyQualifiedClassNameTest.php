@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ArkitectTests\Analyzer;
 
@@ -7,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 
 class FullyQualifiedClassNameTest extends TestCase
 {
-
     public function patternProvider(): array
     {
         return [
@@ -26,6 +26,9 @@ class FullyQualifiedClassNameTest extends TestCase
 
     /**
      * @dataProvider patternProvider
+     * @param string $fqcn
+     * @param string $pattern
+     * @param bool $shouldMatch
      */
     public function test_should_match_namespaces_with_wildcards(string $fqcn, string $pattern, bool $shouldMatch): void
     {

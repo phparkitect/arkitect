@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace ArkitectTests;
 
@@ -42,8 +43,8 @@ EOF;
     }
 }
 
-class FakeFile {
-
+class FakeFile
+{
     private $path;
     private $content;
 
@@ -62,5 +63,4 @@ class FakeFile {
     {
         return $this->content;
     }
-
 }
