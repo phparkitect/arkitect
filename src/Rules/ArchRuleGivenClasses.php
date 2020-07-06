@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Arkitect\Rules;
 
-use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\Events\ClassAnalyzed;
 use Arkitect\ClassSet;
 use Arkitect\Constraints\ArchRuleConstraint;

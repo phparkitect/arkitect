@@ -5,8 +5,14 @@ namespace Arkitect\Analyzer;
 
 class ClassDependency
 {
+    /**
+     * @var string
+     */
     private $line;
 
+    /**
+     * @var FullyQualifiedClassName
+     */
     private $FQCN;
 
     public function __construct(string $FQCN, string $line)

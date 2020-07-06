@@ -8,6 +8,9 @@ use Arkitect\Analyzer\ClassDescription;
 
 class DependsOnClassesInNamespaceConstraint
 {
+    /**
+     * @var string
+     */
     private $namespace;
 
     public function __construct(string $namespace)

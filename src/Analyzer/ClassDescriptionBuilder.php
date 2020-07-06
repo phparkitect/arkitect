@@ -31,7 +31,7 @@ class ClassDescriptionBuilder
 
     public function addInterface(string $FQCN, int $line): ClassDescriptionBuilder
     {
-        $this->addDependency(new ClassDependency($FQCN, $line));
+        $this->addDependency(new ClassDependency($FQCN, (string) $line));
         $this->interfaces[] = FullyQualifiedClassName::fromString($FQCN);
 
         return $this;
