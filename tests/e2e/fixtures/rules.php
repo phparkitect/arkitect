@@ -9,10 +9,10 @@ Arkitect::checkThatClassesInThis(
     ClassSet::fromDir(__DIR__ . '/mvc')
 )->meetTheFollowingRules(
     ArchRule::classes()
-    ->that()
-        ->resideInNamespace('App\Controller')
-    ->should()
-        ->implement('ContainerAwareInterface'),
+        ->that()
+            ->resideInNamespace('App\Controller')
+        ->should()
+            ->implement('ContainerAwareInterface'),
 
     ArchRule::classes()
         ->that()
