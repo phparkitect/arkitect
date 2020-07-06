@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 
 namespace Arkitect\Rules;
@@ -9,5 +10,4 @@ class ArchRule
     {
         return new ArchRuleGivenClasses();
     }
-
 }

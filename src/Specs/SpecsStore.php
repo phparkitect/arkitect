@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Arkitect\Specs;
 
@@ -16,7 +17,6 @@ class SpecsStore
     public function allSpecsAreMatchedBy(ClassDescription $classDescription): bool
     {
         foreach ($this->specs as $spec) {
-
             if (!$spec->apply($classDescription)) {
                 return false;
             }

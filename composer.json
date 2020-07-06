@@ -3,14 +3,14 @@
     "description": "Enforce architectural constraints in your PHP applications",
     "type": "project",
     "require": {
+        "php": "^7.1|^8",
         "nikic/php-parser": "^4.3",
         "symfony/finder": "^5.0",
         "symfony/event-dispatcher": "^5.0",
         "symfony/string": "^5.0"
     },
     "require-dev": {
-        "roave/security-advisories": "dev-master"
-        ,
+        "roave/security-advisories": "dev-master",
         "phpunit/phpunit": "^8.5",
         "symfony/var-dumper": "^5.0"
     },
