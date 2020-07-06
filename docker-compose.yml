@@ -8,3 +8,4 @@ services:
       dockerfile: ./Dockerfile
     volumes:
       - ./:/var/www:cached
+    tty: true
