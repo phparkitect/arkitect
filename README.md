@@ -1,4 +1,4 @@
-# arkitect
+# Arkitect ![Arkitect](https://github.com/phparkitect/arkitect/workflows/Arkitect/badge.svg?branch=master)
 
 ## Goal
 
