@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI;
 
-use Arkitect\Arkitect;
+use Arkitect\RuleChecker;
 use Arkitect\ArchViolations;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -42,7 +42,7 @@ class Check extends Command
 
             require_once $rules;
 
-            Arkitect::run();
+            RuleChecker::run();
         } catch (ArchViolations $exception) {
             foreach ($exception->violations() as $violation) {
                 $output->writeln(sprintf('<error>%s</error>', $violation));
@@ -59,7 +59,7 @@ class Check extends Command
 
         $output->writeln(
             sprintf("Assertions: %d, Errors: %d.\n",
-                Arkitect::assertionsCount(),
+                RuleChecker::assertionsCount(),
                 $errors
             ));
 

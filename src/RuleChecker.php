@@ -7,7 +7,7 @@ use Arkitect\Constraints\ArchRuleConstraint;
 use Arkitect\Rules\ArchRuleGivenClasses;
 use Arkitect\Rules\ViolationsStore;
 
-class Arkitect
+class RuleChecker
 {
     /**
      * @var Assert[]

@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 
-use Arkitect\Arkitect;
 use Arkitect\ClassSet;
 use Arkitect\Rules\ArchRule;
 
@@ -19,7 +18,7 @@ $controllers_should_have_name_ending_with_controller = ArchRule::classes()
     ->should()
         ->haveNameMatching('*Controller');
 
-Arkitect::checkThatClassesIn($mvc_class_set)->meetTheFollowingRules(
+Arkitect\RuleChecker::checkThatClassesIn($mvc_class_set)->meetTheFollowingRules(
     $controllers_should_implement_container_aware_interface,
     $controllers_should_have_name_ending_with_controller
 );
@@ -33,4 +32,4 @@ $a_naming_rule = ArchRule::classes()
     ->should()
         ->haveNameMatching('Happy*');
 
-Arkitect::checkThatClassesIn($happy_island_class_set)->meetTheFollowingRules($a_naming_rule);
+Arkitect\RuleChecker::checkThatClassesIn($happy_island_class_set)->meetTheFollowingRules($a_naming_rule);
