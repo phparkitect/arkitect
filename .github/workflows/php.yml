@@ -33,7 +33,7 @@ jobs:
       run: composer install --prefer-dist --no-progress --no-suggest
 
     - name: Coding Standard Checks
-      run: ./bin/php-cs-fixer fix --dry-run
+      run: ./bin/php-cs-fixer fix --dry-run -v
 
     - name: Test
       run: vendor/bin/phpunit --exclude-group e2e
