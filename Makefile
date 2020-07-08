@@ -1,4 +1,4 @@
-.PHONY: test build db dt dbi
+.PHONY: test build db dt dbi csfix
 
 db:
 	docker run --rm -it -v $(PWD):/var/www arkitect_php make build
@@ -11,6 +11,9 @@ dbi:
 
 test:
 	vendor/bin/phpunit
+
+csfix:
+	bin/php-cs-fixer fix -v
 
 build:
 	composer install

@@ -15,7 +15,7 @@ class ClassDependency
      */
     private $FQCN;
 
-    public function __construct(string $FQCN, string $line)
+    public function __construct(string $FQCN, int $line)
     {
         $this->line = $line;
         $this->FQCN = FullyQualifiedClassName::fromString($FQCN);
@@ -26,7 +26,7 @@ class ClassDependency
         return $this->FQCN->matches($pattern);
     }
 
-    public function getLine(): string
+    public function getLine(): int
     {
         return $this->line;
     }
