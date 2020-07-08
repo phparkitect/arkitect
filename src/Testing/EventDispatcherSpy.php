@@ -9,12 +9,11 @@ class EventDispatcherSpy implements EventDispatcherInterface
 {
     private $events = [];
 
-    /**
-     * @inheritDoc
-     */
     public function dispatch(object $event)
     {
         $this->events[] = $event;
+
+        return $event;
     }
 
     public function getDispatchedEvents(): array
