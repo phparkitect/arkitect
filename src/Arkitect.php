@@ -23,7 +23,7 @@ class Arkitect
     {
     }
 
-    public static function checkThatClassesInThis(ClassSet $classSet): self
+    public static function checkThatClassesIn(ClassSet $classSet): self
     {
         $instance = new self();
 
