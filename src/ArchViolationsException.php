@@ -14,7 +14,7 @@ class ArchViolationsException extends \Exception
 
     public function __construct(ViolationsStore $violations)
     {
-        parent::__construct('Architectural violations detected');
+        parent::__construct(sprintf('%d architectural violations detected', $violations->count()));
 
         $this->violations = $violations;
     }

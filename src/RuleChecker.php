@@ -32,6 +32,9 @@ class RuleChecker
         return $instance;
     }
 
+    /**
+     * @param ArchRuleGivenClasses|ArchRuleConstraint ...$rules
+     */
     public function meetTheFollowingRules(...$rules): self
     {
         $rules = array_map(function ($rule): ArchRuleGivenClasses {
