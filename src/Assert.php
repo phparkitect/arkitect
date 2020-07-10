@@ -30,7 +30,7 @@ class Assert
         $violations = $this->rule->getViolations();
 
         if (count($violations) > 0) {
-            throw new ArchViolations($violations);
+            throw new ArchViolationsException($violations);
         }
     }
 }

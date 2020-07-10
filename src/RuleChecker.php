@@ -61,13 +61,13 @@ class RuleChecker
         foreach (self::$assertions as $assert) {
             try {
                 $assert->run();
-            } catch (ArchViolations $exception) {
+            } catch (ArchViolationsException $exception) {
                 $violations = array_merge($violations, $exception->violations()->toArray());
             }
         }
 
         if (!empty($violations)) {
-            throw new ArchViolations(ViolationsStore::fromViolations(...$violations));
+            throw new ArchViolationsException(ViolationsStore::fromViolations(...$violations));
         }
     }
 

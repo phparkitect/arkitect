@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI;
 
-use Arkitect\ArchViolations;
+use Arkitect\ArchViolationsException;
 use Arkitect\RuleChecker;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,9 +21,9 @@ class Check extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Creates a new user.') // TODO
-            ->setHelp('This command allows you to create a user...') // TODO
-            ->addOption('rules', 'r', InputOption::VALUE_REQUIRED, 'File containing rules to be checked');
+            ->setDescription('Check that architectural rules are matched.')
+            ->setHelp('This command allows you check that architectural rules defined in your config file are matched.')
+            ->addOption('rules', 'r', InputOption::VALUE_REQUIRED, 'File containing rules to be matched');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -42,7 +42,7 @@ class Check extends Command
             require_once $rules;
 
             RuleChecker::run();
-        } catch (ArchViolations $exception) {
+        } catch (ArchViolationsException $exception) {
             foreach ($exception->violations() as $violation) {
                 $output->writeln(sprintf('<error>%s</error>', $violation));
             }

@@ -5,7 +5,7 @@ namespace Arkitect;
 
 use Arkitect\Rules\ViolationsStore;
 
-class ArchViolations extends \Exception
+class ArchViolationsException extends \Exception
 {
     /**
      * @var ViolationsStore
