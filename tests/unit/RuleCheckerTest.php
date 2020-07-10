@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 
 class RuleCheckerTest extends TestCase
 {
-    public function test_qualcosa(): void
+    public function test_it_throws_exception_if_violations_are_found(): void
     {
         $classSet = $this->prophesize(ClassSet::class);
 
