@@ -19,3 +19,6 @@ build:
 	composer install
 	php-cs-fixer fix --dry-run
 	vendor/bin/phpunit
+
+shell:
+	 docker-compose exec php /bin/bash
