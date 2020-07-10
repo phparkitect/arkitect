@@ -29,6 +29,7 @@ class FileVisitor extends NodeVisitorAbstract
     public function enterNode(Node $node)
     {
         if ($node instanceof Node\Stmt\Class_) {
+            /** @psalm-suppress UndefinedPropertyFetch */
             $this->classDescriptionBuilder = ClassDescriptionBuilder::create(
                 $node->namespacedName->toCodeString(),
                 $this->fileCurrentlyAnalized
