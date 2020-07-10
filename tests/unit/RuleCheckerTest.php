@@ -34,7 +34,7 @@ class RuleCheckerTest extends TestCase
         RuleChecker::checkThatClassesIn($classSet->reveal())
             ->meetTheFollowingRules($archRuleGivenClasses->reveal(), $archRuleConstraint->reveal());
 
-        self::assertEquals(2,RuleChecker::assertionsCount());
+        self::assertEquals(2, RuleChecker::assertionsCount());
 
         self::expectExceptionObject(new ArchViolationsException(
             new ViolationsStore('Violation 1', 'Violation 2', 'Violation 3')
