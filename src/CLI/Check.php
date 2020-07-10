@@ -5,6 +5,7 @@ namespace Arkitect\CLI;
 
 use Arkitect\ArchViolationsException;
 use Arkitect\RuleChecker;
+use Arkitect\Rules\ViolationsStore;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -13,6 +14,9 @@ use Webmozart\Assert\Assert;
 
 class Check extends Command
 {
+    public const FAILURE = 1;
+    private const CONFIG_FILENAME_PARAM = 'config';
+
     public function __construct()
     {
         parent::__construct('check');
@@ -23,47 +27,80 @@ class Check extends Command
         $this
             ->setDescription('Check that architectural rules are matched.')
             ->setHelp('This command allows you check that architectural rules defined in your config file are matched.')
-            ->addOption('rules', 'r', InputOption::VALUE_REQUIRED, 'File containing rules to be matched');
+            ->addOption(
+                self::CONFIG_FILENAME_PARAM,
+                'c',
+                InputOption::VALUE_REQUIRED,
+                'File containing configs, such as rules to be matched'
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $rules = $input->getOption('rules');
+        $this->printHeadingLine($output);
 
-        Assert::notNull($rules, 'You must specify the file containing rules');
-        Assert::file($rules);
-
-        $output->writeln("PHPArkitect 0.0.1\n");
-        $output->writeln(sprintf("Rules file: %s\n", $rules));
+        $violations = ViolationsStore::fromViolations();
 
         try {
-            $errors = 0;
-
-            require_once $rules;
+            $rulesFilename = $this->getConfigFilename($input);
+            $output->writeln(sprintf("Config file: %s\n", $rulesFilename));
+            $this->readRules($rulesFilename);
 
             RuleChecker::run();
         } catch (ArchViolationsException $exception) {
-            foreach ($exception->violations() as $violation) {
-                $output->writeln(sprintf('<error>%s</error>', $violation));
-            }
+            $violations = $exception->violations();
+        } catch (\Exception $exception) {
+            $output->writeln(sprintf('<error>%s</error>', $exception->getMessage()));
 
-            $errors = $exception->violations()->count();
+            return self::FAILURE;
         }
 
-        $output->writeln('');
-
-        if ($errors) {
-            $output->writeln('ERRORS!');
+        if ($violations->count() > 0) {
+            $this->printViolations($violations, $output);
         }
 
+        $this->printSummaryLine($output, $violations->count());
+
+        return $violations->count();
+    }
+
+    protected function readRules($rulesFilename): void
+    {
+        require_once $rulesFilename;
+    }
+
+    protected function printSummaryLine(OutputInterface $output, int $violationCount): void
+    {
         $output->writeln(
             sprintf(
-                "Assertions: %d, Errors: %d.\n",
+                "\nAssertions: %d, Violations: %d.\n",
                 RuleChecker::assertionsCount(),
-                $errors
+                $violationCount
             )
         );
+    }
 
-        return $errors;
+    protected function printHeadingLine(OutputInterface $output): void
+    {
+        $output->writeln("<info>PHPArkitect 0.0.1</info>\n");
+    }
+
+    private function getConfigFilename(InputInterface $input)
+    {
+        $filename = $input->getOption(self::CONFIG_FILENAME_PARAM);
+
+        Assert::notNull($filename, 'You must specify the file containing rules');
+        Assert::file($filename, 'Config file not found');
+
+        return $filename;
+    }
+
+    private function printViolations(ViolationsStore $violations, OutputInterface $output): void
+    {
+        $output->writeln('<error>ERRORS!</error>');
+
+        foreach ($violations as $violation) {
+            $output->writeln(sprintf('%s', $violation));
+        }
     }
 }

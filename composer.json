@@ -36,5 +36,8 @@
             "name": "Patrick Luca Fazzi",
             "email": "patrick91@live.it"
         }
+    ],
+    "bin": [
+        "phparkitect"
     ]
 }
