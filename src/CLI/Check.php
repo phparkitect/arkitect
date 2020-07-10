@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI;
 
-use Arkitect\RuleChecker;
 use Arkitect\ArchViolations;
+use Arkitect\RuleChecker;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -23,8 +23,7 @@ class Check extends Command
         $this
             ->setDescription('Creates a new user.') // TODO
             ->setHelp('This command allows you to create a user...') // TODO
-            ->addOption('rules', 'r', InputOption::VALUE_REQUIRED, 'File containing rules to be checked')
-        ;
+            ->addOption('rules', 'r', InputOption::VALUE_REQUIRED, 'File containing rules to be checked');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -58,10 +57,12 @@ class Check extends Command
         }
 
         $output->writeln(
-            sprintf("Assertions: %d, Errors: %d.\n",
+            sprintf(
+                "Assertions: %d, Errors: %d.\n",
                 RuleChecker::assertionsCount(),
                 $errors
-            ));
+            )
+        );
 
         return $errors;
     }
