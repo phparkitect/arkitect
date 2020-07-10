@@ -15,6 +15,9 @@ test:
 csfix:
 	bin/php-cs-fixer fix -v
 
+psalm:
+	vendor/bin/psalm
+
 build:
 	composer install
 	php-cs-fixer fix --dry-run

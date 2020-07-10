@@ -6,7 +6,7 @@ namespace Arkitect\Analyzer;
 class ClassDependency
 {
     /**
-     * @var string
+     * @var int
      */
     private $line;
 
