@@ -49,4 +49,11 @@ class ArchRuleConstraint
 
         return $this;
     }
+
+    public function doNotExtendClass(string $class)
+    {
+        $this->constraintsStore->add(new DoNotExtendClass($class));
+
+        return $this;
+    }
 }
