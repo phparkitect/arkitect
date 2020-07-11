@@ -31,5 +31,4 @@ App\Controller\ProductsController does not implement ContainerAwareInterface.");
 
         ArchRuleTestCase::assertArchRule($rule, $set);
     }
-
 }
