@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-class UserController
+use e2e\fixtures\mvc\Controller\ReallyBadBaseController;
+
+class UserController extends ReallyBadBaseController
 {
+
 }
