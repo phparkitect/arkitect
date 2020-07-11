@@ -1,14 +1,15 @@
 <?php
 
 
-namespace e2e\fixtures;
+namespace e2e;
 
 
 use Arkitect\ClassSet;
 use Arkitect\PHPUnit\ArchRuleTestCase;
 use Arkitect\Rules\ArchRule;
+use PHPUnit\Framework\TestCase;
 
-class CheckClassDependencyTest
+class CheckClassDependencyTest extends TestCase
 {
 
     public function test_should_check_code_in_happy_island_does_not_depend_on_outside_code(): void
