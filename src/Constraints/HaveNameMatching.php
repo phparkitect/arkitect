@@ -6,7 +6,7 @@ namespace Arkitect\Constraints;
 
 use Arkitect\Analyzer\ClassDescription;
 
-class HaveNameMatching
+class HaveNameMatching implements Constraint
 {
     private $name;
 
@@ -17,7 +17,7 @@ class HaveNameMatching
 
     public function getViolationError(ClassDescription $classDescription): string
     {
-        return "{$classDescription->getFQCN()} have name matching {$this->name}";
+        return "{$classDescription->getFQCN()} have name that doesn't match {$this->name}";
     }
 
     public function isViolatedBy(ClassDescription $theClass): bool
