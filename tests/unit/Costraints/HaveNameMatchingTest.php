@@ -25,5 +25,4 @@ class HaveNameMatchingTest extends TestCase
         $this->assertTrue($constraint->isViolatedBy($badClass));
         $this->assertEquals('\App\BadNameClass has a name that doesn\'t match **GoodName**', $constraint->getViolationError($badClass));
     }
-
 }
