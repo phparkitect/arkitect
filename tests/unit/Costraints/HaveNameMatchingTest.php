@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class HaveNameMatchingTest extends TestCase
 {
-    public function testHappyPath()
+    public function test_check_class_name_match()
     {
         $constraint = new HaveNameMatching("**Class");
 
@@ -17,7 +17,7 @@ class HaveNameMatchingTest extends TestCase
         $this->assertFalse($constraint->isViolatedBy($goodClass));
     }
 
-    public function testWrongName()
+    public function test_show_violation_when_class_name_does_not_match()
     {
         $constraint = new HaveNameMatching("**GoodName**");
 
@@ -25,4 +25,5 @@ class HaveNameMatchingTest extends TestCase
         $this->assertTrue($constraint->isViolatedBy($badClass));
         $this->assertEquals('\App\BadNameClass has a name that doesn\'t match **GoodName**', $constraint->getViolationError($badClass));
     }
+
 }
