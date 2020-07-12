@@ -23,6 +23,6 @@ class HaveNameMatchingTest extends TestCase
 
         $badClass = ClassDescription::build('\App\BadNameClass', 'App')->get();
         $this->assertTrue($constraint->isViolatedBy($badClass));
-        $this->assertEquals('\App\BadNameClass have name that doesn\'t match **GoodName**', $constraint->getViolationError($badClass));
+        $this->assertEquals('\App\BadNameClass has a name that doesn\'t match **GoodName**', $constraint->getViolationError($badClass));
     }
 }

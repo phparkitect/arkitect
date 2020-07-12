@@ -17,7 +17,7 @@ class HaveNameMatching implements Constraint
 
     public function getViolationError(ClassDescription $classDescription): string
     {
-        return "{$classDescription->getFQCN()} have name that doesn't match {$this->name}";
+        return "{$classDescription->getFQCN()} has a name that doesn't match {$this->name}";
     }
 
     public function isViolatedBy(ClassDescription $theClass): bool
