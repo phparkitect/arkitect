@@ -6,7 +6,7 @@ namespace Arkitect\Constraints;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Rules\ViolationsStore;
 
-class ImplementConstraint
+class ImplementConstraint implements Constraint
 {
     private $interface;
 
