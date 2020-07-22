@@ -29,5 +29,3 @@ class ClassDescriptionBuilderTest extends TestCase
         $this->assertEquals($FQCN, $classDescription->getFQCN());
     }
 }
-
-

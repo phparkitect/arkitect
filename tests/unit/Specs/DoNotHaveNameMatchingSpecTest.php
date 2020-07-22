@@ -5,7 +5,6 @@ declare(strict_types=1);
 
 namespace ArkitectTests\unit\Specs;
 
-
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Specs\DoNotHaveNameMatchingSpec;

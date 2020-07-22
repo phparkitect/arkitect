@@ -5,7 +5,6 @@ declare(strict_types=1);
 
 namespace ArkitectTests\unit\Specs;
 
-
 use Arkitect\Constraints\ArchRuleConstraint;
 use Arkitect\Constraints\ConstraintsStore;
 use Arkitect\Rules\ArchRuleGivenClasses;

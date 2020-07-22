@@ -12,14 +12,14 @@ use Prophecy\Argument;
 
 class ClassDescriptionArrayParserTest extends TestCase
 {
-   public function test()
-   {
-       $eventiDispatcher = $this->prophesize(EventDispatcherSpy::class);
-       $eventiDispatcher->dispatch(Argument::any())->shouldBeCalled();
+    public function test_event_dispatch_is_called_when_class_description_array_is_parsed()
+    {
+        $eventiDispatcher = $this->prophesize(EventDispatcherSpy::class);
+        $eventiDispatcher->dispatch(Argument::any())->shouldBeCalled();
 
-       $classDescriptionArrayParser = new ClassDescriptionArrayParser($eventiDispatcher->reveal());
+        $classDescriptionArrayParser = new ClassDescriptionArrayParser($eventiDispatcher->reveal());
 
-       $classDescription = ClassDescription::build('FQCN', 'fullyPath')->get();
-       $classDescriptionArrayParser->parse($classDescription);
-   }
+        $classDescription = ClassDescription::build('FQCN', 'fullyPath')->get();
+        $classDescriptionArrayParser->parse($classDescription);
+    }
 }

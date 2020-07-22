@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace ArkitectTests\unit\Costraints;
 
-
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Constraints\ConstraintsStore;
 use Arkitect\Constraints\HaveNameMatching;
