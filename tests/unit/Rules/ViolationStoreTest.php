@@ -5,7 +5,6 @@ declare(strict_types=1);
 
 namespace ArkitectTests\unit\Rules;
 
-
 use Arkitect\Rules\ViolationsStore;
 use PHPUnit\Framework\TestCase;
 

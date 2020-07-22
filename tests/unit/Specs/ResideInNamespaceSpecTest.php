@@ -7,18 +7,18 @@ namespace ArkitectTests\unit\Specs;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
-use Arkitect\Specs\HaveNameMatchingSpec;
+use Arkitect\Specs\ResideInNamespaceSpec;
 use PHPUnit\Framework\TestCase;
 
-class HaveNameMatchingSpecTest extends TestCase
+class ResideInNamespaceSpecTest extends TestCase
 {
-    public function test_it_should_return_false_if_not_match_name(): void
+    public function test_it_should_return_false_if_not_reside_in_namespace(): void
     {
-        $haveNameMatching = new HaveNameMatchingSpec('foo');
+        $haveNameMatching = new ResideInNamespaceSpec('MyNamespace');
 
         $classDescription = new ClassDescription(
             '/path',
-            FullyQualifiedClassName::fromString('HappyIsland'),
+            FullyQualifiedClassName::fromString('AnotherNamespace\HappyIsland'),
             [],
             []
         );
@@ -26,13 +26,13 @@ class HaveNameMatchingSpecTest extends TestCase
         $this->assertFalse($haveNameMatching->apply($classDescription));
     }
 
-    public function test_it_should_return_true_if_match_name(): void
+    public function test_it_should_return_true_if_reside_in_namespace(): void
     {
-        $haveNameMatching = new HaveNameMatchingSpec('HappyIsland');
+        $haveNameMatching = new ResideInNamespaceSpec('MyNamespace');
 
         $classDescription = new ClassDescription(
             '/path',
-            FullyQualifiedClassName::fromString('HappyIsland'),
+            FullyQualifiedClassName::fromString('MyNamespace\HappyIsland'),
             [],
             []
         );

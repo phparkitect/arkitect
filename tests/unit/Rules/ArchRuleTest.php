@@ -5,7 +5,6 @@ declare(strict_types=1);
 
 namespace ArkitectTests\unit\Rules;
 
-
 use Arkitect\Rules\ArchRule;
 use Arkitect\Rules\ArchRuleGivenClasses;
 use PHPUnit\Framework\TestCase;

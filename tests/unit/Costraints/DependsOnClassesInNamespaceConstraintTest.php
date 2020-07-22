@@ -5,7 +5,6 @@ declare(strict_types=1);
 
 namespace ArkitectTests\unit\Costraints;
 
-
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
