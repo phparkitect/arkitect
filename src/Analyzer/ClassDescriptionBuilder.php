@@ -14,6 +14,10 @@ class ClassDescriptionBuilder
 
     private $interfaces;
 
+    private function __construct()
+    {
+    }
+
     public static function create(string $FQCN, string $filePath): ClassDescriptionBuilder
     {
         $cdb = new self;
