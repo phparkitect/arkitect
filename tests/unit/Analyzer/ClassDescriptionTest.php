@@ -1,7 +1,8 @@
 <?php
+
 declare(strict_types=1);
 
-namespace ArkitectTests;
+namespace ArkitectTests\Analyzer;
 
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
@@ -46,6 +47,7 @@ class ClassDescriptionTest extends TestCase
         $this->assertTrue($cd->dependsOn('Fruit\Mango'));
         $this->assertTrue($cd->dependsOnClass('F*\Mango'));
         $this->assertTrue($cd->dependsOnNamespace('Vegetabl*'));
+        $this->assertTrue($cd->dependsOnly('Vegetabl*'));
     }
 
     public function test_should_return_true_if_there_class_is_in_namespace(): void
@@ -53,5 +55,13 @@ class ClassDescriptionTest extends TestCase
         $cd = $this->builder->get();
 
         $this->assertTrue($cd->isInNamespace('Fruit'));
+    }
+
+    public function test_should_return_name(): void
+    {
+        $cd = $this->builder->get();
+
+
+        $this->assertEquals('Banana', $cd->getName());
     }
 }

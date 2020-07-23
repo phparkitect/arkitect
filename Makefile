@@ -25,3 +25,7 @@ build:
 
 shell:
 	 docker-compose exec php /bin/bash
+
+coverage:
+	vendor/bin/phpunit --coverage-html web/tests
+
