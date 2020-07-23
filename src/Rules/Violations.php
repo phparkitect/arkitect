@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Rules;
 
-class ViolationsStore implements \IteratorAggregate, \Countable
+class Violations implements \IteratorAggregate, \Countable
 {
     /**
      * @var string[]

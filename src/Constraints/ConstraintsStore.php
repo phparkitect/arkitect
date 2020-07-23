@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Constraints;
 
 use Arkitect\Analyzer\ClassDescription;
-use Arkitect\Rules\ViolationsStore;
+use Arkitect\Rules\Violations;
 
 class ConstraintsStore
 {
@@ -16,7 +16,7 @@ class ConstraintsStore
         $this->constraints[] = $constraints;
     }
 
-    public function checkAll(ClassDescription $classDescription, ViolationsStore $violationsStore): void
+    public function checkAll(ClassDescription $classDescription, Violations $violationsStore): void
     {
         /** @var Constraint $constraint */
         foreach ($this->constraints as $constraint) {

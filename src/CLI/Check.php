@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI;
 
-use Arkitect\ArchViolationsException;
 use Arkitect\RuleChecker;
-use Arkitect\Rules\ViolationsStore;
+use Arkitect\Rules\Violations;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\Assert;
+use function Amp\Promise\rethrow;
 
 class Check extends Command
 {
@@ -39,21 +39,14 @@ class Check extends Command
     {
         $this->printHeadingLine($output);
 
-        $violations = ViolationsStore::fromViolations();
+        $rulesFilename = $this->getConfigFilename($input);
+        $output->writeln(sprintf("Config file: %s\n", $rulesFilename));
 
-        try {
-            $rulesFilename = $this->getConfigFilename($input);
-            $output->writeln(sprintf("Config file: %s\n", $rulesFilename));
-            $this->readRules($rulesFilename);
+        $ruleChecker = new RuleChecker();
 
-            RuleChecker::run();
-        } catch (ArchViolationsException $exception) {
-            $violations = $exception->violations();
-        } catch (\Exception $exception) {
-            $output->writeln(sprintf('<error>%s</error>', $exception->getMessage()));
+        $this->readRules($ruleChecker, $rulesFilename);
 
-            return self::FAILURE;
-        }
+        $violations = $ruleChecker->run();
 
         if ($violations->count() > 0) {
             $this->printViolations($violations, $output);
@@ -64,9 +57,15 @@ class Check extends Command
         return $violations->count();
     }
 
-    protected function readRules($rulesFilename): void
+    protected function readRules(RuleChecker $ruleChecker, string $rulesFilename): void
     {
-        require_once $rulesFilename;
+        \Closure::fromCallable(function () use ($ruleChecker, $rulesFilename) {
+            $config = require $rulesFilename;
+
+            Assert::isCallable($config);
+
+            return $config($ruleChecker);
+        })();
     }
 
     protected function printSummaryLine(OutputInterface $output, int $violationCount): void
@@ -95,7 +94,7 @@ class Check extends Command
         return $filename;
     }
 
-    private function printViolations(ViolationsStore $violations, OutputInterface $output): void
+    private function printViolations(Violations $violations, OutputInterface $output): void
     {
         $output->writeln('<error>ERRORS!</error>');
 

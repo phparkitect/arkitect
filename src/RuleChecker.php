@@ -5,31 +5,29 @@ namespace Arkitect;
 
 use Arkitect\Constraints\ArchRuleConstraint;
 use Arkitect\Rules\ArchRuleGivenClasses;
-use Arkitect\Rules\ViolationsStore;
+use Arkitect\Rules\Violations;
 
 class RuleChecker
 {
     /**
      * @var Assert[]
      */
-    private static $assertions = [];
+    private $assertions = [];
 
     /**
      * @var ClassSet
      */
     private $classSet;
 
-    private function __construct()
+    public function __construct()
     {
     }
 
-    public static function checkThatClassesIn(ClassSet $classSet): self
+    public function checkThatClassesIn(ClassSet $classSet): self
     {
-        $instance = new self();
+        $this->classSet = $classSet;
 
-        $instance->classSet = $classSet;
-
-        return $instance;
+        return $this;
     }
 
     /**
@@ -45,23 +43,20 @@ class RuleChecker
             }
         }, $rules);
 
-        $instance = new self();
-
         $rules = array_map(function (ArchRuleGivenClasses $rule): Assert {
             return new Assert($this->classSet, $rule);
         }, $rules);
 
-        self::$assertions = array_merge(self::$assertions, $rules);
+        $this->assertions = array_merge($this->assertions, $rules);
 
-
-        return $instance;
+        return $this;
     }
 
-    public static function run(): void
+    public function run(): Violations
     {
         $violations = [];
 
-        foreach (self::$assertions as $assert) {
+        foreach ($this->assertions as $assert) {
             try {
                 $assert->run();
             } catch (ArchViolationsException $exception) {
@@ -69,13 +64,11 @@ class RuleChecker
             }
         }
 
-        if (!empty($violations)) {
-            throw new ArchViolationsException(ViolationsStore::fromViolations(...$violations));
-        }
+        return Violations::fromViolations(...$violations);
     }
 
-    public static function assertionsCount(): int
+    public function assertionsCount(): int
     {
-        return count(self::$assertions);
+        return count($this->assertions);
     }
 }

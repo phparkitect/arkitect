@@ -3,23 +3,23 @@ declare(strict_types=1);
 
 namespace Arkitect;
 
-use Arkitect\Rules\ViolationsStore;
+use Arkitect\Rules\Violations;
 
 class ArchViolationsException extends \Exception
 {
     /**
-     * @var ViolationsStore
+     * @var Violations
      */
     private $violations;
 
-    public function __construct(ViolationsStore $violations)
+    public function __construct(Violations $violations)
     {
         parent::__construct(sprintf('%d architectural violations detected', $violations->count()));
 
         $this->violations = $violations;
     }
 
-    public function violations(): ViolationsStore
+    public function violations(): Violations
     {
         return $this->violations;
     }

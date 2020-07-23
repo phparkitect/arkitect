@@ -7,7 +7,7 @@ use Arkitect\ArchViolationsException;
 use Arkitect\Assert;
 use Arkitect\ClassSet;
 use Arkitect\Rules\ArchRuleGivenClasses;
-use Arkitect\Rules\ViolationsStore;
+use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
 class AssertTest extends TestCase
@@ -21,7 +21,7 @@ class AssertTest extends TestCase
 
         $rule
             ->getViolations()
-            ->willReturn(new ViolationsStore('Random violation 1', 'Random violation 2'));
+            ->willReturn(new Violations('Random violation 1', 'Random violation 2'));
 
         $assert = new Assert($classSet->reveal(), $rule->reveal());
 

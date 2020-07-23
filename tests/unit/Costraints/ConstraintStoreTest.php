@@ -6,7 +6,7 @@ namespace ArkitectTests\unit\Costraints;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Constraints\ConstraintsStore;
 use Arkitect\Constraints\HaveNameMatching;
-use Arkitect\Rules\ViolationsStore;
+use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 
@@ -22,7 +22,7 @@ class ConstraintStoreTest extends TestCase
         $classDescription = $this->prophesize(ClassDescription::class);
         $constraint->isViolatedBy($classDescription)->willReturn(false);
 
-        $violationStore = $this->prophesize(ViolationsStore::class);
+        $violationStore = $this->prophesize(Violations::class);
         $violationStore->add(Argument::any())->shouldNotBeCalled();
         $constraintStore->checkAll($classDescription->reveal(), $violationStore->reveal());
     }
@@ -38,7 +38,7 @@ class ConstraintStoreTest extends TestCase
         $constraint->isViolatedBy($classDescription)->willReturn(true);
         $constraint->getViolationError($classDescription)->willReturn('bar');
 
-        $violationStore = $this->prophesize(ViolationsStore::class);
+        $violationStore = $this->prophesize(Violations::class);
         $violationStore->add(Argument::any())->shouldBeCalled();
         $constraintStore->checkAll($classDescription->reveal(), $violationStore->reveal());
     }

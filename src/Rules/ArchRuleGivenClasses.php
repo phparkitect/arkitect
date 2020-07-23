@@ -23,7 +23,7 @@ class ArchRuleGivenClasses
     {
         $this->specsStore = new SpecsStore();
         $this->constraintsStore = new ConstraintsStore();
-        $this->violationsStore = new ViolationsStore();
+        $this->violationsStore = new Violations();
     }
 
     public function that(): ArchRuleSpec
@@ -45,7 +45,7 @@ class ArchRuleGivenClasses
 
             private $violationsStore;
 
-            public function __construct(SpecsStore $specStore, ConstraintsStore $constraintsStore, ViolationsStore $violationsStore)
+            public function __construct(SpecsStore $specStore, ConstraintsStore $constraintsStore, Violations $violationsStore)
             {
                 $this->specsStore = $specStore;
                 $this->constraintsStore = $constraintsStore;
@@ -75,7 +75,7 @@ class ArchRuleGivenClasses
         $set->run();
     }
 
-    public function getViolations(): ViolationsStore
+    public function getViolations(): Violations
     {
         return $this->violationsStore;
     }

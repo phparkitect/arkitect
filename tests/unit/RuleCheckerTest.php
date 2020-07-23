@@ -8,12 +8,12 @@ use Arkitect\ClassSet;
 use Arkitect\Constraints\ArchRuleConstraint;
 use Arkitect\RuleChecker;
 use Arkitect\Rules\ArchRuleGivenClasses;
-use Arkitect\Rules\ViolationsStore;
+use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
 class RuleCheckerTest extends TestCase
 {
-    public function test_it_throws_exception_if_violations_are_found(): void
+    public function test_it_returns_violations(): void
     {
         $classSet = $this->prophesize(ClassSet::class);
 
@@ -25,21 +25,24 @@ class RuleCheckerTest extends TestCase
             ->shouldBeCalled();
 
         $archRuleConstraintToGivenClasses->check($classSet)->shouldBeCalled();
-        $archRuleConstraintToGivenClasses->getViolations()->willReturn(new ViolationsStore('Violation 2', 'Violation 3'))->shouldBeCalled();
+        $archRuleConstraintToGivenClasses->getViolations()->willReturn(new Violations('Violation 2', 'Violation 3'))->shouldBeCalled();
 
         $archRuleGivenClasses = $this->prophesize(ArchRuleGivenClasses::class);
         $archRuleGivenClasses->check($classSet)->shouldBeCalled();
-        $archRuleGivenClasses->getViolations()->willReturn(new ViolationsStore('Violation 1'))->shouldBeCalled();
+        $archRuleGivenClasses->getViolations()->willReturn(new Violations('Violation 1'))->shouldBeCalled();
 
-        RuleChecker::checkThatClassesIn($classSet->reveal())
+
+        $ruleChecker = new RuleChecker();
+        $ruleChecker
+            ->checkThatClassesIn($classSet->reveal())
             ->meetTheFollowingRules($archRuleGivenClasses->reveal(), $archRuleConstraint->reveal());
 
-        self::assertEquals(2, RuleChecker::assertionsCount());
+        self::assertEquals(2, $ruleChecker->assertionsCount());
 
-        self::expectExceptionObject(new ArchViolationsException(
-            new ViolationsStore('Violation 1', 'Violation 2', 'Violation 3')
-        ));
-
-        RuleChecker::run();
+        $violations = $ruleChecker->run();
+        self::assertEquals(
+            new Violations('Violation 1', 'Violation 2', 'Violation 3'),
+            $violations
+        );
     }
 }
