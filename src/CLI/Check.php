@@ -51,7 +51,7 @@ class Check extends Command
             $this->printViolations($violations, $output);
         }
 
-        $this->printSummaryLine($output, $violations->count());
+        $this->printSummaryLine($output, $ruleChecker->assertionsCount(), $violations->count());
 
         return $violations->count();
     }
@@ -67,12 +67,12 @@ class Check extends Command
         })();
     }
 
-    protected function printSummaryLine(OutputInterface $output, int $violationCount): void
+    protected function printSummaryLine(OutputInterface $output, int $assertionCount, int $violationCount): void
     {
         $output->writeln(
             sprintf(
                 "\nAssertions: %d, Violations: %d.\n",
-                RuleChecker::assertionsCount(),
+                $assertionCount,
                 $violationCount
             )
         );
