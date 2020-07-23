@@ -6,7 +6,7 @@ namespace Arkitect\Constraints;
 
 use Arkitect\Analyzer\ClassDescription;
 
-class NotHaveDependencyOutsideNamespace
+class NotHaveDependencyOutsideNamespace implements Constraint
 {
     private $namespace;
 

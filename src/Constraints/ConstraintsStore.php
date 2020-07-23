@@ -11,13 +11,14 @@ class ConstraintsStore
 {
     private $constraints = [];
 
-    public function add($constraints): void
+    public function add(Constraint $constraints): void
     {
         $this->constraints[] = $constraints;
     }
 
     public function checkAll(ClassDescription $classDescription, ViolationsStore $violationsStore): void
     {
+        /** @var Constraint $constraint */
         foreach ($this->constraints as $constraint) {
             if ($constraint->isViolatedBy($classDescription)) {
                 $violationsStore->add($constraint->getViolationError($classDescription));
