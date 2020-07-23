@@ -4,7 +4,7 @@ declare(strict_types=1);
 use Arkitect\ClassSet;
 use Arkitect\Rules\ArchRule;
 
-return static function(Arkitect\RuleChecker $ruleChecker): void {
+return static function (Arkitect\RuleChecker $ruleChecker): void {
     $mvc_class_set = ClassSet::fromDir(__DIR__ . '/mvc');
 
     $controllers_should_implement_container_aware_interface = ArchRule::classes()
