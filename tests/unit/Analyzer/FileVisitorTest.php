@@ -1,13 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace ArkitectTests;
+namespace ArkitectTests\Analyzer;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FileParser;
 use Arkitect\Testing\EventDispatcherSpy;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Finder\SplFileInfo;
 
 class FileVisitorTest extends TestCase
 {
