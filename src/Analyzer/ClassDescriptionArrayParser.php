@@ -16,8 +16,12 @@ class ClassDescriptionArrayParser implements Parser
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function parse($classDescription): void
+    public function parse($classDescription, array $excludedFiles = []): void
     {
-        $this->eventDispatcher->dispatch(new ClassAnalyzed($classDescription));
+        $file = $classDescription->getFQCN();
+
+        if (!in_array($file, $excludedFiles)) {
+            $this->eventDispatcher->dispatch(new ClassAnalyzed($classDescription));
+        }
     }
 }

@@ -10,19 +10,20 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 
 class ClassSet
 {
     private $fileIterator;
     private $dispatcher;
     private $parser;
+    private $excludedFiles;
 
     private function __construct(\Iterator $fileIterator, EventDispatcherInterface $dispatcher, Parser $parser)
     {
         $this->fileIterator = $fileIterator;
         $this->dispatcher = $dispatcher;
         $this->parser = $parser;
+        $this->excludedFiles = [];
     }
 
     public static function fromDir(string $directory): self
@@ -50,12 +51,17 @@ class ClassSet
     public function run(): void
     {
         foreach ($this->fileIterator as $file) {
-            $this->parser->parse($file);
+            $this->parser->parse($file, $this->excludedFiles);
         }
     }
 
     public function addSubScriber(EventSubscriberInterface $subscriber): void
     {
         $this->dispatcher->addSubscriber($subscriber);
+    }
+
+    public function excludeFiles(array $excludedFiles): void
+    {
+        $this->excludedFiles = $excludedFiles;
     }
 }

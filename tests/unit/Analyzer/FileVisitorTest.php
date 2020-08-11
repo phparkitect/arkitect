@@ -62,4 +62,9 @@ class FakeFile
     {
         return $this->content;
     }
+
+    public function getFilename()
+    {
+        return 'FakeFile';
+    }
 }

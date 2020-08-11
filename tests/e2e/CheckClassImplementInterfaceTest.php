@@ -31,4 +31,19 @@ App\Controller\ProductsController does not implement ContainerAwareInterface.");
 
         ArchRuleTestCase::assertArchRule($rule, $set);
     }
+
+    public function test_assertion_should_fail_on_broken_rule_woth_excluded_files(): void
+    {
+        $set = ClassSet::fromDir(__DIR__ . '/fixtures/mvc');
+
+        $rule = ArchRule::classes()
+            ->that()
+            ->resideInNamespace('App\Controller')
+            ->should()
+            ->implement('ContainerAwareInterface')
+            ->get()
+            ->excludeFiles(['App\Controller\ProductsController', 'App\Controller\UserController']);
+
+        ArchRuleTestCase::assertArchRule($rule, $set);
+    }
 }

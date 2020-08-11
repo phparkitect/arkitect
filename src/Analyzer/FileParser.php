@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
 
-use PhpParser\Error;
+use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\ParserFactory;
@@ -27,7 +27,7 @@ class FileParser implements Parser
         $this->traverser->addVisitor($this->fileVisitor);
     }
 
-    public function parse($file): void
+    public function parse($file, array $excludedFiles = []): void
     {
         $filePath = $file->getRelativePath();
         $fileContent = $file->getContents();
@@ -37,10 +37,31 @@ class FileParser implements Parser
 
             $stmts = $this->parser->parse($fileContent);
 
-            $this->traverser->traverse($stmts);
+            if (!$this->shouldExcludeFile($stmts, $file->getFilename(), $excludedFiles)) {
+                $this->traverser->traverse($stmts);
+            }
         } catch (\Throwable $e) {
             echo 'Parse Error: ', $e->getMessage();
             print_r($e->getTraceAsString());
         }
+    }
+
+    private function shouldExcludeFile(array $stmts, string $filename, array $excludedFiles): bool
+    {
+        foreach ($stmts as $stmt) {
+            if ($stmt instanceof Node\Stmt\Namespace_) {
+                $classDescriptionBuilder = ClassDescriptionBuilder::create(
+                    $stmt->name->toCodeString(),
+                    $filename
+                );
+
+                $file = $classDescriptionBuilder->get()->getFQCN() .
+                    '\\' . str_replace('.php', '', $filename);
+
+                return in_array($file, $excludedFiles);
+            }
+        }
+
+        return false;
     }
 }

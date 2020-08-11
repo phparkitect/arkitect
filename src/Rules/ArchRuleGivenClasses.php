@@ -20,11 +20,14 @@ class ArchRuleGivenClasses
 
     private $violationsStore;
 
+    private $excludedFiles;
+
     public function __construct()
     {
         $this->specsStore = new SpecsStore();
         $this->constraintsStore = new ConstraintsStore();
         $this->violationsStore = new ViolationsStore();
+        $this->excludedFiles = [];
     }
 
     public function that(): ArchRuleSpec
@@ -73,6 +76,7 @@ class ArchRuleGivenClasses
         };
 
         $set->addSubscriber($checkSub);
+        $set->excludeFiles($this->excludedFiles);
         $set->run();
     }
 
@@ -83,6 +87,13 @@ class ArchRuleGivenClasses
 
     public function get(): ArchRuleGivenClasses
     {
+        return $this;
+    }
+
+    public function excludeFiles(array $excludedFiles): ArchRuleGivenClasses
+    {
+        $this->excludedFiles = $excludedFiles;
+
         return $this;
     }
 }

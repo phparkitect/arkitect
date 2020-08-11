@@ -39,6 +39,7 @@ class ArchRuleGivenClassesTest extends TestCase
     {
         $classSet = $this->prophesize(ClassSet::class);
         $classSet->addSubscriber(Argument::any())->shouldBeCalled();
+        $classSet->excludeFiles([])->shouldBeCalled();
         $classSet->run()->shouldBeCalled();
 
         $this->archRuleGivenClass->check($classSet->reveal());

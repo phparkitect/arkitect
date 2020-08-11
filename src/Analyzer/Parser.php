@@ -5,5 +5,5 @@ namespace Arkitect\Analyzer;
 
 interface Parser
 {
-    public function parse($file): void;
+    public function parse($file, array $excludedFiles = []): void;
 }
