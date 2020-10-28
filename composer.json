@@ -7,7 +7,8 @@
         "nikic/php-parser": "^4.3",
         "symfony/finder": "^5.0",
         "symfony/event-dispatcher": "^5.0",
-        "symfony/string": "^5.0"
+        "symfony/string": "^5.0",
+        "symfony/console": "^5.0"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master",
@@ -35,5 +36,8 @@
             "name": "Patrick Luca Fazzi",
             "email": "patrick91@live.it"
         }
+    ],
+    "bin": [
+        "phparkitect"
     ]
 }

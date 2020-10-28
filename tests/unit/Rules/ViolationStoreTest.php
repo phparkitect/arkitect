@@ -5,7 +5,7 @@ declare(strict_types=1);
 
 namespace ArkitectTests\unit\Rules;
 
-use Arkitect\Rules\ViolationsStore;
+use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
 class ViolationStoreTest extends TestCase
@@ -15,7 +15,7 @@ class ViolationStoreTest extends TestCase
      */
     private $violationData;
     /**
-     * @var ViolationsStore
+     * @var Violations
      */
     private $violationStore;
 
@@ -23,7 +23,7 @@ class ViolationStoreTest extends TestCase
     {
         $this->violationData = 'violation';
 
-        $this->violationStore = new ViolationsStore();
+        $this->violationStore = new Violations();
         $this->violationStore->add($this->violationData);
     }
 

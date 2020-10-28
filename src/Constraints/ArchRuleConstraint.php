@@ -7,8 +7,14 @@ use Arkitect\Rules\ArchRuleGivenClasses;
 
 class ArchRuleConstraint
 {
+    /**
+     * @var ConstraintsStore
+     */
     private $constraintsStore;
 
+    /**
+     * @var ArchRuleGivenClasses
+     */
     private $parent;
 
     public function __construct(ArchRuleGivenClasses $parent, ConstraintsStore $constraintsStore)

@@ -8,6 +8,9 @@ use Arkitect\Analyzer\ClassDescription;
 
 class HaveNameMatching implements Constraint
 {
+    /**
+     * @var string
+     */
     private $name;
 
     public function __construct(string $name)

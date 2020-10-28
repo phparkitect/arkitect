@@ -8,7 +8,7 @@ namespace ArkitectTests\unit\Rules;
 use Arkitect\ClassSet;
 use Arkitect\Constraints\ArchRuleConstraint;
 use Arkitect\Rules\ArchRuleGivenClasses;
-use Arkitect\Rules\ViolationsStore;
+use Arkitect\Rules\Violations;
 use Arkitect\Specs\ArchRuleSpec;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -46,7 +46,7 @@ class ArchRuleGivenClassesTest extends TestCase
 
     public function test_it_should_return_violation_store(): void
     {
-        $this->assertInstanceOf(ViolationsStore::class, $this->archRuleGivenClass->getViolations());
+        $this->assertInstanceOf(Violations::class, $this->archRuleGivenClass->getViolations());
     }
 
     public function test_it_should_return_self(): void

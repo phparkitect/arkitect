@@ -4,9 +4,22 @@ declare(strict_types=1);
 
 namespace Arkitect\Rules;
 
-class ViolationsStore implements \IteratorAggregate, \Countable
+class Violations implements \IteratorAggregate, \Countable
 {
-    private $violations = [];
+    /**
+     * @var string[]
+     */
+    private $violations;
+
+    public function __construct(string ...$violations)
+    {
+        $this->violations = $violations;
+    }
+
+    public static function fromViolations(string ...$violations): self
+    {
+        return new self(...$violations);
+    }
 
     public function add(string $violation): void
     {
@@ -33,5 +46,10 @@ class ViolationsStore implements \IteratorAggregate, \Countable
     public function toString(): string
     {
         return implode("\n", $this->violations);
+    }
+
+    public function toArray(): array
+    {
+        return $this->violations;
     }
 }
