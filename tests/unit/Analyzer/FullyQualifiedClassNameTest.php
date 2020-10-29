@@ -11,6 +11,7 @@ class FullyQualifiedClassNameTest extends TestCase
     public function patternProvider(): array
     {
         return [
+          ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables\Fruits\Banana\**', true],
           ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables\Fruits\Banana', true],
           ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables\*\Banana', true],
           ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables\**', true],
