@@ -64,9 +64,11 @@ class ArchRuleGivenClasses
                 $classDescription = $classAnalyzed->getClassDescription();
 
                 if (!$this->specsStore->allSpecsAreMatchedBy($classDescription)) {
+                    echo '- Doesn\'t match' . PHP_EOL;
                     return;
                 }
 
+                echo '+ Matches' . PHP_EOL;
                 $this->constraintsStore->checkAll($classDescription, $this->violationsStore);
             }
         };
