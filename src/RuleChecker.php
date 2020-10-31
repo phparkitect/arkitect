@@ -6,6 +6,8 @@ namespace Arkitect;
 use Arkitect\Constraints\ArchRuleConstraint;
 use Arkitect\Rules\ArchRuleGivenClasses;
 use Arkitect\Rules\Violations;
+use Arkitect\Validation\Engine;
+use Arkitect\Validation\Rule;
 
 class RuleChecker
 {
@@ -30,24 +32,12 @@ class RuleChecker
         return $this;
     }
 
-    /**
-     * @param ArchRuleGivenClasses|ArchRuleConstraint ...$rules
-     */
-    public function meetTheFollowingRules(...$rules): self
+    public function meetTheFollowingRules(Rule ...$rules): self
     {
-        $rules = array_map(function ($rule): ArchRuleGivenClasses {
-            switch (true) {
-                case $rule instanceof ArchRuleGivenClasses: return $rule;
-                case $rule instanceof ArchRuleConstraint: return $rule->get();
-                default: throw new \RuntimeException('Unknown rule class: ' . get_class($rule));
-            }
-        }, $rules);
+        $engine = new Engine();
+        $engine->addRules($rules);
 
-        $rules = array_map(function (ArchRuleGivenClasses $rule): Assert {
-            return new Assert($this->classSet, $rule);
-        }, $rules);
-
-        $this->assertions = array_merge($this->assertions, $rules);
+        // T
 
         return $this;
     }

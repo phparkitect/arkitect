@@ -7,7 +7,6 @@ use Arkitect\ArchViolationsException;
 use Arkitect\ClassSet;
 use Arkitect\Constraints\ArchRuleConstraint;
 use Arkitect\RuleChecker;
-use Arkitect\Rules\ArchRuleGivenClasses;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 

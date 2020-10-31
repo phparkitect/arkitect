@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Arkitect;
 
+use Arkitect\DSL\Rule;
 use Arkitect\Rules\ArchRuleGivenClasses;
 
 class Assert
@@ -13,11 +14,11 @@ class Assert
     private $set;
 
     /**
-     * @var ArchRuleGivenClasses
+     * @var Rule
      */
     private $rule;
 
-    public function __construct(ClassSet $classSet, ArchRuleGivenClasses $rule)
+    public function __construct(ClassSet $classSet, Rule $rule)
     {
         $this->set = $classSet;
         $this->rule = $rule;
