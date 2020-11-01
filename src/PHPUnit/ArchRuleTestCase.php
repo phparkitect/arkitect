@@ -64,7 +64,7 @@ class ArchRuleTestCase extends TestCase
             protected function failureDescription($other): string
             {
                 if (0 === \count($this->notifications)) {
-                    return '';
+                    throw new \LogicException('Attempt to get description without any failure.');
                 }
 
                 /** @var Notification $firstNote */
@@ -72,7 +72,7 @@ class ArchRuleTestCase extends TestCase
 
                 $errors = $firstNote->errors();
                 if (!isset($errors[0])) {
-                    return '';
+                    throw new \LogicException('Attempt to get description without any failure.');
                 }
 
                 return $errors[0];
