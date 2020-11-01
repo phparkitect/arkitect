@@ -63,10 +63,17 @@ class ArchRuleTestCase extends TestCase
 
             protected function failureDescription($other): string
             {
+                if (0 === \count($this->notifications)) {
+                    return '';
+                }
+
                 /** @var Notification $firstNote */
                 $firstNote = $this->notifications[0];
 
                 $errors = $firstNote->errors();
+                if (!isset($errors[0])) {
+                    return '';
+                }
 
                 return $errors[0];
             }
