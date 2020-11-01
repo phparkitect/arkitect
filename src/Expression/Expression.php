@@ -7,5 +7,7 @@ use Arkitect\Analyzer\ClassDescription;
 
 interface Expression
 {
-    public function __invoke(ClassDescription $class): bool;
+    public function evaluate(ClassDescription $class): bool;
+
+    public function toString(): string;
 }

@@ -17,8 +17,13 @@ class ImplementInterface implements Expression
         $this->FQCN = $FQCN;
     }
 
-    public function __invoke(ClassDescription $class): bool
+    public function evaluate(ClassDescription $class): bool
     {
         return $class->implements($this->FQCN);
+    }
+
+    public function toString(): string
+    {
+        return sprintf('implements %s', $this->FQCN);
     }
 }

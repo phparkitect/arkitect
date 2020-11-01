@@ -8,6 +8,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Webmozart\Assert\Assert;
 
 class Check extends Command
@@ -35,10 +36,12 @@ class Check extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->printHeadingLine($output);
+        $io = new SymfonyStyle($input, $output);
+
+        $this->printHeadingLine($io);
 
         $rulesFilename = $this->getConfigFilename($input);
-        $output->writeln(sprintf("Config file: %s\n", $rulesFilename));
+        $io->writeln(sprintf("Config file: %s\n", $rulesFilename));
 
         $ruleChecker = new RuleChecker();
 
@@ -55,10 +58,8 @@ class Check extends Command
         );
 
         if ($violations > 0) {
-            $this->printViolations($notifications, $output);
+            $this->printViolations($notifications, $io);
         }
-
-//        $this->printSummaryLine($output, $ruleChecker->ruleCount(), $notifications->count());
 
         return $violations;
     }
@@ -74,20 +75,9 @@ class Check extends Command
         })();
     }
 
-    protected function printSummaryLine(OutputInterface $output, int $assertionCount, int $violationCount): void
+    protected function printHeadingLine(SymfonyStyle $io): void
     {
-        $output->writeln(
-            sprintf(
-                "\nAssertions: %d, Violations: %d.\n",
-                $assertionCount,
-                $violationCount
-            )
-        );
-    }
-
-    protected function printHeadingLine(OutputInterface $output): void
-    {
-        $output->writeln("<info>PHPArkitect 0.0.1</info>\n");
+        $io->title("<info>PHPArkitect 0.1.0</info>\n");
     }
 
     private function getConfigFilename(InputInterface $input)
@@ -103,12 +93,14 @@ class Check extends Command
     /**
      * @param Notification[] $notifications
      */
-    private function printViolations(array $notifications, OutputInterface $output): void
+    private function printViolations(array $notifications, SymfonyStyle $io): void
     {
-        $output->writeln('<error>ERRORS!</error>');
+        $io->writeln('<error>ERRORS!</error>');
 
         foreach ($notifications as $notification) {
-            $output->writeln(sprintf('%s', $notification));
+            if ($notification->hasErrors()) {
+                $io->error($notification->errors());
+            }
         }
     }
 }

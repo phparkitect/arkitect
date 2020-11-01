@@ -24,12 +24,12 @@ class Rule
         $this->message = $message;
     }
 
-    public function check(Notification $notification, ClassDescription $item): void
+    public function check(Notification $notification, ClassDescription $class): void
     {
-        if (!($this->assertion)($item)) {
-            $notification->addError(sprintf("Validation of '%s' failed because '%s'.", $item->getFQCN(), $this->message));
+        if (!$this->assertion->evaluate($class)) {
+            $notification->addError(sprintf('Failed asserting that %s %s', $class->getFQCN(), $this->assertion->toString()));
         } else {
-            $notification->addRespectedRule(sprintf("'%s' is correct because '%s'.", $item->getFQCN(), $this->message));
+            $notification->addRespectedRule(sprintf('%s %s', $class->getFQCN(), $this->assertion->toString()));
         }
     }
 
@@ -37,7 +37,7 @@ class Rule
     {
         /** @var Expression $selector */
         foreach ($this->selectors as $selector) {
-            if (!$selector($item)) {
+            if (!$selector->evaluate($item)) {
                 return false;
             }
         }

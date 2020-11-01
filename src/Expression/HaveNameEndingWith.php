@@ -17,8 +17,13 @@ class HaveNameEndingWith implements Expression
         $this->nameEnding = $nameEnding;
     }
 
-    public function __invoke(ClassDescription $class): bool
+    public function evaluate(ClassDescription $class): bool
     {
         throw new \RuntimeException(sprintf('Unimplemented expression logic in class %s', __CLASS__));
+    }
+
+    public function toString(): string
+    {
+        throw new \RuntimeException(sprintf('Unimplemented toString method in class %s', __CLASS__));
     }
 }

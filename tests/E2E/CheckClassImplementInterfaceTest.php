@@ -26,8 +26,7 @@ class CheckClassImplementInterfaceTest extends TestCase
             ->because('Of some reason');
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage("Failed asserting that App\Controller\UserController does not implement ContainerAwareInterface
-App\Controller\ProductsController does not implement ContainerAwareInterface.");
+        $this->expectExceptionMessage("Failed asserting that App\Controller\UserController implements ContainerAwareInterface");
 
         ArchRuleTestCase::assertArchRule($rule, $set);
     }

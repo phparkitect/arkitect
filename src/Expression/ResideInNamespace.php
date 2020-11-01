@@ -15,7 +15,7 @@ class ResideInNamespace implements Expression
         $this->namespaces = $namespaces;
     }
 
-    public function __invoke(ClassDescription $class): bool
+    public function evaluate(ClassDescription $class): bool
     {
         foreach ($this->namespaces as $namespace) {
             if ($class->isInNamespace($namespace)) {
@@ -24,5 +24,10 @@ class ResideInNamespace implements Expression
         }
 
         return false;
+    }
+
+    public function toString(): string
+    {
+        throw new \RuntimeException(sprintf('Unimplemented toString method in class %s', __CLASS__));
     }
 }

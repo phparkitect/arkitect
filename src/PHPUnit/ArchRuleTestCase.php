@@ -63,7 +63,12 @@ class ArchRuleTestCase extends TestCase
 
             protected function failureDescription($other): string
             {
-                return 'TODO'; // TODO
+                /** @var Notification $firstNote */
+                $firstNote = $this->notifications[0];
+
+                $errors = $firstNote->errors();
+
+                return $errors[0];
             }
         };
 

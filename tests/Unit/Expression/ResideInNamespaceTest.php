@@ -21,7 +21,7 @@ class ResideInNamespaceTest extends TestCase
             []
         );
 
-        self::assertFalse($exp($class));
+        self::assertFalse($exp->evaluate($class));
     }
 
     public function test_class_in_namespace(): void
@@ -35,6 +35,6 @@ class ResideInNamespaceTest extends TestCase
             []
         );
 
-        self::assertTrue($exp($class));
+        self::assertTrue($exp->evaluate($class));
     }
 }

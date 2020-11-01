@@ -22,5 +22,7 @@ class CLITest extends TestCase
         $output = new BufferedOutput();
 
         $command->run($input, $output);
+
+        echo $output->fetch();
     }
 }

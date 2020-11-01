@@ -17,8 +17,13 @@ class HaveNameMatching implements Expression
         $this->pattern = $pattern;
     }
 
-    public function __invoke(ClassDescription $class): bool
+    public function evaluate(ClassDescription $class): bool
     {
         return $class->nameMatches($this->pattern);
+    }
+
+    public function toString(): string
+    {
+        return sprintf('have name matching %s', $this->pattern);
     }
 }

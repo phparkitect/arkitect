@@ -11,11 +11,6 @@ class Notification
     /** @var string[] */
     private $respectedRules = [];
 
-    public function __toString(): string
-    {
-        return implode(PHP_EOL, $this->errors);
-    }
-
     public function addError(string $error): void
     {
         $this->errors[] = $error;
@@ -27,6 +22,19 @@ class Notification
     }
 
     public function getErrorCount(): int
+    {
+        return \count($this->errors);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function errors(): array
+    {
+        return $this->errors;
+    }
+
+    public function hasErrors(): int
     {
         return \count($this->errors);
     }
