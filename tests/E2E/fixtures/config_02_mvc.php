@@ -14,12 +14,14 @@ return static function (RuleChecker $ruleChecker): void {
     $controllers_should_implement_container_aware_interface = Rule::classes()
         ->that(new ResideInNamespace('App\Controller'))
         ->should(new ImplementInterface('ContainerAwareInterface'))
-        ->because('DI component can automagically inject the service container');
+        ->because('DI component can automagically inject the service container')
+        ->get();
 
     $controllers_should_have_name_ending_with_controller = Rule::classes()
         ->that(new ResideInNamespace('App\Controller'))
         ->should(new HaveNameMatching('*Controller'))
-        ->because('This is a naming convention that helps the team for some reason');
+        ->because('This is a naming convention that helps the team for some reason')
+        ->get();
 
     $ruleChecker
         ->checkThatClassesIn($mvc_class_set)

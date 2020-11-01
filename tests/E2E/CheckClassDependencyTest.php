@@ -19,7 +19,8 @@ class CheckClassDependencyTest extends TestCase
         $rule = Rule::classes()
             ->that(new ResideInNamespace('App\HappyIsland'))
             ->should(new HaveNameMatching('Happy*'))
-            ->because('Some weird reason');
+            ->because('Some weird reason')
+            ->get();
 
         ArchRuleTestCase::assertArchRule($rule, $set);
     }

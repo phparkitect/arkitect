@@ -43,10 +43,15 @@ class Rule implements ThatParser, BecauseParser, AndThatShouldParser
         return $this;
     }
 
-    public function because(string $reason): ValidationRule
+    public function because(string $reason): GetParser
     {
         $this->ruleBuilder->withMessage($reason);
 
+        return $this;
+    }
+
+    public function get(): ValidationRule
+    {
         return $this->ruleBuilder->build();
     }
 }

@@ -15,7 +15,8 @@ class DSLTest extends TestCase
         $rule = DSL\Rule::classes()
             ->that(new Expression\ResideInNamespace('App\Controller'))
             ->should(new Expression\HaveNameEndingWith('Controller'))
-            ->because('Controllers should have name ending with "Controller" suffix');
+            ->because('Controllers should have name ending with "Controller" suffix')
+            ->get();
 
         $expected = new Validation\Rule(
             [
@@ -34,7 +35,8 @@ class DSLTest extends TestCase
             ->that(new Expression\ResideInNamespace('App\UI\Web\Controller', 'App\UI\Rest\Controller'))
                 ->andThat(new Expression\AreInvokable())
             ->should(new Expression\HaveNameEndingWith('Controller'))
-            ->because('Controllers should have name ending with "Controller" suffix');
+            ->because('Controllers should have name ending with "Controller" suffix')
+            ->get();
 
         $expected = new Validation\Rule(
             [
@@ -55,7 +57,8 @@ class DSLTest extends TestCase
                 ->andThat(new Expression\AreInvokable())
                 ->andThat(new Expression\Extend('App\UI\BaseController'))
             ->should(new Expression\HaveNameEndingWith('Controller'))
-            ->because('Controllers should have name ending with "Controller" suffix');
+            ->because('Controllers should have name ending with "Controller" suffix')
+            ->get();
 
         $expected = new Validation\Rule(
             [

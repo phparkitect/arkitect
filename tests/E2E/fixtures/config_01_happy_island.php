@@ -13,7 +13,8 @@ return static function (RuleChecker $ruleChecker): void {
     $a_naming_rule = Rule::classes()
         ->that(new ResideInNamespace('App\HappyIsland'))
         ->should(new HaveNameMatching('Happy*'))
-        ->because('For some reason we want to distinguish this classes using naming');
+        ->because('For some reason we want to distinguish this classes using naming')
+        ->get();
 
     $ruleChecker
         ->checkThatClassesIn($happy_island_class_set)

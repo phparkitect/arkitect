@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 namespace Arkitect\DSL;
 
-use Arkitect\Validation\Rule;
-
-interface BecauseParser
+interface BecauseParser extends GetParser
 {
-    public function because(string $reason): Rule;
+    public function because(string $reason): GetParser;
 }

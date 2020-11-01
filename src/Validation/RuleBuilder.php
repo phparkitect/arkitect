@@ -13,8 +13,8 @@ class RuleBuilder
     /** @var Expression */
     private $assertion;
 
-    /** @var string */
-    private $message;
+    /** @var ?string */
+    private $message = null;
 
     public function withSelector(Expression $selector): self
     {

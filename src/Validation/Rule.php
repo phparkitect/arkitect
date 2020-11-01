@@ -14,14 +14,14 @@ class Rule
     /** @var Expression */
     private $assertion;
 
-    /** @var string */
-    private $message;
+    /** @var ?string */
+    private $reason;
 
-    public function __construct(array $selectors, Expression $assertion, string $message)
+    public function __construct(array $selectors, Expression $assertion, ?string $reason)
     {
         $this->selectors = $selectors;
         $this->assertion = $assertion;
-        $this->message = $message;
+        $this->reason = $reason;
     }
 
     public function check(Notification $notification, ClassDescription $class): void

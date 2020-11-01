@@ -23,7 +23,8 @@ class CheckClassImplementInterfaceTest extends TestCase
         $rule = Rule::classes()
             ->that(new ResideInNamespace('App\Controller'))
             ->should(new ImplementInterface('ContainerAwareInterface'))
-            ->because('Of some reason');
+            ->because('Of some reason')
+            ->get();
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage("Failed asserting that App\Controller\UserController implements ContainerAwareInterface");
