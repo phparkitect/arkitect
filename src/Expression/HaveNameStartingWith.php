@@ -11,7 +11,7 @@ class HaveNameStartingWith implements Expression
     {
     }
 
-    public function __invoke(ClassDescription $item): bool
+    public function __invoke(ClassDescription $class): bool
     {
         return true; // TODO
     }
