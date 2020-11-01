@@ -7,12 +7,18 @@ use Arkitect\Analyzer\ClassDescription;
 
 class HaveNameMatching implements Expression
 {
+    /**
+     * @var string
+     */
+    private $pattern;
+
     public function __construct(string $pattern)
     {
+        $this->pattern = $pattern;
     }
 
     public function __invoke(ClassDescription $class): bool
     {
-        return true; // TODO
+        return $class->nameMatches($this->pattern);
     }
 }

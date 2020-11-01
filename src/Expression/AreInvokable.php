@@ -9,6 +9,6 @@ class AreInvokable implements Expression
 {
     public function __invoke(ClassDescription $class): bool
     {
-        return true; // TODO: Implement __invoke() method.
+        throw new \RuntimeException(sprintf('Unimplemented expression logic in class %s', __CLASS__));
     }
 }

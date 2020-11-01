@@ -19,6 +19,6 @@ class HaveNameEndingWith implements Expression
 
     public function __invoke(ClassDescription $class): bool
     {
-        return true; // TODO
+        throw new \RuntimeException(sprintf('Unimplemented expression logic in class %s', __CLASS__));
     }
 }

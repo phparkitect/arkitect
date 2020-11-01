@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 class CLITest extends TestCase
 {
-    public function test_command(): void
+    public function test_command_runs(): void
     {
         self::expectNotToPerformAssertions();
 
@@ -22,7 +22,5 @@ class CLITest extends TestCase
         $output = new BufferedOutput();
 
         $command->run($input, $output);
-
-        echo $output->fetch();
     }
 }

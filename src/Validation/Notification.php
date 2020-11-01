@@ -9,7 +9,7 @@ class Notification
     private $errors = [];
 
     /** @var string[] */
-    private $respectedRules;
+    private $respectedRules = [];
 
     public function __toString(): string
     {
@@ -28,6 +28,6 @@ class Notification
 
     public function getErrorCount(): int
     {
-        return \count($this->respectedRules);
+        return \count($this->errors);
     }
 }
