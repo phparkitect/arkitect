@@ -26,7 +26,7 @@ class FileVisitor extends NodeVisitorAbstract
         $this->fileCurrentlyAnalized = $filePath;
     }
 
-    public function enterNode(Node $node)
+    public function enterNode(Node $node): void
     {
         if ($node instanceof Node\Stmt\Class_) {
             /** @psalm-suppress UndefinedPropertyFetch */
@@ -53,7 +53,7 @@ class FileVisitor extends NodeVisitorAbstract
         }
     }
 
-    public function leaveNode(Node $node)
+    public function leaveNode(Node $node): void
     {
         if ($node instanceof Node\Stmt\Class_) {
             $classDescription = $this->classDescriptionBuilder->get();

@@ -53,7 +53,7 @@ class ClassSet
         }
     }
 
-    public function addSubScriber(EventSubscriberInterface $subscriber): void
+    public function addSubscriber(EventSubscriberInterface $subscriber): void
     {
         $this->dispatcher->addSubscriber($subscriber);
     }

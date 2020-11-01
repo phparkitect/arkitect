@@ -3,8 +3,7 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI;
 
-use Arkitect\RuleChecker;
-use Arkitect\Rules\Violations;
+use Arkitect\Validation\Notification;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -21,7 +20,7 @@ class Check extends Command
         parent::__construct('check');
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Check that architectural rules are matched.')
@@ -45,15 +44,23 @@ class Check extends Command
 
         $this->readRules($ruleChecker, $rulesFilename);
 
-        $violations = $ruleChecker->run();
+        $notifications = $ruleChecker->run();
 
-        if ($violations->count() > 0) {
-            $this->printViolations($violations, $output);
+        $violations = array_reduce(
+            $notifications,
+            function (int $count, Notification $notification) {
+                return $count + $notification->getErrorCount();
+            },
+            0
+        );
+
+        if ($violations > 0) {
+            $this->printViolations($notifications, $output);
         }
 
-        $this->printSummaryLine($output, $ruleChecker->assertionsCount(), $violations->count());
+//        $this->printSummaryLine($output, $ruleChecker->ruleCount(), $notifications->count());
 
-        return $violations->count();
+        return $violations;
     }
 
     protected function readRules(RuleChecker $ruleChecker, string $rulesFilename): void
@@ -93,12 +100,15 @@ class Check extends Command
         return $filename;
     }
 
-    private function printViolations(Violations $violations, OutputInterface $output): void
+    /**
+     * @param Notification[] $notifications
+     */
+    private function printViolations(array $notifications, OutputInterface $output): void
     {
         $output->writeln('<error>ERRORS!</error>');
 
-        foreach ($violations as $violation) {
-            $output->writeln(sprintf('%s', $violation));
+        foreach ($notifications as $notification) {
+            $output->writeln(sprintf('%s', $notification));
         }
     }
 }

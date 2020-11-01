@@ -3,8 +3,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Validation;
 
-use Arkitect\DSL\Expression;
-use Arkitect\Validation\Rule;
+use Arkitect\Expression\Expression;
 
 class RuleBuilder
 {

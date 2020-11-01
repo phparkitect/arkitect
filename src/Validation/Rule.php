@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace Arkitect\Validation;
 
-use Arkitect\DSL\Expression;
+use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Expression\Expression;
 
 class Rule
 {
@@ -23,12 +24,24 @@ class Rule
         $this->message = $message;
     }
 
-    public function check(Notification $notification, Item $item): void
+    public function check(Notification $notification, ClassDescription $item): void
     {
         if (!($this->assertion)($item)) {
-            $notification->addError(sprintf("Validation of '%s' failed because '%s'.", $item->toString(), $this->message));
+            $notification->addError(sprintf("Validation of '%s' failed because '%s'.", $item->getFQCN(), $this->message));
         } else {
-            $notification->addRespectedRule(sprintf("'%s' is correct because '%s'.", $item->toString(), $this->message));
+            $notification->addRespectedRule(sprintf("'%s' is correct because '%s'.", $item->getFQCN(), $this->message));
         }
+    }
+
+    public function appliesTo(ClassDescription $item): bool
+    {
+        /** @var Expression $selector */
+        foreach ($this->selectors as $selector) {
+            if (!$selector($item)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

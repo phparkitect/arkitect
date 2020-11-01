@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 
-
 namespace Arkitect\Analyzer;
 
 class ClassDescriptionBuilder
@@ -18,9 +17,9 @@ class ClassDescriptionBuilder
     {
     }
 
-    public static function create(string $FQCN, string $filePath): ClassDescriptionBuilder
+    public static function create(string $FQCN, string $filePath): self
     {
-        $cdb = new self;
+        $cdb = new self();
         $cdb->FQCN = FullyQualifiedClassName::fromString($FQCN);
         $cdb->filePath = $filePath;
         $cdb->classDependencies = [];
@@ -29,7 +28,7 @@ class ClassDescriptionBuilder
         return $cdb;
     }
 
-    public function addInterface(string $FQCN, int $line): ClassDescriptionBuilder
+    public function addInterface(string $FQCN, int $line): self
     {
         $this->addDependency(new ClassDependency($FQCN, $line));
         $this->interfaces[] = FullyQualifiedClassName::fromString($FQCN);
@@ -37,7 +36,7 @@ class ClassDescriptionBuilder
         return $this;
     }
 
-    public function addDependency(ClassDependency $cd): ClassDescriptionBuilder
+    public function addDependency(ClassDependency $cd): self
     {
         $this->classDependencies[] = $cd;
 

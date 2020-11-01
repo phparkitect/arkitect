@@ -1,32 +1,59 @@
 <?php
 declare(strict_types=1);
 
-
 namespace Arkitect\PHPUnit;
 
+use Arkitect\Analyzer\Events\ClassAnalyzed;
 use Arkitect\ClassSet;
-use Arkitect\Rules\ArchRuleGivenClasses;
+use Arkitect\Validation\Engine;
+use Arkitect\Validation\Notification;
+use Arkitect\Validation\Rule;
 use PHPUnit\Framework\Constraint\Constraint;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ArchRuleTestCase extends \PHPUnit\Framework\TestCase
+class ArchRuleTestCase extends TestCase
 {
-    public static function assertArchRule(ArchRuleGivenClasses $rule, ClassSet $set): void
+    public static function assertArchRule(Rule $rule, ClassSet $set): void
     {
-        $constraint = new class($rule) extends Constraint {
-            private $rule;
+        $constraint = new class($rule) extends Constraint implements EventSubscriberInterface {
+            private $engine;
+            private $notifications = [];
 
-            public function __construct(ArchRuleGivenClasses $rule)
+            public function __construct(Rule $rule)
             {
-                $this->rule = $rule;
+                $this->engine = new Engine();
+                $this->engine->addRule($rule);
+            }
+
+            public static function getSubscribedEvents()
+            {
+                return [
+                    ClassAnalyzed::class => 'onClassAnalyzed',
+                ];
+            }
+
+            public function onClassAnalyzed(ClassAnalyzed $classAnalyzed): void
+            {
+                $item = $classAnalyzed->getClassDescription();
+
+                $this->notifications[] = $this->engine->run($item);
             }
 
             protected function matches($set): bool
             {
-                $this->rule->check($set);
+                $set->addSubscriber($this);
+                $set->run();
 
-                $violations = $this->rule->getViolations();
+                $violations = array_reduce(
+                    $this->notifications,
+                    function (int $count, Notification $notification) {
+                        return $count + $notification->getErrorCount();
+                    },
+                    0
+                );
 
-                return count($violations) === 0;
+                return 0 === $violations;
             }
 
             public function toString(): string
@@ -36,11 +63,10 @@ class ArchRuleTestCase extends \PHPUnit\Framework\TestCase
 
             protected function failureDescription($other): string
             {
-                return $this->rule->getViolations()->toString();
+                return 'TODO'; // TODO
             }
         };
 
-
-        static::assertThat($set, $constraint, '');
+        static::assertThat($set, $constraint);
     }
 }

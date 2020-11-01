@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Arkitect\DSL;
 
+use Arkitect\Expression\Expression;
 use Arkitect\Validation\Rule as ValidationRule;
 use Arkitect\Validation\RuleBuilder;
 

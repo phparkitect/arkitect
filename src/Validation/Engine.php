@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace Arkitect\Validation;
 
+use Arkitect\Analyzer\ClassDescription;
+
 class Engine
 {
-    /** @var Rule[]  */
+    /** @var Rule[] */
     private $rules = [];
 
     public function addRule(Rule $rule): void
@@ -15,17 +17,19 @@ class Engine
 
     public function addRules(array $rules): void
     {
-        $this->rules[] = array_merge($this->rules, $rules);
+        $this->rules = array_merge($this->rules, $rules);
     }
 
-    public function run(Item $item): Notification
+    public function run(ClassDescription $item): Notification
     {
-        $violations = new Notification();
+        $notification = new Notification();
 
         foreach ($this->rules as $rule) {
-            $rule->check($violations, $item);
+            if ($rule->appliesTo($item)) {
+                $rule->check($notification, $item);
+            }
         }
 
-        return $violations;
+        return $notification;
     }
 }
