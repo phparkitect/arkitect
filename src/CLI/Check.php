@@ -57,9 +57,8 @@ class Check extends Command
             0
         );
 
-        if ($violations > 0) {
-            $this->printViolations($notifications, $io);
-        }
+        $this->printLog($notifications, $io);
+        $this->printSummaryLine($violations, $io);
 
         return $violations;
     }
@@ -93,14 +92,26 @@ class Check extends Command
     /**
      * @param Notification[] $notifications
      */
-    private function printViolations(array $notifications, SymfonyStyle $io): void
+    private function printLog(array $notifications, SymfonyStyle $io): void
     {
-        $io->writeln('<error>ERRORS!</error>');
-
         foreach ($notifications as $notification) {
-            if ($notification->hasErrors()) {
-                $io->error($notification->errors());
+            foreach ($notification->errors() as $message) {
+                $io->writeln("<error>$message</error>");
             }
+            if ($io->isVerbose()) {
+                foreach ($notification->respectedRules() as $message) {
+                    $io->writeln("<info>$message</info>");
+                }
+            }
+        }
+    }
+
+    protected function printSummaryLine($violations, SymfonyStyle $io): void
+    {
+        if ($violations > 0) {
+            $io->error(sprintf('%d violations of architectural rules were found.', $violations));
+        } else {
+            $io->success(sprintf('All architectural rules are respected.'));
         }
     }
 }

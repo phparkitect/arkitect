@@ -38,4 +38,9 @@ class Notification
     {
         return \count($this->errors);
     }
+
+    public function respectedRules(): array
+    {
+        return $this->respectedRules;
+    }
 }
