@@ -79,6 +79,15 @@ class Check extends Command
         $io->title("<info>PHPArkitect 0.1.0</info>\n");
     }
 
+    protected function printSummaryLine($violations, SymfonyStyle $io): void
+    {
+        if ($violations > 0) {
+            $io->error(sprintf('%d violations of architectural rules were found.', $violations));
+        } else {
+            $io->success(sprintf('All architectural rules are respected.'));
+        }
+    }
+
     private function getConfigFilename(InputInterface $input)
     {
         $filename = $input->getOption(self::CONFIG_FILENAME_PARAM);
@@ -103,15 +112,6 @@ class Check extends Command
                     $io->writeln("<info>$message</info>");
                 }
             }
-        }
-    }
-
-    protected function printSummaryLine($violations, SymfonyStyle $io): void
-    {
-        if ($violations > 0) {
-            $io->error(sprintf('%d violations of architectural rules were found.', $violations));
-        } else {
-            $io->success(sprintf('All architectural rules are respected.'));
         }
     }
 }
