@@ -34,13 +34,13 @@ class Notification
         return $this->errors;
     }
 
-    public function hasErrors(): int
-    {
-        return \count($this->errors);
-    }
-
     public function respectedRules(): array
     {
         return $this->respectedRules;
+    }
+
+    public function hasErrors(): bool
+    {
+        return !empty($this->errors);
     }
 }

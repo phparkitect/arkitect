@@ -26,10 +26,11 @@ class Rule
 
     public function check(Notification $notification, ClassDescription $class): void
     {
+        $ruleDescription = sprintf('%s %s', $class->getFQCN(), $this->assertion->toString());
         if (!$this->assertion->evaluate($class)) {
-            $notification->addError(sprintf('Failed asserting that %s %s', $class->getFQCN(), $this->assertion->toString()));
+            $notification->addError($ruleDescription);
         } else {
-            $notification->addRespectedRule(sprintf('%s %s', $class->getFQCN(), $this->assertion->toString()));
+            $notification->addRespectedRule($ruleDescription);
         }
     }
 

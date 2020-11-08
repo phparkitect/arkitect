@@ -18,6 +18,7 @@ class ArchRuleTestCase extends TestCase
     {
         $constraint = new class($rule) extends Constraint implements EventSubscriberInterface {
             private $engine;
+            /** @var Notification[] */
             private $notifications = [];
 
             public function __construct(Rule $rule)
@@ -45,13 +46,7 @@ class ArchRuleTestCase extends TestCase
                 $set->addSubscriber($this);
                 $set->run();
 
-                $violations = array_reduce(
-                    $this->notifications,
-                    function (int $count, Notification $notification) {
-                        return $count + $notification->getErrorCount();
-                    },
-                    0
-                );
+                $violations = $this->countViolations();
 
                 return 0 === $violations;
             }
@@ -63,19 +58,40 @@ class ArchRuleTestCase extends TestCase
 
             protected function failureDescription($other): string
             {
-                if (0 === \count($this->notifications)) {
+                $violations = $this->countViolations();
+                if (0 === $violations) {
                     throw new \LogicException('Attempt to get description without any failure.');
                 }
 
-                /** @var Notification $firstNote */
-                $firstNote = $this->notifications[0];
-
+                $firstNote = $this->getFirstViolations();
                 $errors = $firstNote->errors();
                 if (!isset($errors[0])) {
-                    throw new \LogicException('Attempt to get description without any failure.');
+                    throw new \LogicException('Notification does not have errors');
                 }
 
                 return $errors[0];
+            }
+
+            protected function countViolations(): int
+            {
+                return array_reduce(
+                    $this->notifications,
+                    function (int $count, Notification $notification) {
+                        return $count + $notification->getErrorCount();
+                    },
+                    0
+                );
+            }
+
+            private function getFirstViolations(): Notification
+            {
+                foreach ($this->notifications as $notification) {
+                    if ($notification->hasErrors()) {
+                        return $notification;
+                    }
+                }
+
+                throw new \LogicException('No violations found');
             }
         };
 
