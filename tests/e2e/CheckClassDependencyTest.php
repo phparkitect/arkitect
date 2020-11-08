@@ -5,7 +5,7 @@ namespace e2e;
 
 use Arkitect\ClassSet;
 use Arkitect\PHPUnit\ArchRuleTestCase;
-use Arkitect\Rules\ArchRule;
+use Arkitect\Rules\Rule;
 use PHPUnit\Framework\TestCase;
 
 class CheckClassDependencyTest extends TestCase
@@ -14,7 +14,7 @@ class CheckClassDependencyTest extends TestCase
     {
         $set = ClassSet::fromDir(__DIR__.'/fixtures/happy_island');
 
-        $rule = ArchRule::classes()
+        $rule = Rule::classes()
             ->that()
             ->resideInNamespace('App\HappyIsland')
             ->should()

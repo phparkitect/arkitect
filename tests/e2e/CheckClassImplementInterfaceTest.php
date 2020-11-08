@@ -5,7 +5,7 @@ namespace ArkitectTests;
 
 use Arkitect\ClassSet;
 use Arkitect\PHPUnit\ArchRuleTestCase;
-use Arkitect\Rules\ArchRule;
+use Arkitect\Rules\Rule;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
@@ -18,7 +18,7 @@ class CheckClassImplementInterfaceTest extends TestCase
     {
         $set = ClassSet::fromDir(__DIR__.'/fixtures/mvc');
 
-        $rule = ArchRule::classes()
+        $rule = Rule::classes()
             ->that()
                 ->resideInNamespace('App\Controller')
             ->should()
