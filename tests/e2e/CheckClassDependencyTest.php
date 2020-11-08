@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace e2e;
 
 use Arkitect\ClassSet;
+use Arkitect\Constraints\HaveNameMatching;
 use Arkitect\PHPUnit\ArchRuleTestCase;
 use Arkitect\Rules\Rule;
 use Arkitect\Specs\ResideInNamespaceSpec;
@@ -17,9 +18,7 @@ class CheckClassDependencyTest extends TestCase
 
         $rule = Rule::classes()
             ->that(new ResideInNamespaceSpec('App\HappyIsland'))
-            ->should()
-            ->haveNameMatching('Happy*')
-            ->get();
+            ->should(new HaveNameMatching('Happy*'));
 
         ArchRuleTestCase::assertArchRule($rule, $set);
     }

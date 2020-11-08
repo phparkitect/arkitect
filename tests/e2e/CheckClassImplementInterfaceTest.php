@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace ArkitectTests;
 
 use Arkitect\ClassSet;
+use Arkitect\Constraints\ImplementConstraint;
 use Arkitect\PHPUnit\ArchRuleTestCase;
 use Arkitect\Rules\Rule;
 use Arkitect\Specs\ResideInNamespaceSpec;
@@ -21,9 +22,7 @@ class CheckClassImplementInterfaceTest extends TestCase
 
         $rule = Rule::classes()
             ->that(new ResideInNamespaceSpec('App\Controller'))
-            ->should()
-                ->implement('ContainerAwareInterface')
-            ->get();
+            ->should(new ImplementConstraint('ContainerAwareInterface'));
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage("Failed asserting that App\Controller\UserController does not implement ContainerAwareInterface

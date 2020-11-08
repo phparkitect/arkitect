@@ -24,11 +24,6 @@ class ArchRuleGivenClassesTest extends TestCase
         $this->archRuleGivenClass = new ArchRuleGivenClasses();
     }
 
-    public function test_it_should_return_arch_rule_constraint_when_that_is_should(): void
-    {
-        $this->assertInstanceOf(ArchRuleConstraint::class, $this->archRuleGivenClass->should());
-    }
-
     public function test_it_should_add_subscriber(): void
     {
         $classSet = $this->prophesize(ClassSet::class);
@@ -45,6 +40,6 @@ class ArchRuleGivenClassesTest extends TestCase
 
     public function test_it_should_return_self(): void
     {
-        $this->assertEquals($this->archRuleGivenClass, $this->archRuleGivenClass->get());
+        $this->assertEquals($this->archRuleGivenClass, $this->archRuleGivenClass);
     }
 }
