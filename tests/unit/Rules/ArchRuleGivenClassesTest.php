@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace ArkitectTests\unit\Rules;
 
 use Arkitect\ClassSet;
-use Arkitect\Constraints\ArchRuleConstraint;
 use Arkitect\Rules\ArchRuleGivenClasses;
 use Arkitect\Rules\Violations;
-use Arkitect\Specs\ArchRuleSpec;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 

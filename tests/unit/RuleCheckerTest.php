@@ -16,24 +16,18 @@ class RuleCheckerTest extends TestCase
     {
         $classSet = $this->prophesize(ClassSet::class);
 
-        $archRuleConstraint = $this->prophesize(ArchRuleConstraint::class);
-        $archRuleConstraintToGivenClasses = $this->prophesize(ArchRuleGivenClasses::class);
-        $archRuleConstraint
-            ->get()
-            ->willReturn($archRuleConstraintToGivenClasses)
-            ->shouldBeCalled();
-
-        $archRuleConstraintToGivenClasses->check($classSet)->shouldBeCalled();
-        $archRuleConstraintToGivenClasses->getViolations()->willReturn(new Violations('Violation 2', 'Violation 3'))->shouldBeCalled();
-
         $archRuleGivenClasses = $this->prophesize(ArchRuleGivenClasses::class);
         $archRuleGivenClasses->check($classSet)->shouldBeCalled();
         $archRuleGivenClasses->getViolations()->willReturn(new Violations('Violation 1'))->shouldBeCalled();
 
+        $anotherArchRuleGivenClasses = $this->prophesize(ArchRuleGivenClasses::class);
+        $anotherArchRuleGivenClasses->check($classSet)->shouldBeCalled();
+        $anotherArchRuleGivenClasses->getViolations()->willReturn(new Violations('Violation 2', 'Violation 3'))->shouldBeCalled();
+
         $ruleChecker = new RuleChecker();
         $ruleChecker
             ->checkThatClassesIn($classSet->reveal())
-            ->meetTheFollowingRules($archRuleGivenClasses->reveal(), $archRuleConstraint->reveal());
+            ->meetTheFollowingRules($archRuleGivenClasses->reveal(), $anotherArchRuleGivenClasses->reveal());
 
         self::assertEquals(2, $ruleChecker->assertionsCount());
 
