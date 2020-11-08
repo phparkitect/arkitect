@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace ArkitectTests\unit;
 
-use Arkitect\ArchViolationsException;
 use Arkitect\ClassSet;
 use Arkitect\Constraints\ArchRuleConstraint;
 use Arkitect\RuleChecker;
@@ -30,7 +29,6 @@ class RuleCheckerTest extends TestCase
         $archRuleGivenClasses = $this->prophesize(ArchRuleGivenClasses::class);
         $archRuleGivenClasses->check($classSet)->shouldBeCalled();
         $archRuleGivenClasses->getViolations()->willReturn(new Violations('Violation 1'))->shouldBeCalled();
-
 
         $ruleChecker = new RuleChecker();
         $ruleChecker

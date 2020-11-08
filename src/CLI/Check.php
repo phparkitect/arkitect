@@ -21,7 +21,7 @@ class Check extends Command
         parent::__construct('check');
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Check that architectural rules are matched.')

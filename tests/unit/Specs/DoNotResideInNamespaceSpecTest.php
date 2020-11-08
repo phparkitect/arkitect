@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace ArkitectTests\unit\Specs;
 
 use Arkitect\Analyzer\ClassDescription;

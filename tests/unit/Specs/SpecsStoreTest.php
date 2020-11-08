@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace ArkitectTests\unit\Specs;
 
 use Arkitect\Analyzer\ClassDependency;
@@ -42,7 +41,7 @@ class SpecsStoreTest extends TestCase
             '/path',
             FullyQualifiedClassName::fromString('MyNamespace\HappyIsland'),
             [
-                new ClassDependency('Foo', 100)
+                new ClassDependency('Foo', 100),
             ],
             []
         );

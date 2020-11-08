@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 
-
 namespace Arkitect\PHPUnit;
 
 use Arkitect\ClassSet;
@@ -26,7 +25,7 @@ class ArchRuleTestCase extends \PHPUnit\Framework\TestCase
 
                 $violations = $this->rule->getViolations();
 
-                return count($violations) === 0;
+                return 0 === \count($violations);
             }
 
             public function toString(): string
@@ -39,7 +38,6 @@ class ArchRuleTestCase extends \PHPUnit\Framework\TestCase
                 return $this->rule->getViolations()->toString();
             }
         };
-
 
         static::assertThat($set, $constraint, '');
     }

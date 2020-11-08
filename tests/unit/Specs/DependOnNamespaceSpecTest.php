@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace ArkitectTests\unit\Specs;
 
 use Arkitect\Analyzer\ClassDependency;
@@ -36,7 +35,7 @@ class DependOnNamespaceSpecTest extends TestCase
             '/foo',
             FullyQualifiedClassName::fromString('foo\HappyIsland'),
             [
-                $classDependency
+                $classDependency,
             ],
             []
         );

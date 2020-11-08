@@ -17,7 +17,7 @@ class ClassDescription
     {
         $this->FQCN = $FQCN;
         $this->fullPath = $fullPath;
-        $this->dependencies =  $dependencies;
+        $this->dependencies = $dependencies;
         $this->interfaces = $interfaces;
     }
 
@@ -47,7 +47,7 @@ class ClassDescription
             return $dependency->getFQCN()->matches($pattern);
         };
 
-        return (bool) count(array_filter($this->dependencies, $depends));
+        return (bool) \count(array_filter($this->dependencies, $depends));
     }
 
     public function dependsOnNamespace(string $pattern): bool
@@ -56,7 +56,7 @@ class ClassDescription
             return $dependency->getFQCN()->namespaceMatches($pattern);
         };
 
-        return (bool) count(array_filter($this->dependencies, $depends));
+        return (bool) \count(array_filter($this->dependencies, $depends));
     }
 
     public function dependsOn(string $pattern): bool
@@ -65,7 +65,7 @@ class ClassDescription
             return $dependency->matches($pattern);
         };
 
-        return (bool) count(array_filter($this->dependencies, $depends));
+        return (bool) \count(array_filter($this->dependencies, $depends));
     }
 
     public function dependsOnly(string $pattern): bool
@@ -74,7 +74,7 @@ class ClassDescription
             return !$dependency->getFQCN()->namespaceMatches($pattern);
         };
 
-        $externalDep = count(array_filter($this->dependencies, $depends));
+        $externalDep = \count(array_filter($this->dependencies, $depends));
 
         return $externalDep > 0;
     }
@@ -90,6 +90,6 @@ class ClassDescription
             return $FQCN->matches($pattern);
         };
 
-        return (bool) count(array_filter($this->interfaces, $implements));
+        return (bool) \count(array_filter($this->interfaces, $implements));
     }
 }

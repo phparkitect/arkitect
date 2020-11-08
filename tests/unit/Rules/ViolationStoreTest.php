@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace ArkitectTests\unit\Rules;
 
 use Arkitect\Rules\Violations;

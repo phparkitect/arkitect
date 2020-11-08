@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Arkitect\Constraints;
 
 use Arkitect\Analyzer\ClassDescription;
-use Arkitect\Rules\Violations;
 
 class ImplementConstraint implements Constraint
 {

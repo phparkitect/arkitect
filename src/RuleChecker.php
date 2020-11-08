@@ -39,7 +39,7 @@ class RuleChecker
             switch (true) {
                 case $rule instanceof ArchRuleGivenClasses: return $rule;
                 case $rule instanceof ArchRuleConstraint: return $rule->get();
-                default: throw new \RuntimeException('Unknown rule class: ' . get_class($rule));
+                default: throw new \RuntimeException('Unknown rule class: '.\get_class($rule));
             }
         }, $rules);
 
@@ -69,6 +69,6 @@ class RuleChecker
 
     public function assertionsCount(): int
     {
-        return count($this->assertions);
+        return \count($this->assertions);
     }
 }

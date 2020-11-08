@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace ArkitectTests\unit\Costraints;
 
 use Arkitect\Analyzer\ClassDependency;
@@ -26,7 +25,7 @@ class DependsOnClassesInNamespaceConstraintTest extends TestCase
 
         $violationError = $dependOnClasses->getViolationError($classDescription);
 
-        $this->assertEquals('HappyIsland do not depends on classes in namespace ' . $namespace, $violationError);
+        $this->assertEquals('HappyIsland do not depends on classes in namespace '.$namespace, $violationError);
     }
 
     public function test_it_should_return_true_if_not_depends_on_namespace(): void

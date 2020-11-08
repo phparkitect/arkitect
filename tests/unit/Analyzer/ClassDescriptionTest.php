@@ -61,7 +61,6 @@ class ClassDescriptionTest extends TestCase
     {
         $cd = $this->builder->get();
 
-
         $this->assertEquals('Banana', $cd->getName());
     }
 }

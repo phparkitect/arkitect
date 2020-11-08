@@ -26,9 +26,6 @@ class FullyQualifiedClassNameTest extends TestCase
 
     /**
      * @dataProvider patternProvider
-     * @param string $fqcn
-     * @param string $pattern
-     * @param bool $shouldMatch
      */
     public function test_should_match_namespaces_with_wildcards(string $fqcn, string $pattern, bool $shouldMatch): void
     {

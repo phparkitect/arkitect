@@ -9,17 +9,17 @@ use PHPUnit\Framework\TestCase;
 
 class HaveNameMatchingTest extends TestCase
 {
-    public function test_check_class_name_match()
+    public function test_check_class_name_match(): void
     {
-        $constraint = new HaveNameMatching("**Class");
+        $constraint = new HaveNameMatching('**Class');
 
         $goodClass = ClassDescription::build('\App\MyClass', 'App')->get();
         $this->assertFalse($constraint->isViolatedBy($goodClass));
     }
 
-    public function test_show_violation_when_class_name_does_not_match()
+    public function test_show_violation_when_class_name_does_not_match(): void
     {
-        $constraint = new HaveNameMatching("**GoodName**");
+        $constraint = new HaveNameMatching('**GoodName**');
 
         $badClass = ClassDescription::build('\App\BadNameClass', 'App')->get();
         $this->assertTrue($constraint->isViolatedBy($badClass));

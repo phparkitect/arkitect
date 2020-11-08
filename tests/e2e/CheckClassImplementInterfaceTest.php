@@ -16,7 +16,7 @@ class CheckClassImplementInterfaceTest extends TestCase
 {
     public function test_assertion_should_fail_on_broken_rule(): void
     {
-        $set = ClassSet::fromDir(__DIR__ . '/fixtures/mvc');
+        $set = ClassSet::fromDir(__DIR__.'/fixtures/mvc');
 
         $rule = ArchRule::classes()
             ->that()

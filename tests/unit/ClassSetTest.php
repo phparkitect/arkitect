@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace unit;
 
 use Arkitect\Analyzer\ClassDescription;
@@ -13,10 +12,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ClassSetTest extends TestCase
 {
-    public function test_can_be_built_from_files()
+    public function test_can_be_built_from_files(): void
     {
         $this->markTestSkipped();
-        $set = ClassSet::fromDir(__DIR__ . '/../e2e/fixtures/happy_island');
+        $set = ClassSet::fromDir(__DIR__.'/../e2e/fixtures/happy_island');
         $fakeSubscriber = new FakeSubscriber();
         $set->addSubScriber($fakeSubscriber);
         $set->run();
@@ -27,7 +26,7 @@ class ClassSetTest extends TestCase
         ], $fakeSubscriber->getAllClassAnalyzed());
     }
 
-    public function test_can_be_built_from_array()
+    public function test_can_be_built_from_array(): void
     {
         $this->markTestSkipped();
         $set = ClassSet::fromArray([
@@ -39,7 +38,7 @@ class ClassSetTest extends TestCase
         $set->run();
         $this->assertEquals([
             ClassDescription::build('Fruit\Banana', 'my/path')->get(),
-            ClassDescription::build('Fruit\Apple', 'my/path')->get()
+            ClassDescription::build('Fruit\Apple', 'my/path')->get(),
         ], $fakeSubscriber->getAllClassAnalyzed());
     }
 }
@@ -56,7 +55,7 @@ class FakeSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            ClassAnalyzed::class => 'onClassAnalyzed'
+            ClassAnalyzed::class => 'onClassAnalyzed',
         ];
     }
 

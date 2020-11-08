@@ -55,7 +55,7 @@ class ArchRuleGivenClasses
             public static function getSubscribedEvents()
             {
                 return [
-                    ClassAnalyzed::class => 'onClassAnalyzed'
+                    ClassAnalyzed::class => 'onClassAnalyzed',
                 ];
             }
 
@@ -80,7 +80,7 @@ class ArchRuleGivenClasses
         return $this->violationsStore;
     }
 
-    public function get(): ArchRuleGivenClasses
+    public function get(): self
     {
         return $this;
     }

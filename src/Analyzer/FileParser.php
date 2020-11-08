@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
 
-use PhpParser\Error;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\ParserFactory;
@@ -19,7 +18,7 @@ class FileParser implements Parser
 
     public function __construct(EventDispatcherInterface $eventDispatcher)
     {
-        $this->parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
+        $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
         $this->fileVisitor = new FileVisitor($eventDispatcher);
         $this->traverser = new NodeTraverser();
 

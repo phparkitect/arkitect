@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace ArkitectTests\unit\Specs;
 
 use Arkitect\Constraints\ArchRuleConstraint;
@@ -22,7 +21,6 @@ use PHPUnit\Framework\TestCase;
 
 class ArchRuleSpecTest extends TestCase
 {
-
     /**
      * @var \Prophecy\Prophecy\ObjectProphecy
      */

@@ -28,28 +28,28 @@ class ArchRuleConstraint
         return $this->parent;
     }
 
-    public function implement(string $interface): ArchRuleConstraint
+    public function implement(string $interface): self
     {
         $this->constraintsStore->add(new ImplementConstraint($interface));
 
         return $this;
     }
 
-    public function notHaveDependencyOutsideNamespace(string $namespace): ArchRuleConstraint
+    public function notHaveDependencyOutsideNamespace(string $namespace): self
     {
         $this->constraintsStore->add(new NotHaveDependencyOutsideNamespace($namespace));
 
         return $this;
     }
 
-    public function dependOnClassesInNamespace($namespace): ArchRuleConstraint
+    public function dependOnClassesInNamespace($namespace): self
     {
         $this->constraintsStore->add(new DependsOnClassesInNamespaceConstraint($namespace));
 
         return $this;
     }
 
-    public function haveNameMatching(string $name): ArchRuleConstraint
+    public function haveNameMatching(string $name): self
     {
         $this->constraintsStore->add(new HaveNameMatching($name));
 

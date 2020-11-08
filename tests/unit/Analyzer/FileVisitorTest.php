@@ -10,28 +10,28 @@ use PHPUnit\Framework\TestCase;
 
 class FileVisitorTest extends TestCase
 {
-    public function test_should_create_a_class_description()
+    public function test_should_create_a_class_description(): void
     {
         $ed = new EventDispatcherSpy();
 
         $fp = new FileParser($ed);
 
         $code = <<< 'EOF'
-<?php
+            <?php
 
-namespace Root\Namespace1;
+            namespace Root\Namespace1;
 
-use Root\Namespace2\D;
+            use Root\Namespace2\D;
 
-class Dog implements AnInterface, InterfaceTwo
-{   
-} 
+            class Dog implements AnInterface, InterfaceTwo
+            {   
+            } 
 
-class Cat implements AnInterface
-{
+            class Cat implements AnInterface
+            {
 
-}
-EOF;
+            }
+            EOF;
 
         $fp->parse(new FakeFile('my/file/path', $code));
 

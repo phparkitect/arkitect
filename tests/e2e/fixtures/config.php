@@ -5,7 +5,7 @@ use Arkitect\ClassSet;
 use Arkitect\Rules\ArchRule;
 
 return static function (Arkitect\RuleChecker $ruleChecker): void {
-    $mvc_class_set = ClassSet::fromDir(__DIR__ . '/mvc');
+    $mvc_class_set = ClassSet::fromDir(__DIR__.'/mvc');
 
     $controllers_should_implement_container_aware_interface = ArchRule::classes()
         ->that()
@@ -26,8 +26,7 @@ return static function (Arkitect\RuleChecker $ruleChecker): void {
             $controllers_should_have_name_ending_with_controller
         );
 
-
-    $happy_island_class_set = ClassSet::fromDir(__DIR__ . '/happy_island');
+    $happy_island_class_set = ClassSet::fromDir(__DIR__.'/happy_island');
 
     $a_naming_rule = ArchRule::classes()
         ->that()
