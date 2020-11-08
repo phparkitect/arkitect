@@ -19,20 +19,23 @@ class ArchRuleGivenClasses
     private $constraintsStore;
 
     private $violationsStore;
-    private $ruleSpec;
 
     public function __construct()
     {
         $this->specsStore = new SpecsStore();
         $this->constraintsStore = new ConstraintsStore();
         $this->violationsStore = new Violations();
-        $this->ruleSpec = new ArchRuleSpec($this, $this->specsStore, $this->constraintsStore);
     }
 
     public function that(BaseSpec $spec): self
     {
         $this->specsStore->add($spec);
         return $this;
+    }
+
+    public function andThat(BaseSpec $spec): self
+    {
+        return $this->that($spec);
     }
 
     public function should(): ArchRuleConstraint
