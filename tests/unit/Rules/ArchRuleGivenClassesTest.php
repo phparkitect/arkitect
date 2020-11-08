@@ -24,11 +24,6 @@ class ArchRuleGivenClassesTest extends TestCase
         $this->archRuleGivenClass = new ArchRuleGivenClasses();
     }
 
-    public function test_it_should_return_arch_rule_spec_when_that_is_called(): void
-    {
-        $this->assertInstanceOf(ArchRuleSpec::class, $this->archRuleGivenClass->that());
-    }
-
     public function test_it_should_return_arch_rule_constraint_when_that_is_should(): void
     {
         $this->assertInstanceOf(ArchRuleConstraint::class, $this->archRuleGivenClass->should());

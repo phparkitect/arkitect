@@ -6,6 +6,7 @@ namespace e2e;
 use Arkitect\ClassSet;
 use Arkitect\PHPUnit\ArchRuleTestCase;
 use Arkitect\Rules\Rule;
+use Arkitect\Specs\ResideInNamespaceSpec;
 use PHPUnit\Framework\TestCase;
 
 class CheckClassDependencyTest extends TestCase
@@ -15,8 +16,7 @@ class CheckClassDependencyTest extends TestCase
         $set = ClassSet::fromDir(__DIR__.'/fixtures/happy_island');
 
         $rule = Rule::classes()
-            ->that()
-            ->resideInNamespace('App\HappyIsland')
+            ->that(new ResideInNamespaceSpec('App\HappyIsland'))
             ->should()
             ->haveNameMatching('Happy*')
             ->get();

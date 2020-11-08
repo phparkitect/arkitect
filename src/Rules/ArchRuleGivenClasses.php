@@ -8,6 +8,7 @@ use Arkitect\ClassSet;
 use Arkitect\Constraints\ArchRuleConstraint;
 use Arkitect\Constraints\ConstraintsStore;
 use Arkitect\Specs\ArchRuleSpec;
+use Arkitect\Specs\BaseSpec;
 use Arkitect\Specs\SpecsStore;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -18,17 +19,20 @@ class ArchRuleGivenClasses
     private $constraintsStore;
 
     private $violationsStore;
+    private $ruleSpec;
 
     public function __construct()
     {
         $this->specsStore = new SpecsStore();
         $this->constraintsStore = new ConstraintsStore();
         $this->violationsStore = new Violations();
+        $this->ruleSpec = new ArchRuleSpec($this, $this->specsStore, $this->constraintsStore);
     }
 
-    public function that(): ArchRuleSpec
+    public function that(BaseSpec $spec): self
     {
-        return new ArchRuleSpec($this, $this->specsStore, $this->constraintsStore);
+        $this->specsStore->add($spec);
+        return $this;
     }
 
     public function should(): ArchRuleConstraint
