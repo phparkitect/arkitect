@@ -26,16 +26,16 @@ class ArchRuleGivenClasses
         $this->violationsStore = new Violations();
     }
 
-    public function that(BaseSpec $spec): self
+    public function that(Constraint $constraint): self
     {
-        $this->specsStore->add($spec);
+        $this->specsStore->add($constraint);
 
         return $this;
     }
 
-    public function andThat(BaseSpec $spec): self
+    public function andThat(Constraint $constraint): self
     {
-        return $this->that($spec);
+        return $this->that($constraint);
     }
 
     public function should(Constraint $constraint): self

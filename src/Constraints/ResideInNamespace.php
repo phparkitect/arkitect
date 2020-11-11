@@ -5,7 +5,7 @@ namespace Arkitect\Constraints;
 
 use Arkitect\Analyzer\ClassDescription;
 
-class DependsOnClassesInNamespaceConstraint implements Constraint
+class ResideInNamespace implements Constraint
 {
     /**
      * @var string
@@ -19,11 +19,12 @@ class DependsOnClassesInNamespaceConstraint implements Constraint
 
     public function getViolationError(ClassDescription $classDescription): string
     {
-        return "{$classDescription->getFQCN()} do not depends on classes in namespace {$this->namespace}";
+        return "{$classDescription->getFQCN()} does not reside in namespace {$this->namespace}";
     }
 
     public function isViolatedBy(ClassDescription $theClass): bool
     {
-        return !$theClass->dependsOn($this->namespace);
+        return ! $theClass->isInNamespace($this->namespace);
     }
+
 }

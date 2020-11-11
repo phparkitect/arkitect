@@ -6,7 +6,7 @@ namespace ArkitectTests\unit\Costraints;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
-use Arkitect\Constraints\ImplementConstraint;
+use Arkitect\Constraints\Implement;
 use PHPUnit\Framework\TestCase;
 
 class ImplementConstraintTest extends TestCase
@@ -15,7 +15,7 @@ class ImplementConstraintTest extends TestCase
     {
         $interface = 'interface';
 
-        $implementConstraint = new ImplementConstraint($interface);
+        $implementConstraint = new Implement($interface);
         $classDescription = new ClassDescription(
             'full/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
@@ -32,7 +32,7 @@ class ImplementConstraintTest extends TestCase
     {
         $interface = 'interface';
 
-        $implementConstraint = new ImplementConstraint($interface);
+        $implementConstraint = new Implement($interface);
         $classDescription = new ClassDescription(
             'full/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
@@ -47,7 +47,7 @@ class ImplementConstraintTest extends TestCase
     {
         $interface = 'interface';
 
-        $implementConstraint = new ImplementConstraint($interface);
+        $implementConstraint = new Implement($interface);
         $classDescription = new ClassDescription(
             'full/path',
             FullyQualifiedClassName::fromString('HappyIsland'),

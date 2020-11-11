@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace ArkitectTests\unit\Specs;
+namespace ArkitectTests\unit\Costraints;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
-use Arkitect\Specs\ResideInNamespaceSpec;
+use Arkitect\Constraints\ResideInNamespace;
 use PHPUnit\Framework\TestCase;
 
-class ResideInNamespaceSpecTest extends TestCase
+class ResideInNamespaceTest extends TestCase
 {
     public function test_it_should_return_false_if_not_reside_in_namespace(): void
     {
-        $haveNameMatching = new ResideInNamespaceSpec('MyNamespace');
+        $haveNameMatching = new ResideInNamespace('MyNamespace');
 
         $classDescription = new ClassDescription(
             '/path',
@@ -22,12 +22,12 @@ class ResideInNamespaceSpecTest extends TestCase
             []
         );
 
-        $this->assertFalse($haveNameMatching->apply($classDescription));
+        $this->assertTrue($haveNameMatching->isViolatedBy($classDescription));
     }
 
     public function test_it_should_return_true_if_reside_in_namespace(): void
     {
-        $haveNameMatching = new ResideInNamespaceSpec('MyNamespace');
+        $haveNameMatching = new ResideInNamespace('MyNamespace');
 
         $classDescription = new ClassDescription(
             '/path',
@@ -36,6 +36,6 @@ class ResideInNamespaceSpecTest extends TestCase
             []
         );
 
-        $this->assertTrue($haveNameMatching->apply($classDescription));
+        $this->assertFalse($haveNameMatching->isViolatedBy($classDescription));
     }
 }
