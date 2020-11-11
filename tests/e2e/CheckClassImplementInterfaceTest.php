@@ -5,9 +5,9 @@ namespace ArkitectTests;
 
 use Arkitect\ClassSet;
 use Arkitect\Constraints\Implement;
+use Arkitect\Constraints\ResideInNamespace;
 use Arkitect\PHPUnit\ArchRuleTestCase;
 use Arkitect\Rules\Rule;
-use Arkitect\Constraints\ResideInNamespace;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 

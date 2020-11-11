@@ -8,7 +8,6 @@ use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Constraints\HaveNameMatching;
-use Arkitect\Specs\DependOnClassSpec;
 use Arkitect\Specs\SpecsStore;
 use PHPUnit\Framework\TestCase;
 

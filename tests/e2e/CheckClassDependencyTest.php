@@ -5,9 +5,9 @@ namespace e2e;
 
 use Arkitect\ClassSet;
 use Arkitect\Constraints\HaveNameMatching;
+use Arkitect\Constraints\ResideInNamespace;
 use Arkitect\PHPUnit\ArchRuleTestCase;
 use Arkitect\Rules\Rule;
-use Arkitect\Constraints\ResideInNamespace;
 use PHPUnit\Framework\TestCase;
 
 class CheckClassDependencyTest extends TestCase

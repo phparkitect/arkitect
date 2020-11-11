@@ -24,7 +24,6 @@ class ResideInNamespace implements Constraint
 
     public function isViolatedBy(ClassDescription $theClass): bool
     {
-        return ! $theClass->isInNamespace($this->namespace);
+        return !$theClass->isInNamespace($this->namespace);
     }
-
 }

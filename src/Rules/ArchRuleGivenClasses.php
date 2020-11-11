@@ -7,7 +7,6 @@ use Arkitect\Analyzer\Events\ClassAnalyzed;
 use Arkitect\ClassSet;
 use Arkitect\Constraints\Constraint;
 use Arkitect\Constraints\ConstraintsStore;
-use Arkitect\Specs\BaseSpec;
 use Arkitect\Specs\SpecsStore;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
