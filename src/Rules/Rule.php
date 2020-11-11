@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Rules;
 
-class ArchRule
+class Rule
 {
     public static function classes(): ArchRuleGivenClasses
     {

@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace e2e;
 
 use Arkitect\ClassSet;
+use Arkitect\Constraints\HaveNameMatching;
 use Arkitect\PHPUnit\ArchRuleTestCase;
-use Arkitect\Rules\ArchRule;
+use Arkitect\Rules\Rule;
+use Arkitect\Specs\ResideInNamespaceSpec;
 use PHPUnit\Framework\TestCase;
 
 class CheckClassDependencyTest extends TestCase
@@ -14,12 +16,9 @@ class CheckClassDependencyTest extends TestCase
     {
         $set = ClassSet::fromDir(__DIR__.'/fixtures/happy_island');
 
-        $rule = ArchRule::classes()
-            ->that()
-            ->resideInNamespace('App\HappyIsland')
-            ->should()
-            ->haveNameMatching('Happy*')
-            ->get();
+        $rule = Rule::classes()
+            ->that(new ResideInNamespaceSpec('App\HappyIsland'))
+            ->should(new HaveNameMatching('Happy*'));
 
         ArchRuleTestCase::assertArchRule($rule, $set);
     }

@@ -5,9 +5,9 @@ namespace Arkitect\Rules;
 
 use Arkitect\Analyzer\Events\ClassAnalyzed;
 use Arkitect\ClassSet;
-use Arkitect\Constraints\ArchRuleConstraint;
+use Arkitect\Constraints\Constraint;
 use Arkitect\Constraints\ConstraintsStore;
-use Arkitect\Specs\ArchRuleSpec;
+use Arkitect\Specs\BaseSpec;
 use Arkitect\Specs\SpecsStore;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -26,14 +26,23 @@ class ArchRuleGivenClasses
         $this->violationsStore = new Violations();
     }
 
-    public function that(): ArchRuleSpec
+    public function that(BaseSpec $spec): self
     {
-        return new ArchRuleSpec($this, $this->specsStore, $this->constraintsStore);
+        $this->specsStore->add($spec);
+
+        return $this;
     }
 
-    public function should(): ArchRuleConstraint
+    public function andThat(BaseSpec $spec): self
     {
-        return new ArchRuleConstraint($this, $this->constraintsStore);
+        return $this->that($spec);
+    }
+
+    public function should(Constraint $constraint): self
+    {
+        $this->constraintsStore->add($constraint);
+
+        return $this;
     }
 
     public function check(ClassSet $set): void
@@ -78,10 +87,5 @@ class ArchRuleGivenClasses
     public function getViolations(): Violations
     {
         return $this->violationsStore;
-    }
-
-    public function get(): self
-    {
-        return $this;
     }
 }

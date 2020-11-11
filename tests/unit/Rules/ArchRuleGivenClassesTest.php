@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace ArkitectTests\unit\Rules;
 
 use Arkitect\ClassSet;
-use Arkitect\Constraints\ArchRuleConstraint;
 use Arkitect\Rules\ArchRuleGivenClasses;
 use Arkitect\Rules\Violations;
-use Arkitect\Specs\ArchRuleSpec;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 
@@ -22,16 +20,6 @@ class ArchRuleGivenClassesTest extends TestCase
     public function setUp(): void
     {
         $this->archRuleGivenClass = new ArchRuleGivenClasses();
-    }
-
-    public function test_it_should_return_arch_rule_spec_when_that_is_called(): void
-    {
-        $this->assertInstanceOf(ArchRuleSpec::class, $this->archRuleGivenClass->that());
-    }
-
-    public function test_it_should_return_arch_rule_constraint_when_that_is_should(): void
-    {
-        $this->assertInstanceOf(ArchRuleConstraint::class, $this->archRuleGivenClass->should());
     }
 
     public function test_it_should_add_subscriber(): void
@@ -50,6 +38,6 @@ class ArchRuleGivenClassesTest extends TestCase
 
     public function test_it_should_return_self(): void
     {
-        $this->assertEquals($this->archRuleGivenClass, $this->archRuleGivenClass->get());
+        $this->assertEquals($this->archRuleGivenClass, $this->archRuleGivenClass);
     }
 }
