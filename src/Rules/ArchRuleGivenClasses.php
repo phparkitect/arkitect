@@ -5,8 +5,8 @@ namespace Arkitect\Rules;
 
 use Arkitect\Analyzer\Events\ClassAnalyzed;
 use Arkitect\ClassSet;
-use Arkitect\Expression\ConstraintsStore;
 use Arkitect\Expression\Expression;
+use Arkitect\Expression\ExpressionsStore;
 use Arkitect\Specs\SpecsStore;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -21,7 +21,7 @@ class ArchRuleGivenClasses
     public function __construct()
     {
         $this->specsStore = new SpecsStore();
-        $this->constraintsStore = new ConstraintsStore();
+        $this->expressionsStore = new ExpressionsStore();
         $this->violationsStore = new Violations();
     }
 
@@ -39,24 +39,24 @@ class ArchRuleGivenClasses
 
     public function should(Expression $expression): self
     {
-        $this->constraintsStore->add($expression);
+        $this->expressionsStore->add($expression);
 
         return $this;
     }
 
     public function check(ClassSet $set): void
     {
-        $checkSub = new class($this->specsStore, $this->constraintsStore, $this->violationsStore) implements EventSubscriberInterface {
+        $checkSub = new class($this->specsStore, $this->expressionsStore, $this->violationsStore) implements EventSubscriberInterface {
             private $specsStore;
 
             private $expressionsStore;
 
             private $violationsStore;
 
-            public function __construct(SpecsStore $specStore, ConstraintsStore $expressionsStore, Violations $violationsStore)
+            public function __construct(SpecsStore $specStore, ExpressionsStore $expressionsStore, Violations $violationsStore)
             {
                 $this->specsStore = $specStore;
-                $this->constraintsStore = $expressionsStore;
+                $this->expressionsStore = $expressionsStore;
                 $this->violationsStore = $violationsStore;
             }
 
@@ -75,7 +75,7 @@ class ArchRuleGivenClasses
                     return;
                 }
 
-                $this->constraintsStore->checkAll($classDescription, $this->violationsStore);
+                $this->expressionsStore->checkAll($classDescription, $this->violationsStore);
             }
         };
 

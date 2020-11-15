@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ArkitectTests\unit\Costraints;
+namespace ArkitectTests\unit\Expressions;
 
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
@@ -10,7 +10,7 @@ use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\DependsOnClassesInNamespace;
 use PHPUnit\Framework\TestCase;
 
-class DependsOnClassesInNamespaceConstraintTest extends TestCase
+class DependsOnClassesInNamespaceTest extends TestCase
 {
     public function test_it_should_return_violation_error(): void
     {

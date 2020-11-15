@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace ArkitectTests\unit\Costraints;
+namespace ArkitectTests\unit\Expressions;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\HaveNameMatching;

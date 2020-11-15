@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace ArkitectTests\unit\Costraints;
+namespace ArkitectTests\unit\Expressions;
 
 use Arkitect\Analyzer\ClassDescription;
-use Arkitect\Expression\ConstraintsStore;
+use Arkitect\Expression\ExpressionsStore;
 use Arkitect\Expression\HaveNameMatching;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
@@ -16,7 +16,7 @@ class ConstraintStoreTest extends TestCase
     {
         $expression = $this->prophesize(HaveNameMatching::class);
 
-        $expressionStore = new ConstraintsStore();
+        $expressionStore = new ExpressionsStore();
         $expressionStore->add($expression->reveal());
 
         $classDescription = $this->prophesize(ClassDescription::class);
@@ -31,7 +31,7 @@ class ConstraintStoreTest extends TestCase
     {
         $expression = $this->prophesize(HaveNameMatching::class);
 
-        $expressionStore = new ConstraintsStore();
+        $expressionStore = new ExpressionsStore();
         $expressionStore->add($expression->reveal());
 
         $classDescription = $this->prophesize(ClassDescription::class);
