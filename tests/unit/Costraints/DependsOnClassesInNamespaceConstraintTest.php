@@ -7,7 +7,7 @@ namespace ArkitectTests\unit\Costraints;
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
-use Arkitect\Constraints\DependsOnClassesInNamespace;
+use Arkitect\Expression\DependsOnClassesInNamespace;
 use PHPUnit\Framework\TestCase;
 
 class DependsOnClassesInNamespaceConstraintTest extends TestCase

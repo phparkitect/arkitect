@@ -7,7 +7,7 @@ namespace ArkitectTests\unit\Specs;
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
-use Arkitect\Constraints\HaveNameMatching;
+use Arkitect\Expression\HaveNameMatching;
 use Arkitect\Specs\SpecsStore;
 use PHPUnit\Framework\TestCase;
 

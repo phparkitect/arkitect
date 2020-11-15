@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace ArkitectTests;
 
 use Arkitect\ClassSet;
-use Arkitect\Constraints\Implement;
-use Arkitect\Constraints\ResideInNamespace;
+use Arkitect\Expression\Implement;
+use Arkitect\Expression\ResideInNamespace;
 use Arkitect\PHPUnit\ArchRuleTestCase;
 use Arkitect\Rules\Rule;
 use PHPUnit\Framework\ExpectationFailedException;

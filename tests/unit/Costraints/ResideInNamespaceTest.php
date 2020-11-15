@@ -6,7 +6,7 @@ namespace ArkitectTests\unit\Costraints;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
-use Arkitect\Constraints\ResideInNamespace;
+use Arkitect\Expression\ResideInNamespace;
 use PHPUnit\Framework\TestCase;
 
 class ResideInNamespaceTest extends TestCase

@@ -5,8 +5,8 @@ namespace Arkitect\Rules;
 
 use Arkitect\Analyzer\Events\ClassAnalyzed;
 use Arkitect\ClassSet;
-use Arkitect\Constraints\Constraint;
-use Arkitect\Constraints\ConstraintsStore;
+use Arkitect\Expression\Expression;
+use Arkitect\Expression\ConstraintsStore;
 use Arkitect\Specs\SpecsStore;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -14,7 +14,7 @@ class ArchRuleGivenClasses
 {
     private $specsStore;
 
-    private $constraintsStore;
+    private $expressionsStore;
 
     private $violationsStore;
 
@@ -25,21 +25,21 @@ class ArchRuleGivenClasses
         $this->violationsStore = new Violations();
     }
 
-    public function that(Constraint $constraint): self
+    public function that(Expression $expression): self
     {
-        $this->specsStore->add($constraint);
+        $this->specsStore->add($expression);
 
         return $this;
     }
 
-    public function andThat(Constraint $constraint): self
+    public function andThat(Expression $expression): self
     {
-        return $this->that($constraint);
+        return $this->that($expression);
     }
 
-    public function should(Constraint $constraint): self
+    public function should(Expression $expression): self
     {
-        $this->constraintsStore->add($constraint);
+        $this->constraintsStore->add($expression);
 
         return $this;
     }
@@ -49,14 +49,14 @@ class ArchRuleGivenClasses
         $checkSub = new class($this->specsStore, $this->constraintsStore, $this->violationsStore) implements EventSubscriberInterface {
             private $specsStore;
 
-            private $constraintsStore;
+            private $expressionsStore;
 
             private $violationsStore;
 
-            public function __construct(SpecsStore $specStore, ConstraintsStore $constraintsStore, Violations $violationsStore)
+            public function __construct(SpecsStore $specStore, ConstraintsStore $expressionsStore, Violations $violationsStore)
             {
                 $this->specsStore = $specStore;
-                $this->constraintsStore = $constraintsStore;
+                $this->constraintsStore = $expressionsStore;
                 $this->violationsStore = $violationsStore;
             }
 

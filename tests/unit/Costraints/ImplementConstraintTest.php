@@ -6,7 +6,7 @@ namespace ArkitectTests\unit\Costraints;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
-use Arkitect\Constraints\Implement;
+use Arkitect\Expression\Implement;
 use PHPUnit\Framework\TestCase;
 
 class ImplementConstraintTest extends TestCase

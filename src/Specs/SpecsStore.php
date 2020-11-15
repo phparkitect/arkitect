@@ -4,20 +4,20 @@ declare(strict_types=1);
 namespace Arkitect\Specs;
 
 use Arkitect\Analyzer\ClassDescription;
-use Arkitect\Constraints\Constraint;
+use Arkitect\Expression\Expression;
 
 class SpecsStore
 {
     private $specs = [];
 
-    public function add(Constraint $spec): void
+    public function add(Expression $spec): void
     {
         $this->specs[] = $spec;
     }
 
     public function allSpecsAreMatchedBy(ClassDescription $classDescription): bool
     {
-        /** @var Constraint $spec */
+        /** @var Expression $spec */
         foreach ($this->specs as $spec) {
             if ($spec->isViolatedBy($classDescription)) {
                 return false;
