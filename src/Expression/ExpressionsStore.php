@@ -10,9 +10,9 @@ class ExpressionsStore
 {
     private $expressions = [];
 
-    public function add(Expression $expressions): void
+    public function add(Expression $expression): void
     {
-        $this->expressions[] = $expressions;
+        $this->expressions[] = $expression;
     }
 
     public function checkAll(ClassDescription $classDescription, Violations $violationsStore): void
