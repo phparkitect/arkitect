@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ArkitectTests\unit\Costraints;
+namespace ArkitectTests\unit\Expressions;
 
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
-use Arkitect\Constraints\NotHaveDependencyOutsideNamespace;
+use Arkitect\Expression\NotHaveDependencyOutsideNamespace;
 use PHPUnit\Framework\TestCase;
 
 class NotHaveDependencyOutsideNamespaceTest extends TestCase

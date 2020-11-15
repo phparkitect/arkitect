@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Arkitect\Constraints;
+namespace Arkitect\Expression;
 
 use Arkitect\Analyzer\ClassDescription;
 
-interface Constraint
+interface Expression
 {
     public function getViolationError(ClassDescription $classDescription): string;
 

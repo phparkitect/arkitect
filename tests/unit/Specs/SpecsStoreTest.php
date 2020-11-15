@@ -7,7 +7,7 @@ namespace ArkitectTests\unit\Specs;
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
-use Arkitect\Specs\DependOnClassSpec;
+use Arkitect\Expression\HaveNameMatching;
 use Arkitect\Specs\SpecsStore;
 use PHPUnit\Framework\TestCase;
 
@@ -17,7 +17,7 @@ class SpecsStoreTest extends TestCase
     {
         $specStore = new SpecsStore();
         $specStore->add(
-            new DependOnClassSpec('Foo')
+            new HaveNameMatching('Foo')
         );
 
         $classDescription = new ClassDescription(
@@ -34,7 +34,7 @@ class SpecsStoreTest extends TestCase
     {
         $specStore = new SpecsStore();
         $specStore->add(
-            new DependOnClassSpec('Foo')
+            new HaveNameMatching('Happy*')
         );
 
         $classDescription = new ClassDescription(

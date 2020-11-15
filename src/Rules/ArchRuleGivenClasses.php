@@ -5,9 +5,8 @@ namespace Arkitect\Rules;
 
 use Arkitect\Analyzer\Events\ClassAnalyzed;
 use Arkitect\ClassSet;
-use Arkitect\Constraints\Constraint;
-use Arkitect\Constraints\ConstraintsStore;
-use Arkitect\Specs\BaseSpec;
+use Arkitect\Expression\Expression;
+use Arkitect\Expression\ExpressionsStore;
 use Arkitect\Specs\SpecsStore;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -15,49 +14,49 @@ class ArchRuleGivenClasses
 {
     private $specsStore;
 
-    private $constraintsStore;
+    private $expressionsStore;
 
     private $violationsStore;
 
     public function __construct()
     {
         $this->specsStore = new SpecsStore();
-        $this->constraintsStore = new ConstraintsStore();
+        $this->expressionsStore = new ExpressionsStore();
         $this->violationsStore = new Violations();
     }
 
-    public function that(BaseSpec $spec): self
+    public function that(Expression $expression): self
     {
-        $this->specsStore->add($spec);
+        $this->specsStore->add($expression);
 
         return $this;
     }
 
-    public function andThat(BaseSpec $spec): self
+    public function andThat(Expression $expression): self
     {
-        return $this->that($spec);
+        return $this->that($expression);
     }
 
-    public function should(Constraint $constraint): self
+    public function should(Expression $expression): self
     {
-        $this->constraintsStore->add($constraint);
+        $this->expressionsStore->add($expression);
 
         return $this;
     }
 
     public function check(ClassSet $set): void
     {
-        $checkSub = new class($this->specsStore, $this->constraintsStore, $this->violationsStore) implements EventSubscriberInterface {
+        $checkSub = new class($this->specsStore, $this->expressionsStore, $this->violationsStore) implements EventSubscriberInterface {
             private $specsStore;
 
-            private $constraintsStore;
+            private $expressionsStore;
 
             private $violationsStore;
 
-            public function __construct(SpecsStore $specStore, ConstraintsStore $constraintsStore, Violations $violationsStore)
+            public function __construct(SpecsStore $specStore, ExpressionsStore $expressionsStore, Violations $violationsStore)
             {
                 $this->specsStore = $specStore;
-                $this->constraintsStore = $constraintsStore;
+                $this->expressionsStore = $expressionsStore;
                 $this->violationsStore = $violationsStore;
             }
 
@@ -76,7 +75,7 @@ class ArchRuleGivenClasses
                     return;
                 }
 
-                $this->constraintsStore->checkAll($classDescription, $this->violationsStore);
+                $this->expressionsStore->checkAll($classDescription, $this->violationsStore);
             }
         };
 

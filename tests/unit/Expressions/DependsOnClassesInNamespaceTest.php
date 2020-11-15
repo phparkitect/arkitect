@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace ArkitectTests\unit\Costraints;
+namespace ArkitectTests\unit\Expressions;
 
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
-use Arkitect\Constraints\DependsOnClassesInNamespaceConstraint;
+use Arkitect\Expression\DependsOnClassesInNamespace;
 use PHPUnit\Framework\TestCase;
 
-class DependsOnClassesInNamespaceConstraintTest extends TestCase
+class DependsOnClassesInNamespaceTest extends TestCase
 {
     public function test_it_should_return_violation_error(): void
     {
         $namespace = 'myNamespace';
-        $dependOnClasses = new DependsOnClassesInNamespaceConstraint($namespace);
+        $dependOnClasses = new DependsOnClassesInNamespace($namespace);
         $classDescription = new ClassDescription(
             'full/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
@@ -30,7 +30,7 @@ class DependsOnClassesInNamespaceConstraintTest extends TestCase
 
     public function test_it_should_return_true_if_not_depends_on_namespace(): void
     {
-        $dependOnClasses = new DependsOnClassesInNamespaceConstraint('myNamespace');
+        $dependOnClasses = new DependsOnClassesInNamespace('myNamespace');
         $classDescription = new ClassDescription(
             'full/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
@@ -43,7 +43,7 @@ class DependsOnClassesInNamespaceConstraintTest extends TestCase
 
     public function test_it_should_return_false_if_depends_on_namespace(): void
     {
-        $dependOnClasses = new DependsOnClassesInNamespaceConstraint('myNamespace');
+        $dependOnClasses = new DependsOnClassesInNamespace('myNamespace');
         $classDescription = new ClassDescription(
             'full/path',
             FullyQualifiedClassName::fromString('HappyIsland'),

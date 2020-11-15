@@ -1,12 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Arkitect\Constraints;
+namespace Arkitect\Expression;
 
 use Arkitect\Analyzer\ClassDescription;
 
-class NotHaveDependencyOutsideNamespace implements Constraint
+class DependsOnClassesInNamespace implements Expression
 {
+    /**
+     * @var string
+     */
     private $namespace;
 
     public function __construct(string $namespace)
@@ -16,11 +19,11 @@ class NotHaveDependencyOutsideNamespace implements Constraint
 
     public function getViolationError(ClassDescription $classDescription): string
     {
-        return "{$classDescription->getFQCN()} depends on classes outside in namespace {$this->namespace}";
+        return "{$classDescription->getFQCN()} do not depends on classes in namespace {$this->namespace}";
     }
 
     public function isViolatedBy(ClassDescription $theClass): bool
     {
-        return !$theClass->dependsOnly($this->namespace);
+        return !$theClass->dependsOn($this->namespace);
     }
 }

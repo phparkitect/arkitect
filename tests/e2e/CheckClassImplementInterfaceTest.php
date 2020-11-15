@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace ArkitectTests;
 
 use Arkitect\ClassSet;
-use Arkitect\Constraints\ImplementConstraint;
+use Arkitect\Expression\Implement;
+use Arkitect\Expression\ResideInNamespace;
 use Arkitect\PHPUnit\ArchRuleTestCase;
 use Arkitect\Rules\Rule;
-use Arkitect\Specs\ResideInNamespaceSpec;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 
@@ -21,8 +21,8 @@ class CheckClassImplementInterfaceTest extends TestCase
         $set = ClassSet::fromDir(__DIR__.'/fixtures/mvc');
 
         $rule = Rule::classes()
-            ->that(new ResideInNamespaceSpec('App\Controller'))
-            ->should(new ImplementConstraint('ContainerAwareInterface'));
+            ->that(new ResideInNamespace('App\Controller'))
+            ->should(new Implement('ContainerAwareInterface'));
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage("Failed asserting that App\Controller\UserController does not implement ContainerAwareInterface
