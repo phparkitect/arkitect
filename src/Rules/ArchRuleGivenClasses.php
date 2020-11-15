@@ -5,8 +5,8 @@ namespace Arkitect\Rules;
 
 use Arkitect\Analyzer\Events\ClassAnalyzed;
 use Arkitect\ClassSet;
-use Arkitect\Expression\Expression;
 use Arkitect\Expression\ConstraintsStore;
+use Arkitect\Expression\Expression;
 use Arkitect\Specs\SpecsStore;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
