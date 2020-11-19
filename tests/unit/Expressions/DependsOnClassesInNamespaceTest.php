@@ -23,7 +23,7 @@ class DependsOnClassesInNamespaceTest extends TestCase
             []
         );
 
-        $violationError = $dependOnClasses->getViolationError($classDescription);
+        $violationError = $dependOnClasses->describe($classDescription);
 
         $this->assertEquals('HappyIsland do not depends on classes in namespace '.$namespace, $violationError);
     }
@@ -38,7 +38,7 @@ class DependsOnClassesInNamespaceTest extends TestCase
             []
         );
 
-        $this->assertTrue($dependOnClasses->isViolatedBy($classDescription));
+        $this->assertTrue($dependOnClasses->evaluate($classDescription));
     }
 
     public function test_it_should_return_false_if_depends_on_namespace(): void
@@ -51,6 +51,6 @@ class DependsOnClassesInNamespaceTest extends TestCase
             []
         );
 
-        $this->assertFalse($dependOnClasses->isViolatedBy($classDescription));
+        $this->assertFalse($dependOnClasses->evaluate($classDescription));
     }
 }

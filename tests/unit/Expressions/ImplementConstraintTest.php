@@ -23,7 +23,7 @@ class ImplementConstraintTest extends TestCase
             []
         );
 
-        $violationError = $implementConstraint->getViolationError($classDescription);
+        $violationError = $implementConstraint->describe($classDescription);
 
         $this->assertEquals('HappyIsland does not implement '.$interface, $violationError);
     }
@@ -40,7 +40,7 @@ class ImplementConstraintTest extends TestCase
             [FullyQualifiedClassName::fromString('foo')]
         );
 
-        $this->assertTrue($implementConstraint->isViolatedBy($classDescription));
+        $this->assertTrue($implementConstraint->evaluate($classDescription));
     }
 
     public function test_it_should_return_false_if_depends_on_namespace(): void
@@ -55,6 +55,6 @@ class ImplementConstraintTest extends TestCase
             [FullyQualifiedClassName::fromString('interface')]
         );
 
-        $this->assertFalse($implementConstraint->isViolatedBy($classDescription));
+        $this->assertFalse($implementConstraint->evaluate($classDescription));
     }
 }

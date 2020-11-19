@@ -20,7 +20,7 @@ class ConstraintStoreTest extends TestCase
         $expressionStore->add($expression->reveal());
 
         $classDescription = $this->prophesize(ClassDescription::class);
-        $expression->isViolatedBy($classDescription)->willReturn(false);
+        $expression->evaluate($classDescription)->willReturn(false);
 
         $violationStore = $this->prophesize(Violations::class);
         $violationStore->add(Argument::any())->shouldNotBeCalled();
@@ -35,8 +35,8 @@ class ConstraintStoreTest extends TestCase
         $expressionStore->add($expression->reveal());
 
         $classDescription = $this->prophesize(ClassDescription::class);
-        $expression->isViolatedBy($classDescription)->willReturn(true);
-        $expression->getViolationError($classDescription)->willReturn('bar');
+        $expression->evaluate($classDescription)->willReturn(true);
+        $expression->describe($classDescription)->willReturn('bar');
 
         $violationStore = $this->prophesize(Violations::class);
         $violationStore->add(Argument::any())->shouldBeCalled();

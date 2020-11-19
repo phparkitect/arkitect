@@ -17,12 +17,12 @@ class ResideInNamespace implements Expression
         $this->namespace = $namespace;
     }
 
-    public function getViolationError(ClassDescription $classDescription): string
+    public function describe(ClassDescription $classDescription): string
     {
         return "{$classDescription->getFQCN()} does not reside in namespace {$this->namespace}";
     }
 
-    public function isViolatedBy(ClassDescription $theClass): bool
+    public function evaluate(ClassDescription $theClass): bool
     {
         return !$theClass->isInNamespace($this->namespace);
     }
