@@ -7,7 +7,7 @@ use Arkitect\Analyzer\ClassDescription;
 
 interface Expression
 {
-    public function getViolationError(ClassDescription $classDescription): string;
+    public function describe(ClassDescription $classDescription): string;
 
-    public function isViolatedBy(ClassDescription $theClass): bool;
+    public function evaluate(ClassDescription $theClass): bool;
 }

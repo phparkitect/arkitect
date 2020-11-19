@@ -14,12 +14,12 @@ class Implement implements Expression
         $this->interface = $interface;
     }
 
-    public function getViolationError(ClassDescription $classDescription): string
+    public function describe(ClassDescription $classDescription): string
     {
         return "{$classDescription->getFQCN()} does not implement {$this->interface}";
     }
 
-    public function isViolatedBy(ClassDescription $theClass): bool
+    public function evaluate(ClassDescription $theClass): bool
     {
         return !$theClass->implements($this->interface);
     }

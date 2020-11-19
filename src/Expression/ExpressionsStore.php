@@ -19,8 +19,8 @@ class ExpressionsStore
     {
         /** @var Expression $expression */
         foreach ($this->expressions as $expression) {
-            if ($expression->isViolatedBy($classDescription)) {
-                $violationsStore->add($expression->getViolationError($classDescription));
+            if ($expression->evaluate($classDescription)) {
+                $violationsStore->add($expression->describe($classDescription));
             }
         }
     }

@@ -22,7 +22,7 @@ class ResideInNamespaceTest extends TestCase
             []
         );
 
-        $this->assertTrue($haveNameMatching->isViolatedBy($classDescription));
+        $this->assertTrue($haveNameMatching->evaluate($classDescription));
     }
 
     public function test_it_should_return_true_if_reside_in_namespace(): void
@@ -36,6 +36,6 @@ class ResideInNamespaceTest extends TestCase
             []
         );
 
-        $this->assertFalse($haveNameMatching->isViolatedBy($classDescription));
+        $this->assertFalse($haveNameMatching->evaluate($classDescription));
     }
 }
