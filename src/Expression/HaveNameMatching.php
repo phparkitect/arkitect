@@ -17,12 +17,12 @@ class HaveNameMatching implements Expression
         $this->name = $name;
     }
 
-    public function getViolationError(ClassDescription $classDescription): string
+    public function describe(ClassDescription $classDescription): string
     {
         return "{$classDescription->getFQCN()} has a name that doesn't match {$this->name}";
     }
 
-    public function isViolatedBy(ClassDescription $theClass): bool
+    public function evaluate(ClassDescription $theClass): bool
     {
         return !$theClass->nameMatches($this->name);
     }

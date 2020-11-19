@@ -14,7 +14,7 @@ class HaveNameMatchingTest extends TestCase
         $expression = new HaveNameMatching('**Class');
 
         $goodClass = ClassDescription::build('\App\MyClass', 'App')->get();
-        $this->assertFalse($expression->isViolatedBy($goodClass));
+        $this->assertFalse($expression->evaluate($goodClass));
     }
 
     public function test_show_violation_when_class_name_does_not_match(): void
@@ -22,7 +22,7 @@ class HaveNameMatchingTest extends TestCase
         $expression = new HaveNameMatching('**GoodName**');
 
         $badClass = ClassDescription::build('\App\BadNameClass', 'App')->get();
-        $this->assertTrue($expression->isViolatedBy($badClass));
-        $this->assertEquals('\App\BadNameClass has a name that doesn\'t match **GoodName**', $expression->getViolationError($badClass));
+        $this->assertTrue($expression->evaluate($badClass));
+        $this->assertEquals('\App\BadNameClass has a name that doesn\'t match **GoodName**', $expression->describe($badClass));
     }
 }
