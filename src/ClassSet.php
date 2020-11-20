@@ -13,8 +13,11 @@ use Symfony\Component\Finder\Finder;
 
 class ClassSet
 {
+    /** @var \Iterator */
     private $fileIterator;
+    /** @var EventDispatcherInterface */
     private $dispatcher;
+    /** @var Parser */
     private $parser;
 
     private function __construct(\Iterator $fileIterator, EventDispatcherInterface $dispatcher, Parser $parser)
@@ -30,6 +33,7 @@ class ClassSet
             ->files()
             ->in($directory)
             ->name('*.php')
+            ->sortByName()
             ->followLinks()
             ->ignoreUnreadableDirs(true)
             ->ignoreVCS(true);
@@ -53,7 +57,7 @@ class ClassSet
         }
     }
 
-    public function addSubScriber(EventSubscriberInterface $subscriber): void
+    public function addSubscriber(EventSubscriberInterface $subscriber): void
     {
         $this->dispatcher->addSubscriber($subscriber);
     }

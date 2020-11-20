@@ -18,7 +18,7 @@ class ClassSetTest extends TestCase
         $this->markTestSkipped();
         $set = ClassSet::fromDir(__DIR__.'/../e2e/fixtures/happy_island');
         $fakeSubscriber = new FakeSubscriber();
-        $set->addSubScriber($fakeSubscriber);
+        $set->addSubscriber($fakeSubscriber);
         $set->run();
         $this->assertEquals([
             new ClassDescription('HappyIsland', FullyQualifiedClassName::fromString('App\HappyIsland\HappyClass'), [], []),
@@ -35,7 +35,7 @@ class ClassSetTest extends TestCase
             ClassDescription::build('Fruit\Apple', 'my/path')->get(),
         ]);
         $fakeSubscriber = new FakeSubscriber();
-        $set->addSubScriber($fakeSubscriber);
+        $set->addSubscriber($fakeSubscriber);
         $set->run();
         $this->assertEquals([
             ClassDescription::build('Fruit\Banana', 'my/path')->get(),
