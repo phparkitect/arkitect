@@ -14,12 +14,12 @@ class NotHaveDependencyOutsideNamespace implements Expression
         $this->namespace = $namespace;
     }
 
-    public function getViolationError(ClassDescription $classDescription): string
+    public function describe(ClassDescription $classDescription): string
     {
         return "{$classDescription->getFQCN()} depends on classes outside in namespace {$this->namespace}";
     }
 
-    public function isViolatedBy(ClassDescription $theClass): bool
+    public function evaluate(ClassDescription $theClass): bool
     {
         return !$theClass->dependsOnly($this->namespace);
     }

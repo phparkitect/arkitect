@@ -23,7 +23,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "ArkitectTests\\": "tests/"
+            "Arkitect\\Tests\\": "tests/"
         }
     },
     "license": "MIT",
