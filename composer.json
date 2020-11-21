@@ -22,7 +22,7 @@
         }
     ],
     "require": {
-        "php": "^7.1|^8",
+        "php": "^7.4|^8",
         "nikic/php-parser": "^4.3",
         "symfony/finder": "^5.0",
         "symfony/event-dispatcher": "^5.0",

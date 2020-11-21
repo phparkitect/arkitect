@@ -30,13 +30,13 @@ jobs:
 
     - name: Install dependencies
       if: steps.composer-cache.outputs.cache-hit != 'true'
-      run: composer install --prefer-dist --no-progress --no-suggest
+      run: composer install --prefer-dist --no-progress
 
     - name: Coding Standard Checks
       run: ./bin/php-cs-fixer fix --dry-run -v
 
     - name: Static Analysis
-      run: ./vendor/bin/psalm
+      run: ./bin/psalm
 
     - name: Test
-      run: vendor/bin/phpunit
+      run: ./bin/phpunit
