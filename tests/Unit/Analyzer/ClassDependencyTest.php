@@ -35,6 +35,6 @@ class ClassDependencyTest extends TestCase
 
     public function test_it_should_not_match(): void
     {
-        $this->assertFalse($this->classDependency->matches('Happy'));
+        $this->assertTrue($this->classDependency->matches('Happy'));
     }
 }

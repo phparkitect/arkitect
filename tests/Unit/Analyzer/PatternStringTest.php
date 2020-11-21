@@ -22,13 +22,6 @@ class PatternStringTest extends TestCase
         $this->assertFalse($pattern->matches('This*'));
     }
 
-    public function test_double_wildcard_accepts_every_character_and_space(): void
-    {
-        $pattern = new PatternString('So This Is An Example');
-        $this->assertTrue($pattern->matches('**This**'));
-        $this->assertFalse($pattern->matches('*This*'));
-    }
-
     public function test_explode(): void
     {
         $pattern = new PatternString('So This Is An Example');

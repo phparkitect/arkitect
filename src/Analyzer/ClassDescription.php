@@ -36,6 +36,9 @@ class ClassDescription
         return $this->FQCN->toString();
     }
 
+    /**
+     * @deprecated usare namespaceMatches il cui comportamento è corretto
+     */
     public function isInNamespace(string $pattern): bool
     {
         return $this->FQCN->namespaceMatches($pattern);
@@ -82,6 +85,11 @@ class ClassDescription
     public function nameMatches(string $pattern): bool
     {
         return $this->FQCN->classMatches($pattern);
+    }
+
+    public function namespaceMatches(string $pattern): bool
+    {
+        return $this->FQCN->matches($pattern);
     }
 
     public function implements(string $pattern): bool
