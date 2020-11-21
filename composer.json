@@ -2,31 +2,6 @@
     "name": "micheleorselli/arkitect",
     "description": "Enforce architectural constraints in your PHP applications",
     "type": "project",
-    "require": {
-        "php": "^7.1|^8",
-        "nikic/php-parser": "^4.3",
-        "symfony/finder": "^5.0",
-        "symfony/event-dispatcher": "^5.0",
-        "symfony/string": "^5.0",
-        "symfony/console": "^5.0",
-        "ocramius/package-versions": "~1.5.0"
-    },
-    "require-dev": {
-        "roave/security-advisories": "dev-master",
-        "phpunit/phpunit": "^8.5",
-        "symfony/var-dumper": "^5.0",
-        "vimeo/psalm": "^3.12"
-    },
-    "autoload": {
-        "psr-4": {
-            "Arkitect\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Arkitect\\Tests\\": "tests/"
-        }
-    },
     "license": "MIT",
     "authors": [
         {
@@ -38,7 +13,33 @@
             "email": "patrick91@live.it"
         }
     ],
-    "bin": [
-        "phparkitect"
-    ]
+    "require": {
+        "php": "^7.1|^8",
+        "nikic/php-parser": "^4.3",
+        "symfony/finder": "^5.0",
+        "symfony/event-dispatcher": "^5.0",
+        "symfony/string": "^5.0",
+        "symfony/console": "^5.0"
+    },
+    "require-dev": {
+        "roave/security-advisories": "dev-master",
+        "phpunit/phpunit": "^8.5",
+        "symfony/var-dumper": "^5.0",
+        "vimeo/psalm": "^3.12",
+        "friendsofphp/php-cs-fixer": "^2.16",
+        "ocramius/package-versions": "~1.5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Arkitect\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Arkitect\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "bin-dir": "bin"
+    }
 }
