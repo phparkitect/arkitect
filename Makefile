@@ -11,7 +11,7 @@ dt: ## lancia i test usando un container
 	docker run --rm -it -v $(PWD):/var/www arkitect_php make test
 
 dbi: ## crea l'immagine docker per lo sviluppo
-	docker image build -t arkitect_php:1.0 .
+	docker image build -t arkitect_php .
 
 shell: ## entra nel container
 	 docker-compose exec php /bin/bash
