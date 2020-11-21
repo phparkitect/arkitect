@@ -10,22 +10,22 @@ dbi:
 	docker image build -t arkitect_php:1.0 .
 
 test:
-	vendor/bin/phpunit
+	bin/phpunit
 
 csfix:
 	bin/php-cs-fixer fix -v
 
 psalm:
-	vendor/bin/psalm
+	bin/psalm
 
 build:
 	composer install
-	php-cs-fixer fix --dry-run
-	vendor/bin/phpunit
+	bin/php-cs-fixer fix --dry-run
+	bin/phpunit
 
 shell:
 	 docker-compose exec php /bin/bash
 
 coverage:
-	vendor/bin/phpunit --coverage-html web/tests
+	bin/phpunit --coverage-html web/tests
 
