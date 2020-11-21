@@ -24,6 +24,6 @@ class ResideInNamespace implements Expression
 
     public function evaluate(ClassDescription $theClass): bool
     {
-        return !$theClass->isInNamespace($this->namespace);
+        return !$theClass->namespaceMatches($this->namespace);
     }
 }

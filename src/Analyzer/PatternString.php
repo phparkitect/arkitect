@@ -14,10 +14,21 @@ class PatternString
 
     public function matches(string $pattern): bool
     {
-        $pattern = strtr($pattern, ['\\' => '_', '**' => '(.+)',  '*' => '([a-zA-Z0-9]+)']);
-        $name = strtr($this->value, ['\\' => '_']);
+        if ('' === $pattern) {
+            return false;
+        }
 
-        return (bool) preg_match("/^$pattern$/", $name);
+        // se è una stringa senza wildcard ed è il prefisso faccio match
+        if ((
+            !str_contains($pattern, '*') &&
+            !str_contains($pattern, '?') &&
+            !str_contains($pattern, '.') &&
+            !str_contains($pattern, '[')
+        ) && str_starts_with($this->value, $pattern)) {
+            return true;
+        }
+
+        return fnmatch($pattern, $this->value, FNM_NOESCAPE);
     }
 
     public function explode(string $delimiter): array

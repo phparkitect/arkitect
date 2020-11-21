@@ -9,10 +9,12 @@ class FullyQualifiedClassName
      * @var PatternString
      */
     private $fqcnString;
+
     /**
      * @var PatternString
      */
     private $namespace;
+
     /**
      * @var PatternString
      */

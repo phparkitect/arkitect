@@ -13,13 +13,8 @@ class FullyQualifiedClassNameTest extends TestCase
         return [
           ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables\Fruits\Banana', true],
           ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables\*\Banana', true],
-          ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables\**', true],
-          ['Food\Vegetables\Fruits\Banana', 'Food\**\Banana', true],
-          ['Food\Vegetables\Fruits\Banana', '**', true],
-
-          ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables', false],
-          ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables\*', false],
-          ['Food\Vegetables\Fruits\Mango', 'Food\**\Banana', false],
+          ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables', true],
+          ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables\*', true],
           ['Food\Vegetables\Fruits\Mango', '', false],
         ];
     }
