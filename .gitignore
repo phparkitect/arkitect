@@ -4,3 +4,4 @@
 .php_cs.cache
 /web
 php-cs-fixer
+/bin
