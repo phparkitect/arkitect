@@ -42,5 +42,8 @@
     },
     "config": {
         "bin-dir": "bin"
-    }
+    },
+    "bin": [
+        "phparkitect"
+    ]
 }
