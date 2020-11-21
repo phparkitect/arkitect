@@ -5,12 +5,20 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Michele Orselli",
-            "email": "michele.orselli@gmail.com"
+            "name": "Pietro Campagnano",
+            "email": "hello@pietro.camp"
         },
         {
             "name": "Patrick Luca Fazzi",
             "email": "patrick91@live.it"
+        },
+        {
+            "name": "Alessandro Minoccheri",
+            "email": "alessandro.minoccheri@gmail.com"
+        },
+        {
+            "name": "Michele Orselli",
+            "email": "michele.orselli@gmail.com"
         }
     ],
     "require": {
