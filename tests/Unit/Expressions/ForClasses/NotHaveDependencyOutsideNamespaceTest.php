@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Tests\Unit\Expressions;
+namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
-use Arkitect\Expression\NotHaveDependencyOutsideNamespace;
+use Arkitect\Expression\ForClasses\NotHaveDependencyOutsideNamespace;
 use PHPUnit\Framework\TestCase;
 
 class NotHaveDependencyOutsideNamespaceTest extends TestCase
@@ -25,7 +25,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
 
         $violationError = $notHaveDependencyOutsideNamespace->describe($classDescription);
 
-        $this->assertEquals('HappyIsland depends on classes outside in namespace '.$namespace, $violationError);
+        $this->assertEquals('HappyIsland does not depend on classes outside in namespace '.$namespace, $violationError);
     }
 
     public function test_it_should_return_true_if_not_depends_on_namespace(): void
@@ -34,7 +34,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
         $classDescription = new ClassDescription(
             'full/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
-            [],
+            [new ClassDependency('myNamespace', 100)],
             []
         );
 
@@ -47,7 +47,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
         $classDescription = new ClassDescription(
             'full/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
-            [new ClassDependency('myNamespace', 100)],
+            [new ClassDependency('myNamespace', 100), new ClassDependency('another\class', 200)],
             []
         );
 

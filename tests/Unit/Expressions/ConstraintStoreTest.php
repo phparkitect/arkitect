@@ -5,7 +5,7 @@ namespace Arkitect\Tests\Unit\Expressions;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\ExpressionsStore;
-use Arkitect\Expression\HaveNameMatching;
+use Arkitect\Expression\ForClasses\HaveNameMatching;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -20,10 +20,11 @@ class ConstraintStoreTest extends TestCase
         $expressionStore->add($expression->reveal());
 
         $classDescription = $this->prophesize(ClassDescription::class);
-        $expression->evaluate($classDescription)->willReturn(false);
+        $expression->evaluate($classDescription)->willReturn(true);
 
         $violationStore = $this->prophesize(Violations::class);
         $violationStore->add(Argument::any())->shouldNotBeCalled();
+
         $expressionStore->checkAll($classDescription->reveal(), $violationStore->reveal());
     }
 
@@ -35,7 +36,7 @@ class ConstraintStoreTest extends TestCase
         $expressionStore->add($expression->reveal());
 
         $classDescription = $this->prophesize(ClassDescription::class);
-        $expression->evaluate($classDescription)->willReturn(true);
+        $expression->evaluate($classDescription)->willReturn(false);
         $expression->describe($classDescription)->willReturn('bar');
 
         $violationStore = $this->prophesize(Violations::class);

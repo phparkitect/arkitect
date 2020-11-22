@@ -74,12 +74,12 @@ class ClassDescription
     public function dependsOnly(string $pattern): bool
     {
         $depends = function (ClassDependency $dependency) use ($pattern) {
-            return !$dependency->getFQCN()->namespaceMatches($pattern);
+            return !$dependency->getFQCN()->matches($pattern);
         };
 
         $externalDep = \count(array_filter($this->dependencies, $depends));
 
-        return $externalDep > 0;
+        return 0 === $externalDep;
     }
 
     public function nameMatches(string $pattern): bool

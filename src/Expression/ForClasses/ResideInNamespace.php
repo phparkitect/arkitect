@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Arkitect\Expression;
+namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Expression\Expression;
 
 class ResideInNamespace implements Expression
 {
@@ -17,13 +18,13 @@ class ResideInNamespace implements Expression
         $this->namespace = $namespace;
     }
 
-    public function describe(ClassDescription $classDescription): string
+    public function describe(ClassDescription $theClass): string
     {
-        return "{$classDescription->getFQCN()} does not reside in namespace {$this->namespace}";
+        return "{$theClass->getFQCN()} resides in namespace {$this->namespace}";
     }
 
     public function evaluate(ClassDescription $theClass): bool
     {
-        return !$theClass->namespaceMatches($this->namespace);
+        return $theClass->namespaceMatches($this->namespace);
     }
 }
