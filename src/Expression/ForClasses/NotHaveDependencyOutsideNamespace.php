@@ -22,6 +22,6 @@ class NotHaveDependencyOutsideNamespace implements Expression
 
     public function evaluate(ClassDescription $theClass): bool
     {
-        return $theClass->dependsOnly($this->namespace);
+        return $theClass->dependsOnlyOnClassesMatching($this->namespace);
     }
 }
