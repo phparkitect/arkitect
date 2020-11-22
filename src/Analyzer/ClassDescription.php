@@ -71,7 +71,7 @@ class ClassDescription
         return (bool) \count(array_filter($this->dependencies, $depends));
     }
 
-    public function dependsOnly(string $pattern): bool
+    public function dependsOnlyOnClassesMatching(string $pattern): bool
     {
         $depends = function (ClassDependency $dependency) use ($pattern) {
             return !$dependency->getFQCN()->matches($pattern);

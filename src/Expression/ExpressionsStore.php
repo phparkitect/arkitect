@@ -15,12 +15,12 @@ class ExpressionsStore
         $this->expressions[] = $expression;
     }
 
-    public function checkAll(ClassDescription $classDescription, Violations $violationsStore): void
+    public function checkAll(ClassDescription $classDescription, Violations $violations): void
     {
         /** @var Expression $expression */
         foreach ($this->expressions as $expression) {
             if (!$expression->evaluate($classDescription)) {
-                $violationsStore->add($expression->describe($classDescription));
+                $violations->add($expression->describe($classDescription));
             }
         }
     }

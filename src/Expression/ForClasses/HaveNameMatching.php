@@ -20,7 +20,7 @@ class HaveNameMatching implements Expression
 
     public function describe(ClassDescription $theClass): string
     {
-        return "{$theClass->getFQCN()} has a name that match {$this->name}";
+        return "{$theClass->getFQCN()} has a name that matches {$this->name}";
     }
 
     public function evaluate(ClassDescription $theClass): bool
