@@ -8,7 +8,7 @@ use Arkitect\Rules\Violations;
 
 class ExpressionsStore
 {
-    private $expressions = [];
+    private array $expressions = [];
 
     public function add(Expression $expression): void
     {

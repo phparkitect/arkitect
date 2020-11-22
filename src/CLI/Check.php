@@ -13,7 +13,6 @@ use Webmozart\Assert\Assert;
 
 class Check extends Command
 {
-    public const FAILURE = 1;
     private const CONFIG_FILENAME_PARAM = 'config';
 
     public function __construct()

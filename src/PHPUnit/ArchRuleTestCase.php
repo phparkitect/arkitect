@@ -12,7 +12,7 @@ class ArchRuleTestCase extends \PHPUnit\Framework\TestCase
     public static function assertArchRule(ArchRuleGivenClasses $rule, ClassSet $set): void
     {
         $expression = new class($rule) extends Constraint {
-            private $rule;
+            private \Arkitect\Rules\ArchRuleGivenClasses $rule;
 
             public function __construct(ArchRuleGivenClasses $rule)
             {

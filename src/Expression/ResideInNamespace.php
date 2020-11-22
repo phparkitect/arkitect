@@ -7,10 +7,7 @@ use Arkitect\Analyzer\ClassDescription;
 
 class ResideInNamespace implements Expression
 {
-    /**
-     * @var string
-     */
-    private $namespace;
+    private string $namespace;
 
     public function __construct(string $namespace)
     {

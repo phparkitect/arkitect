@@ -12,11 +12,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ArchRuleGivenClasses
 {
-    private $specsStore;
+    private \Arkitect\Specs\SpecsStore $specsStore;
 
-    private $expressionsStore;
+    private \Arkitect\Expression\ExpressionsStore $expressionsStore;
 
-    private $violationsStore;
+    private \Arkitect\Rules\Violations $violationsStore;
 
     public function __construct()
     {
@@ -47,11 +47,11 @@ class ArchRuleGivenClasses
     public function check(ClassSet $set): void
     {
         $checkSub = new class($this->specsStore, $this->expressionsStore, $this->violationsStore) implements EventSubscriberInterface {
-            private $specsStore;
+            private \Arkitect\Specs\SpecsStore $specsStore;
 
-            private $expressionsStore;
+            private \Arkitect\Expression\ExpressionsStore $expressionsStore;
 
-            private $violationsStore;
+            private \Arkitect\Rules\Violations $violationsStore;
 
             public function __construct(SpecsStore $specStore, ExpressionsStore $expressionsStore, Violations $violationsStore)
             {

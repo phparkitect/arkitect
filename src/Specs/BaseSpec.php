@@ -7,7 +7,7 @@ use Arkitect\Analyzer\ClassDescription;
 
 abstract class BaseSpec
 {
-    private $pattern;
+    private string $pattern;
 
     public function __construct(string $pattern)
     {

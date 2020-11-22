@@ -7,15 +7,9 @@ use Arkitect\Rules\ArchRuleGivenClasses;
 
 class Assert
 {
-    /**
-     * @var ClassSet
-     */
-    private $set;
+    private \Arkitect\ClassSet $set;
 
-    /**
-     * @var ArchRuleGivenClasses
-     */
-    private $rule;
+    private \Arkitect\Rules\ArchRuleGivenClasses $rule;
 
     public function __construct(ClassSet $classSet, ArchRuleGivenClasses $rule)
     {

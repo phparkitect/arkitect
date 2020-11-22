@@ -5,18 +5,15 @@ namespace Arkitect\Analyzer;
 
 class ClassDescription
 {
-    private $FQCN;
+    private \Arkitect\Analyzer\FullyQualifiedClassName $FQCN;
 
-    private $fullPath;
+    private array $dependencies;
 
-    private $dependencies;
+    private array $interfaces;
 
-    private $interfaces;
-
-    public function __construct(string $fullPath, FullyQualifiedClassName $FQCN, array $dependencies, array $interfaces)
+    public function __construct(FullyQualifiedClassName $FQCN, array $dependencies, array $interfaces)
     {
         $this->FQCN = $FQCN;
-        $this->fullPath = $fullPath;
         $this->dependencies = $dependencies;
         $this->interfaces = $interfaces;
     }
