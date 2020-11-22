@@ -18,13 +18,7 @@ class PatternString
             return false;
         }
 
-        // se è una stringa senza wildcard ed è il prefisso faccio match
-        if ((
-            !str_contains($pattern, '*') &&
-            !str_contains($pattern, '?') &&
-            !str_contains($pattern, '.') &&
-            !str_contains($pattern, '[')
-        ) && str_starts_with($this->value, $pattern)) {
+        if (!$this->containsWildcard($pattern) && str_starts_with($this->value, $pattern)) {
             return true;
         }
 
@@ -39,5 +33,14 @@ class PatternString
     public function toString(): string
     {
         return $this->value;
+    }
+
+    private function containsWildcard(string $pattern): bool
+    {
+        return
+            str_contains($pattern, '*') ||
+            str_contains($pattern, '?') ||
+            str_contains($pattern, '.') ||
+            str_contains($pattern, '[');
     }
 }
