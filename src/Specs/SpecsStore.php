@@ -19,7 +19,7 @@ class SpecsStore
     {
         /** @var Expression $spec */
         foreach ($this->specs as $spec) {
-            if ($spec->evaluate($classDescription)) {
+            if (!$spec->evaluate($classDescription)) {
                 return false;
             }
         }

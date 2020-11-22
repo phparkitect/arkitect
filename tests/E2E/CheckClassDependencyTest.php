@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Arkitect\Tests\E2E;
 
 use Arkitect\ClassSet;
-use Arkitect\Expression\HaveNameMatching;
-use Arkitect\Expression\ResideInNamespace;
+use Arkitect\Expression\ForClasses\HaveNameMatching;
+use Arkitect\Expression\ForClasses\ResideInNamespace;
 use Arkitect\PHPUnit\ArchRuleTestCase;
 use Arkitect\Rules\Rule;
 use PHPUnit\Framework\TestCase;

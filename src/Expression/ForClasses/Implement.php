@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Arkitect\Expression;
+namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Expression\Expression;
 
 class Implement implements Expression
 {
@@ -14,13 +15,13 @@ class Implement implements Expression
         $this->interface = $interface;
     }
 
-    public function describe(ClassDescription $classDescription): string
+    public function describe(ClassDescription $theClass): string
     {
-        return "{$classDescription->getFQCN()} does not implement {$this->interface}";
+        return "{$theClass->getFQCN()} implements {$this->interface}";
     }
 
     public function evaluate(ClassDescription $theClass): bool
     {
-        return !$theClass->implements($this->interface);
+        return $theClass->implements($this->interface);
     }
 }

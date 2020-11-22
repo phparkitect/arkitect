@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Arkitect\Expression;
+namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Expression\Expression;
 
 class HaveNameMatching implements Expression
 {
@@ -17,13 +18,13 @@ class HaveNameMatching implements Expression
         $this->name = $name;
     }
 
-    public function describe(ClassDescription $classDescription): string
+    public function describe(ClassDescription $theClass): string
     {
-        return "{$classDescription->getFQCN()} has a name that doesn't match {$this->name}";
+        return "{$theClass->getFQCN()} has a name that match {$this->name}";
     }
 
     public function evaluate(ClassDescription $theClass): bool
     {
-        return !$theClass->nameMatches($this->name);
+        return $theClass->nameMatches($this->name);
     }
 }

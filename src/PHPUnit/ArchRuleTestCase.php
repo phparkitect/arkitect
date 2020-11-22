@@ -30,7 +30,7 @@ class ArchRuleTestCase extends \PHPUnit\Framework\TestCase
 
             public function toString(): string
             {
-                return 'satifies all constraints';
+                return 'satisfies all constraints';
             }
 
             protected function failureDescription($other): string

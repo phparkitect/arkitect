@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Arkitect\Expression;
+namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Expression\Expression;
 
 class DependsOnClassesInNamespace implements Expression
 {
@@ -17,13 +18,13 @@ class DependsOnClassesInNamespace implements Expression
         $this->namespace = $namespace;
     }
 
-    public function describe(ClassDescription $classDescription): string
+    public function describe(ClassDescription $theClass): string
     {
-        return "{$classDescription->getFQCN()} do not depends on classes in namespace {$this->namespace}";
+        return "{$theClass->getFQCN()} depends on classes in namespace {$this->namespace}";
     }
 
     public function evaluate(ClassDescription $theClass): bool
     {
-        return !$theClass->dependsOn($this->namespace);
+        return $theClass->dependsOn($this->namespace);
     }
 }

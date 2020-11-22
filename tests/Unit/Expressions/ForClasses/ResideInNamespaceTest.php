@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Tests\Unit\Expressions;
+namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
-use Arkitect\Analyzer\FullyQualifiedClassName;
-use Arkitect\Expression\ResideInNamespace;
+use Arkitect\Expression\ForClasses\ResideInNamespace;
 use PHPUnit\Framework\TestCase;
 
 class ResideInNamespaceTest extends TestCase
@@ -32,34 +31,15 @@ class ResideInNamespaceTest extends TestCase
 
         $classDesc = ClassDescription::build($actualFQCN, '')->get();
 
-        $this->assertNotTrue($haveNameMatching->evaluate($classDesc));
+        $this->assertTrue($haveNameMatching->evaluate($classDesc));
     }
 
     public function test_it_should_return_false_if_not_reside_in_namespace(): void
     {
         $haveNameMatching = new ResideInNamespace('MyNamespace');
 
-        $classDescription = new ClassDescription(
-            '/path',
-            FullyQualifiedClassName::fromString('AnotherNamespace\HappyIsland'),
-            [],
-            []
-        );
+        $classDesc = ClassDescription::build('AnotherNamespace\HappyIsland', '')->get();
 
-        $this->assertTrue($haveNameMatching->evaluate($classDescription));
-    }
-
-    public function test_it_should_return_true_if_reside_in_namespace(): void
-    {
-        $haveNameMatching = new ResideInNamespace('MyNamespace');
-
-        $classDescription = new ClassDescription(
-            '/path',
-            FullyQualifiedClassName::fromString('MyNamespace\HappyIsland'),
-            [],
-            []
-        );
-
-        $this->assertFalse($haveNameMatching->evaluate($classDescription));
+        $this->assertFalse($haveNameMatching->evaluate($classDesc));
     }
 }

@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Expressions;
 
-use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
-use Arkitect\Expression\DependsOnClassesInNamespace;
+use Arkitect\Expression\ForClasses\Implement;
 use PHPUnit\Framework\TestCase;
 
-class DependsOnClassesInNamespaceTest extends TestCase
+class ImplementConstraintTest extends TestCase
 {
     public function test_it_should_return_violation_error(): void
     {
-        $namespace = 'myNamespace';
-        $dependOnClasses = new DependsOnClassesInNamespace($namespace);
+        $interface = 'interface';
+
+        $implementConstraint = new Implement($interface);
         $classDescription = new ClassDescription(
             'full/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
@@ -23,34 +23,39 @@ class DependsOnClassesInNamespaceTest extends TestCase
             []
         );
 
-        $violationError = $dependOnClasses->describe($classDescription);
+        $violationError = $implementConstraint->describe($classDescription);
 
-        $this->assertEquals('HappyIsland do not depends on classes in namespace '.$namespace, $violationError);
+        $this->assertFalse($implementConstraint->evaluate($classDescription));
+        $this->assertEquals('HappyIsland implements '.$interface, $violationError);
     }
 
     public function test_it_should_return_true_if_not_depends_on_namespace(): void
     {
-        $dependOnClasses = new DependsOnClassesInNamespace('myNamespace');
+        $interface = 'interface';
+
+        $implementConstraint = new Implement($interface);
         $classDescription = new ClassDescription(
             'full/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
-            []
+            [FullyQualifiedClassName::fromString('foo')]
         );
 
-        $this->assertTrue($dependOnClasses->evaluate($classDescription));
+        $this->assertFalse($implementConstraint->evaluate($classDescription));
     }
 
     public function test_it_should_return_false_if_depends_on_namespace(): void
     {
-        $dependOnClasses = new DependsOnClassesInNamespace('myNamespace');
+        $interface = 'interface';
+
+        $implementConstraint = new Implement($interface);
         $classDescription = new ClassDescription(
             'full/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
-            [new ClassDependency('myNamespace', 100)],
-            []
+            [],
+            [FullyQualifiedClassName::fromString('interface')]
         );
 
-        $this->assertFalse($dependOnClasses->evaluate($classDescription));
+        $this->assertTrue($implementConstraint->evaluate($classDescription));
     }
 }
