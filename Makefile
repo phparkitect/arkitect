@@ -10,7 +10,7 @@ db: ## lancia la build usando un container
 dt: ## lancia i test usando un container
 	docker run --rm -it -v $(PWD):/var/www arkitect_php make test
 
-dbi: ## crea l'immagine docker per lo sviluppo
+dbi: ## crea immagine docker per lo sviluppo
 	docker image build -t arkitect_php .
 
 shell: ## entra nel container
@@ -28,7 +28,7 @@ csfix: ## cs fix
 psalm: ## lancia psalm
 	bin/psalm
 
-build: ## laacia tutta la build
+build: ## lancia tutta la build
 	composer install
 	bin/php-cs-fixer fix --dry-run
 	bin/psalm
