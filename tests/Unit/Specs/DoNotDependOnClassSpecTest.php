@@ -17,7 +17,6 @@ class DoNotDependOnClassSpecTest extends TestCase
         $dependOnClassSpec = new DoNotDependOnClassSpec('foo');
 
         $classDescription = new ClassDescription(
-            '/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             []
@@ -32,11 +31,10 @@ class DoNotDependOnClassSpecTest extends TestCase
         $classDependency = new ClassDependency('OtherClass', 100);
 
         $classDescription = new ClassDescription(
-            '/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
             [
-                $classDependency,
-            ],
+            $classDependency,
+        ],
             []
         );
 

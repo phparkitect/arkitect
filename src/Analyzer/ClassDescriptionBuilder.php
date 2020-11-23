@@ -46,7 +46,6 @@ class ClassDescriptionBuilder
     public function get(): ClassDescription
     {
         return new ClassDescription(
-            $this->filePath,
             $this->FQCN,
             $this->classDependencies,
             $this->interfaces

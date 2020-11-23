@@ -21,9 +21,9 @@ class ClassSetTest extends TestCase
         $set->addSubscriber($fakeSubscriber);
         $set->run();
         $this->assertEquals([
-            new ClassDescription('HappyIsland', FullyQualifiedClassName::fromString('App\HappyIsland\HappyClass'), [], []),
-            new ClassDescription('BadCode', FullyQualifiedClassName::fromString('App\BadCode\BadCode'), [], []),
-            new ClassDescription('OtherBadCode', FullyQualifiedClassName::fromString('App\BadCode\OtherBadCode'), [], []),
+            new ClassDescription(FullyQualifiedClassName::fromString('App\HappyIsland\HappyClass'), [], []),
+            new ClassDescription(FullyQualifiedClassName::fromString('App\BadCode\BadCode'), [], []),
+            new ClassDescription(FullyQualifiedClassName::fromString('App\BadCode\OtherBadCode'), [], []),
         ], $fakeSubscriber->getAllClassAnalyzed());
     }
 

@@ -17,7 +17,6 @@ class DependOnClassSpecTest extends TestCase
         $dependOnClassSpec = new DependOnClassSpec('foo');
 
         $classDescription = new ClassDescription(
-            '/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             []
@@ -32,11 +31,10 @@ class DependOnClassSpecTest extends TestCase
         $classDependency = new ClassDependency('OtherClass', 100);
 
         $classDescription = new ClassDescription(
-            '/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
             [
-                $classDependency,
-            ],
+            $classDependency,
+        ],
             []
         );
 

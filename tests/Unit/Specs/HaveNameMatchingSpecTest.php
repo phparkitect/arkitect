@@ -16,7 +16,6 @@ class HaveNameMatchingSpecTest extends TestCase
         $haveNameMatching = new HaveNameMatchingSpec('foo');
 
         $classDescription = new ClassDescription(
-            '/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             []
@@ -30,7 +29,6 @@ class HaveNameMatchingSpecTest extends TestCase
         $haveNameMatching = new HaveNameMatchingSpec('HappyIsland');
 
         $classDescription = new ClassDescription(
-            '/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             []

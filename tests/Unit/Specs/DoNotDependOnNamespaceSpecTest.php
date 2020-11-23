@@ -17,7 +17,6 @@ class DoNotDependOnNamespaceSpecTest extends TestCase
         $dependOnNamespaceSpec = new DoNotDependOnNamespaceSpec('foo');
 
         $classDescription = new ClassDescription(
-            '/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             []
@@ -32,11 +31,10 @@ class DoNotDependOnNamespaceSpecTest extends TestCase
         $classDependency = new ClassDependency('foo\OtherClass', 100);
 
         $classDescription = new ClassDescription(
-            '/foo',
             FullyQualifiedClassName::fromString('foo\HappyIsland'),
             [
-                $classDependency,
-            ],
+            $classDependency,
+        ],
             []
         );
 

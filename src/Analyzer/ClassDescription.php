@@ -5,7 +5,7 @@ namespace Arkitect\Analyzer;
 
 class ClassDescription
 {
-    private \Arkitect\Analyzer\FullyQualifiedClassName $FQCN;
+    private FullyQualifiedClassName $FQCN;
 
     private array $dependencies;
 
