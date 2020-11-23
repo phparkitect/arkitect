@@ -21,6 +21,7 @@ class SpecsStoreTest extends TestCase
         );
 
         $classDescription = new ClassDescription(
+            '/path',
             FullyQualifiedClassName::fromString('MyNamespace\HappyIsland'),
             [],
             []
@@ -37,10 +38,11 @@ class SpecsStoreTest extends TestCase
         );
 
         $classDescription = new ClassDescription(
+            '/path',
             FullyQualifiedClassName::fromString('MyNamespace\HappyIsland'),
             [
-            new ClassDependency('Foo', 100),
-        ],
+                new ClassDependency('Foo', 100),
+            ],
             []
         );
 

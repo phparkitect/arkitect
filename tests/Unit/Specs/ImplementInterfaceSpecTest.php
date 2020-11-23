@@ -16,6 +16,7 @@ class ImplementInterfaceSpecTest extends TestCase
         $haveNameMatching = new ImplementInterfaceSpec('MyInterface');
 
         $classDescription = new ClassDescription(
+            '/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             [
@@ -31,6 +32,7 @@ class ImplementInterfaceSpecTest extends TestCase
         $haveNameMatching = new ImplementInterfaceSpec('MyInterface');
 
         $classDescription = new ClassDescription(
+            '/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             [

@@ -17,6 +17,7 @@ class ImplementConstraintTest extends TestCase
 
         $implementConstraint = new Implement($interface);
         $classDescription = new ClassDescription(
+            'full/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             []
@@ -33,6 +34,7 @@ class ImplementConstraintTest extends TestCase
 
         $implementConstraint = new Implement($interface);
         $classDescription = new ClassDescription(
+            'full/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             [FullyQualifiedClassName::fromString('foo')]
@@ -47,6 +49,7 @@ class ImplementConstraintTest extends TestCase
 
         $implementConstraint = new Implement($interface);
         $classDescription = new ClassDescription(
+            'full/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             [FullyQualifiedClassName::fromString('interface')]

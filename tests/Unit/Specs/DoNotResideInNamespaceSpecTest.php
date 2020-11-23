@@ -16,6 +16,7 @@ class DoNotResideInNamespaceSpecTest extends TestCase
         $haveNameMatching = new DoNotResideInNamespaceSpec('MyNamespace');
 
         $classDescription = new ClassDescription(
+            '/path',
             FullyQualifiedClassName::fromString('AnotherNamespace\HappyIsland'),
             [],
             []
@@ -29,6 +30,7 @@ class DoNotResideInNamespaceSpecTest extends TestCase
         $haveNameMatching = new DoNotResideInNamespaceSpec('MyNamespace');
 
         $classDescription = new ClassDescription(
+            '/path',
             FullyQualifiedClassName::fromString('MyNamespace\HappyIsland'),
             [],
             []

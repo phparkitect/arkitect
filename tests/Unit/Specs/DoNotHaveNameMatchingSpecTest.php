@@ -16,6 +16,7 @@ class DoNotHaveNameMatchingSpecTest extends TestCase
         $notHaveNameMatching = new DoNotHaveNameMatchingSpec('foo');
 
         $classDescription = new ClassDescription(
+            '/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             []
@@ -29,6 +30,7 @@ class DoNotHaveNameMatchingSpecTest extends TestCase
         $notHaveNameMatching = new DoNotHaveNameMatchingSpec('HappyIsland');
 
         $classDescription = new ClassDescription(
+            '/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             []

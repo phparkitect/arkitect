@@ -17,6 +17,7 @@ class DependsOnClassesInNamespaceTest extends TestCase
         $namespace = 'myNamespace';
         $dependOnClasses = new DependsOnClassesInNamespace($namespace);
         $classDescription = new ClassDescription(
+            'full/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             []
@@ -31,6 +32,7 @@ class DependsOnClassesInNamespaceTest extends TestCase
     {
         $dependOnClasses = new DependsOnClassesInNamespace('myNamespace');
         $classDescription = new ClassDescription(
+            'full/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             []
@@ -43,6 +45,7 @@ class DependsOnClassesInNamespaceTest extends TestCase
     {
         $dependOnClasses = new DependsOnClassesInNamespace('myNamespace');
         $classDescription = new ClassDescription(
+            'full/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
             [new ClassDependency('myNamespace', 100)],
             []

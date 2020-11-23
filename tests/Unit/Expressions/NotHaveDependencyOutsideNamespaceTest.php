@@ -17,6 +17,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
         $namespace = 'myNamespace';
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace($namespace);
         $classDescription = new ClassDescription(
+            'full/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             []
@@ -31,6 +32,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
     {
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('myNamespace');
         $classDescription = new ClassDescription(
+            'full/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             []
@@ -43,6 +45,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
     {
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('myNamespace');
         $classDescription = new ClassDescription(
+            'full/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
             [new ClassDependency('myNamespace', 100)],
             []

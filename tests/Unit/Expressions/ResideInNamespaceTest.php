@@ -40,6 +40,7 @@ class ResideInNamespaceTest extends TestCase
         $haveNameMatching = new ResideInNamespace('MyNamespace');
 
         $classDescription = new ClassDescription(
+            '/path',
             FullyQualifiedClassName::fromString('AnotherNamespace\HappyIsland'),
             [],
             []
@@ -53,6 +54,7 @@ class ResideInNamespaceTest extends TestCase
         $haveNameMatching = new ResideInNamespace('MyNamespace');
 
         $classDescription = new ClassDescription(
+            '/path',
             FullyQualifiedClassName::fromString('MyNamespace\HappyIsland'),
             [],
             []

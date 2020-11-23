@@ -16,6 +16,7 @@ class DoNotImplementInterfaceSpecTest extends TestCase
         $haveNameMatching = new DoNotImplementInterfaceSpec('MyInterface');
 
         $classDescription = new ClassDescription(
+            '/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             [
@@ -31,6 +32,7 @@ class DoNotImplementInterfaceSpecTest extends TestCase
         $haveNameMatching = new DoNotImplementInterfaceSpec('MyInterface');
 
         $classDescription = new ClassDescription(
+            '/path',
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             [
