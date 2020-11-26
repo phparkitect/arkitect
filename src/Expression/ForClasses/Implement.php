@@ -8,7 +8,7 @@ use Arkitect\Expression\Expression;
 
 class Implement implements Expression
 {
-    private $interface;
+    private string $interface;
 
     public function __construct(string $interface)
     {
