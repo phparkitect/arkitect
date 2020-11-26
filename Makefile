@@ -32,5 +32,5 @@ build: ## lancia tutta la build
 	composer install
 	bin/php-cs-fixer fix -v
 	#bin/psalm
-	bin/phpunit --filter CheckClassImplementInterfaceTest
+	bin/phpunit
 
