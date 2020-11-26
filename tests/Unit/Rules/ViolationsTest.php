@@ -7,7 +7,7 @@ namespace Arkitect\Tests\Unit\Rules;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
-class ViolationStoreTest extends TestCase
+class ViolationsTest extends TestCase
 {
     /**
      * @var string

@@ -8,10 +8,7 @@ use Arkitect\Expression\Expression;
 
 class HaveNameMatching implements Expression
 {
-    /**
-     * @var string
-     */
-    private $name;
+    private string $name;
 
     public function __construct(string $name)
     {

@@ -20,9 +20,10 @@ class CheckClassImplementInterfaceTest extends TestCase
     {
         $set = ClassSet::fromDir(__DIR__.'/fixtures/mvc');
 
-        $rule = Rule::classes()
+        $rule = Rule::allClasses()
             ->that(new ResideInNamespace('App\Controller'))
-            ->should(new Implement('ContainerAwareInterface'));
+            ->should(new Implement('ContainerAwareInterface'))
+            ->because('i said so');
 
         $expectedExceptionMessage = <<< 'EOT'
             Failed asserting that App\Controller\ProductsController implements ContainerAwareInterface

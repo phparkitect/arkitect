@@ -8,7 +8,7 @@ use Arkitect\Expression\Expression;
 
 class NotHaveDependencyOutsideNamespace implements Expression
 {
-    private $namespace;
+    private string $namespace;
 
     public function __construct(string $namespace)
     {

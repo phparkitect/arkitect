@@ -1,24 +1,17 @@
 <?php
 declare(strict_types=1);
 
-namespace Arkitect\Specs;
+namespace Arkitect\Rules;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\Expression;
 
-class SpecsStore
+class Specs extends Expressions
 {
-    private $specs = [];
-
-    public function add(Expression $spec): void
-    {
-        $this->specs[] = $spec;
-    }
-
     public function allSpecsAreMatchedBy(ClassDescription $classDescription): bool
     {
         /** @var Expression $spec */
-        foreach ($this->specs as $spec) {
+        foreach ($this->expressions as $spec) {
             if (!$spec->evaluate($classDescription)) {
                 return false;
             }

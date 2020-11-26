@@ -8,10 +8,7 @@ use Arkitect\Expression\Expression;
 
 class DependsOnClassesInNamespace implements Expression
 {
-    /**
-     * @var string
-     */
-    private $namespace;
+    private string $namespace;
 
     public function __construct(string $namespace)
     {

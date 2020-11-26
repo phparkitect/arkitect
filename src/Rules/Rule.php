@@ -5,8 +5,8 @@ namespace Arkitect\Rules;
 
 class Rule
 {
-    public static function classes(): ArchRuleGivenClasses
+    public static function allClasses(): AllClasses
     {
-        return new ArchRuleGivenClasses();
+        return new AllClasses();
     }
 }
