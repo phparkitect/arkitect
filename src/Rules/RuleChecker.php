@@ -13,17 +13,20 @@ class RuleChecker implements EventSubscriberInterface
 
     private \Arkitect\Rules\DSL\ArchRule $rule;
 
-    public function __construct()
+    private ClassSet $classSet;
+
+    public function __construct(ClassSet $classSet, Violations $violations)
     {
-        $this->violations = new Violations();
+        $this->classSet = $classSet;
+        $this->violations = $violations;
+
+        $this->classSet->addSubscriber($this);
     }
 
-    public function check(DSL\ArchRule $rule, ClassSet $set): void
+    public function check(DSL\ArchRule $rule): void
     {
         $this->rule = $rule;
-
-        $set->addSubscriber($this);
-        $set->run();
+        $this->classSet->run();
     }
 
     public function getViolations(): Violations

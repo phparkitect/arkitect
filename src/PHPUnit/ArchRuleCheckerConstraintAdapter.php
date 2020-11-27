@@ -4,19 +4,17 @@ declare(strict_types=1);
 namespace Arkitect\PHPUnit;
 
 use Arkitect\ClassSet;
-use Arkitect\Rules\DSL\ArchRule;
 use Arkitect\Rules\RuleChecker;
+use Arkitect\Rules\Violations;
 use PHPUnit\Framework\Constraint\Constraint;
 
 class ArchRuleCheckerConstraintAdapter extends Constraint
 {
-    private ArchRule $rule;
     private RuleChecker $ruleChecker;
 
-    public function __construct(ArchRule $rule)
+    public function __construct(ClassSet $classSet, Violations $violations)
     {
-        $this->rule = $rule;
-        $this->ruleChecker = new RuleChecker();
+        $this->ruleChecker = new RuleChecker($classSet, $violations);
     }
 
     public function toString(): string
@@ -24,20 +22,13 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
         return 'satisfies all architectural constraints';
     }
 
-    /**
-     * @param ClassSet $set
-     */
-    protected function matches($set): bool
+    protected function matches(/** ArchRule */ $rule): bool
     {
-        $this->ruleChecker->check($this->rule, $set);
+        $this->ruleChecker->check($rule);
 
         return !$this->ruleChecker->hasViolations();
     }
 
-    /**
-     * @param ClassSet $set
-     * @param mixed    $other
-     */
     protected function failureDescription($other): string
     {
         return $this->ruleChecker->getViolations()->toString();
