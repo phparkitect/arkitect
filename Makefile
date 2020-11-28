@@ -14,13 +14,13 @@ dbi: ## crea immagine docker per lo sviluppo
 	docker image build -t arkitect_php .
 
 shell: ## entra nel container
-	 docker-compose exec php /bin/bash
+	docker run --rm -it -v $(PWD):/var/www arkitect_php bash
 
 test: ## lancia i test
 	bin/phpunit
 
 coverage: ## lancia i test con coverage
-	bin/phpunit --coverage-html web/tests
+	phpdbg -qrr ./bin/phpunit --coverage-html build/coverage
 
 csfix: ## cs fix
 	bin/php-cs-fixer fix -v
