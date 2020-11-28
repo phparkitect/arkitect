@@ -9,24 +9,24 @@ use Arkitect\Rules\DSL\BecauseParser;
 
 class AndThatShould implements AndThatShouldParser
 {
-    private RuleBuilder $expressionBuilder;
+    private RuleBuilder $ruleBuilder;
 
     public function __construct(RuleBuilder $expressionBuilder)
     {
-        $this->expressionBuilder = $expressionBuilder;
+        $this->ruleBuilder = $expressionBuilder;
     }
 
     public function andThat(Expression $expression): AndThatShouldParser
     {
-        $this->expressionBuilder->addThat($expression);
+        $this->ruleBuilder->addThat($expression);
 
         return $this;
     }
 
     public function should(Expression $expression): BecauseParser
     {
-        $this->expressionBuilder->addShould($expression);
+        $this->ruleBuilder->addShould($expression);
 
-        return new Because($this->expressionBuilder);
+        return new Because($this->ruleBuilder);
     }
 }

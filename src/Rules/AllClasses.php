@@ -9,17 +9,17 @@ use Arkitect\Rules\DSL\ThatParser;
 
 class AllClasses implements ThatParser
 {
-    protected RuleBuilder $expressionBuilder;
+    protected RuleBuilder $ruleBuilder;
 
     public function __construct()
     {
-        $this->expressionBuilder = new RuleBuilder();
+        $this->ruleBuilder = new RuleBuilder();
     }
 
     public function that(Expression $expression): AndThatShouldParser
     {
-        $this->expressionBuilder->addThat($expression);
+        $this->ruleBuilder->addThat($expression);
 
-        return new AndThatShould($this->expressionBuilder);
+        return new AndThatShould($this->ruleBuilder);
     }
 }

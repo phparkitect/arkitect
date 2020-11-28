@@ -8,17 +8,17 @@ use Arkitect\Rules\DSL\BecauseParser;
 
 class Because implements BecauseParser
 {
-    private RuleBuilder $expressionBuilder;
+    private RuleBuilder $ruleBuilder;
 
     public function __construct(RuleBuilder $expressionBuilder)
     {
-        $this->expressionBuilder = $expressionBuilder;
+        $this->ruleBuilder = $expressionBuilder;
     }
 
     public function because(string $reason): ArchRule
     {
-        $this->expressionBuilder->setBecause($reason);
+        $this->ruleBuilder->setBecause($reason);
 
-        return $this->expressionBuilder->build();
+        return $this->ruleBuilder->build();
     }
 }
