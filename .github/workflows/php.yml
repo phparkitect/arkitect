@@ -35,8 +35,8 @@ jobs:
     - name: Coding Standard Checks
       run: ./bin/php-cs-fixer fix --dry-run -v
 
-    - name: Static Analysis
-      run: ./bin/psalm
+    #- name: Static Analysis
+    #  run: ./bin/psalm
 
     - name: Test
       run: ./bin/phpunit
