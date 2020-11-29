@@ -31,6 +31,6 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
 
     protected function failureDescription($other): string
     {
-        return $this->ruleChecker->getViolations()->toString();
+        return "\n" . $this->ruleChecker->getViolations()->toString();
     }
 }
