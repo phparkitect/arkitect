@@ -11,7 +11,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $parameters = $containerConfigurator->parameters();
 
     $parameters->set(Option::SETS, [
-        SetList::DEAD_CODE,
     ]);
 
     $services = $containerConfigurator->services();
