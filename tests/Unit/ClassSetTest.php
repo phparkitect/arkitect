@@ -18,8 +18,10 @@ class ClassSetTest extends TestCase
         $this->markTestSkipped();
         $set = ClassSet::fromDir(__DIR__.'/../e2e/fixtures/happy_island');
         $fakeSubscriber = new FakeSubscriber();
+
         $set->addSubscriber($fakeSubscriber);
         $set->run();
+
         $this->assertEquals([
             new ClassDescription('HappyIsland', FullyQualifiedClassName::fromString('App\HappyIsland\HappyClass'), [], []),
             new ClassDescription('BadCode', FullyQualifiedClassName::fromString('App\BadCode\BadCode'), [], []),

@@ -47,7 +47,7 @@ class ClassDescriptionTest extends TestCase
         $this->assertTrue($cd->dependsOn('Fruit\Mango'));
         $this->assertTrue($cd->dependsOnClass('F*\Mango'));
         $this->assertTrue($cd->dependsOnNamespace('Vegetabl*'));
-        $this->assertTrue($cd->dependsOnly('Vegetabl*'));
+        $this->assertFalse($cd->dependsOnlyOnClassesMatching('Vegetabl*'));
     }
 
     public function test_should_return_true_if_there_class_is_in_namespace(): void

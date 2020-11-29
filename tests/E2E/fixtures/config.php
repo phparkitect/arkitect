@@ -2,37 +2,34 @@
 declare(strict_types=1);
 
 use Arkitect\ClassSet;
+use Arkitect\Expression\ForClasses\HaveNameMatching;
+use Arkitect\Expression\ForClasses\Implement;
+use Arkitect\Expression\ForClasses\ResideInNamespace;
 use Arkitect\Rules\Rule;
 
 return static function (Arkitect\RuleChecker $ruleChecker): void {
     $mvc_class_set = ClassSet::fromDir(__DIR__.'/mvc');
 
-    $controllers_should_implement_container_aware_interface = Rule::classes()
-        ->that()
-            ->resideInNamespace('App\Controller')
-        ->should()
-            ->implement('ContainerAwareInterface');
+    $rule_1 = Rule::allClasses()
+        ->that(new ResideInNamespace('App\Controller'))
+        ->should(new Implement('ContainerAwareInterface'))
+        ->because('all controllers should be container aware');
 
-    $controllers_should_have_name_ending_with_controller = Rule::classes()
-        ->that()
-            ->resideInNamespace('App\Controller')
-        ->should()
-            ->haveNameMatching('*Controller');
+    $rule_2 = Rule::allClasses()
+        ->that(new ResideInNamespace('App\Controller'))
+        ->should(new HaveNameMatching('*Controller'))
+        ->because('we want uniform naming');
 
     $ruleChecker
         ->checkThatClassesIn($mvc_class_set)
-        ->meetTheFollowingRules(
-            $controllers_should_implement_container_aware_interface,
-            $controllers_should_have_name_ending_with_controller
-        );
+        ->meetTheFollowingRules($rule_1, $rule_2);
 
     $happy_island_class_set = ClassSet::fromDir(__DIR__.'/happy_island');
 
-    $a_naming_rule = Rule::classes()
-        ->that()
-            ->resideInNamespace('App\HappyIsland')
-        ->should()
-            ->haveNameMatching('Happy*');
+    $a_naming_rule = Rule::allClasses()
+        ->that(new ResideInNamespace('App\HappyIsland'))
+        ->should(new HaveNameMatching('Happy*'))
+        ->because('every class in the happy island should be happy');
 
     $ruleChecker
         ->checkThatClassesIn($happy_island_class_set)

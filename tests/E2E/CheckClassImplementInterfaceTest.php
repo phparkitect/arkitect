@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Arkitect\Tests\E2E;
 
 use Arkitect\ClassSet;
-use Arkitect\Expression\Implement;
-use Arkitect\Expression\ResideInNamespace;
+use Arkitect\Expression\ForClasses\Implement;
+use Arkitect\Expression\ForClasses\ResideInNamespace;
 use Arkitect\PHPUnit\ArchRuleTestCase;
 use Arkitect\Rules\Rule;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -20,14 +20,18 @@ class CheckClassImplementInterfaceTest extends TestCase
     {
         $set = ClassSet::fromDir(__DIR__.'/fixtures/mvc');
 
-        $rule = Rule::classes()
+        $rule = Rule::allClasses()
             ->that(new ResideInNamespace('App\Controller'))
-            ->should(new Implement('ContainerAwareInterface'));
+            ->should(new Implement('ContainerAwareInterface'))
+            ->because('i said so');
+
+        $expectedExceptionMessage = <<< 'EOT'
+            Failed asserting that App\Controller\ProductsController implements ContainerAwareInterface
+            App\Controller\UserController implements ContainerAwareInterface.
+            EOT;
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage(
-            "Failed asserting that App\\Controller\\ProductsController does not implement ContainerAwareInterface\nApp\\Controller\\UserController does not implement ContainerAwareInterface."
-        );
+        $this->expectExceptionMessage($expectedExceptionMessage);
 
         ArchRuleTestCase::assertArchRule($rule, $set);
     }

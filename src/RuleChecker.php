@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Arkitect;
 
-use Arkitect\Rules\ArchRuleGivenClasses;
 use Arkitect\Rules\Violations;
 
 class RuleChecker

@@ -30,7 +30,7 @@ psalm: ## lancia psalm
 
 build: ## lancia tutta la build
 	composer install
-	bin/php-cs-fixer fix --dry-run
-	bin/psalm
+	bin/php-cs-fixer fix -v
+	#bin/psalm
 	bin/phpunit
 
