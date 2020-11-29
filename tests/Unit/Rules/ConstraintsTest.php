@@ -6,6 +6,7 @@ namespace Arkitect\Tests\Unit\Rules;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\Expression;
 use Arkitect\Expression\ExpressionDescription;
+use Arkitect\Expression\PositiveExpressionDescription;
 use Arkitect\Rules\Constraints;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
@@ -17,7 +18,7 @@ class ConstraintsTest extends TestCase
         $trueExpression = new class() implements Expression {
             public function describe(ClassDescription $theClass): ExpressionDescription
             {
-                return new ExpressionDescription('');
+                return new PositiveExpressionDescription('');
             }
 
             public function evaluate(ClassDescription $theClass): bool
@@ -43,7 +44,7 @@ class ConstraintsTest extends TestCase
         $falseExpression = new class() implements Expression {
             public function describe(ClassDescription $theClass): ExpressionDescription
             {
-                return new ExpressionDescription('bar');
+                return new PositiveExpressionDescription('bar');
             }
 
             public function evaluate(ClassDescription $theClass): bool
