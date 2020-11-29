@@ -6,6 +6,7 @@ namespace Arkitect\Expression\ForClasses;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\Expression;
 use Arkitect\Expression\ExpressionDescription;
+use Arkitect\Expression\PositiveExpressionDescription;
 
 class Implement implements Expression
 {
@@ -18,7 +19,7 @@ class Implement implements Expression
 
     public function describe(ClassDescription $theClass): ExpressionDescription
     {
-        return new ExpressionDescription("{$theClass->getFQCN()} [implements|does not implement] {$this->interface}");
+        return new PositiveExpressionDescription("{$theClass->getFQCN()} [implements|does not implement] {$this->interface}");
     }
 
     public function evaluate(ClassDescription $theClass): bool
