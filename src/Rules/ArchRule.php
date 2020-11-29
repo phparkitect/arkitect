@@ -8,9 +8,7 @@ use Arkitect\Analyzer\ClassDescription;
 class ArchRule implements DSL\ArchRule
 {
     private Specs $thats;
-
     private Constraints $shoulds;
-
     private string $because;
 
     public function __construct(Specs $specs, Constraints $constraints, string $because)

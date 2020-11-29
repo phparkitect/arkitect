@@ -13,12 +13,9 @@ use Symfony\Component\Finder\Finder;
 
 class ClassSet
 {
-    /** @var \Iterator */
-    private $fileIterator;
-    /** @var EventDispatcherInterface */
-    private $dispatcher;
-    /** @var Parser */
-    private $parser;
+    private \Iterator $fileIterator;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
+    private \Arkitect\Analyzer\Parser $parser;
 
     private function __construct(\Iterator $fileIterator, EventDispatcherInterface $dispatcher, Parser $parser)
     {

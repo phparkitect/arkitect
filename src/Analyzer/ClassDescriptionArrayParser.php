@@ -8,7 +8,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 
 class ClassDescriptionArrayParser implements Parser
 {
-    private $eventDispatcher;
+    private \Psr\EventDispatcher\EventDispatcherInterface $eventDispatcher;
 
     public function __construct(EventDispatcherInterface $eventDispatcher)
     {

@@ -10,16 +10,9 @@ class RuleChecker
     /**
      * @var Assert[]
      */
-    private $assertions = [];
+    private array $assertions = [];
 
-    /**
-     * @var ClassSet
-     */
-    private $classSet;
-
-    public function __construct()
-    {
-    }
+    private ?\Arkitect\ClassSet $classSet;
 
     public function checkThatClassesIn(ClassSet $classSet): self
     {

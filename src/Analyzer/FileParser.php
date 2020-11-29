@@ -10,11 +10,11 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 
 class FileParser implements Parser
 {
-    private $parser;
+    private \PhpParser\Parser $parser;
 
-    private $traverser;
+    private \PhpParser\NodeTraverser $traverser;
 
-    private $fileVisitor;
+    private \Arkitect\Analyzer\FileVisitor $fileVisitor;
 
     public function __construct(EventDispatcherInterface $eventDispatcher)
     {

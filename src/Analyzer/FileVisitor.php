@@ -10,11 +10,11 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 
 class FileVisitor extends NodeVisitorAbstract
 {
-    private $eventDispatcher;
+    private \Psr\EventDispatcher\EventDispatcherInterface $eventDispatcher;
 
-    private $fileCurrentlyAnalized;
+    private ?string $fileCurrentlyAnalized;
 
-    private $classDescriptionBuilder;
+    private ?\Arkitect\Analyzer\ClassDescriptionBuilder $classDescriptionBuilder;
 
     public function __construct(EventDispatcherInterface $eventDispatcher)
     {

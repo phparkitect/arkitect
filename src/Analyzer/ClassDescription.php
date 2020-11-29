@@ -5,20 +5,17 @@ namespace Arkitect\Analyzer;
 
 class ClassDescription
 {
-    private $FQCN;
-
-    private $fullPath;
-
-    private $dependencies;
-
-    private $interfaces;
+    private FullyQualifiedClassName $FQCN;
+    private array $dependencies;
+    private array $interfaces;
+    private string $fullPath;
 
     public function __construct(string $fullPath, FullyQualifiedClassName $FQCN, array $dependencies, array $interfaces)
     {
         $this->FQCN = $FQCN;
-        $this->fullPath = $fullPath;
         $this->dependencies = $dependencies;
         $this->interfaces = $interfaces;
+        $this->fullPath = $fullPath;
     }
 
     public static function build(string $FQCN, string $filePath): ClassDescriptionBuilder
@@ -99,5 +96,10 @@ class ClassDescription
         };
 
         return (bool) \count(array_filter($this->interfaces, $implements));
+    }
+
+    public function fullPath(): string
+    {
+        return $this->fullPath;
     }
 }
