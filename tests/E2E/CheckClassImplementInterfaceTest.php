@@ -26,7 +26,8 @@ class CheckClassImplementInterfaceTest extends TestCase
             ->because('i said so');
 
         $expectedExceptionMessage = <<< 'EOT'
-            Failed asserting that App\Controller\ProductsController implements ContainerAwareInterface
+            Failed asserting that 
+            App\Controller\ProductsController implements ContainerAwareInterface
             App\Controller\UserController implements ContainerAwareInterface.
             EOT;
 

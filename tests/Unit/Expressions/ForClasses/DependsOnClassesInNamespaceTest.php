@@ -25,7 +25,7 @@ class DependsOnClassesInNamespaceTest extends TestCase
         );
 
         $this->assertFalse($dependOnClasses->evaluate($classDescription));
-        $this->assertEquals('HappyIsland depends on classes in namespace '.$namespace, $dependOnClasses->describe($classDescription));
+        $this->assertEquals('HappyIsland depends on classes in namespace '.$namespace, $dependOnClasses->describe($classDescription)->toString());
     }
 
     public function test_it_should_return_true_if_not_depends_on_namespace(): void
