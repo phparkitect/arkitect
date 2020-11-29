@@ -29,4 +29,11 @@ class AndThatShould implements AndThatShouldParser
 
         return new Because($this->ruleBuilder);
     }
+
+    public function shouldNot(Expression $expression): BecauseParser
+    {
+        $this->ruleBuilder->addShouldNot($expression);
+
+        return new Because($this->ruleBuilder);
+    }
 }
