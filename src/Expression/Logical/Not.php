@@ -5,6 +5,7 @@ namespace Arkitect\Expression\Logical;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\Expression;
+use Arkitect\Expression\ExpressionDescription;
 
 class Not implements Expression
 {
@@ -15,9 +16,9 @@ class Not implements Expression
         $this->expression = $expression;
     }
 
-    public function describe(ClassDescription $theClass): string
+    public function describe(ClassDescription $theClass): ExpressionDescription
     {
-        return '! '.$this->expression->describe($theClass);
+        return $this->expression->describe($theClass)->toggle();
     }
 
     public function evaluate(ClassDescription $theClass): bool

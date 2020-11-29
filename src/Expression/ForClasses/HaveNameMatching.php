@@ -5,6 +5,7 @@ namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\Expression;
+use Arkitect\Expression\ExpressionDescription;
 
 class HaveNameMatching implements Expression
 {
@@ -15,9 +16,9 @@ class HaveNameMatching implements Expression
         $this->name = $name;
     }
 
-    public function describe(ClassDescription $theClass): string
+    public function describe(ClassDescription $theClass): ExpressionDescription
     {
-        return "{$theClass->getFQCN()} has a name that matches {$this->name}";
+        return new ExpressionDescription("{$theClass->getFQCN()} [has|doesn't have] a name that matches {$this->name}");
     }
 
     public function evaluate(ClassDescription $theClass): bool

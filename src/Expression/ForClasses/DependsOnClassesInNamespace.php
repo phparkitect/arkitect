@@ -5,6 +5,7 @@ namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\Expression;
+use Arkitect\Expression\ExpressionDescription;
 
 class DependsOnClassesInNamespace implements Expression
 {
@@ -15,9 +16,9 @@ class DependsOnClassesInNamespace implements Expression
         $this->namespace = $namespace;
     }
 
-    public function describe(ClassDescription $theClass): string
+    public function describe(ClassDescription $theClass): ExpressionDescription
     {
-        return "{$theClass->getFQCN()} depends on classes in namespace {$this->namespace}";
+        return new ExpressionDescription("{$theClass->getFQCN()} [depends|doesn't depend] on classes in namespace {$this->namespace}");
     }
 
     public function evaluate(ClassDescription $theClass): bool

@@ -23,7 +23,7 @@ class ImplementConstraintTest extends TestCase
             []
         );
 
-        $violationError = $implementConstraint->describe($classDescription);
+        $violationError = $implementConstraint->describe($classDescription)->toString();
 
         $this->assertFalse($implementConstraint->evaluate($classDescription));
         $this->assertEquals('HappyIsland implements '.$interface, $violationError);

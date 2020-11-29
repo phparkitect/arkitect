@@ -25,6 +25,6 @@ class HaveNameMatchingTest extends TestCase
         $badClass = ClassDescription::build('\App\BadNameClass', 'App')->get();
 
         $this->assertFalse($expression->evaluate($badClass));
-        $this->assertEquals('\App\BadNameClass has a name that matches *GoodName*', $expression->describe($badClass));
+        $this->assertEquals('\App\BadNameClass has a name that matches *GoodName*', $expression->describe($badClass)->toString());
     }
 }

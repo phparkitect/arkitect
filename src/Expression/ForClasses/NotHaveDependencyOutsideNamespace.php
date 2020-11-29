@@ -5,6 +5,7 @@ namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\Expression;
+use Arkitect\Expression\ExpressionDescription;
 
 class NotHaveDependencyOutsideNamespace implements Expression
 {
@@ -15,9 +16,9 @@ class NotHaveDependencyOutsideNamespace implements Expression
         $this->namespace = $namespace;
     }
 
-    public function describe(ClassDescription $theClass): string
+    public function describe(ClassDescription $theClass): ExpressionDescription
     {
-        return "{$theClass->getFQCN()} does not depend on classes outside in namespace {$this->namespace}";
+        return new ExpressionDescription("{$theClass->getFQCN()} [does not depend|does depend] on classes outside in namespace {$this->namespace}");
     }
 
     public function evaluate(ClassDescription $theClass): bool
