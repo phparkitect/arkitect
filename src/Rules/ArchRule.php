@@ -8,13 +8,14 @@ use Arkitect\Analyzer\ClassDescription;
 class ArchRule implements DSL\ArchRule
 {
     private Specs $thats;
-
     private Constraints $shoulds;
+    private string $because;
 
-    public function __construct(Specs $specs, Constraints $constraints)
+    public function __construct(Specs $specs, Constraints $constraints, string $because)
     {
         $this->thats = $specs;
         $this->shoulds = $constraints;
+        $this->because = $because;
     }
 
     public function check(ClassDescription $classDescription, Violations $violations): void
