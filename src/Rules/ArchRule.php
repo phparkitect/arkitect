@@ -11,13 +11,10 @@ class ArchRule implements DSL\ArchRule
 
     private Constraints $shoulds;
 
-    private string $because;
-
-    public function __construct(Specs $specs, Constraints $constraints, string $because)
+    public function __construct(Specs $specs, Constraints $constraints)
     {
         $this->thats = $specs;
         $this->shoulds = $constraints;
-        $this->because = $because;
     }
 
     public function check(ClassDescription $classDescription, Violations $violations): void
