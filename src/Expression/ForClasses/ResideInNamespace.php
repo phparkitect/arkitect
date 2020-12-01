@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
-use Arkitect\Expression\ExpressionDescription;
-use Arkitect\Expression\PositiveExpressionDescription;
+use Arkitect\Expression\PositiveDescription;
 
 class ResideInNamespace implements Expression
 {
@@ -17,9 +17,9 @@ class ResideInNamespace implements Expression
         $this->namespace = $namespace;
     }
 
-    public function describe(ClassDescription $theClass): ExpressionDescription
+    public function describe(ClassDescription $theClass): Description
     {
-        return new PositiveExpressionDescription("{$theClass->getFQCN()} [resides|doesn't reside] in namespace {$this->namespace}");
+        return new PositiveDescription("{$theClass->getFQCN()} [resides|doesn't reside] in namespace {$this->namespace}");
     }
 
     public function evaluate(ClassDescription $theClass): bool

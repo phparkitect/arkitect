@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Arkitect\Expression\Logical;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
-use Arkitect\Expression\PositiveExpressionDescription;
-use Arkitect\Expression\NegativeExpressionDescription;
+use Arkitect\Expression\NegativeDescription;
 
 class Not implements Expression
 {
@@ -17,9 +17,9 @@ class Not implements Expression
         $this->expression = $expression;
     }
 
-    public function describe(ClassDescription $theClass): NegativeExpressionDescription
+    public function describe(ClassDescription $theClass): Description
     {
-        return new NegativeExpressionDescription($this->expression->describe($theClass));
+        return new NegativeDescription($this->expression->describe($theClass));
     }
 
     public function evaluate(ClassDescription $theClass): bool
