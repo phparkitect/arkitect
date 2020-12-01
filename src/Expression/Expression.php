@@ -17,7 +17,7 @@ interface Expression
      * Returns a human readable description of the expression
      * $theClass can be used to add contextual information.
      */
-    public function describe(ClassDescription $theClass): ExpressionDescription;
+    public function describe(ClassDescription $theClass): Description;
 
     /**
      * Evaluates the expression for the class passed as parameter.
