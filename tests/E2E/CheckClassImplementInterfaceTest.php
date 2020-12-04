@@ -27,6 +27,7 @@ class CheckClassImplementInterfaceTest extends TestCase
 
         $expectedExceptionMessage = <<< 'EOT'
             Failed asserting that 
+            App\Controller\Foo implements ContainerAwareInterface
             App\Controller\ProductsController implements ContainerAwareInterface
             App\Controller\UserController implements ContainerAwareInterface
             App\Services\UserService implements ContainerAwareInterface.
