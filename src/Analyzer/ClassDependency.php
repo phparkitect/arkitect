@@ -20,6 +20,17 @@ class ClassDependency
         return $this->FQCN->matches($pattern);
     }
 
+    public function matchesOneOf(string ...$patterns): bool
+    {
+        foreach ($patterns as $pattern) {
+            if (!$this->FQCN->matches($pattern)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public function getLine(): int
     {
         return $this->line;
