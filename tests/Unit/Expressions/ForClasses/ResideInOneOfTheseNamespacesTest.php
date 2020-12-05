@@ -8,7 +8,7 @@ use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use PHPUnit\Framework\TestCase;
 
-class ResideInNamespaceTest extends TestCase
+class ResideInOneOfTheseNamespacesTest extends TestCase
 {
     public function shouldMatchNamespacesProvider(): array
     {
