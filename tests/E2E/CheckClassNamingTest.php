@@ -5,7 +5,7 @@ namespace Arkitect\Tests\E2E;
 
 use Arkitect\ClassSet;
 use Arkitect\Expression\ForClasses\HaveNameMatching;
-use Arkitect\Expression\ForClasses\ResideInNamespace;
+use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\PHPUnit\ArchRuleTestCase;
 use Arkitect\Rules\Rule;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -18,7 +18,7 @@ class CheckClassNamingTest extends TestCase
         $set = ClassSet::fromDir(__DIR__.'/fixtures/happy_island');
 
         $rule = Rule::allClasses()
-            ->that(new ResideInNamespace('App\HappyIsland'))
+            ->that(new ResideInOneOfTheseNamespaces('App\HappyIsland'))
             ->should(new HaveNameMatching('Happy*'))
             ->because("that's what she said");
 
@@ -38,7 +38,7 @@ class CheckClassNamingTest extends TestCase
         $set = ClassSet::fromDir(__DIR__.'/fixtures/happy_island');
 
         $rule = Rule::allClasses()
-            ->that(new ResideInNamespace('App\HappyIsland'))
+            ->that(new ResideInOneOfTheseNamespaces('App\HappyIsland'))
             ->shouldNot(new HaveNameMatching('Happy*'))
             ->because('we decided to avoid the Happy prefix in class names');
 

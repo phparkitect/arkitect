@@ -8,7 +8,7 @@ use Arkitect\Analyzer\ClassDescription;
 /**
  * A class implementing this interface represents a property a php class may or may not have.
  *
- * @example ResideInNamespace Expression tells if a class is in a particular namespace
+ * @example ResideInOneOfTheseNamespaces Expression tells if a class is defined in a particular namespace
  * @example HaveNameMatching tells if a class has a name matching a pattern
  */
 interface Expression

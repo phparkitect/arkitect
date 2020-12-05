@@ -5,7 +5,7 @@ namespace Arkitect\Tests\E2E;
 
 use Arkitect\ClassSet;
 use Arkitect\Expression\ForClasses\Implement;
-use Arkitect\Expression\ForClasses\ResideInNamespace;
+use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\PHPUnit\ArchRuleTestCase;
 use Arkitect\Rules\Rule;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -21,7 +21,7 @@ class CheckClassImplementInterfaceTest extends TestCase
         $set = ClassSet::fromDir(__DIR__.'/fixtures/mvc');
 
         $rule = Rule::allClasses()
-            ->that(new ResideInNamespace('App\Controller'))
+            ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
             ->should(new Implement('ContainerAwareInterface'))
             ->because('i said so');
 
