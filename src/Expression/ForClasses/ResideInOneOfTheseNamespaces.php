@@ -34,5 +34,4 @@ class ResideInOneOfTheseNamespaces implements Expression
 
         return false;
     }
-
 }
