@@ -6,14 +6,12 @@ namespace Arkitect\Tests\Unit\Analyzer;
 
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptionBuilder;
 use PHPUnit\Framework\TestCase;
 
 class ClassDescriptionTest extends TestCase
 {
-    /**
-     * @var \Arkitect\Analyzer\ClassDescriptionBuilder
-     */
-    private $builder;
+    private ClassDescriptionBuilder $builder;
 
     public function setUp(): void
     {
@@ -54,7 +52,7 @@ class ClassDescriptionTest extends TestCase
     {
         $cd = $this->builder->get();
 
-        $this->assertTrue($cd->isInNamespace('Fruit'));
+        $this->assertTrue($cd->namespaceMatches('Fruit'));
     }
 
     public function test_should_return_name(): void

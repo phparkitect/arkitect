@@ -18,7 +18,12 @@ class ClassDescription
         $this->fullPath = $fullPath;
     }
 
-    public static function build(string $FQCN, string $filePath): ClassDescriptionBuilder
+    public function setFullPath(string $fullPath): void
+    {
+        $this->fullPath = $fullPath;
+    }
+
+    public static function build(string $FQCN, string $filePath = ''): ClassDescriptionBuilder
     {
         return ClassDescriptionBuilder::create($FQCN, $filePath);
     }
@@ -31,14 +36,6 @@ class ClassDescription
     public function getFQCN(): string
     {
         return $this->FQCN->toString();
-    }
-
-    /**
-     * @deprecated usare namespaceMatches il cui comportamento è corretto
-     */
-    public function isInNamespace(string $pattern): bool
-    {
-        return $this->FQCN->namespaceMatches($pattern);
     }
 
     public function dependsOnClass(string $pattern): bool

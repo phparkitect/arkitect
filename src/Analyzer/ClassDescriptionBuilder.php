@@ -17,7 +17,7 @@ class ClassDescriptionBuilder
     {
     }
 
-    public static function create(string $FQCN, string $filePath): self
+    public static function create(string $FQCN, string $filePath = ''): self
     {
         $cdb = new self();
         $cdb->FQCN = FullyQualifiedClassName::fromString($FQCN);

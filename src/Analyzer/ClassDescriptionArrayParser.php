@@ -19,4 +19,8 @@ class ClassDescriptionArrayParser implements Parser
     {
         $this->eventDispatcher->dispatch(new ClassAnalyzed($classDescription));
     }
+
+    public function onClassAnalyzed(callable $callable): void
+    {
+    }
 }
