@@ -19,6 +19,9 @@ shell: ## entra nel container
 test: ## lancia i test
 	bin/phpunit
 
+outdated:
+	composer outdated
+
 coverage: ## lancia i test con coverage
 	phpdbg -qrr ./bin/phpunit --coverage-html build/coverage
 

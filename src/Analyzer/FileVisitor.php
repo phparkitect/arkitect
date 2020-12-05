@@ -3,28 +3,15 @@ declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
 
-use Arkitect\Analyzer\Events\ClassAnalyzed;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use Psr\EventDispatcher\EventDispatcherInterface;
 
 class FileVisitor extends NodeVisitorAbstract
 {
-    private \Psr\EventDispatcher\EventDispatcherInterface $eventDispatcher;
+    private ?ClassDescriptionBuilder $classDescriptionBuilder;
 
-    private ?string $fileCurrentlyAnalized;
-
-    private ?\Arkitect\Analyzer\ClassDescriptionBuilder $classDescriptionBuilder;
-
-    public function __construct(EventDispatcherInterface $eventDispatcher)
-    {
-        $this->eventDispatcher = $eventDispatcher;
-    }
-
-    public function setCurrentAnalisedFile(string $filePath): void
-    {
-        $this->fileCurrentlyAnalized = $filePath;
-    }
+    /** @var callable(ClassDescription) */
+    private $callable;
 
     public function enterNode(Node $node): void
     {
@@ -32,7 +19,6 @@ class FileVisitor extends NodeVisitorAbstract
             /** @psalm-suppress UndefinedPropertyFetch */
             $this->classDescriptionBuilder = ClassDescriptionBuilder::create(
                 $node->namespacedName->toCodeString(),
-                $this->fileCurrentlyAnalized
             );
 
             foreach ($node->implements as $interface) {
@@ -53,12 +39,17 @@ class FileVisitor extends NodeVisitorAbstract
         }
     }
 
+    public function onClassAnalyzed(callable $callable): void
+    {
+        $this->callable = $callable;
+    }
+
     public function leaveNode(Node $node): void
     {
         if ($node instanceof Node\Stmt\Class_) {
             $classDescription = $this->classDescriptionBuilder->get();
 
-            $this->eventDispatcher->dispatch(new ClassAnalyzed($classDescription));
+            \call_user_func($this->callable, $classDescription);
         }
     }
 }

@@ -6,7 +6,6 @@ namespace Arkitect\Analyzer;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\ParserFactory;
-use Psr\EventDispatcher\EventDispatcherInterface;
 
 class FileParser implements Parser
 {
@@ -14,26 +13,26 @@ class FileParser implements Parser
 
     private \PhpParser\NodeTraverser $traverser;
 
-    private \Arkitect\Analyzer\FileVisitor $fileVisitor;
+    private FileVisitor $fileVisitor;
 
-    public function __construct(EventDispatcherInterface $eventDispatcher)
+    public function __construct()
     {
-        $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
-        $this->fileVisitor = new FileVisitor($eventDispatcher);
-        $this->traverser = new NodeTraverser();
+        $this->fileVisitor = new FileVisitor();
 
+        $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
+        $this->traverser = new NodeTraverser();
         $this->traverser->addVisitor(new NameResolver());
         $this->traverser->addVisitor($this->fileVisitor);
     }
 
-    public function parse($file): void
+    public function onClassAnalyzed(callable $callable): void
     {
-        $filePath = $file->getRelativePath();
-        $fileContent = $file->getContents();
+        $this->fileVisitor->onClassAnalyzed($callable);
+    }
 
+    public function parse(string $fileContent): void
+    {
         try {
-            $this->fileVisitor->setCurrentAnalisedFile($filePath);
-
             $stmts = $this->parser->parse($fileContent);
 
             $this->traverser->traverse($stmts);

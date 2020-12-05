@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Unit\Rules;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Expression\PositiveDescription;
@@ -32,7 +33,7 @@ class ConstraintsTest extends TestCase
         $violations = new Violations();
 
         $expressionStore->checkAll(
-            $this->prophesize(ClassDescription::class)->reveal(),
+            ClassDescriptionBuilder::create('Banana')->get(),
             $violations
         );
 
@@ -58,7 +59,7 @@ class ConstraintsTest extends TestCase
         $violations = new Violations();
 
         $expressionStore->checkAll(
-            $this->prophesize(ClassDescription::class)->reveal(),
+            ClassDescriptionBuilder::create('Banana')->get(),
             $violations
         );
 

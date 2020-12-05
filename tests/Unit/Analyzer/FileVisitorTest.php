@@ -5,16 +5,17 @@ namespace Arkitect\Tests\Unit\Analyzer;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FileParser;
-use Arkitect\Testing\EventDispatcherSpy;
 use PHPUnit\Framework\TestCase;
 
 class FileVisitorTest extends TestCase
 {
     public function test_should_create_a_class_description(): void
     {
-        $ed = new EventDispatcherSpy();
-
-        $fp = new FileParser($ed);
+        $cd = [];
+        $fp = new FileParser();
+        $fp->onClassAnalyzed(static function (ClassDescription $classDescription) use (&$cd): void {
+            $cd[] = $classDescription;
+        });
 
         $code = <<< 'EOF'
             <?php
@@ -33,33 +34,10 @@ class FileVisitorTest extends TestCase
             }
             EOF;
 
-        $fp->parse(new FakeFile('my/file/path', $code));
+        $fp->parse($code);
 
-        [$firstEvent, $secondEvent] = $ed->getDispatchedEvents();
-
-        $this->assertInstanceOf(ClassDescription::class, $firstEvent->getClassDescription());
-        $this->assertInstanceOf(ClassDescription::class, $secondEvent->getClassDescription());
-    }
-}
-
-class FakeFile
-{
-    private $path;
-    private $content;
-
-    public function __construct($path, $content)
-    {
-        $this->path = $path;
-        $this->content = $content;
-    }
-
-    public function getRelativePath()
-    {
-        return $this->path;
-    }
-
-    public function getContents()
-    {
-        return $this->content;
+        self::assertCount(2, $cd);
+        self::assertInstanceOf(ClassDescription::class, $cd[0]);
+        self::assertInstanceOf(ClassDescription::class, $cd[1]);
     }
 }
