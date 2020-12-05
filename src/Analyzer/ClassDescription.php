@@ -50,6 +50,18 @@ class ClassDescription
         return (bool) \count(array_filter($this->dependencies, $depends));
     }
 
+    public function dependsOnlyOnTheseNamespaces(string ...$namespaces): bool
+    {
+        /** @var ClassDependency $dependency */
+        foreach ($this->dependencies as $dependency) {
+            if (!$dependency->matchesOneOf(...$namespaces)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public function dependsOnNamespace(string $pattern): bool
     {
         $depends = function (ClassDependency $dependency) use ($pattern) {
