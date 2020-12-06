@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Arkitect;
 
 use Arkitect\Analyzer\ClassDescription;
-use Arkitect\Analyzer\ClassDescriptionArrayParser;
 use Arkitect\Analyzer\Events\ClassAnalyzed;
 use Arkitect\Analyzer\FileParser;
 use Arkitect\Analyzer\FilePath;
@@ -52,13 +51,6 @@ class ClassSet
         });
 
         return new self($finder->getIterator(), $eventDispatcher, $fileParser, $currentlyAnalyzedFile);
-    }
-
-    public static function fromArray(array $classDescriptions)
-    {
-        $eventDispatcher = new EventDispatcher();
-
-        return new self(new \ArrayIterator($classDescriptions), $eventDispatcher, new ClassDescriptionArrayParser($eventDispatcher), new FilePath());
     }
 
     public function run(): void
