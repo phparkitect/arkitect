@@ -7,25 +7,32 @@ class ClassDescriptionBuilder
 {
     private ?array $classDependencies;
 
-    private ?\Arkitect\Analyzer\FullyQualifiedClassName $FQCN;
-
-    private ?string $filePath;
+    private ?FullyQualifiedClassName $FQCN;
 
     private ?array $interfaces;
+
+    private string $filePath;
 
     private function __construct()
     {
     }
 
-    public static function create(string $FQCN, string $filePath = ''): self
+    public static function create(string $FQCN): self
     {
         $cdb = new self();
         $cdb->FQCN = FullyQualifiedClassName::fromString($FQCN);
-        $cdb->filePath = $filePath;
+        $cdb->filePath = '';
         $cdb->classDependencies = [];
         $cdb->interfaces = [];
 
         return $cdb;
+    }
+
+    public function setFilePath(string $filePath): self
+    {
+        $this->filePath = $filePath;
+
+        return $this;
     }
 
     public function addInterface(string $FQCN, int $line): self
@@ -45,11 +52,9 @@ class ClassDescriptionBuilder
 
     public function get(): ClassDescription
     {
-        return new ClassDescription(
-            $this->filePath,
-            $this->FQCN,
-            $this->classDependencies,
-            $this->interfaces
-        );
+        $cd = new ClassDescription($this->FQCN, $this->classDependencies, $this->interfaces);
+        $cd->setFullPath($this->filePath);
+
+        return $cd;
     }
 }

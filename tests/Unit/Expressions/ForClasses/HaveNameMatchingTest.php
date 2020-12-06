@@ -13,7 +13,7 @@ class HaveNameMatchingTest extends TestCase
     {
         $expression = new HaveNameMatching('*Class');
 
-        $goodClass = ClassDescription::build('\App\MyClass', 'App')->get();
+        $goodClass = ClassDescription::build('\App\MyClass')->get();
 
         $this->assertTrue($expression->evaluate($goodClass));
     }
@@ -22,7 +22,7 @@ class HaveNameMatchingTest extends TestCase
     {
         $expression = new HaveNameMatching('*GoodName*');
 
-        $badClass = ClassDescription::build('\App\BadNameClass', 'App')->get();
+        $badClass = ClassDescription::build('\App\BadNameClass')->get();
 
         $this->assertFalse($expression->evaluate($badClass));
         $this->assertEquals('\App\BadNameClass has a name that matches *GoodName*', $expression->describe($badClass)->toString());

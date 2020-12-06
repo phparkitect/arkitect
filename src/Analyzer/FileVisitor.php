@@ -18,7 +18,7 @@ class FileVisitor extends NodeVisitorAbstract
         if ($node instanceof Node\Stmt\Class_) {
             /** @psalm-suppress UndefinedPropertyFetch */
             $this->classDescriptionBuilder = ClassDescriptionBuilder::create(
-                $node->namespacedName->toCodeString(),
+                $node->namespacedName->toCodeString()
             );
 
             foreach ($node->implements as $interface) {
