@@ -14,7 +14,7 @@ class ClassSetTest extends TestCase
 {
     public function test_can_be_built_from_files(): void
     {
-        $set = ClassSet::fromDir(__DIR__.'/../e2e/fixtures/happy_island');
+        $set = ClassSet::fromDir(__DIR__.'/../E2E/fixtures/happy_island');
         $fakeSubscriber = new FakeSubscriber();
 
         $set->addSubscriber($fakeSubscriber);
