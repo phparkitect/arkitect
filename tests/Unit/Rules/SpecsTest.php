@@ -17,7 +17,7 @@ class SpecsTest extends TestCase
         $specStore = new Specs();
         $specStore->add(new HaveNameMatching('Foo'));
 
-        $classDescription = ClassDescription::build('MyNamespace\HappyIsland', '')->get();
+        $classDescription = ClassDescription::build('MyNamespace\HappyIsland')->get();
 
         $this->assertFalse($specStore->allSpecsAreMatchedBy($classDescription));
     }
@@ -27,7 +27,7 @@ class SpecsTest extends TestCase
         $specStore = new Specs();
         $specStore->add(new HaveNameMatching('Happy*'));
 
-        $classDescription = ClassDescription::build('MyNamespace\HappyIsland', '')
+        $classDescription = ClassDescription::build('MyNamespace\HappyIsland')
             ->addDependency(new ClassDependency('Foo', 100))
             ->get();
 

@@ -29,7 +29,7 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
     {
         $haveNameMatching = new ResideInOneOfTheseNamespaces($expectedNamespace);
 
-        $classDesc = ClassDescription::build($actualFQCN, '')->get();
+        $classDesc = ClassDescription::build($actualFQCN)->get();
 
         self::assertTrue($haveNameMatching->evaluate($classDesc));
     }
@@ -38,7 +38,7 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
     {
         $haveNameMatching = new ResideInOneOfTheseNamespaces('MyNamespace');
 
-        $classDesc = ClassDescription::build('AnotherNamespace\HappyIsland', '')->get();
+        $classDesc = ClassDescription::build('AnotherNamespace\HappyIsland')->get();
 
         self::assertFalse($haveNameMatching->evaluate($classDesc));
     }
@@ -47,16 +47,16 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
     {
         $haveNameMatching = new ResideInOneOfTheseNamespaces('MyNamespace', 'AnotherNamespace', 'AThirdNamespace');
 
-        $classDesc = ClassDescription::build('AnotherNamespace\HappyIsland', '')->get();
+        $classDesc = ClassDescription::build('AnotherNamespace\HappyIsland')->get();
         self::assertTrue($haveNameMatching->evaluate($classDesc));
 
-        $classDesc = ClassDescription::build('MyNamespace\HappyIsland', '')->get();
+        $classDesc = ClassDescription::build('MyNamespace\HappyIsland')->get();
         self::assertTrue($haveNameMatching->evaluate($classDesc));
 
-        $classDesc = ClassDescription::build('AThirdNamespace\HappyIsland', '')->get();
+        $classDesc = ClassDescription::build('AThirdNamespace\HappyIsland')->get();
         self::assertTrue($haveNameMatching->evaluate($classDesc));
 
-        $classDesc = ClassDescription::build('NopeNamespace\HappyIsland', '')->get();
+        $classDesc = ClassDescription::build('NopeNamespace\HappyIsland')->get();
         self::assertFalse($haveNameMatching->evaluate($classDesc));
     }
 }

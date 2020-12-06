@@ -10,12 +10,11 @@ class ClassDescription
     private array $interfaces;
     private string $fullPath;
 
-    public function __construct(string $fullPath, FullyQualifiedClassName $FQCN, array $dependencies, array $interfaces)
+    public function __construct(FullyQualifiedClassName $FQCN, array $dependencies, array $interfaces)
     {
         $this->FQCN = $FQCN;
         $this->dependencies = $dependencies;
         $this->interfaces = $interfaces;
-        $this->fullPath = $fullPath;
     }
 
     public function setFullPath(string $fullPath): void
@@ -23,9 +22,9 @@ class ClassDescription
         $this->fullPath = $fullPath;
     }
 
-    public static function build(string $FQCN, string $filePath = ''): ClassDescriptionBuilder
+    public static function build(string $FQCN): ClassDescriptionBuilder
     {
-        return ClassDescriptionBuilder::create($FQCN, $filePath);
+        return ClassDescriptionBuilder::create($FQCN);
     }
 
     public function getName(): string

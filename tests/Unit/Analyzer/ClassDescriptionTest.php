@@ -15,7 +15,7 @@ class ClassDescriptionTest extends TestCase
 
     public function setUp(): void
     {
-        $this->builder = ClassDescription::build('Fruit\Banana', 'my/path');
+        $this->builder = ClassDescription::build('Fruit\Banana');
     }
 
     public function test_should_return_true_if_name_matches(): void
