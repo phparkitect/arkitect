@@ -10,11 +10,13 @@ use PHPUnit\Framework\Constraint\Constraint;
 
 class ArchRuleCheckerConstraintAdapter extends Constraint
 {
-    private RuleChecker $ruleChecker;
+    private ClassSet $classSet;
 
-    public function __construct(ClassSet $classSet, Violations $violations)
+    private Violations $violations;
+
+    public function __construct(ClassSet $classSet)
     {
-        $this->ruleChecker = new RuleChecker($classSet, $violations);
+        $this->classSet = $classSet;
     }
 
     public function toString(): string
@@ -24,13 +26,15 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
 
     protected function matches(/** ArchRule */ $rule): bool
     {
-        $this->ruleChecker->check($rule);
+        $ruleChecker = RuleChecker::build($this->classSet, $rule);
 
-        return !$this->ruleChecker->hasViolations();
+        $this->violations = $ruleChecker->run();
+
+        return 0 === $this->violations->count();
     }
 
     protected function failureDescription($other): string
     {
-        return "\n".$this->ruleChecker->getViolations()->toString();
+        return "\n".$this->violations->toString();
     }
 }
