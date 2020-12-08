@@ -3,11 +3,14 @@ declare(strict_types=1);
 
 namespace Arkitect\Rules;
 
-use Arkitect\Analyzer\Events\ClassAnalyzed;
+use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\FileParser;
+use Arkitect\Analyzer\FilePath;
+use Arkitect\Analyzer\Parser;
 use Arkitect\ClassSet;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Finder\SplFileInfo;
 
-class RuleChecker implements EventSubscriberInterface
+class RuleChecker
 {
     private Violations $violations;
 
@@ -15,41 +18,43 @@ class RuleChecker implements EventSubscriberInterface
 
     private ClassSet $classSet;
 
-    public function __construct(ClassSet $classSet, Violations $violations)
+    private FilePath $currentlyAnalyzedFile;
+
+    private Parser $parser;
+
+    public function __construct(ClassSet $classSet, DSL\ArchRule $rule, Parser $parser, FilePath $currentlyAnalyzedFile, Violations $violations)
     {
         $this->classSet = $classSet;
-        $this->violations = $violations;
-
-        $this->classSet->addSubscriber($this);
-    }
-
-    public function check(DSL\ArchRule $rule): void
-    {
         $this->rule = $rule;
-        $this->classSet->run();
+        $this->parser = $parser;
+        $this->violations = $violations;
+        $this->currentlyAnalyzedFile = $currentlyAnalyzedFile;
     }
 
-    public function getViolations(): Violations
+    public static function build(ClassSet $classSet, DSL\ArchRule $rule): self
     {
+        $violations = new Violations();
+        $currentlyAnalyzedFile = new FilePath();
+
+        $fileParser = new FileParser();
+        $fileParser->onClassAnalyzed(static function (ClassDescription $classDescription) use ($currentlyAnalyzedFile, $rule, $violations): void {
+            $classDescription->setFullPath($currentlyAnalyzedFile->toString());
+
+            $rule->check($classDescription, $violations);
+        });
+
+        return new self($classSet, $rule, $fileParser, $currentlyAnalyzedFile, $violations);
+    }
+
+    public function run(): Violations
+    {
+        /** @var SplFileInfo $file */
+        foreach ($this->classSet as $file) {
+            $this->currentlyAnalyzedFile->set($file->getRelativePath());
+
+            $this->parser->parse($file->getContents());
+        }
+
         return $this->violations;
-    }
-
-    public function hasViolations(): bool
-    {
-        return 0 !== $this->violations->count();
-    }
-
-    public function onClassAnalyzed(ClassAnalyzed $classAnalyzed): void
-    {
-        $classDescription = $classAnalyzed->getClassDescription();
-
-        $this->rule->check($classDescription, $this->violations);
-    }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ClassAnalyzed::class => 'onClassAnalyzed',
-        ];
     }
 }

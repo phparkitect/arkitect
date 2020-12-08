@@ -3,30 +3,15 @@ declare(strict_types=1);
 
 namespace Arkitect;
 
-use Arkitect\Analyzer\ClassDescription;
-use Arkitect\Analyzer\Events\ClassAnalyzed;
-use Arkitect\Analyzer\FileParser;
-use Arkitect\Analyzer\FilePath;
-use Arkitect\Analyzer\Parser;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 
-class ClassSet
+class ClassSet implements \IteratorAggregate
 {
     private \Iterator $fileIterator;
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-    private \Arkitect\Analyzer\Parser $parser;
-    private FilePath $currentlyAnalyzedFile;
 
-    private function __construct(\Iterator $fileIterator, EventDispatcherInterface $dispatcher, Parser $parser, FilePath $filePath)
+    private function __construct(\Iterator $fileIterator)
     {
         $this->fileIterator = $fileIterator;
-        $this->dispatcher = $dispatcher;
-        $this->parser = $parser;
-        $this->currentlyAnalyzedFile = $filePath;
     }
 
     public static function fromDir(string $directory): self
@@ -40,31 +25,11 @@ class ClassSet
             ->ignoreUnreadableDirs(true)
             ->ignoreVCS(true);
 
-        $eventDispatcher = new EventDispatcher();
-        $currentlyAnalyzedFile = new FilePath();
-        $fileParser = new FileParser();
-
-        $fileParser->onClassAnalyzed(static function (ClassDescription $classDescription) use ($eventDispatcher, $currentlyAnalyzedFile): void {
-            $classDescription->setFullPath($currentlyAnalyzedFile->toString());
-
-            $eventDispatcher->dispatch(new ClassAnalyzed($classDescription));
-        });
-
-        return new self($finder->getIterator(), $eventDispatcher, $fileParser, $currentlyAnalyzedFile);
+        return new self($finder->getIterator());
     }
 
-    public function run(): void
+    public function getIterator()
     {
-        /** @var SplFileInfo $file */
-        foreach ($this->fileIterator as $file) {
-            $this->currentlyAnalyzedFile->set($file->getRelativePath());
-
-            $this->parser->parse($file->getContents());
-        }
-    }
-
-    public function addSubscriber(EventSubscriberInterface $subscriber): void
-    {
-        $this->dispatcher->addSubscriber($subscriber);
+        return $this->fileIterator;
     }
 }
