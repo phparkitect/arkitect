@@ -7,29 +7,43 @@ use Symfony\Component\Finder\Finder;
 
 class ClassSet implements \IteratorAggregate
 {
-    private \Iterator $fileIterator;
+    private string $directory;
 
-    private function __construct(\Iterator $fileIterator)
+    private array $exclude;
+
+    private function __construct(string $directory)
     {
-        $this->fileIterator = $fileIterator;
+        $this->directory = $directory;
+        $this->exclude = [];
+    }
+
+    public function exclude(string ...$pattern): self
+    {
+        $this->exclude = array_merge($this->exclude, $pattern);
+
+        return $this;
     }
 
     public static function fromDir(string $directory): self
     {
+        return new self($directory);
+    }
+
+    public function getIterator()
+    {
         $finder = (new Finder())
             ->files()
-            ->in($directory)
+            ->in($this->directory)
             ->name('*.php')
             ->sortByName()
             ->followLinks()
             ->ignoreUnreadableDirs(true)
             ->ignoreVCS(true);
 
-        return new self($finder->getIterator());
-    }
+        if ($this->exclude) {
+            $finder->notPath($this->exclude);
+        }
 
-    public function getIterator()
-    {
-        return $this->fileIterator;
+        return $finder;
     }
 }
