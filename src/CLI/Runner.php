@@ -23,15 +23,12 @@ class Runner
     {
         $this->classSet = $classSet;
         $this->rules = $rules;
-        $this->ruleChecker = new RuleChecker($this->classSet, new Violations());
+
+        $this->ruleChecker = RuleChecker::build($classSet, ...$rules);
     }
 
     public function run(): Violations
     {
-        foreach ($this->rules as $rule) {
-            $this->ruleChecker->check($rule);
-        }
-
-        return $this->ruleChecker->getViolations();
+        return $this->ruleChecker->run();
     }
 }

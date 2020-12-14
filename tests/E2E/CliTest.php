@@ -26,15 +26,13 @@ class CliTest extends TestCase
     {
         $process = new Process([$this->phparkitect, 'check', '--config='.$this->configWithErrors], __DIR__);
         $process->run();
-        var_dump($process->getErrorOutput());
-        var_dump($process->getOutput());
         $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
 
         $expectedErrors = 'ERRORS!
 App\Controller\Foo implements ContainerAwareInterface
+App\Controller\Foo has a name that matches *Controller
 App\Controller\ProductsController implements ContainerAwareInterface
-App\Controller\UserController implements ContainerAwareInterface
-App\Controller\Foo has a name that matches *Controller';
+App\Controller\UserController implements ContainerAwareInterface';
         $this->assertStringContainsString($expectedErrors, $process->getOutput());
     }
 

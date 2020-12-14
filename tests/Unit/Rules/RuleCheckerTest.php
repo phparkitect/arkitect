@@ -25,7 +25,7 @@ class RuleCheckerTest extends TestCase
             $rule->check($classDescription, $violations);
         });
 
-        $ruleChecker = new RuleChecker(new FakeClassSet(), $rule, $fileParser, new FilePath(), $violations);
+        $ruleChecker = new RuleChecker(new FakeClassSet(), $fileParser, new FilePath(), $violations, ...[$rule]);
         $violations = $ruleChecker->run();
 
         self::assertCount(3, $violations);
