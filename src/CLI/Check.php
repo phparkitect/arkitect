@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI;
 
-use Arkitect\RuleChecker;
 use Arkitect\Rules\Violations;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,6 +13,10 @@ use Webmozart\Assert\Assert;
 class Check extends Command
 {
     private const CONFIG_FILENAME_PARAM = 'config';
+
+    private const SUCCESS_CODE = 0;
+
+    private const ERROR_CODE = 1;
 
     public function __construct()
     {
@@ -40,22 +43,23 @@ class Check extends Command
         $rulesFilename = $this->getConfigFilename($input);
         $output->writeln(sprintf("Config file: %s\n", $rulesFilename));
 
-        $ruleChecker = new RuleChecker();
+        $config = new Config();
 
-        $this->readRules($ruleChecker, $rulesFilename);
+        $this->readRules($config, $rulesFilename);
 
-        $violations = $ruleChecker->run();
+        $runner = $config->getRunner();
+        $violations = $runner->run();
 
         if ($violations->count() > 0) {
             $this->printViolations($violations, $output);
+
+            exit(self::ERROR_CODE);
         }
 
-        $this->printSummaryLine($output, $ruleChecker->assertionsCount(), $violations->count());
-
-        return $violations->count();
+        exit(self::SUCCESS_CODE);
     }
 
-    protected function readRules(RuleChecker $ruleChecker, string $rulesFilename): void
+    protected function readRules(Config $ruleChecker, string $rulesFilename): void
     {
         \Closure::fromCallable(function () use ($ruleChecker, $rulesFilename) {
             $config = require $rulesFilename;

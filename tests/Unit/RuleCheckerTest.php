@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Unit;
 
 use Arkitect\ClassSet;
-use Arkitect\RuleChecker;
+use Arkitect\Config;
 use Arkitect\Rules\ArchRuleGivenClasses;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
@@ -25,7 +25,7 @@ class RuleCheckerTest extends TestCase
         $anotherArchRuleGivenClasses->check($classSet)->shouldBeCalled();
         $anotherArchRuleGivenClasses->getViolations()->willReturn(new Violations('Violation 2', 'Violation 3'))->shouldBeCalled();
 
-        $ruleChecker = new RuleChecker();
+        $ruleChecker = new Config();
         $ruleChecker
             ->checkThatClassesIn($classSet->reveal())
             ->meetTheFollowingRules($archRuleGivenClasses->reveal(), $anotherArchRuleGivenClasses->reveal());
