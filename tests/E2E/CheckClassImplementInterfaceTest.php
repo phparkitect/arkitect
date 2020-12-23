@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
  */
 class CheckClassImplementInterfaceTest extends TestCase
 {
-    public function testAssertionShouldFailOnBrokenRule(): void
+    public function test_assertion_should_fail_on_broken_rule(): void
     {
         $set = ClassSet::fromDir(__DIR__.'/fixtures/mvc');
 

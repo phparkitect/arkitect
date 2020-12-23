@@ -22,18 +22,18 @@ class ClassDependencyTest extends TestCase
         $this->classDependency = new ClassDependency($this->FQCN, $this->line);
     }
 
-    public function testItShouldCreateClassDependency(): void
+    public function test_it_should_create_class_dependency(): void
     {
         $this->assertEquals(FullyQualifiedClassName::fromString($this->FQCN), $this->classDependency->getFQCN());
         $this->assertEquals($this->line, $this->classDependency->getLine());
     }
 
-    public function testItShouldMatch(): void
+    public function test_it_should_match(): void
     {
         $this->assertTrue($this->classDependency->matches('HappyIsland'));
     }
 
-    public function testItShouldNotMatch(): void
+    public function test_it_should_not_match(): void
     {
         $this->assertTrue($this->classDependency->matches('Happy'));
     }

@@ -18,14 +18,14 @@ class ClassDescriptionTest extends TestCase
         $this->builder = ClassDescription::build('Fruit\Banana');
     }
 
-    public function testShouldReturnTrueIfNameMatches(): void
+    public function test_should_return_true_if_name_matches(): void
     {
         $cd = $this->builder->get();
 
         $this->assertTrue($cd->nameMatches('Banana'));
     }
 
-    public function testShouldReturnTrueIfImplementsInterface(): void
+    public function test_should_return_true_if_implements_interface(): void
     {
         $cd = $this->builder
             ->addInterface('Fruit\EdibleInterface', 12)
@@ -35,7 +35,7 @@ class ClassDescriptionTest extends TestCase
         $this->assertFalse($cd->implements('Fruit\AnotherInterface'));
     }
 
-    public function testShouldReturnTrueIfThereIsADependency(): void
+    public function test_should_return_true_if_there_is_a_dependency(): void
     {
         $cd = $this->builder
             ->addDependency(new ClassDependency('Fruit\Mango', 12))
@@ -48,14 +48,14 @@ class ClassDescriptionTest extends TestCase
         $this->assertFalse($cd->dependsOnlyOnClassesMatching('Vegetabl*'));
     }
 
-    public function testShouldReturnTrueIfThereClassIsInNamespace(): void
+    public function test_should_return_true_if_there_class_is_in_namespace(): void
     {
         $cd = $this->builder->get();
 
         $this->assertTrue($cd->namespaceMatches('Fruit'));
     }
 
-    public function testShouldReturnName(): void
+    public function test_should_return_name(): void
     {
         $cd = $this->builder->get();
 

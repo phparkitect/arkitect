@@ -25,7 +25,7 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
      * @param mixed $expectedNamespace
      * @param mixed $actualFQCN
      */
-    public function testItShouldMatchNamespaceAndDescendants($expectedNamespace, $actualFQCN): void
+    public function test_it_should_match_namespace_and_descendants($expectedNamespace, $actualFQCN): void
     {
         $haveNameMatching = new ResideInOneOfTheseNamespaces($expectedNamespace);
 
@@ -34,7 +34,7 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
         self::assertTrue($haveNameMatching->evaluate($classDesc));
     }
 
-    public function testItShouldReturnFalseIfNotResideInNamespace(): void
+    public function test_it_should_return_false_if_not_reside_in_namespace(): void
     {
         $haveNameMatching = new ResideInOneOfTheseNamespaces('MyNamespace');
 
@@ -43,7 +43,7 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
         self::assertFalse($haveNameMatching->evaluate($classDesc));
     }
 
-    public function testItShouldCheckMultipleNamespacesInOr(): void
+    public function test_it_should_check_multiple_namespaces_in_or(): void
     {
         $haveNameMatching = new ResideInOneOfTheseNamespaces('MyNamespace', 'AnotherNamespace', 'AThirdNamespace');
 

@@ -26,23 +26,23 @@ class ViolationsTest extends TestCase
         $this->violationStore->add($this->violationData);
     }
 
-    public function testAddElementsToStoreAndGetIt(): void
+    public function test_add_elements_to_store_and_get_it(): void
     {
         $this->assertEquals($this->violationData, $this->violationStore->get(0));
     }
 
-    public function testAddElementsToStoreAndCantGetItIfIndexNotValid(): void
+    public function test_add_elements_to_store_and_cant_get_it_if_index_not_valid(): void
     {
         $this->assertEquals('', $this->violationStore->get(1111));
     }
 
-    public function testCount(): void
+    public function test_count(): void
     {
         $this->violationStore->add('foo');
         $this->assertEquals(2, $this->violationStore->count());
     }
 
-    public function testToString(): void
+    public function test_to_string(): void
     {
         $this->violationStore->add('foo');
         $expected = 'violation

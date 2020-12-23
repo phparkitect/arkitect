@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class FileVisitorTest extends TestCase
 {
-    public function testShouldCreateAClassDescription(): void
+    public function test_should_create_a_class_description(): void
     {
         $cd = [];
         $fp = new FileParser();

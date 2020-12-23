@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class ImplementConstraintTest extends TestCase
 {
-    public function testItShouldReturnViolationError(): void
+    public function test_it_should_return_violation_error(): void
     {
         $interface = 'interface';
 
@@ -28,7 +28,7 @@ class ImplementConstraintTest extends TestCase
         $this->assertEquals('HappyIsland implements '.$interface, $violationError);
     }
 
-    public function testItShouldReturnTrueIfNotDependsOnNamespace(): void
+    public function test_it_should_return_true_if_not_depends_on_namespace(): void
     {
         $interface = 'interface';
 
@@ -42,7 +42,7 @@ class ImplementConstraintTest extends TestCase
         $this->assertFalse($implementConstraint->evaluate($classDescription));
     }
 
-    public function testItShouldReturnFalseIfDependsOnNamespace(): void
+    public function test_it_should_return_false_if_depends_on_namespace(): void
     {
         $interface = 'interface';
 

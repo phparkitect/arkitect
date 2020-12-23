@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class ClassDescriptionBuilderTest extends TestCase
 {
-    public function testItShouldCreateBuilderWithDependencyAndInterface(): void
+    public function test_it_should_create_builder_with_dependency_and_interface(): void
     {
         $FQCN = 'HappyIsland';
         $classDescriptionBuilder = ClassDescriptionBuilder::create($FQCN);

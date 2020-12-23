@@ -22,14 +22,14 @@ class FullyQualifiedClassNameTest extends TestCase
     /**
      * @dataProvider patternProvider
      */
-    public function testShouldMatchNamespacesWithWildcards(string $fqcn, string $pattern, bool $shouldMatch): void
+    public function test_should_match_namespaces_with_wildcards(string $fqcn, string $pattern, bool $shouldMatch): void
     {
         $fqcn = FullyQualifiedClassName::fromString($fqcn);
 
         $this->assertEquals($shouldMatch, $fqcn->matches($pattern));
     }
 
-    public function testShouldThrowIfInvalidNamespaceIsPassed(): void
+    public function test_should_throw_if_invalid_namespace_is_passed(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('-Gvnn is not a valid namespace definition');
@@ -37,7 +37,7 @@ class FullyQualifiedClassNameTest extends TestCase
         FullyQualifiedClassName::fromString('-Gvnn');
     }
 
-    public function testShouldReturnClassName(): void
+    public function test_should_return_class_name(): void
     {
         $fqcn = FullyQualifiedClassName::fromString('Food\Vegetables\Fruits\Banana');
 
