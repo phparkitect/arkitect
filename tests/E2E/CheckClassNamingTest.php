@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 
 class CheckClassNamingTest extends TestCase
 {
-    public function test_code_in_happy_island_should_have_name_matching_prefix(): void
+    public function testCodeInHappyIslandShouldHaveNameMatchingPrefix(): void
     {
         $set = ClassSet::fromDir(__DIR__.'/fixtures/happy_island');
 
@@ -25,10 +25,9 @@ class CheckClassNamingTest extends TestCase
         ArchRuleTestCase::assertArchRule($rule, $set);
     }
 
-    public function test_code_in_happy_island_should_not_have_name_matching_prefix(): void
+    public function testCodeInHappyIslandShouldNotHaveNameMatchingPrefix(): void
     {
         $expectedExceptionMessage = <<< 'EOT'
-            Failed asserting that 
             App\HappyIsland\HappyClass doesn't have a name that matches Happy*
             EOT;
 

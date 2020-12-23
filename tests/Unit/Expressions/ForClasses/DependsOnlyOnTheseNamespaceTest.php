@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class DependsOnlyOnTheseNamespaceTest extends TestCase
 {
-    public function test_it_should_return_true_if_it_has_no_dependencies(): void
+    public function testItShouldReturnTrueIfItHasNoDependencies(): void
     {
         $dependOnClasses = new DependsOnlyOnTheseNamespace('myNamespace');
 
@@ -21,7 +21,7 @@ class DependsOnlyOnTheseNamespaceTest extends TestCase
         self::assertEquals('HappyIsland\Myclass depends only on classes in one of these namespaces: myNamespace', $dependOnClasses->describe($classDescription)->toString());
     }
 
-    public function test_it_should_return_true_if_not_depends_on_namespace(): void
+    public function testItShouldReturnTrueIfNotDependsOnNamespace(): void
     {
         $dependOnClasses = new DependsOnlyOnTheseNamespace('myNamespace');
 
@@ -33,7 +33,7 @@ class DependsOnlyOnTheseNamespaceTest extends TestCase
         self::assertFalse($dependOnClasses->evaluate($classDescription));
     }
 
-    public function test_it_should_return_false_if_depends_on_namespace(): void
+    public function testItShouldReturnFalseIfDependsOnNamespace(): void
     {
         $dependOnClasses = new DependsOnlyOnTheseNamespace('myNamespace');
 

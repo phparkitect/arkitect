@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class HaveNameMatchingTest extends TestCase
 {
-    public function test_check_class_name_match(): void
+    public function testCheckClassNameMatch(): void
     {
         $expression = new HaveNameMatching('*Class');
 
@@ -18,7 +18,7 @@ class HaveNameMatchingTest extends TestCase
         $this->assertTrue($expression->evaluate($goodClass));
     }
 
-    public function test_show_violation_when_class_name_does_not_match(): void
+    public function testShowViolationWhenClassNameDoesNotMatch(): void
     {
         $expression = new HaveNameMatching('*GoodName*');
 

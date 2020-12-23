@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class RuleCheckerTest extends TestCase
 {
-    public function test_it_returns_violations(): void
+    public function testItReturnsViolations(): void
     {
         $this->markTestSkipped();
 

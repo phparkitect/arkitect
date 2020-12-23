@@ -15,7 +15,7 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class RuleCheckerTest extends TestCase
 {
-    public function test_should_run_parse_on_all_files_in_class_set(): void
+    public function testShouldRunParseOnAllFilesInClassSet(): void
     {
         $violations = new Violations();
         $fileParser = new FakeParser();

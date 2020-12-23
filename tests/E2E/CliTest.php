@@ -22,7 +22,7 @@ class CliTest extends TestCase
     /** @var string */
     private $configWithoutErrors = __DIR__.'/fixtures/configMvcWithoutErrors.php';
 
-    public function test_returns_error(): void
+    public function testReturnsError(): void
     {
         $process = new Process([$this->phparkitect, 'check', '--config='.$this->configWithErrors], __DIR__);
         $process->run();
@@ -36,7 +36,7 @@ App\Controller\UserController implements ContainerAwareInterface';
         $this->assertStringContainsString($expectedErrors, $process->getOutput());
     }
 
-    public function test_run_command_with_success(): void
+    public function testRunCommandWithSuccess(): void
     {
         $process = new Process([$this->phparkitect, 'check', '--config='.$this->configWithoutErrors], __DIR__);
         $process->run();

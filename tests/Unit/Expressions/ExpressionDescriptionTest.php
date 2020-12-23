@@ -23,7 +23,7 @@ class ExpressionDescriptionTest extends TestCase
      * @param mixed $positive
      * @param mixed $negative
      */
-    public function test_should_return_expression_description_in_positive_form($msg, $positive, $negative): void
+    public function testShouldReturnExpressionDescriptionInPositiveForm($msg, $positive, $negative): void
     {
         $desc = new PositiveDescription($msg);
 

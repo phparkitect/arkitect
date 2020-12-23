@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 class NotHaveDependencyOutsideNamespaceTest extends TestCase
 {
-    public function test_it_should_return_violation_error(): void
+    public function testItShouldReturnViolationError(): void
     {
         $namespace = 'myNamespace';
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace($namespace);
@@ -27,7 +27,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
         $this->assertEquals('HappyIsland does not depend on classes outside in namespace '.$namespace, $violationError);
     }
 
-    public function test_it_should_return_true_if_not_depends_on_namespace(): void
+    public function testItShouldReturnTrueIfNotDependsOnNamespace(): void
     {
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('myNamespace');
         $classDescription = new ClassDescription(
@@ -39,7 +39,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
         $this->assertTrue($notHaveDependencyOutsideNamespace->evaluate($classDescription));
     }
 
-    public function test_it_should_return_false_if_depends_on_namespace(): void
+    public function testItShouldReturnFalseIfDependsOnNamespace(): void
     {
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('myNamespace');
         $classDescription = new ClassDescription(

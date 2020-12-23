@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class FileVisitorTest extends TestCase
 {
-    public function test_should_create_a_class_description(): void
+    public function testShouldCreateAClassDescription(): void
     {
         $cd = [];
         $fp = new FileParser();
@@ -25,8 +25,8 @@ class FileVisitorTest extends TestCase
             use Root\Namespace2\D;
 
             class Dog implements AnInterface, InterfaceTwo
-            {   
-            } 
+            {
+            }
 
             class Cat implements AnInterface
             {

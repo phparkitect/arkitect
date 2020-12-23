@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class ClassSetTest extends TestCase
 {
-    public function test_can_iterate_over_directories_recursively(): void
+    public function testCanIterateOverDirectoriesRecursively(): void
     {
         $set = ClassSet::fromDir(__DIR__.'/../E2E/fixtures/happy_island');
 

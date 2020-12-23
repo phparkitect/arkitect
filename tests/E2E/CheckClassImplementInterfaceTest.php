@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
  */
 class CheckClassImplementInterfaceTest extends TestCase
 {
-    public function test_assertion_should_fail_on_broken_rule(): void
+    public function testAssertionShouldFailOnBrokenRule(): void
     {
         $set = ClassSet::fromDir(__DIR__.'/fixtures/mvc');
 
@@ -26,7 +26,6 @@ class CheckClassImplementInterfaceTest extends TestCase
             ->because('i said so');
 
         $expectedExceptionMessage = <<< 'EOT'
-            Failed asserting that 
             App\Controller\Foo implements ContainerAwareInterface
             App\Controller\ProductsController implements ContainerAwareInterface
             App\Controller\UserController implements ContainerAwareInterface

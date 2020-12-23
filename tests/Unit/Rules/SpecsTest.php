@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 class SpecsTest extends TestCase
 {
-    public function test_return_false_if_not_all_specs_are_matched(): void
+    public function testReturnFalseIfNotAllSpecsAreMatched(): void
     {
         $specStore = new Specs();
         $specStore->add(new HaveNameMatching('Foo'));
@@ -22,7 +22,7 @@ class SpecsTest extends TestCase
         $this->assertFalse($specStore->allSpecsAreMatchedBy($classDescription));
     }
 
-    public function test_return_true_if_all_specs_are_matched(): void
+    public function testReturnTrueIfAllSpecsAreMatched(): void
     {
         $specStore = new Specs();
         $specStore->add(new HaveNameMatching('Happy*'));
