@@ -14,7 +14,7 @@ class ClassDependencyTest extends TestCase
     private $line;
     private $classDependency;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->FQCN = 'HappyIsland';
         $this->line = 100;

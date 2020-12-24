@@ -25,8 +25,8 @@ class FileVisitorTest extends TestCase
             use Root\Namespace2\D;
 
             class Dog implements AnInterface, InterfaceTwo
-            {   
-            } 
+            {
+            }
 
             class Cat implements AnInterface
             {

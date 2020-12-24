@@ -13,7 +13,7 @@ class ClassDescriptionTest extends TestCase
 {
     private ClassDescriptionBuilder $builder;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->builder = ClassDescription::build('Fruit\Banana');
     }

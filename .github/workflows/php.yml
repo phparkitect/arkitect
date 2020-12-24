@@ -31,6 +31,8 @@ jobs:
     - name: Install dependencies
       #if: steps.composer-cache.outputs.cache-hit != 'true'
       run: composer install --prefer-dist --no-progress
+        with:
+          php-version: '7.4'
 
     - name: Coding Standard Checks
       run: ./bin/php-cs-fixer fix --dry-run -v

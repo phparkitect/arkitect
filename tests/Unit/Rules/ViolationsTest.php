@@ -18,7 +18,7 @@ class ViolationsTest extends TestCase
      */
     private $violationStore;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->violationData = 'violation';
 

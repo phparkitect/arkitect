@@ -36,6 +36,7 @@ return PhpCsFixer\Config::create()
     'align_multiline_comment' => true,
     'general_phpdoc_annotation_remove' => ['annotations' => ['author', 'package']],
     'list_syntax' => ['syntax' => 'short'],
-    'phpdoc_to_comment' => false
+    'phpdoc_to_comment' => false,
+    'php_unit_method_casing' => ['case' => 'snake_case']
   ])
 ;

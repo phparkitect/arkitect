@@ -28,7 +28,6 @@ class CheckClassNamingTest extends TestCase
     public function test_code_in_happy_island_should_not_have_name_matching_prefix(): void
     {
         $expectedExceptionMessage = <<< 'EOT'
-            Failed asserting that 
             App\HappyIsland\HappyClass doesn't have a name that matches Happy*
             EOT;
 
