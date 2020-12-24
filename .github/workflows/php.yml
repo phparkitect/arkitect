@@ -42,3 +42,4 @@ jobs:
 
     - name: Test
       run: ./bin/phpunit
+      
