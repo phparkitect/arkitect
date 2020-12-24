@@ -19,6 +19,9 @@ class CliTest extends TestCase
 
     private string $configWithoutErrors = __DIR__.'/fixtures/configMvcWithoutErrors.php';
 
+    /** @var string */
+    private $configForBugYields = __DIR__.'/fixtures/configMvcForYieldBug.php';
+
     public function test_returns_error(): void
     {
         $process = new Process([$this->phparkitect, 'check', '--config='.$this->configWithErrors], __DIR__);
@@ -51,5 +54,16 @@ App\Controller\UserController implements ContainerAwareInterface';
 
         $expectedOutput = 'ERRORS!';
         $this->assertStringNotContainsString($expectedOutput, $process->getOutput());
+    }
+
+    public function test_bug_yield(): void
+    {
+        $process = new Process([$this->phparkitect, 'check', '--config='.$this->configForBugYields], __DIR__);
+        $process->run();
+        $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
+
+        $expectedErrors = 'Parse Error: Call to undefined method PhpParser\Node\Expr\Variable::toString()#0';
+
+        $this->assertStringNotContainsString($expectedErrors, $process->getOutput());
     }
 }
