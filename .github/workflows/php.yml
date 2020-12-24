@@ -18,7 +18,7 @@ jobs:
 
     - name: Validate composer.json and composer.lock
       run: composer validate
-      
+
     - name: Cache Composer packages
       id: composer-cache
       uses: actions/cache@v2
@@ -30,16 +30,19 @@ jobs:
 
     - name: Install dependencies
       #if: steps.composer-cache.outputs.cache-hit != 'true'
-      run: composer install --prefer-dist --no-progress
-        with:
-          php-version: '7.4'
+      uses: php-actions/composer@v5
+      with:
+        args: --prefer-dist
+        composer_version: 2
+        php_version: 7.4
 
     - name: Coding Standard Checks
-      run: ./bin/php-cs-fixer fix --dry-run -v
+      uses: docker://oskarstark/php-cs-fixer-ga
+      with:
+        args: --dry-run -v
 
     #- name: Static Analysis
     #  run: ./bin/psalm
 
     - name: Test
       run: ./bin/phpunit
-      
