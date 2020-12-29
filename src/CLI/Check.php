@@ -38,21 +38,26 @@ class Check extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->printHeadingLine($output);
+        try {
+            $this->printHeadingLine($output);
 
-        $rulesFilename = $this->getConfigFilename($input);
-        $output->writeln(sprintf("Config file: %s\n", $rulesFilename));
+            $rulesFilename = $this->getConfigFilename($input);
+            $output->writeln(sprintf("Config file: %s\n", $rulesFilename));
 
-        $config = new Config();
+            $config = new Config();
 
-        $this->readRules($config, $rulesFilename);
+            $this->readRules($config, $rulesFilename);
 
-        $runner = $config->getRunner();
-        $violations = $runner->run();
+            $runner = $config->getRunner();
+            $violations = $runner->run();
 
-        if ($violations->count() > 0) {
-            $this->printViolations($violations, $output);
+            if ($violations->count() > 0) {
+                $this->printViolations($violations, $output);
 
+                exit(self::ERROR_CODE);
+            }
+        } catch (\Throwable $e) {
+            $output->writeln($e->getMessage());
             exit(self::ERROR_CODE);
         }
 

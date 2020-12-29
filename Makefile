@@ -19,6 +19,9 @@ shell: ## entra nel container
 test: ## lancia i test
 	bin/phpunit
 
+test_%: ## lancia un test
+	docker run --rm -it -v $(PWD):/var/www arkitect_php bin/phpunit --filter $@
+
 outdated:
 	composer outdated
 

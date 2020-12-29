@@ -13,14 +13,11 @@ class CliTest extends TestCase
 
     const ERROR_CODE = 1;
 
-    /** @var string */
-    private $phparkitect = __DIR__.'/../../phparkitect';
+    private string $phparkitect = __DIR__.'/../../phparkitect';
 
-    /** @var string */
-    private $configWithErrors = __DIR__.'/fixtures/configMvc.php';
+    private string $configWithErrors = __DIR__.'/fixtures/configMvc.php';
 
-    /** @var string */
-    private $configWithoutErrors = __DIR__.'/fixtures/configMvcWithoutErrors.php';
+    private string $configWithoutErrors = __DIR__.'/fixtures/configMvcWithoutErrors.php';
 
     public function test_returns_error(): void
     {
@@ -33,13 +30,23 @@ App\Controller\Foo implements ContainerAwareInterface
 App\Controller\Foo has a name that matches *Controller
 App\Controller\ProductsController implements ContainerAwareInterface
 App\Controller\UserController implements ContainerAwareInterface';
+
         $this->assertStringContainsString($expectedErrors, $process->getOutput());
+    }
+
+    public function test_does_not_explode_if_an_exception_is_thrown(): void
+    {
+        $process = new Process([$this->phparkitect, 'check', '--config='.__DIR__.'/fixtures/configThrowsException.php'], __DIR__);
+        $process->run();
+
+        $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
     }
 
     public function test_run_command_with_success(): void
     {
         $process = new Process([$this->phparkitect, 'check', '--config='.$this->configWithoutErrors], __DIR__);
         $process->run();
+
         $this->assertEquals(self::SUCCESS_CODE, $process->getExitCode());
 
         $expectedOutput = 'ERRORS!';
