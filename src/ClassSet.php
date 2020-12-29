@@ -17,9 +17,9 @@ class ClassSet implements \IteratorAggregate
         $this->exclude = [];
     }
 
-    public function exclude(string ...$pattern): self
+    public function excludePath(string $pattern): self
     {
-        $this->exclude = array_merge($this->exclude, $pattern);
+        $this->exclude[] = Glob::toRegex($pattern);
 
         return $this;
     }
