@@ -33,7 +33,7 @@ class FileVisitor extends NodeVisitorAbstract
                 ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
         }
 
-        if ($node instanceof Node\Expr\New_) {
+        if ($node instanceof Node\Expr\New_ && !($node->class instanceof Node\Expr\Variable)) {
             $this->classDescriptionBuilder
                 ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
         }

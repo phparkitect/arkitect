@@ -22,6 +22,9 @@ test: ## lancia i test
 test_%: ## lancia un test
 	docker run --rm -it -v $(PWD):/var/www arkitect_php bin/phpunit --filter $@
 
+%Test: ## lancia un test
+	docker run --rm -it -v $(PWD):/var/www arkitect_php bin/phpunit --filter $@
+
 outdated:
 	composer outdated
 

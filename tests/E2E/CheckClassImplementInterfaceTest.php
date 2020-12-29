@@ -29,6 +29,7 @@ class CheckClassImplementInterfaceTest extends TestCase
             App\Controller\Foo implements ContainerAwareInterface
             App\Controller\ProductsController implements ContainerAwareInterface
             App\Controller\UserController implements ContainerAwareInterface
+            App\Controller\YieldController implements ContainerAwareInterface
             App\Services\UserService implements ContainerAwareInterface.
             EOT;
 
