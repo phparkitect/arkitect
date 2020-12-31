@@ -48,8 +48,8 @@ class Check extends Command
 
             $this->readRules($config, $rulesFilename);
 
-            $runner = $config->getRunner();
-            $violations = $runner->run();
+            $runner = new Runner();
+            $violations = $runner->run($config);
 
             if ($violations->count() > 0) {
                 $this->printViolations($violations, $output);
