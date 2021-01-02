@@ -5,24 +5,16 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Unit;
 
 use Arkitect\ClassSet;
+use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 
 class ClassSetTest extends TestCase
 {
-    public function test_can_iterate_over_directories_recursively(): void
-    {
-        $set = ClassSet::fromDir(__DIR__.'/../E2E/fixtures/happy_island');
-
-        $files = iterator_to_array($set);
-
-        self::assertEquals('BadCode', array_shift($files)->getFilenameWithoutExtension());
-        self::assertEquals('HappyClass', array_shift($files)->getFilenameWithoutExtension());
-        self::assertEquals('OtherBadCode', array_shift($files)->getFilenameWithoutExtension());
-    }
-
     public function test_can_exclude_files_or_directories(): void
     {
-        $set = ClassSet::fromDir(__DIR__.'/../E2E/fixtures/mvc')
+        $path = $this->createMvcProjectStructure();
+
+        $set = ClassSet::fromDir($path)
             ->excludePath('Model')
             ->excludePath('ContainerAwareInterface');
 
@@ -47,7 +39,9 @@ class ClassSetTest extends TestCase
 
     public function test_can_exclude_glob_patterns(): void
     {
-        $set = ClassSet::fromDir(__DIR__.'/../E2E/fixtures/mvc')
+        $path = $this->createMvcProjectStructure();
+
+        $set = ClassSet::fromDir($path)
             ->excludePath('*Catalog*');
 
         $expected = [
@@ -70,5 +64,39 @@ class ClassSetTest extends TestCase
         }, iterator_to_array($set)));
 
         self::assertEquals($expected, $actual);
+    }
+
+    protected function createMvcProjectStructure(): string
+    {
+        $structure = [
+            'Controller' => [
+                'CatalogController.php' => '',
+                'Foo.php' => '',
+                'ProductsController.php' => '',
+                'UserController.php' => '',
+                'YieldController.php' => '',
+            ],
+            'Model' => [
+                'Repository' => [
+                    'CatalogRepository.php' => '',
+                    'ProductsRepository.php' => '',
+                    'UserRepository.php' => '',
+                ],
+                'Catalog.php' => '',
+                'Products.php' => '',
+                'User.php' => '',
+            ],
+            'Services' => [
+                'UserService.php' => '',
+            ],
+            'View' => [
+                'CatalogView.php' => '',
+                'ProductView.php' => '',
+                'UserView.php' => '',
+            ],
+            'ContainerAwareInterface.php' => '',
+        ];
+
+        return vfsStream::setup('root', null, $structure)->url();
     }
 }
