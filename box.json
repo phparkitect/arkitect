@@ -1,0 +1,19 @@
+
+{
+  "banner": [
+    "Arkitect"
+  ],
+  "directories": [
+    "src",
+    "vendor"
+  ],
+  "compression": "GZ",
+  "compactors": [
+    "KevinGH\\Box\\Compactor\\Php",
+    "KevinGH\\Box\\Compactor\\PhpScoper",
+    "KevinGH\\Box\\Compactor\\Json"
+  ],
+  "main": "bin-stub/phparkitect",
+  "output": "phparkitect.phar",
+  "datetime": "release-date"
+}

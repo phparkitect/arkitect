@@ -13,7 +13,7 @@ class CliTest extends TestCase
 
     const ERROR_CODE = 1;
 
-    private string $phparkitect = __DIR__.'/../../phparkitect';
+    private string $phparkitect = __DIR__.'/../../bin-stub/phparkitect';
 
     public function test_returns_error(): void
     {

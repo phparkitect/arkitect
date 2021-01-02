@@ -1,4 +1,4 @@
-.PHONY: test build db dt dbi csfix
+.PHONY: test build db dt dbi dphar csfix
 .DEFAULT_GOAL := help
 
 help: ## visualizza questo help
@@ -13,6 +13,9 @@ dt: ## lancia i test usando un container
 dbi: ## crea immagine docker per lo sviluppo
 	docker image build -t arkitect_php .
 
+dphar: ## crea un phar nel container
+	docker run --rm -it -v $(PWD):/var/www arkitect_php make phar
+
 shell: ## entra nel container
 	docker run --rm -it -v $(PWD):/var/www arkitect_php bash
 
@@ -24,6 +27,13 @@ test_%: ## lancia un test
 
 %Test: ## lancia un test
 	docker run --rm -it -v $(PWD):/var/www arkitect_php bin/phpunit --filter $@
+
+phar: ## crea il phar
+	rm -rf /tmp/arkitect && mkdir -p /tmp/arkitect
+	cp -R src bin-stub box.json README.md composer.json composer.lock /tmp/arkitect
+	cd /tmp/arkitect && composer install --prefer-source --no-dev -o
+	bin/box build -c /tmp/arkitect/box.json
+	cp /tmp/arkitect/phparkitect.phar .
 
 outdated:
 	composer outdated
