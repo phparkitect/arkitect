@@ -4,31 +4,21 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI;
 
-use Arkitect\ClassSet;
-use Arkitect\Rules\DSL\ArchRule;
 use Arkitect\Rules\RuleChecker;
 use Arkitect\Rules\Violations;
 
 class Runner
 {
-    private ClassSet $classSet;
-    /**
-     * @var ArchRule[]
-     */
-    private array $rules;
-
-    private RuleChecker $ruleChecker;
-
-    public function __construct(ClassSet $classSet, ArchRule ...$rules)
+    public function run(Config $config): Violations
     {
-        $this->classSet = $classSet;
-        $this->rules = $rules;
+        $violations = [];
+        $classSetRules = $config->getClassSetRules();
 
-        $this->ruleChecker = RuleChecker::build($classSet, ...$rules);
-    }
+        foreach ($classSetRules as $classSetRule) {
+            $ruleChecker = RuleChecker::build($classSetRule->getClassSet(), ...$classSetRule->getRules());
+            $violations = array_merge($violations, $ruleChecker->run()->toArray());
+        }
 
-    public function run(): Violations
-    {
-        return $this->ruleChecker->run();
+        return new Violations(...$violations);
     }
 }
