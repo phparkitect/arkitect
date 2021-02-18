@@ -3,31 +3,32 @@ declare(strict_types=1);
 
 namespace Arkitect\Rules;
 
+use Arkitect\Exceptions\ViolationNotFoundException;
+
 class Violations implements \IteratorAggregate, \Countable
 {
     /**
-     * @var string[]
+     * @var Violation[]
      */
     private $violations;
 
-    public function __construct(string ...$violations)
+    public function __construct(array $violations = [])
     {
         $this->violations = $violations;
     }
 
-    public static function fromViolations(string ...$violations): self
-    {
-        return new self(...$violations);
-    }
-
-    public function add(string $violation): void
+    public function add(Violation $violation): void
     {
         $this->violations[] = $violation;
     }
 
-    public function get(int $index): string
+    public function get(int $index): Violation
     {
-        return $this->violations[$index] ?? '';
+        if (!\array_key_exists($index, $this->violations)) {
+            throw new ViolationNotFoundException($index);
+        }
+
+        return $this->violations[$index];
     }
 
     public function getIterator()
@@ -42,9 +43,34 @@ class Violations implements \IteratorAggregate, \Countable
         return \count($this->violations);
     }
 
+    public function mappedByFQCN(): array
+    {
+        return array_reduce($this->violations, function (array $accumulator, Violation $element) {
+            $accumulator[$element->getFqcn()][] = $element;
+
+            return $accumulator;
+        }, []);
+    }
+
     public function toString(): string
     {
-        return implode("\n", $this->violations);
+        $errors = '';
+        $violationsCollection = $this->mappedByFQCN();
+
+        /**
+         * @var string      $key
+         * @var Violation[] $violationsByFqcn
+         */
+        foreach ($violationsCollection as $key => $violationsByFqcn) {
+            $errors .= "\n".$key.' violates rules';
+
+            foreach ($violationsByFqcn as $violation) {
+                $errors .= "\n".$violation->getError();
+            }
+            $errors .= "\n";
+        }
+
+        return $errors;
     }
 
     public function toArray(): array

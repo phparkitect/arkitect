@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Rules;
 
+use Arkitect\Exceptions\ViolationNotFoundException;
+use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
@@ -18,35 +20,48 @@ class ViolationsTest extends TestCase
      */
     private $violationStore;
 
+    private Violation $violation;
+
     protected function setUp(): void
     {
         $this->violationData = 'violation';
 
         $this->violationStore = new Violations();
-        $this->violationStore->add($this->violationData);
+        $this->violation = Violation::create('App\Controller\ProductController', 'should implement ContainerInterface');
+        $this->violationStore->add($this->violation);
     }
 
     public function test_add_elements_to_store_and_get_it(): void
     {
-        $this->assertEquals($this->violationData, $this->violationStore->get(0));
+        $this->assertEquals($this->violation, $this->violationStore->get(0));
     }
 
     public function test_add_elements_to_store_and_cant_get_it_if_index_not_valid(): void
     {
+        $this->expectException(ViolationNotFoundException::class);
+        $this->expectExceptionMessage('Violation not found with index 1111');
         $this->assertEquals('', $this->violationStore->get(1111));
     }
 
     public function test_count(): void
     {
-        $this->violationStore->add('foo');
+        $violation = Violation::create('App\Controller\Shop', 'should have name end with Controller');
+        $this->violationStore->add($violation);
         $this->assertEquals(2, $this->violationStore->count());
     }
 
     public function test_to_string(): void
     {
-        $this->violationStore->add('foo');
-        $expected = 'violation
-foo';
+        $violation = Violation::create('App\Controller\Foo', 'should have name end with Controller');
+
+        $this->violationStore->add($violation);
+        $expected = '
+App\Controller\ProductController violates rules
+should implement ContainerInterface
+
+App\Controller\Foo violates rules
+should have name end with Controller
+';
 
         $this->assertEquals($expected, $this->violationStore->toString());
     }

@@ -104,9 +104,6 @@ class Check extends Command
     private function printViolations(Violations $violations, OutputInterface $output): void
     {
         $output->writeln('<error>ERRORS!</error>');
-
-        foreach ($violations as $violation) {
-            $output->writeln(sprintf('%s', $violation));
-        }
+        $output->writeln(sprintf('%s', $violations->toString()));
     }
 }

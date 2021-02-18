@@ -19,7 +19,7 @@ class Implement implements Expression
 
     public function describe(ClassDescription $theClass): Description
     {
-        return new PositiveDescription("{$theClass->getFQCN()} [implements|does not implement] {$this->interface}");
+        return new PositiveDescription("should [implements|does not implement] {$this->interface}");
     }
 
     public function evaluate(ClassDescription $theClass): bool

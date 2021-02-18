@@ -13,7 +13,11 @@ class Constraints extends Expressions
         /** @var Expression $expression */
         foreach ($this->expressions as $expression) {
             if (!$expression->evaluate($classDescription)) {
-                $violations->add($expression->describe($classDescription)->toString());
+                $violation = Violation::create(
+                    $classDescription->getFQCN(),
+                    $expression->describe($classDescription)->toString()
+                );
+                $violations->add($violation);
             }
         }
     }

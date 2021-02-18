@@ -24,7 +24,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
 
         $violationError = $notHaveDependencyOutsideNamespace->describe($classDescription)->toString();
 
-        $this->assertEquals('HappyIsland does not depend on classes outside in namespace '.$namespace, $violationError);
+        $this->assertEquals('should does not depend on classes outside in namespace '.$namespace, $violationError);
     }
 
     public function test_it_should_return_true_if_not_depends_on_namespace(): void

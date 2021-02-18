@@ -19,7 +19,7 @@ class HaveNameMatching implements Expression
 
     public function describe(ClassDescription $theClass): Description
     {
-        return new PositiveDescription("{$theClass->getFQCN()} [has|doesn't have] a name that matches {$this->name}");
+        return new PositiveDescription("should [has|doesn't have] a name that matches {$this->name}");
     }
 
     public function evaluate(ClassDescription $theClass): bool

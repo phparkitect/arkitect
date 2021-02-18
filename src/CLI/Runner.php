@@ -19,6 +19,6 @@ class Runner
             $violations = array_merge($violations, $ruleChecker->run()->toArray());
         }
 
-        return new Violations(...$violations);
+        return new Violations($violations);
     }
 }

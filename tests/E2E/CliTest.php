@@ -20,10 +20,19 @@ class CliTest extends TestCase
         $process = $this->runArkitect(__DIR__.'/fixtures/configMvc.php');
 
         $expectedErrors = 'ERRORS!
-App\Controller\Foo implements ContainerAwareInterface
-App\Controller\Foo has a name that matches *Controller
-App\Controller\ProductsController implements ContainerAwareInterface
-App\Controller\UserController implements ContainerAwareInterface';
+
+App\Controller\Foo violates rules
+should implements ContainerAwareInterface
+should has a name that matches *Controller
+
+App\Controller\ProductsController violates rules
+should implements ContainerAwareInterface
+
+App\Controller\UserController violates rules
+should implements ContainerAwareInterface
+
+App\Controller\YieldController violates rules
+should implements ContainerAwareInterface';
 
         $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
         $this->assertStringContainsString($expectedErrors, $process->getOutput());
@@ -49,7 +58,9 @@ App\Controller\UserController implements ContainerAwareInterface';
         $process = $this->runArkitect(__DIR__.'/fixtures/configMvcForYieldBug.php');
 
         $expectedErrors = 'ERRORS!
-App\Controller\Foo has a name that matches *Controller';
+
+App\Controller\Foo violates rules
+should has a name that matches *Controller';
 
         $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
         $this->assertStringContainsString($expectedErrors, $process->getOutput());

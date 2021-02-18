@@ -18,7 +18,7 @@ class DependsOnlyOnTheseNamespaceTest extends TestCase
         $classDescription = ClassDescription::build('HappyIsland\Myclass', 'full/path')->get();
 
         self::assertTrue($dependOnClasses->evaluate($classDescription));
-        self::assertEquals('HappyIsland\Myclass depends only on classes in one of these namespaces: myNamespace', $dependOnClasses->describe($classDescription)->toString());
+        self::assertEquals('should depends only on classes in one of these namespaces: myNamespace', $dependOnClasses->describe($classDescription)->toString());
     }
 
     public function test_it_should_return_true_if_not_depends_on_namespace(): void
