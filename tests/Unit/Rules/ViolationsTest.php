@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Rules;
 
-use Arkitect\Exceptions\ViolationNotFoundException;
+use Arkitect\Exceptions\IndexNotFoundException;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
@@ -38,8 +38,8 @@ class ViolationsTest extends TestCase
 
     public function test_add_elements_to_store_and_cant_get_it_if_index_not_valid(): void
     {
-        $this->expectException(ViolationNotFoundException::class);
-        $this->expectExceptionMessage('Violation not found with index 1111');
+        $this->expectException(IndexNotFoundException::class);
+        $this->expectExceptionMessage('Index not found 1111');
         $this->assertEquals('', $this->violationStore->get(1111));
     }
 

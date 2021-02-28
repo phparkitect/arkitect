@@ -22,17 +22,17 @@ class CliTest extends TestCase
         $expectedErrors = 'ERRORS!
 
 App\Controller\Foo violates rules
-should implements ContainerAwareInterface
-should has a name that matches *Controller
+should implement ContainerAwareInterface
+should have a name that matches *Controller
 
 App\Controller\ProductsController violates rules
-should implements ContainerAwareInterface
+should implement ContainerAwareInterface
 
 App\Controller\UserController violates rules
-should implements ContainerAwareInterface
+should implement ContainerAwareInterface
 
 App\Controller\YieldController violates rules
-should implements ContainerAwareInterface';
+should implement ContainerAwareInterface';
 
         $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
         $this->assertStringContainsString($expectedErrors, $process->getOutput());
@@ -60,7 +60,7 @@ should implements ContainerAwareInterface';
         $expectedErrors = 'ERRORS!
 
 App\Controller\Foo violates rules
-should has a name that matches *Controller';
+should have a name that matches *Controller';
 
         $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
         $this->assertStringContainsString($expectedErrors, $process->getOutput());

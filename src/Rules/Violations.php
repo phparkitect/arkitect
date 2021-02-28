@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Rules;
 
-use Arkitect\Exceptions\ViolationNotFoundException;
+use Arkitect\Exceptions\IndexNotFoundException;
 
 class Violations implements \IteratorAggregate, \Countable
 {
@@ -25,7 +25,7 @@ class Violations implements \IteratorAggregate, \Countable
     public function get(int $index): Violation
     {
         if (!\array_key_exists($index, $this->violations)) {
-            throw new ViolationNotFoundException($index);
+            throw new IndexNotFoundException($index);
         }
 
         return $this->violations[$index];
@@ -43,7 +43,7 @@ class Violations implements \IteratorAggregate, \Countable
         return \count($this->violations);
     }
 
-    public function mappedByFQCN(): array
+    public function groupedByFqcn(): array
     {
         return array_reduce($this->violations, function (array $accumulator, Violation $element) {
             $accumulator[$element->getFqcn()][] = $element;
@@ -55,7 +55,7 @@ class Violations implements \IteratorAggregate, \Countable
     public function toString(): string
     {
         $errors = '';
-        $violationsCollection = $this->mappedByFQCN();
+        $violationsCollection = $this->groupedByFqcn();
 
         /**
          * @var string      $key
