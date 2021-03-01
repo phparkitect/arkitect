@@ -19,7 +19,7 @@ class Implement implements Expression
 
     public function describe(ClassDescription $theClass): Description
     {
-        return new PositiveDescription("should [implement|don't implement] {$this->interface}");
+        return new PositiveDescription("should [implement|not implement] {$this->interface}");
     }
 
     public function evaluate(ClassDescription $theClass): bool

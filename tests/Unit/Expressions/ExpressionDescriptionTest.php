@@ -11,7 +11,7 @@ class ExpressionDescriptionTest extends TestCase
     public function descriptionProvider(): array
     {
         return [
-            ["My class [have|don't have] a dependency", 'My class have a dependency', "My class don't have a dependency"],
+            ['My class [have|not have] a dependency', 'My class have a dependency', 'My class not have a dependency'],
             ['My class have a dependency', 'My class have a dependency', 'My class have a dependency'],
         ];
     }
