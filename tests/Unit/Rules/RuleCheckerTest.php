@@ -9,6 +9,7 @@ use Arkitect\Analyzer\Parser;
 use Arkitect\ClassSet;
 use Arkitect\Rules\DSL\ArchRule;
 use Arkitect\Rules\RuleChecker;
+use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
@@ -60,7 +61,7 @@ class FakeRule implements ArchRule
 {
     public function check(ClassDescription $classDescription, Violations $violations): void
     {
-        $violations->add('nuuuuuu');
+        $violations->add(Violation::create('fqcn', 'error'));
     }
 }
 

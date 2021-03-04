@@ -25,7 +25,7 @@ class ImplementConstraintTest extends TestCase
         $violationError = $implementConstraint->describe($classDescription)->toString();
 
         $this->assertFalse($implementConstraint->evaluate($classDescription));
-        $this->assertEquals('HappyIsland implements '.$interface, $violationError);
+        $this->assertEquals('should implement '.$interface, $violationError);
     }
 
     public function test_it_should_return_true_if_not_depends_on_namespace(): void

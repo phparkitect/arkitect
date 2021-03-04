@@ -33,9 +33,7 @@ jobs:
         php_version: 7.4
 
     - name: Coding Standard Checks
-      uses: docker://oskarstark/php-cs-fixer-ga
-      with:
-        args: --dry-run -v
+      run: PHP_CS_FIXER_IGNORE_ENV=1 ./bin/php-cs-fixer fix --dry-run -v
 
     #- name: Static Analysis
     #  run: ./bin/psalm
