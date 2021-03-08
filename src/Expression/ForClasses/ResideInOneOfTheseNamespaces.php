@@ -7,6 +7,8 @@ use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Expression\PositiveDescription;
+use Arkitect\Rules\Violation;
+use Arkitect\Rules\Violations;
 
 class ResideInOneOfTheseNamespaces implements Expression
 {
@@ -24,14 +26,21 @@ class ResideInOneOfTheseNamespaces implements Expression
         return new PositiveDescription("should [reside|not reside] in one of these namespaces: $descr");
     }
 
-    public function evaluate(ClassDescription $theClass): bool
+    public function evaluate(ClassDescription $theClass, Violations $violations): void
     {
+        $resideInNamespace = false;
         foreach ($this->namespaces as $namespace) {
             if ($theClass->namespaceMatches($namespace)) {
-                return true;
+                $resideInNamespace = true;
             }
         }
 
-        return false;
+        if (!$resideInNamespace) {
+            $violation = Violation::create(
+                $theClass->getFQCN(),
+                $this->describe($theClass)->toString()
+            );
+            $violations->add($violation);
+        }
     }
 }

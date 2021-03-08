@@ -22,9 +22,8 @@ class ConstraintsTest extends TestCase
                 return new PositiveDescription('');
             }
 
-            public function evaluate(ClassDescription $theClass): bool
+            public function evaluate(ClassDescription $theClass, Violations $violations): void
             {
-                return true;
             }
         };
 
@@ -48,9 +47,8 @@ class ConstraintsTest extends TestCase
                 return new PositiveDescription('bar');
             }
 
-            public function evaluate(ClassDescription $theClass): bool
+            public function evaluate(ClassDescription $theClass, Violations $violations): void
             {
-                return false;
             }
         };
 

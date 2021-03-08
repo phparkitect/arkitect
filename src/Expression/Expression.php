@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Arkitect\Expression;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Rules\Violations;
 
 /**
  * A class implementing this interface represents a property a php class may or may not have.
@@ -23,5 +24,5 @@ interface Expression
      * Evaluates the expression for the class passed as parameter.
      * It should return true if $theClass has the property, false otherwise.
      */
-    public function evaluate(ClassDescription $theClass): bool;
+    public function evaluate(ClassDescription $theClass, Violations $violations): void;
 }
