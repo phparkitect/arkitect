@@ -12,7 +12,10 @@ class Specs extends Expressions
     {
         /** @var Expression $spec */
         foreach ($this->expressions as $spec) {
-            if (!$spec->evaluate($classDescription)) {
+            $violations = new Violations();
+            $spec->evaluate($classDescription, $violations);
+
+            if ($violations->count() > 0) {
                 return false;
             }
         }

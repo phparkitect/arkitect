@@ -8,6 +8,7 @@ use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\ForClasses\NotHaveDependencyOutsideNamespace;
+use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
 class NotHaveDependencyOutsideNamespaceTest extends TestCase
@@ -36,7 +37,9 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
             []
         );
 
-        $this->assertTrue($notHaveDependencyOutsideNamespace->evaluate($classDescription));
+        $violations = new Violations();
+        $notHaveDependencyOutsideNamespace->evaluate($classDescription, $violations);
+        self::assertEquals(0, $violations->count());
     }
 
     public function test_it_should_return_false_if_depends_on_namespace(): void
@@ -48,6 +51,8 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
             []
         );
 
-        $this->assertFalse($notHaveDependencyOutsideNamespace->evaluate($classDescription));
+        $violations = new Violations();
+        $notHaveDependencyOutsideNamespace->evaluate($classDescription, $violations);
+        self::assertNotEquals(0, $violations->count());
     }
 }

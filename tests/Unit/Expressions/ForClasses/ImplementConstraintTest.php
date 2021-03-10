@@ -7,6 +7,7 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\ForClasses\Implement;
+use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
 class ImplementConstraintTest extends TestCase
@@ -24,7 +25,10 @@ class ImplementConstraintTest extends TestCase
 
         $violationError = $implementConstraint->describe($classDescription)->toString();
 
-        $this->assertFalse($implementConstraint->evaluate($classDescription));
+        $violations = new Violations();
+        $implementConstraint->evaluate($classDescription, $violations);
+        self::assertNotEquals(0, $violations->count());
+
         $this->assertEquals('should implement '.$interface, $violationError);
     }
 
@@ -39,7 +43,9 @@ class ImplementConstraintTest extends TestCase
             [FullyQualifiedClassName::fromString('foo')]
         );
 
-        $this->assertFalse($implementConstraint->evaluate($classDescription));
+        $violations = new Violations();
+        $implementConstraint->evaluate($classDescription, $violations);
+        self::assertNotEquals(0, $violations->count());
     }
 
     public function test_it_should_return_false_if_depends_on_namespace(): void
@@ -53,6 +59,8 @@ class ImplementConstraintTest extends TestCase
             [FullyQualifiedClassName::fromString('interface')]
         );
 
-        $this->assertTrue($implementConstraint->evaluate($classDescription));
+        $violations = new Violations();
+        $implementConstraint->evaluate($classDescription, $violations);
+        self::assertEquals(0, $violations->count());
     }
 }

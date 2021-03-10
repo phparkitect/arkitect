@@ -5,6 +5,7 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\ForClasses\HaveNameMatching;
+use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
 class HaveNameMatchingTest extends TestCase
@@ -15,7 +16,9 @@ class HaveNameMatchingTest extends TestCase
 
         $goodClass = ClassDescription::build('\App\MyClass')->get();
 
-        $this->assertTrue($expression->evaluate($goodClass));
+        $violations = new Violations();
+        $expression->evaluate($goodClass, $violations);
+        self::assertEquals(0, $violations->count());
     }
 
     public function test_show_violation_when_class_name_does_not_match(): void
@@ -24,7 +27,9 @@ class HaveNameMatchingTest extends TestCase
 
         $badClass = ClassDescription::build('\App\BadNameClass')->get();
 
-        $this->assertFalse($expression->evaluate($badClass));
+        $violations = new Violations();
+        $expression->evaluate($badClass, $violations);
+        self::assertNotEquals(0, $violations->count());
         $this->assertEquals('should have a name that matches *GoodName*', $expression->describe($badClass)->toString());
     }
 }

@@ -9,6 +9,7 @@ use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Expression\PositiveDescription;
 use Arkitect\Rules\Constraints;
+use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
@@ -49,6 +50,12 @@ class ConstraintsTest extends TestCase
 
             public function evaluate(ClassDescription $theClass, Violations $violations): void
             {
+                $violation = Violation::create(
+                    $theClass->getFQCN(),
+                    $this->describe($theClass)->toString()
+                );
+
+                $violations->add($violation);
             }
         };
 

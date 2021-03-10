@@ -37,6 +37,7 @@ class DependsOnlyOnTheseNamespace implements Expression
                     $theClass->getFQCN(),
                     $this->describe($theClass)->toString()
                 );
+
                 $violations->add($violation);
             }
         }

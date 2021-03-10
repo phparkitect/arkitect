@@ -25,16 +25,6 @@ class ClassDescriptionTest extends TestCase
         $this->assertTrue($cd->nameMatches('Banana'));
     }
 
-    public function test_should_return_true_if_implements_interface(): void
-    {
-        $cd = $this->builder
-            ->addInterface('Fruit\EdibleInterface', 12)
-            ->get();
-
-        $this->assertTrue($cd->implements('Fruit\EdibleInterface'));
-        $this->assertFalse($cd->implements('Fruit\AnotherInterface'));
-    }
-
     public function test_should_return_true_if_there_is_a_dependency(): void
     {
         $cd = $this->builder
@@ -45,7 +35,6 @@ class ClassDescriptionTest extends TestCase
         $this->assertTrue($cd->dependsOn('Fruit\Mango'));
         $this->assertTrue($cd->dependsOnClass('F*\Mango'));
         $this->assertTrue($cd->dependsOnNamespace('Vegetabl*'));
-        $this->assertFalse($cd->dependsOnlyOnClassesMatching('Vegetabl*'));
     }
 
     public function test_should_return_true_if_there_class_is_in_namespace(): void
