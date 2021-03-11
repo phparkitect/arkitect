@@ -6,6 +6,7 @@ use Arkitect\ClassSetRules;
 use Arkitect\CLI\Config;
 use Arkitect\Expression\ForClasses\HaveNameMatching;
 use Arkitect\Expression\ForClasses\Implement;
+use Arkitect\Expression\ForClasses\NotHaveDependencyOutsideNamespace;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\Rules\Rule;
 
@@ -22,6 +23,11 @@ return static function (Config $config): void {
         ->should(new HaveNameMatching('*Controller'))
         ->because('we want uniform naming');
 
+    $rule_3 = Rule::allClasses()
+        ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
+        ->should(new NotHaveDependencyOutsideNamespace('App\Domain'))
+        ->because('we want protect our domain');
+
     $config
-        ->add(ClassSetRules::create($mvc_class_set, ...[$rule_1, $rule_2]));
+        ->add(ClassSetRules::create($mvc_class_set, ...[$rule_1, $rule_2, $rule_3]));
 };

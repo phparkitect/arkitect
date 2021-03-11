@@ -15,7 +15,7 @@ class CliTest extends TestCase
 
     private string $phparkitect = __DIR__.'/../../bin-stub/phparkitect';
 
-    public function test_returns_error(): void
+    public function test_returns_error_wit_mulitple_violations(): void
     {
         $process = $this->runArkitect(__DIR__.'/fixtures/configMvc.php');
 
@@ -32,7 +32,11 @@ App\Controller\UserController violates rules
 should implement ContainerAwareInterface
 
 App\Controller\YieldController violates rules
-should implement ContainerAwareInterface';
+should implement ContainerAwareInterface
+
+App\Domain\Model violates rules
+should not depend on classes outside in namespace App\Domain
+should not depend on classes outside in namespace App\Domain';
 
         $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
         $this->assertStringContainsString($expectedErrors, $process->getOutput());
