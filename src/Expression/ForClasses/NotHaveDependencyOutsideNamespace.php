@@ -3,10 +3,13 @@ declare(strict_types=1);
 
 namespace Arkitect\Expression\ForClasses;
 
+use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Expression\PositiveDescription;
+use Arkitect\Rules\Violation;
+use Arkitect\Rules\Violations;
 
 class NotHaveDependencyOutsideNamespace implements Expression
 {
@@ -22,8 +25,22 @@ class NotHaveDependencyOutsideNamespace implements Expression
         return new PositiveDescription("should [not depend|depend] on classes outside in namespace {$this->namespace}");
     }
 
-    public function evaluate(ClassDescription $theClass): bool
+    public function evaluate(ClassDescription $theClass, Violations $violations): void
     {
-        return $theClass->dependsOnlyOnClassesMatching($this->namespace);
+        $namespace = $this->namespace;
+        $depends = function (ClassDependency $dependency) use ($namespace) {
+            return !$dependency->getFQCN()->matches($namespace);
+        };
+
+        $dependencies = $theClass->getDependencies();
+        $externalDeps = array_filter($dependencies, $depends);
+
+        foreach ($externalDeps as $externalDep) {
+            $violation = Violation::create(
+                $theClass->getFQCN(),
+                $this->describe($theClass)->toString()
+            );
+            $violations->add($violation);
+        }
     }
 }

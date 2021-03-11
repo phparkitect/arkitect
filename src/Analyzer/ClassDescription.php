@@ -46,18 +46,6 @@ class ClassDescription
         return (bool) \count(array_filter($this->dependencies, $depends));
     }
 
-    public function dependsOnlyOnTheseNamespaces(string ...$namespaces): bool
-    {
-        /** @var ClassDependency $dependency */
-        foreach ($this->dependencies as $dependency) {
-            if (!$dependency->matchesOneOf(...$namespaces)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     public function dependsOnNamespace(string $pattern): bool
     {
         $depends = function (ClassDependency $dependency) use ($pattern) {
@@ -76,17 +64,6 @@ class ClassDescription
         return (bool) \count(array_filter($this->dependencies, $depends));
     }
 
-    public function dependsOnlyOnClassesMatching(string $pattern): bool
-    {
-        $depends = function (ClassDependency $dependency) use ($pattern) {
-            return !$dependency->getFQCN()->matches($pattern);
-        };
-
-        $externalDep = \count(array_filter($this->dependencies, $depends));
-
-        return 0 === $externalDep;
-    }
-
     public function nameMatches(string $pattern): bool
     {
         return $this->FQCN->classMatches($pattern);
@@ -97,17 +74,18 @@ class ClassDescription
         return $this->FQCN->matches($pattern);
     }
 
-    public function implements(string $pattern): bool
-    {
-        $implements = function (FullyQualifiedClassName $FQCN) use ($pattern) {
-            return $FQCN->matches($pattern);
-        };
-
-        return (bool) \count(array_filter($this->interfaces, $implements));
-    }
-
     public function fullPath(): string
     {
         return $this->fullPath;
+    }
+
+    public function getDependencies(): array
+    {
+        return $this->dependencies;
+    }
+
+    public function getInterfaces(): array
+    {
+        return $this->interfaces;
     }
 }

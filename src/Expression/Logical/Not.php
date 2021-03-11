@@ -7,6 +7,7 @@ use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Expression\NegativeDescription;
+use Arkitect\Rules\Violations;
 
 class Not implements Expression
 {
@@ -22,8 +23,8 @@ class Not implements Expression
         return new NegativeDescription($this->expression->describe($theClass));
     }
 
-    public function evaluate(ClassDescription $theClass): bool
+    public function evaluate(ClassDescription $theClass, Violations $violations): void
     {
-        return !$this->expression->evaluate($theClass);
+        $this->expression->evaluate($theClass, $violations);
     }
 }

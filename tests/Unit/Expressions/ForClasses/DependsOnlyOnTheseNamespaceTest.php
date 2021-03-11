@@ -7,6 +7,7 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespace;
+use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
 class DependsOnlyOnTheseNamespaceTest extends TestCase
@@ -17,7 +18,10 @@ class DependsOnlyOnTheseNamespaceTest extends TestCase
 
         $classDescription = ClassDescription::build('HappyIsland\Myclass', 'full/path')->get();
 
-        self::assertTrue($dependOnClasses->evaluate($classDescription));
+        $violations = new Violations();
+        $dependOnClasses->evaluate($classDescription, $violations);
+
+        self::assertEquals(0, $violations->count());
         self::assertEquals('should depend only on classes in one of these namespaces: myNamespace', $dependOnClasses->describe($classDescription)->toString());
     }
 
@@ -30,7 +34,10 @@ class DependsOnlyOnTheseNamespaceTest extends TestCase
             ->addDependency(new ClassDependency('anotherNamespace\Banana', 1))
             ->get();
 
-        self::assertFalse($dependOnClasses->evaluate($classDescription));
+        $violations = new Violations();
+        $dependOnClasses->evaluate($classDescription, $violations);
+
+        self::assertNotEquals(0, $violations->count());
     }
 
     public function test_it_should_return_false_if_depends_on_namespace(): void
@@ -42,6 +49,9 @@ class DependsOnlyOnTheseNamespaceTest extends TestCase
             ->addDependency(new ClassDependency('myNamespace\Mango', 10))
             ->get();
 
-        self::assertTrue($dependOnClasses->evaluate($classDescription));
+        $violations = new Violations();
+        $dependOnClasses->evaluate($classDescription, $violations);
+
+        self::assertEquals(0, $violations->count());
     }
 }

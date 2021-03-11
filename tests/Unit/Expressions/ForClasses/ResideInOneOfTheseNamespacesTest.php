@@ -6,6 +6,7 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
+use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
 class ResideInOneOfTheseNamespacesTest extends TestCase
@@ -31,7 +32,10 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
 
         $classDesc = ClassDescription::build($actualFQCN)->get();
 
-        self::assertTrue($haveNameMatching->evaluate($classDesc));
+        $violations = new Violations();
+        $haveNameMatching->evaluate($classDesc, $violations);
+
+        self::assertEquals(0, $violations->count());
     }
 
     public function test_it_should_return_false_if_not_reside_in_namespace(): void
@@ -40,7 +44,10 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
 
         $classDesc = ClassDescription::build('AnotherNamespace\HappyIsland')->get();
 
-        self::assertFalse($haveNameMatching->evaluate($classDesc));
+        $violations = new Violations();
+        $haveNameMatching->evaluate($classDesc, $violations);
+
+        self::assertNotEquals(0, $violations->count());
     }
 
     public function test_it_should_check_multiple_namespaces_in_or(): void
@@ -48,15 +55,23 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
         $haveNameMatching = new ResideInOneOfTheseNamespaces('MyNamespace', 'AnotherNamespace', 'AThirdNamespace');
 
         $classDesc = ClassDescription::build('AnotherNamespace\HappyIsland')->get();
-        self::assertTrue($haveNameMatching->evaluate($classDesc));
+        $violations = new Violations();
+        $haveNameMatching->evaluate($classDesc, $violations);
+        self::assertEquals(0, $violations->count());
 
         $classDesc = ClassDescription::build('MyNamespace\HappyIsland')->get();
-        self::assertTrue($haveNameMatching->evaluate($classDesc));
+        $violations = new Violations();
+        $haveNameMatching->evaluate($classDesc, $violations);
+        self::assertEquals(0, $violations->count());
 
         $classDesc = ClassDescription::build('AThirdNamespace\HappyIsland')->get();
-        self::assertTrue($haveNameMatching->evaluate($classDesc));
+        $violations = new Violations();
+        $haveNameMatching->evaluate($classDesc, $violations);
+        self::assertEquals(0, $violations->count());
 
         $classDesc = ClassDescription::build('NopeNamespace\HappyIsland')->get();
-        self::assertFalse($haveNameMatching->evaluate($classDesc));
+        $violations = new Violations();
+        $haveNameMatching->evaluate($classDesc, $violations);
+        self::assertNotEquals(0, $violations->count());
     }
 }
