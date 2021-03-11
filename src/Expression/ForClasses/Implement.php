@@ -33,7 +33,7 @@ class Implement implements Expression
             return $FQCN->matches($interface);
         };
 
-        if (!(bool) \count(array_filter($interfaces, $implements))) {
+        if (0 === \count(array_filter($interfaces, $implements))) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
                 $this->describe($theClass)->toString()
