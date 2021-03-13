@@ -35,10 +35,12 @@ class NotHaveDependencyOutsideNamespace implements Expression
         $dependencies = $theClass->getDependencies();
         $externalDeps = array_filter($dependencies, $depends);
 
+        /** @var ClassDependency $externalDep */
         foreach ($externalDeps as $externalDep) {
-            $violation = Violation::create(
+            $violation = Violation::createWithErrorLine(
                 $theClass->getFQCN(),
-                $this->describe($theClass)->toString()
+                $this->describe($theClass)->toString(),
+                $externalDep->getLine()
             );
             $violations->add($violation);
         }

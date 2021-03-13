@@ -66,6 +66,10 @@ class Violations implements \IteratorAggregate, \Countable
 
             foreach ($violationsByFqcn as $violation) {
                 $errors .= "\n".$violation->getError();
+
+                if (null !== $violation->getLine()) {
+                    $errors .= ' on line '.$violation->getLine();
+                }
             }
             $errors .= "\n";
         }

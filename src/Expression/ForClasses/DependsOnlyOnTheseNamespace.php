@@ -33,9 +33,10 @@ class DependsOnlyOnTheseNamespace implements Expression
         /** @var ClassDependency $dependency */
         foreach ($dependencies as $dependency) {
             if (!$dependency->matchesOneOf(...$this->namespaces)) {
-                $violation = Violation::create(
+                $violation = Violation::createWithErrorLine(
                     $theClass->getFQCN(),
-                    $this->describe($theClass)->toString()
+                    $this->describe($theClass)->toString(),
+                    $dependency->getLine()
                 );
 
                 $violations->add($violation);
