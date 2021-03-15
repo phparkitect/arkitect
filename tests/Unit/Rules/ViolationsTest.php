@@ -27,7 +27,11 @@ class ViolationsTest extends TestCase
         $this->violationData = 'violation';
 
         $this->violationStore = new Violations();
-        $this->violation = Violation::create('App\Controller\ProductController', 'should implement ContainerInterface');
+        $this->violation = Violation::create(
+            'App\Controller\ProductController',
+            'should implement ContainerInterface',
+            1
+        );
         $this->violationStore->add($this->violation);
     }
 
@@ -45,14 +49,22 @@ class ViolationsTest extends TestCase
 
     public function test_count(): void
     {
-        $violation = Violation::create('App\Controller\Shop', 'should have name end with Controller');
+        $violation = Violation::create(
+            'App\Controller\Shop',
+            'should have name end with Controller',
+            2
+        );
         $this->violationStore->add($violation);
         $this->assertEquals(2, $this->violationStore->count());
     }
 
     public function test_to_string(): void
     {
-        $violation = Violation::create('App\Controller\Foo', 'should have name end with Controller');
+        $violation = Violation::create(
+            'App\Controller\Foo',
+            'should have name end with Controller',
+            3
+        );
 
         $this->violationStore->add($violation);
         $expected = '
