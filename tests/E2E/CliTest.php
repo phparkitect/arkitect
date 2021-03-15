@@ -35,8 +35,8 @@ App\Controller\YieldController violates rules
 should implement ContainerAwareInterface
 
 App\Domain\Model violates rules
-should not depend on classes outside in namespace App\Domain on line 14
-should not depend on classes outside in namespace App\Domain on line 15';
+should not depend on classes outside in namespace App\Domain (on line 14)
+should not depend on classes outside in namespace App\Domain (on line 15)';
 
         $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
         $this->assertStringContainsString($expectedErrors, $process->getOutput());

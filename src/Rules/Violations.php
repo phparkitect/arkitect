@@ -68,7 +68,7 @@ class Violations implements \IteratorAggregate, \Countable
                 $errors .= "\n".$violation->getError();
 
                 if (null !== $violation->getLine()) {
-                    $errors .= ' on line '.$violation->getLine();
+                    $errors .= ' (on line '.$violation->getLine().')';
                 }
             }
             $errors .= "\n";
