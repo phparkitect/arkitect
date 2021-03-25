@@ -22,21 +22,21 @@ class CliTest extends TestCase
         $expectedErrors = 'ERRORS!
 
 App\Controller\Foo violates rules
-should implement ContainerAwareInterface
-should have a name that matches *Controller
+  should implement ContainerAwareInterface
+  should have a name that matches *Controller
 
 App\Controller\ProductsController violates rules
-should implement ContainerAwareInterface
+  should implement ContainerAwareInterface
 
 App\Controller\UserController violates rules
-should implement ContainerAwareInterface
+  should implement ContainerAwareInterface
 
 App\Controller\YieldController violates rules
-should implement ContainerAwareInterface
+  should implement ContainerAwareInterface
 
 App\Domain\Model violates rules
-should not depend on classes outside in namespace App\Domain (on line 14)
-should not depend on classes outside in namespace App\Domain (on line 15)';
+  should not depend on classes outside in namespace App\Domain (on line 14)
+  should not depend on classes outside in namespace App\Domain (on line 15)';
 
         $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
         $this->assertStringContainsString($expectedErrors, $process->getOutput());
@@ -64,7 +64,7 @@ should not depend on classes outside in namespace App\Domain (on line 15)';
         $expectedErrors = 'ERRORS!
 
 App\Controller\Foo violates rules
-should have a name that matches *Controller';
+  should have a name that matches *Controller';
 
         $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
         $this->assertStringContainsString($expectedErrors, $process->getOutput());
