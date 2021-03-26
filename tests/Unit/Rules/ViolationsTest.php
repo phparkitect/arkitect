@@ -69,10 +69,10 @@ class ViolationsTest extends TestCase
         $this->violationStore->add($violation);
         $expected = '
 App\Controller\ProductController violates rules
-should implement ContainerInterface
+  should implement ContainerInterface
 
 App\Controller\Foo violates rules
-should have name end with Controller
+  should have name end with Controller
 ';
 
         $this->assertEquals($expected, $this->violationStore->toString());
