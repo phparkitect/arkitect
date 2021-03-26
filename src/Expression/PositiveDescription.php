@@ -24,7 +24,7 @@ class PositiveDescription implements Description
 
     protected function toPositive(): string
     {
-        // cerco nella stringa il pattern [positivo|negativo] e prendo il positivo
+        // looking for the pattern [positive | negative] in the string and take the positive
         return preg_replace('/\[(.+)\|(.+)]/i', '$1', $this->description);
     }
 }
