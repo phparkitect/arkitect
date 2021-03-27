@@ -4,10 +4,6 @@ FROM php:${PHP_VERSION}-cli-alpine AS php_build
 
 COPY --from=composer:2.0 /usr/bin/composer /usr/bin/composer
 
-COPY ./docker/php/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
-
-RUN chmod +x /usr/local/bin/docker-entrypoint
-
 WORKDIR /arkitect
 
 COPY . .
