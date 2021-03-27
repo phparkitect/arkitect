@@ -26,7 +26,7 @@ You can check all the costraints using our cli tool, or, if you prefer, you can 
     }
 ```
 
-## What kind of rules can I enforce with Arkitekt
+## What kind of rules can I enforce with Arkitect
 
 Currently you can check if a class:
  - implements an interface
@@ -39,6 +39,13 @@ Currently you can check if a class:
 ## Using composer
 ## Using a phar
 ## Using docker
+
+If you would like to use Arkitect with Docker you can launch this command:
+
+```
+docker run --rm -it -v $(PWD):/project arkitect_php check --config=/project/yourConfigFile.php
+```
+If you have a project with an incompatible version of PHP with Arkitect, using Docker can help you use Arkitect despite the PHP version.
 
 # How to use it
 ## With PHPUnit
