@@ -1,18 +1,45 @@
 # Arkitect ![Arkitect](https://github.com/phparkitect/arkitect/workflows/Arkitect/badge.svg?branch=master)
 
-## Goal
+Arkitect helps you to keep your PHP codebase coherent and solid, by permitting to add some architectural costraint check to your workflow.
+You can express the costraint that you want to enforce, in simple and readable PHP code, for example:
 
- - Check strong architecture rules and fail on CI
- - Check architecture rules and show warnings (for architectural migrations)
+```php
+Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
+    ->should(new HaveNameMatching('*Controller'))
+    ->because("it's a symfony naming convention");
+```
 
-## Principles
+You can check all the costraints using our cli tool, or, if you prefer, you can add the rules to your Phpunit tests, like this:
 
- - A great Developer eXperience (IDE autocomplete is crucial)
- - Code style is out of scope
- - No new rules without a good real example
+```php
+ public function test_controller_naming_convention(): void
+    {
+        $set = ClassSet::fromDir(__DIR__.'/fixtures/happy_island');
 
-## Examples of rules that can be enforced
+        Rule::allClasses()
+            ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
+            ->should(new HaveNameMatching('*Controller'))
+            ->because("it's a symfony naming convention");
 
- - dependency between namespaces
- - naming of classes
- - should implement interface
+        ArchRuleTestCase::assertArchRule($rule, $set);
+    }
+```
+
+## What kind of rules can I enforce with Arkitekt
+
+Currently you can check if a class:
+ - implements an interface
+ - have a name matching a pattern
+ - depends on a namespace
+ - don't have dependency outside a namespace 
+
+# How to install
+
+## Using composer
+## Using a phar
+## Using docker
+
+# How to use it
+## With PHPUnit
+## Standalone
