@@ -22,7 +22,7 @@ interface Expression
 
     /**
      * Evaluates the expression for the class passed as parameter.
-     * It should return true if $theClass has the property, false otherwise.
+     * It should adds violations if rule is violated.
      */
     public function evaluate(ClassDescription $theClass, Violations $violations): void;
 }

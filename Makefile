@@ -1,34 +1,34 @@
 .PHONY: test build db dt dbi dphar csfix
 .DEFAULT_GOAL := help
 
-help: ## visualizza questo help
+help: ## it shows help menu
 	@awk 'BEGIN {FS = ":.*#"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z0-9_-]+:.*?#/ { printf "  \033[36m%-27s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
-db: ## lancia la build usando un container
-	docker run --rm -it -v $(PWD):/var/www arkitect_php make build
+db: ## it launches build using container
+	docker run --rm -it --entrypoint= -v $(PWD):/arkitect arkitect_php make build
 
-dt: ## lancia i test usando un container
-	docker run --rm -it -v $(PWD):/var/www arkitect_php make test
+dt: ##it launches tests using containerx
+	docker run --rm -it --entrypoint= -v $(PWD):/arkitect arkitect_php make test
 
-dbi: ## crea immagine docker per lo sviluppo
+dbi: ## it creates docker image
 	docker image build -t arkitect_php .
 
-dphar: ## crea un phar nel container
-	docker run --rm -it -v $(PWD):/var/www arkitect_php make phar
+dphar: ## it creates phar inside container
+	docker run --rm -it --entrypoint= -v $(PWD):/arkitect arkitect_php make phar
 
-shell: ## entra nel container
-	docker run --rm -it -v $(PWD):/var/www arkitect_php bash
+shell: ## it enters into the container
+	docker run --rm -it --entrypoint= -v $(PWD):/arkitect arkitect_php bash
 
-test: ## lancia i test
+test: ## it launches tests
 	bin/phpunit
 
-test_%: ## lancia un test
-	docker run --rm -it -v $(PWD):/var/www arkitect_php bin/phpunit --filter $@
+test_%: ## it launches a test
+	docker run --rm -it --entrypoint= -v $(PWD):/arkitect arkitect_php bin/phpunit --filter $@
 
 %Test: ## lancia un test
-	docker run --rm -it -v $(PWD):/var/www arkitect_php bin/phpunit --filter $@
+	docker run --rm -it --entrypoint= -v $(PWD):/arkitect arkitect_php bin/phpunit --filter $@
 
-phar: ## crea il phar
+phar: ## it creates phar
 	rm -rf /tmp/arkitect && mkdir -p /tmp/arkitect
 	cp -R src bin-stub box.json README.md composer.json composer.lock /tmp/arkitect
 	cd /tmp/arkitect && composer install --prefer-source --no-dev -o
@@ -38,16 +38,16 @@ phar: ## crea il phar
 outdated:
 	composer outdated
 
-coverage: ## lancia i test con coverage
+coverage: ## it launches coverage
 	phpdbg -qrr ./bin/phpunit --coverage-html build/coverage
 
 csfix: ## cs fix
 	bin/php-cs-fixer fix -v
 
-psalm: ## lancia psalm
+psalm: ## it launches psalm
 	bin/psalm
 
-build: ## lancia tutta la build
+build: ## it launches all the build
 	composer install
 	bin/php-cs-fixer fix -v
 	#bin/psalm
