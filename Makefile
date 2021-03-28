@@ -5,28 +5,28 @@ help: ## it shows help menu
 	@awk 'BEGIN {FS = ":.*#"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z0-9_-]+:.*?#/ { printf "  \033[36m%-27s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
 db: ## it launches build using container
-	docker run --rm -it --entrypoint= -v $(PWD):/arkitect arkitect_php make build
+	docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect make build
 
 dt: ##it launches tests using containerx
-	docker run --rm -it --entrypoint= -v $(PWD):/arkitect arkitect_php make test
+	docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect make test
 
 dbi: ## it creates docker image
-	docker image build -t arkitect_php .
+	docker image build -t phparkitect .
 
 dphar: ## it creates phar inside container
-	docker run --rm -it --entrypoint= -v $(PWD):/arkitect arkitect_php make phar
+	docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect make phar
 
 shell: ## it enters into the container
-	docker run --rm -it --entrypoint= -v $(PWD):/arkitect arkitect_php bash
+	docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect bash
 
 test: ## it launches tests
 	bin/phpunit
 
 test_%: ## it launches a test
-	docker run --rm -it --entrypoint= -v $(PWD):/arkitect arkitect_php bin/phpunit --filter $@
+	docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect bin/phpunit --filter $@
 
 %Test: ## lancia un test
-	docker run --rm -it --entrypoint= -v $(PWD):/arkitect arkitect_php bin/phpunit --filter $@
+	docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect bin/phpunit --filter $@
 
 phar: ## it creates phar
 	rm -rf /tmp/arkitect && mkdir -p /tmp/arkitect

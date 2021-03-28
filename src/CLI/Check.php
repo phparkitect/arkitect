@@ -38,6 +38,7 @@ class Check extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        ini_set('memory_limit', '-1');
         try {
             $this->printHeadingLine($output);
 
