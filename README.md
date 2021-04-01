@@ -43,7 +43,7 @@ Currently you can check if a class:
 If you would like to use Arkitect with Docker you can launch this command:
 
 ```
-docker run --rm -it -v $(PWD):/project arkitect_php check --config=/project/yourConfigFile.php
+docker run --rm -it -v $(PWD):/project phparkitect/phparkitect:latest check --config=/project/yourConfigFile.php
 ```
 If you have a project with an incompatible version of PHP with Arkitect, using Docker can help you use Arkitect despite the PHP version.
 
