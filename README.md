@@ -26,7 +26,7 @@ You can check all the costraints using our cli tool, or, if you prefer, you can 
     }
 ```
 
-## What kind of rules can I enforce with Arkitekt
+## What kind of rules can I enforce with Arkitect
 
 Currently you can check if a class:
  - implements an interface
