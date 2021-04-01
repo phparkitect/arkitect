@@ -53,6 +53,6 @@
         "bin-dir": "bin"
     },
     "bin": [
-        "phparkitect"
+        "bin-stub/phparkitect"
     ]
 }
