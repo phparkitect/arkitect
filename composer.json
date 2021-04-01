@@ -1,7 +1,7 @@
 {
     "name": "phparkitect/phparkitect",
     "description": "Enforce architectural constraints in your PHP applications",
-    "type": "project",
+    "type": "library",
     "license": "MIT",
     "authors": [
         {
