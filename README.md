@@ -40,6 +40,13 @@ Currently you can check if a class:
 ## Using a phar
 ## Using docker
 
+If you would like to use Arkitect with Docker you can launch this command:
+
+```
+docker run --rm -it -v $(PWD):/project phparkitect/phparkitect:latest check --config=/project/yourConfigFile.php
+```
+If you have a project with an incompatible version of PHP with Arkitect, using Docker can help you use Arkitect despite the PHP version.
+
 # How to use it
 ## With PHPUnit
 ## Standalone

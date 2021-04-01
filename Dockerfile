@@ -1,11 +1,22 @@
-FROM php:7.4.12-cli-alpine
+ARG PHP_VERSION=7.4
 
-MAINTAINER Michele Orselli
+FROM php:${PHP_VERSION}-cli-alpine AS php_build
+
+COPY --from=composer:2.0 /usr/bin/composer /usr/bin/composer
+
+WORKDIR /arkitect
+
+COPY bin-stub ./bin-stub
+COPY src ./src
+COPY composer.json ./composer.json
+COPY box.json ./box.json
+COPY phpunit.xml ./phpunit.xml
+COPY psalm.xml ./psalm.xml
+
+RUN  composer install --no-dev --optimize-autoloader --prefer-dist
 
 RUN apk add zip git bash make icu-dev
 
-RUN docker-php-ext-configure intl && docker-php-ext-install intl
+ENV PATH="/arkitect/bin-stub:${PATH}"
 
-COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
-
-WORKDIR /var/www
+ENTRYPOINT [ "phparkitect"]
