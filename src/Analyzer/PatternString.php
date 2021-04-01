@@ -22,7 +22,7 @@ class PatternString
             return true;
         }
 
-        return fnmatch($pattern, $this->value, FNM_NOESCAPE);
+        return fnmatch($pattern, $this->value, \FNM_NOESCAPE);
     }
 
     public function explode(string $delimiter): array
