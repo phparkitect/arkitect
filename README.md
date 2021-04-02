@@ -48,5 +48,51 @@ docker run --rm -it -v $(PWD):/project phparkitect/phparkitect:latest check --co
 If you have a project with an incompatible version of PHP with Arkitect, using Docker can help you use Arkitect despite the PHP version.
 
 # How to use it
+
+To use this tool you need to launch a command via bash or with Docker like this:
+
+```
+phparkitect check
+```
+
+With this command `phparkitect` will search all rules in the root of you project the default config file called `phparkitect.php`.
+You can also specify your configuration file using `--check` option like this:
+
+phparkitect check --config=/project/yourConfigFile.php
+
+Example of configuration file `phparkitect.php`
+
+```
+<?php
+declare(strict_types=1);
+
+use Arkitect\ClassSet;
+use Arkitect\ClassSetRules;
+use Arkitect\CLI\Config;
+use Arkitect\Expression\ForClasses\HaveNameMatching;
+use Arkitect\Expression\ForClasses\Implement;
+use Arkitect\Expression\ForClasses\NotHaveDependencyOutsideNamespace;
+use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
+use Arkitect\Rules\Rule;
+
+return static function (Config $config): void {
+    $mvc_class_set = ClassSet::fromDir(__DIR__.'/mvc');
+
+    $rule_1 = Rule::allClasses()
+        ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
+        ->should(new HaveNameMatching('*Controller'))
+        ->because('we want uniform naming');
+
+    $rule_2 = Rule::allClasses()
+        ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
+        ->should(new NotHaveDependencyOutsideNamespace('App\Domain'))
+        ->because('we want protect our domain');
+
+    $config
+        ->add(ClassSetRules::create($mvc_class_set, ...[$rule_1, $rule_2]));
+};
+```
+
+
 ## With PHPUnit
 ## Standalone

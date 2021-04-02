@@ -14,6 +14,8 @@ class Check extends Command
 {
     private const CONFIG_FILENAME_PARAM = 'config';
 
+    private const DEFAULT_FILENAME = 'phparkitect.php';
+
     private const SUCCESS_CODE = 0;
 
     private const ERROR_CODE = 1;
@@ -31,7 +33,7 @@ class Check extends Command
             ->addOption(
                 self::CONFIG_FILENAME_PARAM,
                 'c',
-                InputOption::VALUE_REQUIRED,
+                InputOption::VALUE_OPTIONAL,
                 'File containing configs, such as rules to be matched'
             );
     }
@@ -96,7 +98,10 @@ class Check extends Command
     {
         $filename = $input->getOption(self::CONFIG_FILENAME_PARAM);
 
-        Assert::notNull($filename, 'You must specify the file containing rules');
+        if (null === $filename) {
+            $filename = self::DEFAULT_FILENAME;
+        }
+
         Assert::file($filename, 'Config file not found');
 
         return $filename;
