@@ -1,4 +1,4 @@
-# Arkitect ![Arkitect](https://github.com/phparkitect/arkitect/workflows/Arkitect/badge.svg?branch=master)
+# Arkitect [![Latest Stable Version](https://poser.pugx.org/phparkitect/phparkitect/v/stable)](https://packagist.org/packages/phparkitect/phparkitect)  ![Arkitect](https://github.com/phparkitect/arkitect/workflows/Arkitect/badge.svg?branch=master)
 
 Arkitect helps you to keep your PHP codebase coherent and solid, by permitting to add some architectural costraint check to your workflow.
 You can express the costraint that you want to enforce, in simple and readable PHP code, for example:
