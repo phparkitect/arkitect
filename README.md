@@ -55,7 +55,7 @@ To use this tool you need to launch a command via bash or with Docker like this:
 phparkitect check
 ```
 
-With this command `phparkitect` will search all rules in the root of you project the default config file called `phparkitect.php`.
+With this command `phparkitect` will search all rules in the root of your project the default config file called `phparkitect.php`.
 You can also specify your configuration file using `--check` option like this:
 
 phparkitect check --config=/project/yourConfigFile.php

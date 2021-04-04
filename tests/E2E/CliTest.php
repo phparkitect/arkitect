@@ -15,7 +15,7 @@ class CliTest extends TestCase
 
     private string $phparkitect = __DIR__.'/../../bin-stub/phparkitect';
 
-    public function test_returns_error_with_mulitple_violations(): void
+    public function test_returns_error_with_multiple_violations(): void
     {
         $process = $this->runArkitectPassingConfigFilePath(__DIR__.'/fixtures/configMvc.php');
 
