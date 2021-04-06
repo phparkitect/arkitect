@@ -6,9 +6,6 @@ on:
       - 'master'
     tags:
       - '*'
-  pull_request:
-    branches:
-      - 'master'
 
 jobs:
   docker:
