@@ -97,6 +97,20 @@ App\Controller\Foo violates rules
         $this->assertStringContainsString($expectedErrors, $process->getOutput());
     }
 
+    public function test_bug_depends_only_on_namespaces(): void
+    {
+        $process = $this->runArkitectPassingConfigFilePath(__DIR__.'/fixtures/configMvcForDependsOnlyOnTheseNamespaceBug.php');
+
+        $expectedErrors = 'ERRORS!
+
+App\Domain\Model violates rules
+  should depend only on classes in one of these namespaces: App\Domain (on line 15)
+  should depend only on classes in one of these namespaces: App\Domain (on line 16)';
+
+        $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
+        $this->assertStringContainsString($expectedErrors, $process->getOutput());
+    }
+
     protected function runArkitectPassingConfigFilePath($configFilePath): Process
     {
         $process = new Process([$this->phparkitect, 'check', '--config='.$configFilePath], __DIR__);
