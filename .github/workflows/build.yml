@@ -2,7 +2,11 @@ name: Arkitect
 
 on:
   push:
-  pull_request: 
+    branches:
+      - '*'
+    tags:
+      - '*'
+  pull_request:
 
 jobs:
   build:
@@ -40,3 +44,35 @@ jobs:
 
     - name: Test
       run: ./bin/phpunit
+
+  publish_docker_images:
+    needs: build
+    runs-on: ubuntu-latest
+
+    if: github.ref == 'refs/heads/master' || github.event_name == 'release'
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Docker meta
+      id: meta
+      uses: crazy-max/ghaction-docker-meta@v2
+      with:
+        images: name/app
+        tags: |
+          type=raw,value=latest,enable=${{ endsWith(github.ref, 'master') }}
+          type=ref,event=tag
+        flavor: |
+          latest=false
+    - name: Login to DockerHub
+      if: github.event_name != 'pull_request'
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Build and push
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
