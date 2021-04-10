@@ -9,11 +9,14 @@ use PhpParser\ParserFactory;
 
 class FileParser implements Parser
 {
-    private \PhpParser\Parser $parser;
+    /** @var \PhpParser\Parser */
+    private $parser;
 
-    private \PhpParser\NodeTraverser $traverser;
+    /** @var \PhpParser\NodeTraverser */
+    private $traverser;
 
-    private FileVisitor $fileVisitor;
+    /** @var FileVisitor */
+    private $fileVisitor;
 
     public function __construct()
     {

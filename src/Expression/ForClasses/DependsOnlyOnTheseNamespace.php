@@ -13,7 +13,8 @@ use Arkitect\Rules\Violations;
 
 class DependsOnlyOnTheseNamespace implements Expression
 {
-    private array $namespaces;
+    /** @var string[] */
+    private $namespaces;
 
     public function __construct(string ...$namespace)
     {

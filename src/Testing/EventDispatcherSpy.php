@@ -7,7 +7,8 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 
 class EventDispatcherSpy implements EventDispatcherInterface
 {
-    private array $events = [];
+    /** @var array */
+    private $events = [];
 
     public function dispatch(object $event)
     {

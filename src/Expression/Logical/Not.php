@@ -11,7 +11,8 @@ use Arkitect\Rules\Violations;
 
 class Not implements Expression
 {
-    private Expression $expression;
+    /** @var Expression */
+    private $expression;
 
     public function __construct(Expression $expression)
     {

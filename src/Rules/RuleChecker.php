@@ -13,18 +13,20 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class RuleChecker
 {
-    private Violations $violations;
+    /** @var Violations */
+    private $violations;
 
-    private ClassSet $classSet;
+    /** @var ClassSet */
+    private $classSet;
 
-    private FilePath $currentlyAnalyzedFile;
+    /** @var FilePath */
+    private $currentlyAnalyzedFile;
 
-    private Parser $parser;
+    /** @var Parser */
+    private $parser;
 
-    /**
-     * @var ArchRule[]
-     */
-    private array $rules;
+    /** @var ArchRule[] */
+    private $rules;
 
     public function __construct(
         ClassSet $classSet,

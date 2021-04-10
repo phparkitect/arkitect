@@ -6,8 +6,13 @@ namespace Arkitect\Rules;
 
 class Violation
 {
-    private string $fqcn;
-    private string $error;
+    /** @var string */
+    private $fqcn;
+
+    /** @var string */
+    private $error;
+
+    /** @var int|null */
     private $line;
 
     public function __construct(string $fqcn, string $error, ?int $line = null)

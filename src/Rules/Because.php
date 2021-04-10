@@ -8,7 +8,8 @@ use Arkitect\Rules\DSL\BecauseParser;
 
 class Because implements BecauseParser
 {
-    private RuleBuilder $ruleBuilder;
+    /** @var RuleBuilder */
+    private $ruleBuilder;
 
     public function __construct(RuleBuilder $expressionBuilder)
     {

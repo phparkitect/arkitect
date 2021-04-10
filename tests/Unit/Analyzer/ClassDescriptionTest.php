@@ -11,7 +11,8 @@ use PHPUnit\Framework\TestCase;
 
 class ClassDescriptionTest extends TestCase
 {
-    private ClassDescriptionBuilder $builder;
+    /** @var ClassDescriptionBuilder */
+    private $builder;
 
     protected function setUp(): void
     {

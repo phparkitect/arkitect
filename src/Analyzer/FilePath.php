@@ -5,7 +5,8 @@ namespace Arkitect\Analyzer;
 
 class FilePath
 {
-    private string $path = '';
+    /** @var string */
+    private $path = '';
 
     public function toString(): string
     {

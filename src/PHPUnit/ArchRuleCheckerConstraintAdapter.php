@@ -10,9 +10,11 @@ use PHPUnit\Framework\Constraint\Constraint;
 
 class ArchRuleCheckerConstraintAdapter extends Constraint
 {
-    private ClassSet $classSet;
+    /** @var ClassSet */
+    private $classSet;
 
-    private Violations $violations;
+    /** @var Violations */
+    private $violations;
 
     public function __construct(ClassSet $classSet)
     {

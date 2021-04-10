@@ -8,7 +8,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class ClassAnalyzed extends Event
 {
-    private \Arkitect\Analyzer\ClassDescription $cd;
+    /** @var \Arkitect\Analyzer\ClassDescription */
+    private $cd;
 
     public function __construct(ClassDescription $cd)
     {

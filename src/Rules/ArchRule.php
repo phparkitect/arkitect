@@ -7,9 +7,14 @@ use Arkitect\Analyzer\ClassDescription;
 
 class ArchRule implements DSL\ArchRule
 {
-    private Specs $thats;
-    private Constraints $shoulds;
-    private string $because;
+    /** @var Specs */
+    private $thats;
+
+    /** @var Constraints */
+    private $shoulds;
+
+    /** @var string */
+    private $because;
 
     public function __construct(Specs $specs, Constraints $constraints, string $because)
     {

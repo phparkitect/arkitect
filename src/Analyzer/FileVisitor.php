@@ -8,7 +8,8 @@ use PhpParser\NodeVisitorAbstract;
 
 class FileVisitor extends NodeVisitorAbstract
 {
-    private ?ClassDescriptionBuilder $classDescriptionBuilder;
+    /** @var ClassDescriptionBuilder|null */
+    private $classDescriptionBuilder;
 
     /** @var callable(ClassDescription) */
     private $callable;

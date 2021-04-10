@@ -7,7 +7,8 @@ use Arkitect\Rules\Violations;
 
 class ArchViolationsException extends \Exception
 {
-    private \Arkitect\Rules\Violations $violations;
+    /** @var Violations */
+    private $violations;
 
     public function __construct(Violations $violations)
     {

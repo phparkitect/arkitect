@@ -8,11 +8,14 @@ use Arkitect\Expression\Logical\Not;
 
 class RuleBuilder
 {
-    private Specs $thats;
+    /** @var Specs */
+    private $thats;
 
-    private Constraints $shoulds;
+    /** @var Constraints */
+    private $shoulds;
 
-    private string $because;
+    /** @var string */
+    private $because;
 
     public function __construct()
     {
