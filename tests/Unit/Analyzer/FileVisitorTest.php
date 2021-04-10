@@ -17,8 +17,7 @@ class FileVisitorTest extends TestCase
             $cd[] = $classDescription;
         });
 
-        $code = <<< 'EOF'
-            <?php
+        $code = '<?php
 
             namespace Root\Namespace1;
 
@@ -32,7 +31,7 @@ class FileVisitorTest extends TestCase
             {
 
             }
-            EOF;
+            ';
 
         $fp->parse($code);
 

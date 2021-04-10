@@ -13,7 +13,8 @@ use Arkitect\Rules\Violations;
 
 class NotHaveDependencyOutsideNamespace implements Expression
 {
-    private string $namespace;
+    /** @var string */
+    private $namespace;
 
     public function __construct(string $namespace)
     {

@@ -5,7 +5,8 @@ namespace Arkitect\Analyzer;
 
 class PatternString
 {
-    private string $value;
+    /** @var string */
+    private $value;
 
     public function __construct(string $value)
     {

@@ -11,16 +11,14 @@ use PHPUnit\Framework\TestCase;
 
 class ViolationsTest extends TestCase
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $violationData;
-    /**
-     * @var Violations
-     */
+
+    /** @var Violations */
     private $violationStore;
 
-    private Violation $violation;
+    /** @var Violation */
+    private $violation;
 
     protected function setUp(): void
     {

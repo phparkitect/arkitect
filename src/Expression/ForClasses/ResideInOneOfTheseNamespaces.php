@@ -12,7 +12,8 @@ use Arkitect\Rules\Violations;
 
 class ResideInOneOfTheseNamespaces implements Expression
 {
-    private array $namespaces;
+    /** @var string[] */
+    private $namespaces;
 
     public function __construct(string ...$namespaces)
     {

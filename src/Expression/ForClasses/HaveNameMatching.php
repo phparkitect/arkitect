@@ -13,7 +13,8 @@ use Arkitect\Rules\Violations;
 
 class HaveNameMatching implements Expression
 {
-    private string $name;
+    /** @var string */
+    private $name;
 
     public function __construct(string $name)
     {

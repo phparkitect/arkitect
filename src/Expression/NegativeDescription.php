@@ -5,7 +5,8 @@ namespace Arkitect\Expression;
 
 class NegativeDescription implements Description
 {
-    private Description $description;
+    /** @var Description */
+    private $description;
 
     public function __construct(Description $description)
     {

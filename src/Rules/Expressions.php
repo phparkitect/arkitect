@@ -7,7 +7,8 @@ use Arkitect\Expression\Expression;
 
 class Expressions
 {
-    protected array $expressions = [];
+    /** @var array */
+    protected $expressions = [];
 
     public function add(Expression $expression): void
     {

@@ -9,7 +9,8 @@ use Arkitect\Rules\DSL\ThatParser;
 
 class AllClasses implements ThatParser
 {
-    protected RuleBuilder $ruleBuilder;
+    /** @var RuleBuilder */
+    protected $ruleBuilder;
 
     public function __construct()
     {

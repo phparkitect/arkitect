@@ -7,7 +7,8 @@ use Arkitect\ClassSetRules;
 
 class Config
 {
-    private array $classSetRules;
+    /** @var array */
+    private $classSetRules;
 
     public function __construct()
     {

@@ -5,13 +5,17 @@ namespace Arkitect\Analyzer;
 
 class ClassDescriptionBuilder
 {
-    private ?array $classDependencies;
+    /** @var array|null */
+    private $classDependencies;
 
-    private ?FullyQualifiedClassName $FQCN;
+    /** @var FullyQualifiedClassName|null */
+    private $FQCN;
 
-    private ?array $interfaces;
+    /** @var array|null */
+    private $interfaces;
 
-    private string $filePath;
+    /** @var string */
+    private $filePath;
 
     private function __construct()
     {

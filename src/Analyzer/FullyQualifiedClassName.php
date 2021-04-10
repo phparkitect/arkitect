@@ -5,11 +5,14 @@ namespace Arkitect\Analyzer;
 
 class FullyQualifiedClassName
 {
-    private \Arkitect\Analyzer\PatternString $fqcnString;
+    /** @var PatternString */
+    private $fqcnString;
 
-    private \Arkitect\Analyzer\PatternString $namespace;
+    /** @var PatternString */
+    private $namespace;
 
-    private \Arkitect\Analyzer\PatternString $class;
+    /** @var PatternString */
+    private $class;
 
     private function __construct(PatternString $fqcnString, PatternString $namespace, PatternString $class)
     {

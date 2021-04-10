@@ -5,7 +5,8 @@ namespace Arkitect\Expression;
 
 class PositiveDescription implements Description
 {
-    private string $description;
+    /** @var string */
+    private $description;
 
     public function __construct(string $description)
     {
