@@ -33,9 +33,16 @@ class FileParser implements Parser
         $this->fileVisitor->onClassAnalyzed($callable);
     }
 
+    public function getClassDescriptions(): array
+    {
+        return $this->fileVisitor->getClassDescriptions();
+    }
+
     public function parse(string $fileContent): void
     {
         try {
+            $this->fileVisitor->clearParsedClassDescriptions();
+
             $stmts = $this->parser->parse($fileContent);
 
             $this->traverser->traverse($stmts);

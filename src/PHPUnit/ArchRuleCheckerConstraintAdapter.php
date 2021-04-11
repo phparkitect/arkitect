@@ -3,8 +3,12 @@ declare(strict_types=1);
 
 namespace Arkitect\PHPUnit;
 
+use Arkitect\Analyzer\FileParser;
 use Arkitect\ClassSet;
-use Arkitect\Rules\RuleChecker;
+use Arkitect\ClassSetRules;
+use Arkitect\CLI\Runner;
+use Arkitect\CLI\VoidProgress;
+use Arkitect\Rules\ArchRule;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\Constraint\Constraint;
 
@@ -16,9 +20,18 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
     /** @var Violations */
     private $violations;
 
+    /**@var Runner */
+    private $runner;
+
+    /**@var FileParser */
+    private $fileparser;
+
     public function __construct(ClassSet $classSet)
     {
+        $this->runner = new Runner();
+        $this->fileparser = new FileParser();
         $this->classSet = $classSet;
+        $this->violations = new Violations();
     }
 
     public function toString(): string
@@ -26,11 +39,15 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
         return 'satisfies all architectural constraints';
     }
 
-    protected function matches(/** ArchRule */ $rule): bool
+    protected function matches(/** @var $rule ArchRule */ $other): bool
     {
-        $ruleChecker = RuleChecker::build($this->classSet, $rule);
+        $this->runner->check(
+            ClassSetRules::create($this->classSet, $other),
+            new VoidProgress(),
+            $this->fileparser,
+            $this->violations
+        );
 
-        $this->violations = $ruleChecker->run();
 
         return 0 === $this->violations->count();
     }

@@ -31,6 +31,11 @@ class ClassSet implements \IteratorAggregate
         return new self($directory);
     }
 
+    public function getDir(): string
+    {
+        return $this->directory;
+    }
+
     public function getIterator()
     {
         $finder = (new Finder())

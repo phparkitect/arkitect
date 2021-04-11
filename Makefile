@@ -7,7 +7,7 @@ help: ## it shows help menu
 db: ## it launches build using container
 	docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect make build
 
-dt: ##it launches tests using containerx
+dt: ##it launches tests using container
 	docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect make test
 
 dbi: ## it creates docker image
@@ -20,7 +20,7 @@ shell: ## it enters into the container
 	docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect bash
 
 test: ## it launches tests
-	bin/phpunit
+	bin/phpunit -v
 
 test_%: ## it launches a test
 	docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect bin/phpunit --filter $@
