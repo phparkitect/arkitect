@@ -13,17 +13,17 @@ Rule::allClasses()
 You can check all the costraints using our cli tool, or, if you prefer, you can add the rules to your Phpunit tests, like this:
 
 ```php
- public function test_controller_naming_convention(): void
-    {
-        $set = ClassSet::fromDir(__DIR__.'/fixtures/happy_island');
+public function test_controller_naming_convention(): void
+{
+    $set = ClassSet::fromDir(__DIR__.'/fixtures/happy_island');
 
-        Rule::allClasses()
-            ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
-            ->should(new HaveNameMatching('*Controller'))
-            ->because("it's a symfony naming convention");
+    Rule::allClasses()
+        ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
+        ->should(new HaveNameMatching('*Controller'))
+        ->because("it's a symfony naming convention");
 
-        ArchRuleTestCase::assertArchRule($rule, $set);
-    }
+    ArchRuleTestCase::assertArchRule($rule, $set);
+}
 ```
 
 ## What kind of rules can I enforce with Arkitect
@@ -37,6 +37,13 @@ Currently you can check if a class:
 # How to install
 
 ## Using composer
+The recommended way to install Arkitect is to use Composer in a dedicated composer.json file in your project, for example in the tools/arkitect directory:
+
+```bash
+$ mkdir --parents tools/arkitect
+$ composer require --working-dir=tools/arkitect phparkitect/phparkitect
+```
+
 ## Using a phar
 ## Using docker
 
@@ -62,7 +69,7 @@ phparkitect check --config=/project/yourConfigFile.php
 
 Example of configuration file `phparkitect.php`
 
-```
+```php
 <?php
 declare(strict_types=1);
 
