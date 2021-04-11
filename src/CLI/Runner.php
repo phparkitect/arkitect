@@ -28,12 +28,6 @@ class Runner
         return $violations;
     }
 
-    /**
-     * @param ClassSetRules $classSetRule
-     * @param Progress $progress
-     * @param FileParser $fileParser
-     * @param Violations $violations
-     */
     public function check(ClassSetRules $classSetRule, Progress $progress, FileParser $fileParser, Violations $violations): void
     {
         /** @var SplFileInfo $file */
