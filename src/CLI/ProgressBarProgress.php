@@ -21,7 +21,7 @@ class ProgressBarProgress implements Progress
     public function startFileSetAnalysis(ClassSet $set): void
     {
         $this->output->writeln("analyze class set {$set->getDir()}");
-        $this->output->writeln("");
+        $this->output->writeln('');
         $this->progress = new ProgressBar($this->output, iterator_count($set));
 
         $this->progress->start();
@@ -39,7 +39,7 @@ class ProgressBarProgress implements Progress
     public function endFileSetAnalysis(ClassSet $set): void
     {
         $this->progress->finish();
-        $this->output->writeln("");
-        $this->output->writeln("");
+        $this->output->writeln('');
+        $this->output->writeln('');
     }
 }

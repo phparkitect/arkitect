@@ -20,10 +20,10 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
     /** @var Violations */
     private $violations;
 
-    /**@var Runner */
+    /** @var Runner */
     private $runner;
 
-    /**@var FileParser */
+    /** @var FileParser */
     private $fileparser;
 
     public function __construct(ClassSet $classSet)
@@ -47,7 +47,6 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
             $this->fileparser,
             $this->violations
         );
-
 
         return 0 === $this->violations->count();
     }
