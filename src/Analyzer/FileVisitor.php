@@ -11,6 +11,8 @@ class FileVisitor extends NodeVisitorAbstract
     /** @var ClassDescriptionBuilder|null */
     private $classDescriptionBuilder;
 
+    private array $classDescriptions = [];
+
     /** @var callable(ClassDescription) */
     private $callable;
 
@@ -45,12 +47,24 @@ class FileVisitor extends NodeVisitorAbstract
         $this->callable = $callable;
     }
 
+    public function getClassDescriptions(): array
+    {
+        return $this->classDescriptions;
+    }
+
+    public function clearParsedClassDescriptions(): void
+    {
+        $this->classDescriptions = [];
+    }
+
     public function leaveNode(Node $node): void
     {
         if ($node instanceof Node\Stmt\Class_) {
             $classDescription = $this->classDescriptionBuilder->get();
 
-            \call_user_func($this->callable, $classDescription);
+            $this->classDescriptions[] = $classDescription;
+
+            //\call_user_func($this->callable, $classDescription);
         }
     }
 }

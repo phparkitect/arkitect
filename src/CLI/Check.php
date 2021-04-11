@@ -41,7 +41,12 @@ class Check extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         ini_set('memory_limit', '-1');
+
         try {
+            $verbose = $input->getOption('verbose');
+
+            $progress = $verbose ? new DebugProgress($output) : new ProgressBarProgress($output);
+
             $this->printHeadingLine($output);
 
             $rulesFilename = $this->getConfigFilename($input);
@@ -52,7 +57,7 @@ class Check extends Command
             $this->readRules($config, $rulesFilename);
 
             $runner = new Runner();
-            $violations = $runner->run($config);
+            $violations = $runner->run($config, $progress);
 
             if ($violations->count() > 0) {
                 $this->printViolations($violations, $output);
