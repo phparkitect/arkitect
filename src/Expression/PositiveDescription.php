@@ -18,7 +18,7 @@ class PositiveDescription implements Description
         return $this->toPositive();
     }
 
-    public function getPattern()
+    public function getPattern(): string
     {
         return $this->description;
     }
