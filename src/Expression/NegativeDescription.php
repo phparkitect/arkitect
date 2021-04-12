@@ -18,9 +18,9 @@ class NegativeDescription implements Description
         return $this->toNegative();
     }
 
-    public function getPattern(): void
+    public function getPattern(): string
     {
-        $this->description->getPattern();
+        return $this->description->getPattern();
     }
 
     protected function toNegative(): string
