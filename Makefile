@@ -50,6 +50,6 @@ psalm: ## it launches psalm
 build: ## it launches all the build
 	composer install
 	bin/php-cs-fixer fix -v
-	#bin/psalm
+	bin/psalm
 	bin/phpunit
 

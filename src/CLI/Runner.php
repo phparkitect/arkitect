@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\CLI;
 
 use Arkitect\Analyzer\FileParser;
+use Arkitect\Analyzer\Parser;
 use Arkitect\ClassSetRules;
 use Arkitect\Rules\Violations;
 use Symfony\Component\Finder\SplFileInfo;
@@ -28,7 +29,7 @@ class Runner
         return $violations;
     }
 
-    public function check(ClassSetRules $classSetRule, Progress $progress, FileParser $fileParser, Violations $violations): void
+    public function check(ClassSetRules $classSetRule, Progress $progress, Parser $fileParser, Violations $violations): void
     {
         /** @var SplFileInfo $file */
         foreach ($classSetRule->getClassSet() as $file) {

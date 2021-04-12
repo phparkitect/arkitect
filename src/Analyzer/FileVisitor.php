@@ -11,10 +11,7 @@ class FileVisitor extends NodeVisitorAbstract
     /** @var ClassDescriptionBuilder|null */
     private $classDescriptionBuilder;
 
-    private array $classDescriptions = [];
-
-    /** @var callable(ClassDescription) */
-    private $callable;
+    private $classDescriptions = [];
 
     public function enterNode(Node $node): void
     {
@@ -42,11 +39,6 @@ class FileVisitor extends NodeVisitorAbstract
         }
     }
 
-    public function onClassAnalyzed(callable $callable): void
-    {
-        $this->callable = $callable;
-    }
-
     public function getClassDescriptions(): array
     {
         return $this->classDescriptions;
@@ -63,8 +55,6 @@ class FileVisitor extends NodeVisitorAbstract
             $classDescription = $this->classDescriptionBuilder->get();
 
             $this->classDescriptions[] = $classDescription;
-
-            //\call_user_func($this->callable, $classDescription);
         }
     }
 }

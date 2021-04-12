@@ -18,7 +18,7 @@ class NegativeDescription implements Description
         return $this->toNegative();
     }
 
-    public function getPattern(): string
+    public function getPattern(): void
     {
         $this->description->getPattern();
     }
@@ -26,6 +26,8 @@ class NegativeDescription implements Description
     protected function toNegative(): string
     {
         //looking for the pattern [positive | negative] in the string and take the negative
-        return preg_replace('/\[(.+)\|(.+)]/i', '$2', $this->description->getPattern());
+        $replaced = preg_replace('/\[(.+)\|(.+)]/i', '$2', $this->description->getPattern());
+
+        return ((bool) $replaced) ? $replaced : $this->description->toString();
     }
 }
