@@ -18,5 +18,5 @@ interface Description
     /**
      * Returns the raw string.
      */
-    public function getPattern(): string;
+    public function getPattern();
 }

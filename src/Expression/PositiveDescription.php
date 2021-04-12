@@ -18,14 +18,16 @@ class PositiveDescription implements Description
         return $this->toPositive();
     }
 
-    public function getPattern(): string
+    public function getPattern()
     {
         return $this->description;
     }
 
     protected function toPositive(): string
     {
-        // looking for the pattern [positive | negative] in the string and take the positive
-        return preg_replace('/\[(.+)\|(.+)]/i', '$1', $this->description);
+        //looking for the pattern [positive | negative] in the string and take the negative
+        $replaced = preg_replace('/\[(.+)\|(.+)]/i', '$1', $this->description);
+
+        return ((bool) $replaced) ? $replaced : $this->description;
     }
 }

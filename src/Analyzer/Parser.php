@@ -7,5 +7,5 @@ interface Parser
 {
     public function parse(string $fileContent): void;
 
-    public function onClassAnalyzed(callable $callable): void;
+    public function getClassDescriptions(): array;
 }

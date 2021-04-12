@@ -4,11 +4,12 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Unit\Rules;
 
 use Arkitect\Analyzer\ClassDescription;
-use Arkitect\Analyzer\FilePath;
 use Arkitect\Analyzer\Parser;
 use Arkitect\ClassSet;
+use Arkitect\ClassSetRules;
+use Arkitect\CLI\Runner;
+use Arkitect\CLI\VoidProgress;
 use Arkitect\Rules\DSL\ArchRule;
-use Arkitect\Rules\RuleChecker;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
@@ -22,12 +23,14 @@ class RuleCheckerTest extends TestCase
         $fileParser = new FakeParser();
         $rule = new FakeRule();
 
-        $fileParser->onClassAnalyzed(static function (ClassDescription $classDescription) use ($rule, $violations): void {
-            $rule->check($classDescription, $violations);
-        });
+        $runner = new Runner();
 
-        $ruleChecker = new RuleChecker(new FakeClassSet(), $fileParser, new FilePath(), $violations, ...[$rule]);
-        $violations = $ruleChecker->run();
+        $runner->check(
+            ClassSetRules::create(new FakeClassSet(), ...[$rule]),
+            new VoidProgress(),
+            $fileParser,
+            $violations
+        );
 
         self::assertCount(3, $violations);
     }
@@ -67,15 +70,12 @@ class FakeRule implements ArchRule
 
 class FakeParser implements Parser
 {
-    private $callback;
-
     public function parse(string $fileContent): void
     {
-        \call_user_func($this->callback, ClassDescription::build('uno')->get());
     }
 
-    public function onClassAnalyzed(callable $callable): void
+    public function getClassDescriptions(): array
     {
-        $this->callback = $callable;
+        return [ClassDescription::build('uno')->get()];
     }
 }

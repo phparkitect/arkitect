@@ -39,8 +39,8 @@ jobs:
     - name: Coding Standard Checks
       run: PHP_CS_FIXER_IGNORE_ENV=1 ./bin/php-cs-fixer fix --dry-run -v
 
-    #- name: Static Analysis
-    #  run: ./bin/psalm
+    - name: Static Analysis
+      run: ./bin/psalm
 
     - name: Test
       run: ./bin/phpunit

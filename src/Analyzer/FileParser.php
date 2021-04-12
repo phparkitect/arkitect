@@ -28,11 +28,6 @@ class FileParser implements Parser
         $this->traverser->addVisitor($this->fileVisitor);
     }
 
-    public function onClassAnalyzed(callable $callable): void
-    {
-        $this->fileVisitor->onClassAnalyzed($callable);
-    }
-
     public function getClassDescriptions(): array
     {
         return $this->fileVisitor->getClassDescriptions();
