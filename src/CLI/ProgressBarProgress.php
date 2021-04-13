@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ProgressBarProgress implements Progress
 {
-    private OutputInterface $output;
+    private $output;
 
     private $progress;
 
