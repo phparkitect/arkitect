@@ -7,6 +7,8 @@ class CatalogController implements \ContainerAwareInterface
 {
     public function viewAction(string $id)
     {
+        $match = new Match();
+
         return new JsonResponse(['data' => '']);
     }
 
