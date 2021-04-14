@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
 
+use PhpParser\Lexer\Emulative;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\ParserFactory;
-use PhpParser\Lexer\Emulative;
 
 class FileParser implements Parser
 {
@@ -26,7 +26,7 @@ class FileParser implements Parser
 
         $lexer = new Emulative([
             'usedAttributes' => ['comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos'],
-            'phpVersion' => self::PHP_VERSION
+            'phpVersion' => self::PHP_VERSION,
         ]);
 
         $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
