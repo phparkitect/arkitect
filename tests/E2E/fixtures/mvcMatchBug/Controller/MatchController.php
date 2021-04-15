@@ -7,8 +7,8 @@ use App\Domain\Match;
 
 class MatchController
 {
-    public function viewAction()
+    public function viewAction(): void
     {
-       new Match();
+        new Match();
     }
 }

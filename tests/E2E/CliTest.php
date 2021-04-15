@@ -103,13 +103,12 @@ App\Controller\Foo violates rules
      */
     public function test_bug_match(): void
     {
-        $process = $this->runArkitectPassingConfigFilePath(__DIR__.'/fixtures/configMvcForMatchBug.php.php');
+        $process = $this->runArkitectPassingConfigFilePath(__DIR__.'/fixtures/configMvcForMatchBug.php');
 
         $expectedErrors = 'ERRORS!
 
-App\Controller\Foo violates rules
-  should implement ContainerAwareInterface
-  should have a name that matches *Controller';
+App\Controller\MatchController violates rules
+  should implement ContainerAwareInterface';
 
         $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
         $this->assertStringContainsString($expectedErrors, $process->getOutput());

@@ -1,6 +1,7 @@
 <?php
 
 $finder = PhpCsFixer\Finder::create()
+  ->exclude([__DIR__.'/tests/E2E/fixtures/mvcMatchBug'])
   ->in(__DIR__.'/src')
   ->in(__DIR__.'/tests');
 
