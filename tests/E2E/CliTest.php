@@ -98,22 +98,6 @@ App\Controller\Foo violates rules
         $this->assertStringContainsString($expectedErrors, $process->getOutput());
     }
 
-    /**
-     * @group 8.x
-     */
-    public function test_bug_match(): void
-    {
-        $process = $this->runArkitectPassingConfigFilePath(__DIR__.'/fixtures/configMvcForMatchBug.php');
-
-        $expectedErrors = 'ERRORS!
-
-App\Controller\MatchController violates rules
-  should implement ContainerAwareInterface';
-
-        $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
-        $this->assertStringContainsString($expectedErrors, $process->getOutput());
-    }
-
     protected function runArkitectPassingConfigFilePath($configFilePath): Process
     {
         $process = new Process([$this->phparkitect, 'check', '--config='.$configFilePath], __DIR__);

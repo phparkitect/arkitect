@@ -20,18 +20,18 @@ class FileParser implements Parser
     /** @var FileVisitor */
     private $fileVisitor;
 
-    public function __construct()
+    public function __construct(NodeTraverser $traverser, FileVisitor $fileVisitor, NameResolver $nameResolver)
     {
-        $this->fileVisitor = new FileVisitor();
+        $this->fileVisitor = $fileVisitor;
 
         $lexer = new Emulative([
             'usedAttributes' => ['comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos'],
-            'phpVersion' => self::PHP_VERSION,
+             'phpVersion' => self::PHP_VERSION,
         ]);
 
         $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
-        $this->traverser = new NodeTraverser();
-        $this->traverser->addVisitor(new NameResolver());
+        $this->traverser = $traverser;
+        $this->traverser->addVisitor($nameResolver);
         $this->traverser->addVisitor($this->fileVisitor);
     }
 

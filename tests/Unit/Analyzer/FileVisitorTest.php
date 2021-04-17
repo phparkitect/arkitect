@@ -5,6 +5,7 @@ namespace Arkitect\Tests\Unit\Analyzer;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FileParser;
+use Arkitect\Analyzer\FileParserFactory;
 use PHPUnit\Framework\TestCase;
 
 class FileVisitorTest extends TestCase
@@ -28,7 +29,8 @@ class Cat implements AnInterface
 }
 EOF;
 
-        $fp = new FileParser();
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser();
         $fp->parse($code);
         $cd = $fp->getClassDescriptions();
 
