@@ -3,12 +3,14 @@ declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
 
+use PhpParser\Lexer\Emulative;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\ParserFactory;
 
 class FileParser implements Parser
 {
+    private const PHP_VERSION = '7.1';
     /** @var \PhpParser\Parser */
     private $parser;
 
@@ -18,13 +20,18 @@ class FileParser implements Parser
     /** @var FileVisitor */
     private $fileVisitor;
 
-    public function __construct()
+    public function __construct(NodeTraverser $traverser, FileVisitor $fileVisitor, NameResolver $nameResolver)
     {
-        $this->fileVisitor = new FileVisitor();
+        $this->fileVisitor = $fileVisitor;
 
-        $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
-        $this->traverser = new NodeTraverser();
-        $this->traverser->addVisitor(new NameResolver());
+        $lexer = new Emulative([
+            'usedAttributes' => ['comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos'],
+             'phpVersion' => self::PHP_VERSION,
+        ]);
+
+        $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
+        $this->traverser = $traverser;
+        $this->traverser->addVisitor($nameResolver);
         $this->traverser->addVisitor($this->fileVisitor);
     }
 

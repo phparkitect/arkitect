@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\CLI;
 
 use Arkitect\Analyzer\FileParser;
+use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\Analyzer\Parser;
 use Arkitect\ClassSetRules;
 use Arkitect\Rules\Violations;
@@ -14,7 +15,8 @@ class Runner
 {
     public function run(Config $config, Progress $progress): Violations
     {
-        $fileParser = new FileParser();
+        /** @var FileParser $fileParser */
+        $fileParser = FileParserFactory::createFileParser();
         $violations = new Violations();
 
         /** @var ClassSetRules $classSetRule */

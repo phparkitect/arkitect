@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Arkitect\PHPUnit;
 
 use Arkitect\Analyzer\FileParser;
+use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\ClassSet;
 use Arkitect\ClassSetRules;
 use Arkitect\CLI\Runner;
@@ -29,7 +30,7 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
     public function __construct(ClassSet $classSet)
     {
         $this->runner = new Runner();
-        $this->fileparser = new FileParser();
+        $this->fileparser = FileParserFactory::createFileParser();
         $this->classSet = $classSet;
         $this->violations = new Violations();
     }
