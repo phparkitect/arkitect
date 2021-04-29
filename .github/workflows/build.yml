@@ -53,6 +53,15 @@ jobs:
     - name: Test
       run: ./bin/phpunit
 
+    - name: "Compile phparkitect phar"
+      run: ./bin-stub/box.phar build -c ./box.json
+
+    - name: "Upload phar file artifact"
+      uses: actions/upload-artifact@v2
+      with:
+        name: phparkitect.phar
+        path: phparkitect.phar
+
   publish_docker_images:
     needs: build
     runs-on: ubuntu-latest
