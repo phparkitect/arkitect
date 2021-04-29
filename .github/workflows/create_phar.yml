@@ -41,7 +41,7 @@ jobs:
         composer_version: 2
         php_version: 7.4
     - name: "Compile phparkitect phar"
-      run: ./bin/box build -c ./arkitect/box.json
+      run: ./bin/box build -c ./box.json
 
     - name: "Upload phar file artifact"
       uses: actions/upload-artifact@v2
