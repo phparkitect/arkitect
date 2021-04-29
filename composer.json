@@ -36,7 +36,8 @@
         "vimeo/psalm": "^4.6",
         "friendsofphp/php-cs-fixer": "^2.16",
         "phpunit/phpunit": "^7.5",
-        "mikey179/vfsstream": "^1.6"
+        "mikey179/vfsstream": "^1.6",
+        "humbug/box": "^3.7"
     },
     "autoload": {
         "psr-4": {
