@@ -11,7 +11,7 @@ use Arkitect\Expression\PositiveDescription;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
 
-class DependsOnlyOnTheseNamespace implements Expression
+class DependsOnlyOnTheseNamespaces implements Expression
 {
     /** @var string[] */
     private $namespaces;
