@@ -6,7 +6,7 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
-use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespace;
+use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
@@ -14,7 +14,7 @@ class DependsOnlyOnTheseNamespaceTest extends TestCase
 {
     public function test_it_should_return_true_if_it_has_no_dependencies(): void
     {
-        $dependOnClasses = new DependsOnlyOnTheseNamespace('myNamespace');
+        $dependOnClasses = new DependsOnlyOnTheseNamespaces('myNamespace');
 
         $classDescription = ClassDescription::build('HappyIsland\Myclass', 'full/path')->get();
 
@@ -27,7 +27,7 @@ class DependsOnlyOnTheseNamespaceTest extends TestCase
 
     public function test_it_should_return_true_if_not_depends_on_namespace(): void
     {
-        $dependOnClasses = new DependsOnlyOnTheseNamespace('myNamespace');
+        $dependOnClasses = new DependsOnlyOnTheseNamespaces('myNamespace');
 
         $classDescription = ClassDescription::build('HappyIsland\Myclass', 'full/path')
             ->addDependency(new ClassDependency('myNamespace\Banana', 0))
@@ -42,7 +42,7 @@ class DependsOnlyOnTheseNamespaceTest extends TestCase
 
     public function test_it_should_return_false_if_depends_on_namespace(): void
     {
-        $dependOnClasses = new DependsOnlyOnTheseNamespace('myNamespace');
+        $dependOnClasses = new DependsOnlyOnTheseNamespaces('myNamespace');
 
         $classDescription = ClassDescription::build('HappyIsland\Myclass', 'full/path')
             ->addDependency(new ClassDependency('myNamespace\Banana', 0))
