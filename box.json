@@ -15,5 +15,6 @@
   ],
   "main": "bin-stub/phparkitect",
   "output": "phparkitect.phar",
-  "datetime": "release-date"
+  "datetime": "release-date",
+  "dump-autoload": false
 }
