@@ -10,13 +10,13 @@ use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
-class DependsOnlyOnTheseNamespaceTest extends TestCase
+class DependsOnlyOnTheseNamespacesTest extends TestCase
 {
     public function test_it_should_return_true_if_it_has_no_dependencies(): void
     {
         $dependOnClasses = new DependsOnlyOnTheseNamespaces('myNamespace');
 
-        $classDescription = ClassDescription::build('HappyIsland\Myclass', 'full/path')->get();
+        $classDescription = ClassDescription::build('HappyIsland\Myclass')->get();
 
         $violations = new Violations();
         $dependOnClasses->evaluate($classDescription, $violations);
@@ -29,7 +29,7 @@ class DependsOnlyOnTheseNamespaceTest extends TestCase
     {
         $dependOnClasses = new DependsOnlyOnTheseNamespaces('myNamespace');
 
-        $classDescription = ClassDescription::build('HappyIsland\Myclass', 'full/path')
+        $classDescription = ClassDescription::build('HappyIsland\Myclass')
             ->addDependency(new ClassDependency('myNamespace\Banana', 0))
             ->addDependency(new ClassDependency('anotherNamespace\Banana', 1))
             ->get();
@@ -40,11 +40,28 @@ class DependsOnlyOnTheseNamespaceTest extends TestCase
         self::assertNotEquals(0, $violations->count());
     }
 
+    public function test_it_should_return_true_if_depends_on_class_in_root_namespace(): void
+    {
+        $dependOnClasses = new DependsOnlyOnTheseNamespaces('myNamespace');
+
+        $classDescription = ClassDescription::build('HappyIsland\Myclass')
+            ->addDependency(new ClassDependency('myNamespace\Banana', 0))
+            ->addDependency(new ClassDependency('anotherNamespace\Banana', 1))
+            ->addDependency(new ClassDependency('\DateTime', 10))
+            ->get();
+
+        $violations = new Violations();
+
+        $dependOnClasses->evaluate($classDescription, $violations);
+
+        self::assertCount(1, $violations);
+    }
+
     public function test_it_should_return_false_if_depends_on_namespace(): void
     {
         $dependOnClasses = new DependsOnlyOnTheseNamespaces('myNamespace');
 
-        $classDescription = ClassDescription::build('HappyIsland\Myclass', 'full/path')
+        $classDescription = ClassDescription::build('HappyIsland\Myclass')
             ->addDependency(new ClassDependency('myNamespace\Banana', 0))
             ->addDependency(new ClassDependency('myNamespace\Mango', 10))
             ->get();
