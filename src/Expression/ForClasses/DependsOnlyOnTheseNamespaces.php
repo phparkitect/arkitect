@@ -31,8 +31,13 @@ class DependsOnlyOnTheseNamespaces implements Expression
     public function evaluate(ClassDescription $theClass, Violations $violations): void
     {
         $dependencies = $theClass->getDependencies();
+
         /** @var ClassDependency $dependency */
         foreach ($dependencies as $dependency) {
+            if ($dependency->getFQCN()->matches('\\')) {
+                continue;
+            }
+
             if (!$dependency->matchesOneOf(...$this->namespaces)) {
                 $violation = Violation::createWithErrorLine(
                     $theClass->getFQCN(),
