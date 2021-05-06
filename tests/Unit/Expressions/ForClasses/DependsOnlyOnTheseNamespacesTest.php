@@ -46,7 +46,7 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
 
         $classDescription = ClassDescription::build('HappyIsland\Myclass')
             ->addDependency(new ClassDependency('myNamespace\Banana', 0))
-            ->addDependency(new ClassDependency('anotherNamespace\Banana', 1))
+            ->addDependency(new ClassDependency('\anotherNamespace\Banana', 1))
             ->addDependency(new ClassDependency('\DateTime', 10))
             ->get();
 

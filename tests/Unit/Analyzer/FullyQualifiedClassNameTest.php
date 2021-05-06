@@ -40,7 +40,22 @@ class FullyQualifiedClassNameTest extends TestCase
     public function test_should_return_class_name(): void
     {
         $fqcn = FullyQualifiedClassName::fromString('Food\Vegetables\Fruits\Banana');
+        $this->assertEquals('Banana', $fqcn->className());
+    }
+
+    public function test_should_have_root_ns_preserved(): void
+    {
+        $fqcn = FullyQualifiedClassName::fromString('\Banana');
 
         $this->assertEquals('Banana', $fqcn->className());
+        $this->assertEquals('', $fqcn->namespace());
+    }
+
+    public function test_should_have_ns_normalized(): void
+    {
+        $fqcn = FullyQualifiedClassName::fromString('\Food\Vegetables\Fruits\Banana');
+
+        $this->assertEquals('Banana', $fqcn->className());
+        $this->assertEquals('Food\Vegetables\Fruits', $fqcn->namespace());
     }
 }
