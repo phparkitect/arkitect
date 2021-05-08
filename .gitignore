@@ -1,9 +1,8 @@
 /vendor/
-/.phpunit.result.cache
+.phpunit.result.cache
 .idea
 .php_cs.cache
 /web
-php-cs-fixer
 /bin
 !/bin/box
 phparkitect.phar
