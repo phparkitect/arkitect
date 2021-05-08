@@ -5,3 +5,5 @@
 /web
 php-cs-fixer
 /bin
+!/bin/box
+phparkitect.phar

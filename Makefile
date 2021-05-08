@@ -32,7 +32,7 @@ phar: ## it creates phar
 	rm -rf /tmp/arkitect && mkdir -p /tmp/arkitect
 	cp -R src bin-stub box.json README.md composer.json composer.lock /tmp/arkitect
 	cd /tmp/arkitect && composer install --prefer-source --no-dev -o
-	bin/box build -c /tmp/arkitect/box.json
+	bin/box compile -c /tmp/arkitect/box.json
 	cp /tmp/arkitect/phparkitect.phar .
 
 outdated:
