@@ -4,10 +4,13 @@ on:
   push:
     branches:
       - master
+    tags:
+      - '*'
   release:
     types:
       - published
-
+      - created
+  
 jobs:
   create_phar:
     runs-on: ubuntu-latest
@@ -43,7 +46,9 @@ jobs:
         run: ./bin-stub/box.phar build -c ./box.json
 
       - name: "Upload phar file artifact"
-          uses: actions/upload-artifact@v2
-          with:
-            name: phparkitect.phar
-            path: phparkitect.phar
+        uses: actions/upload-artifact@v2
+        with:
+          name: phparkitect.phar
+          path: phparkitect.phar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
