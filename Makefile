@@ -13,9 +13,6 @@ dt: ##it launches tests using container
 dbi: ## it creates docker image
 	docker image build -t phparkitect .
 
-dphar: ## it creates phar inside container
-	docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect make phar
-
 shell: ## it enters into the container
 	docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect bash
 
@@ -32,7 +29,7 @@ phar: ## it creates phar
 	rm -rf /tmp/arkitect && mkdir -p /tmp/arkitect
 	cp -R src bin-stub box.json README.md composer.json composer.lock /tmp/arkitect
 	cd /tmp/arkitect && composer install --prefer-source --no-dev -o
-	bin/box compile -c /tmp/arkitect/box.json
+	bin/box.phar compile -c /tmp/arkitect/box.json
 	cp /tmp/arkitect/phparkitect.phar .
 
 outdated:
