@@ -4,5 +4,4 @@
 .php_cs.cache
 /web
 /bin
-!/bin/box
 phparkitect.phar

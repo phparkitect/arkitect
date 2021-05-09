@@ -17,7 +17,7 @@ jobs:
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.3
+          php-version: 7.4
 
       - name: Validate composer.json and composer.lock
         run: composer validate
@@ -37,10 +37,10 @@ jobs:
         with:
           args: --prefer-dist --no-dev -o
           composer_version: 2
-          php_version: 7.3
+          php_version: 7.4
 
       - name: "Compile phparkitect phar"
-        run: ./bin/box compile -c ./box.json
+        run: ./bin-stub/box.phar compile -c ./box.json
 
       - name: "Smoke test created phar"
         run : ./phparkitect.phar
