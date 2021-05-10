@@ -5,3 +5,4 @@
 /web
 /bin
 phparkitect.phar
+!/bin/box.phar
