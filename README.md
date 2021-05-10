@@ -37,7 +37,22 @@ Currently you can check if a class:
 # How to install
 
 ## Using composer
+
+```
+composer require phparkitect/phparkitect
+```
+
 ## Using a phar
+Sometimes your project can conflict with one or more of Phparkitect's dependencies. In that case you may find the Phar (a self-contained PHP executable) useful.
+
+The Phar can be downloaded from Github:
+
+```
+wget https://github.com/phparkitect/arkitect/releases/latest/download/phparkitect.phar
+chmod +x phparkitect.phar
+./phparkitect.phar check
+```
+
 ## Using docker
 
 If you would like to use Arkitect with Docker you can launch this command:
