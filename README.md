@@ -73,7 +73,9 @@ phparkitect check
 With this command `phparkitect` will search all rules in the root of your project the default config file called `phparkitect.php`.
 You can also specify your configuration file using `--check` option like this:
 
+```
 phparkitect check --config=/project/yourConfigFile.php
+```
 
 Example of configuration file `phparkitect.php`
 
@@ -111,4 +113,3 @@ return static function (Config $config): void {
 By default, a progress bar will show the status of the ongoing analysis. If you like to get more informaitions on what is happening you can pass the verbose option `-v` on the command line
 
 ## With PHPUnit
-## Standalone
