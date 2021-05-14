@@ -96,7 +96,7 @@ class Check extends Command
 
     protected function printHeadingLine(OutputInterface $output): void
     {
-        $output->writeln("<info>PHPArkitect 0.0.1</info>\n");
+        $output->writeln("<info>PHPArkitect</info>\n");
     }
 
     private function getConfigFilename(InputInterface $input)
