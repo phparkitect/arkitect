@@ -16,10 +16,12 @@ class FileVisitor extends NodeVisitorAbstract
     public function enterNode(Node $node): void
     {
         if ($node instanceof Node\Stmt\Class_) {
-            /** @psalm-suppress UndefinedPropertyFetch */
-            $this->classDescriptionBuilder = ClassDescriptionBuilder::create(
-                $node->namespacedName->toCodeString()
-            );
+            if (!$node->isAnonymous()) {
+                /** @psalm-suppress UndefinedPropertyFetch */
+                $this->classDescriptionBuilder = ClassDescriptionBuilder::create(
+                    $node->namespacedName->toCodeString()
+                );
+            }
 
             foreach ($node->implements as $interface) {
                 $this->classDescriptionBuilder
@@ -34,6 +36,10 @@ class FileVisitor extends NodeVisitorAbstract
         }
 
         if ($node instanceof Node\Expr\New_ && !($node->class instanceof Node\Expr\Variable)) {
+            if (method_exists($node->class, 'isAnonymous') && $node->class->isAnonymous()) {
+                return;
+            }
+
             $this->classDescriptionBuilder
                 ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
         }
