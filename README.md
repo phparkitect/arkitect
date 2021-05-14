@@ -10,22 +10,6 @@ Rule::allClasses()
     ->because("it's a symfony naming convention");
 ```
 
-You can check all the costraints using our cli tool, or, if you prefer, you can add the rules to your Phpunit tests, like this:
-
-```php
- public function test_controller_naming_convention(): void
-    {
-        $set = ClassSet::fromDir(__DIR__.'/fixtures/happy_island');
-
-        Rule::allClasses()
-            ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
-            ->should(new HaveNameMatching('*Controller'))
-            ->because("it's a symfony naming convention");
-
-        ArchRuleTestCase::assertArchRule($rule, $set);
-    }
-```
-
 ## What kind of rules can I enforce with Arkitect
 
 Currently you can check if a class:
@@ -38,7 +22,7 @@ Currently you can check if a class:
 
 ## Using composer
 
-```
+```bash
 composer require phparkitect/phparkitect
 ```
 
@@ -71,13 +55,15 @@ phparkitect check
 ```
 
 With this command `phparkitect` will search all rules in the root of your project the default config file called `phparkitect.php`.
-You can also specify your configuration file using `--check` option like this:
+You can also specify your configuration file using `--config` option like this:
 
+```
 phparkitect check --config=/project/yourConfigFile.php
+```
 
 Example of configuration file `phparkitect.php`
 
-```
+```php
 <?php
 declare(strict_types=1);
 
@@ -109,6 +95,3 @@ return static function (Config $config): void {
 ```
 
 By default, a progress bar will show the status of the ongoing analysis. If you like to get more informaitions on what is happening you can pass the verbose option `-v` on the command line
-
-## With PHPUnit
-## Standalone
