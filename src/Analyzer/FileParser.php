@@ -47,6 +47,10 @@ class FileParser implements Parser
 
             $stmts = $this->parser->parse($fileContent);
 
+            if (null === $stmts) {
+                return;
+            }
+
             $this->traverser->traverse($stmts);
         } catch (\Throwable $e) {
             echo 'Parse Error: ', $e->getMessage();

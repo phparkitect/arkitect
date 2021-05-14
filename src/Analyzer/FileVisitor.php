@@ -8,7 +8,7 @@ use PhpParser\NodeVisitorAbstract;
 
 class FileVisitor extends NodeVisitorAbstract
 {
-    /** @var ClassDescriptionBuilder|null */
+    /** @var ClassDescriptionBuilder */
     private $classDescriptionBuilder;
 
     private $classDescriptions = [];
@@ -30,7 +30,7 @@ class FileVisitor extends NodeVisitorAbstract
             }
         }
 
-        if ($node instanceof Node\Expr\Instanceof_) {
+        if ($node instanceof Node\Expr\Instanceof_ && method_exists($node->class, 'toString')) {
             $this->classDescriptionBuilder
                 ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
         }
@@ -62,5 +62,10 @@ class FileVisitor extends NodeVisitorAbstract
 
             $this->classDescriptions[] = $classDescription;
         }
+    }
+
+    private function isNewNodeType(Node $node): bool
+    {
+        return $node instanceof Node\Expr\New_ && !($node->class instanceof Node\Expr\Variable);
     }
 }
