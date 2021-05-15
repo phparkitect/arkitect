@@ -63,9 +63,4 @@ class FileVisitor extends NodeVisitorAbstract
             $this->classDescriptions[] = $classDescription;
         }
     }
-
-    private function isNewNodeType(Node $node): bool
-    {
-        return $node instanceof Node\Expr\New_ && !($node->class instanceof Node\Expr\Variable);
-    }
 }
