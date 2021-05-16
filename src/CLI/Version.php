@@ -6,7 +6,7 @@ namespace Arkitect\CLI;
 
 class Version
 {
-    private const COMPOSER_PATH = __DIR__ . '/../../composer.json';
+    private const COMPOSER_PATH = __DIR__.'/../../composer.json';
 
     public static function get(): string
     {
