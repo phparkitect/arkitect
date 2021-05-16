@@ -3,6 +3,7 @@
     "description": "Enforce architectural constraints in your PHP applications",
     "type": "library",
     "license": "MIT",
+    "version": "0.1.11",
     "authors": [
         {
             "name": "Pietro Campagnano",
@@ -28,7 +29,8 @@
         "symfony/console": "^3.0|^4.0|^5.0",
         "symfony/polyfill-php80": "^1.20",
         "nikic/php-parser": "~4",
-        "webmozart/assert": "^1.9"
+        "webmozart/assert": "^1.9",
+        "ext-json": "*"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master",
