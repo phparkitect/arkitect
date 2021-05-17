@@ -5,13 +5,13 @@ namespace Arkitect\Analyzer;
 
 class ClassDescriptionBuilder
 {
-    /** @var array|null */
+    /** @var array */
     private $classDependencies;
 
-    /** @var FullyQualifiedClassName|null */
+    /** @var FullyQualifiedClassName */
     private $FQCN;
 
-    /** @var array|null */
+    /** @var array */
     private $interfaces;
 
     /** @var string */
