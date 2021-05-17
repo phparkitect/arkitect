@@ -6,13 +6,24 @@ namespace Arkitect\CLI;
 
 class Version
 {
-    private const COMPOSER_PATH = __DIR__.'/../../composer.json';
+    private const COMPOSER_PATHS = [
+        'composer.json',
+        '../composer.json',
+        '../../composer.json',
+        '../../composer.json',
+    ];
 
     public static function get(): string
     {
-        $content = file_get_contents(self::COMPOSER_PATH);
-        $composerData = json_decode($content, true);
+        foreach (self::COMPOSER_PATHS as $composerPath) {
+            if (file_exists($composerPath)) {
+                $content = file_get_contents($composerPath);
+                $composerData = json_decode($content, true);
 
-        return $composerData['version'];
+                return $composerData['version'];
+            }
+        }
+
+        throw new \Exception('composer.json not found');
     }
 }
