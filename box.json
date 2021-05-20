@@ -6,6 +6,9 @@
     "src",
     "vendor"
   ],
+  "files": [
+    "composer.json"
+  ],
   "compression": "GZ",
   "compactors": [
     "KevinGH\\Box\\Compactor\\Php",
@@ -14,5 +17,6 @@
   "main": "bin-stub/phparkitect",
   "output": "phparkitect.phar",
   "datetime": "release-date",
-  "dump-autoload": true
+  "dump-autoload": true,
+  "exclude-composer-files": false
 }
