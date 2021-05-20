@@ -55,7 +55,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
 
-    if: github.ref == 'refs/heads/master' || github.event_name == 'release'
+    if: github.ref == 'refs/heads/main' || github.event_name == 'release'
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -65,7 +65,7 @@ jobs:
       with:
         images: phparkitect/phparkitect
         tags: |
-          type=raw,value=latest,enable=${{ endsWith(github.ref, 'master') }}
+          type=raw,value=latest,enable=${{ endsWith(github.ref, 'main') }}
           type=ref,event=tag
         flavor: |
           latest=false
