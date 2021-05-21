@@ -37,4 +37,14 @@ class ClassDependencyTest extends TestCase
     {
         $this->assertTrue($this->classDependency->matches('Happy'));
     }
+
+    public function test_it_should_match_one_of(): void
+    {
+        $this->assertTrue($this->classDependency->matchesOneOf('Happy', 'Foo', 'Bar'));
+    }
+
+    public function test_it_should_not_match_one_of(): void
+    {
+        $this->assertFalse($this->classDependency->matchesOneOf('Baz', 'Foo', 'Bar'));
+    }
 }
