@@ -2,8 +2,9 @@
 <?php
 declare(strict_types=1);
 
+use Arkitect\CLI\Application;
 use Arkitect\CLI\Check;
-use Symfony\Component\Console\Application;
+use Arkitect\CLI\Version;
 
 foreach (array(__DIR__ . '/../../../autoload.php', __DIR__ . '/../../autoload.php', __DIR__ . '/../vendor/autoload.php', __DIR__ . '/vendor/autoload.php') as $file) {
     if (file_exists($file)) {
@@ -28,7 +29,7 @@ if (!defined('PHPARKITECT_COMPOSER_INSTALL')) {
 
 require PHPARKITECT_COMPOSER_INSTALL;
 
-$application = new Application();
+$application = new Application('PHPArkitect', Version::get());
 
 $application->add(new Check());
 
