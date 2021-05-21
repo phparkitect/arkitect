@@ -29,7 +29,7 @@ return PhpCsFixer\Config::create()
     'phpdoc_add_missing_param_annotation' => ['only_untyped' => false], // PHPDoc should contain @param for all params (for untyped parameters only).
     'phpdoc_order' => true, // Annotations in PHPDoc should be ordered so that @param annotations come first, then @throws annotations, then @return annotations.
     'declare_strict_types' => true,
-    'psr4' => true, // Class names should match the file name.
+    'psr_autoloading' => true, // Class names should match the file name.
     'no_php4_constructor' => true, // Convert PHP4-style constructors to __construct.
     'semicolon_after_instruction' => true,
     'align_multiline_comment' => true,

@@ -20,7 +20,8 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
-            []
+            [],
+            null
         );
 
         $violationError = $notHaveDependencyOutsideNamespace->describe($classDescription)->toString();
@@ -34,7 +35,8 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [new ClassDependency('myNamespace', 100)],
-            []
+            [],
+            null
         );
 
         $violations = new Violations();
@@ -48,7 +50,8 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [new ClassDependency('myNamespace', 100), new ClassDependency('another\class', 200)],
-            []
+            [],
+            null
         );
 
         $violations = new Violations();

@@ -14,6 +14,9 @@ class ClassDescriptionBuilder
     /** @var array */
     private $interfaces;
 
+    /** @var FullyQualifiedClassName */
+    private $extend;
+
     /** @var string */
     private $filePath;
 
@@ -54,9 +57,17 @@ class ClassDescriptionBuilder
         return $this;
     }
 
+    public function setExtends(string $FQCN, int $line): self
+    {
+        $this->addDependency(new ClassDependency($FQCN, $line));
+        $this->extend = FullyQualifiedClassName::fromString($FQCN);
+
+        return $this;
+    }
+
     public function get(): ClassDescription
     {
-        $cd = new ClassDescription($this->FQCN, $this->classDependencies, $this->interfaces);
+        $cd = new ClassDescription($this->FQCN, $this->classDependencies, $this->interfaces, $this->extend);
         $cd->setFullPath($this->filePath);
 
         return $cd;

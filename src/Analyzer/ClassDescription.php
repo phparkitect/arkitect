@@ -16,12 +16,17 @@ class ClassDescription
 
     /** @var string */
     private $fullPath;
+    /**
+     * @var ?FullyQualifiedClassName
+     */
+    private $extends;
 
-    public function __construct(FullyQualifiedClassName $FQCN, array $dependencies, array $interfaces)
+    public function __construct(FullyQualifiedClassName $FQCN, array $dependencies, array $interfaces, ?FullyQualifiedClassName $extends)
     {
         $this->FQCN = $FQCN;
         $this->dependencies = $dependencies;
         $this->interfaces = $interfaces;
+        $this->extends = $extends;
     }
 
     public function setFullPath(string $fullPath): void
@@ -94,5 +99,10 @@ class ClassDescription
     public function getInterfaces(): array
     {
         return $this->interfaces;
+    }
+
+    public function getExtends(): ?FullyQualifiedClassName
+    {
+        return $this->extends;
     }
 }
