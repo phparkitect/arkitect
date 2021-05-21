@@ -95,6 +95,32 @@ EOF;
         $this->assertEquals($expectedInterfaces, $cd[0]->getDependencies());
     }
 
+    public function test_it_should_parse_extends_class(): void
+    {
+        $code = <<< 'EOF'
+<?php
+
+namespace Root\Animals;
+
+class Animal
+{
+}
+
+class Cat extends Animal
+{
+
+}
+EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser();
+        $fp->parse($code);
+
+        $cd = $fp->getClassDescriptions()[1];
+
+        $this->assertEquals('Root\Animals\Animal', $cd->getExtends()->toString());
+    }
+
     public function test_should_depends_on_these_namespaces(): void
     {
         $code = <<< 'EOF'

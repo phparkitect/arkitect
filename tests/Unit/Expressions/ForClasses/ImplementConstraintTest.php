@@ -20,7 +20,8 @@ class ImplementConstraintTest extends TestCase
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
-            []
+            [],
+            null
         );
 
         $violationError = $implementConstraint->describe($classDescription)->toString();
@@ -40,7 +41,8 @@ class ImplementConstraintTest extends TestCase
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
-            [FullyQualifiedClassName::fromString('foo')]
+            [FullyQualifiedClassName::fromString('foo')],
+            null
         );
 
         $violations = new Violations();
@@ -56,7 +58,8 @@ class ImplementConstraintTest extends TestCase
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
-            [FullyQualifiedClassName::fromString('interface')]
+            [FullyQualifiedClassName::fromString('interface')],
+            null
         );
 
         $violations = new Violations();
