@@ -126,4 +126,37 @@ EOF;
 
         $this->assertCount(0, $violations);
     }
+
+    public function test_should_returns_all_dependencies(): void
+    {
+        $code = <<< 'EOF'
+<?php
+namespace Foo\Bar;
+
+use Doctrine\MongoDB\Collection;
+use Foo\Baz\Baz;
+use Symfony\Component\HttpFoundation\Request;
+
+class MyClass implements Baz
+{
+    public function __construct(Request $request)
+    {
+        $collection = new Collection($request);
+    }
+}
+EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser();
+        $fp->parse($code);
+        $cd = $fp->getClassDescriptions();
+
+        $expectedDependencies = [
+            new ClassDependency('Foo\Baz\Baz', 8),
+            new ClassDependency('Symfony\Component\HttpFoundation\Request', 10),
+            new ClassDependency('Doctrine\MongoDB\Collection', 12),
+        ];
+
+        $this->assertEquals($expectedDependencies, $cd[0]->getDependencies());
+    }
 }
