@@ -7,6 +7,8 @@ use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FileParser;
 use Arkitect\Analyzer\FileParserFactory;
+use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
+use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
 class FileVisitorTest extends TestCase
@@ -86,13 +88,42 @@ EOF;
 
         $expectedInterfaces = [
             new ClassDependency('Root\Namespace1\AnInterface', 7),
-            new ClassDependency('\Root\Namespace1\AnInterface', 7),
             new ClassDependency('Root\Namespace1\InterfaceTwo', 7),
-            new ClassDependency('\Root\Namespace1\InterfaceTwo', 7),
             new ClassDependency('Root\Namespace1\Another\ForbiddenInterface', 11),
-            new ClassDependency('\Root\Namespace1\Another\ForbiddenInterface', 11),
         ];
 
         $this->assertEquals($expectedInterfaces, $cd[0]->getDependencies());
+    }
+
+    public function test_should_depends_on_these_namespaces(): void
+    {
+        $code = <<< 'EOF'
+<?php
+namespace Foo\Bar;
+
+use Doctrine\MongoDB\Collection;
+use Foo\Baz\Baz;
+use Symfony\Component\HttpFoundation\Request;
+
+class MyClass implements Baz
+{
+    public function __construct(Request $request)
+    {
+        $collection = new Collection($request);
+    }
+}
+EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser();
+        $fp->parse($code);
+        $cd = $fp->getClassDescriptions();
+
+        $violations = new Violations();
+
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Foo', 'Symfony', 'Doctrine');
+        $dependsOnTheseNamespaces->evaluate($cd[0], $violations);
+
+        $this->assertCount(0, $violations);
     }
 }

@@ -25,8 +25,7 @@ class FileVisitor extends NodeVisitorAbstract
 
             foreach ($node->implements as $interface) {
                 $this->classDescriptionBuilder
-                     ->addInterface($interface->toString(), $interface->getLine())
-                     ->addDependency(new ClassDependency($interface->toCodeString(), $interface->getLine()));
+                     ->addInterface($interface->toString(), $interface->getLine());
             }
         }
 
