@@ -42,6 +42,16 @@ class FileVisitor extends NodeVisitorAbstract
             $this->classDescriptionBuilder
                 ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
         }
+
+        /**
+         * matches parameters dependency in functions and method definitions like
+         * public function __construct(Symfony\Component\HttpFoundation\Request $request).
+         *
+         * @see FileVisitorTest::test_should_returns_all_dependencies
+         */
+        if ($node instanceof Node\Param) {
+            $this->addParamDependency($node);
+        }
     }
 
     public function getClassDescriptions(): array
@@ -61,5 +71,19 @@ class FileVisitor extends NodeVisitorAbstract
 
             $this->classDescriptions[] = $classDescription;
         }
+    }
+
+    private function addParamDependency(Node\Param $node): void
+    {
+        if (null === $node->type || $node->type instanceof Node\NullableType || $node->type instanceof Node\Identifier) {
+            return;
+        }
+
+        if (!method_exists($node->type, 'toString')) {
+            return;
+        }
+
+        $this->classDescriptionBuilder
+            ->addDependency(new ClassDependency($node->type->toString(), $node->getLine()));
     }
 }
