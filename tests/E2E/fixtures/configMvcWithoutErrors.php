@@ -2,7 +2,6 @@
 declare(strict_types=1);
 
 use Arkitect\ClassSet;
-use Arkitect\ClassSetRules;
 use Arkitect\CLI\Config;
 use Arkitect\Expression\ForClasses\HaveNameMatching;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
@@ -17,5 +16,5 @@ return static function (Config $config): void {
         ->because('all services should be end name with Service');
 
     $config
-        ->add(ClassSetRules::create($mvc_class_set, ...[$rule_1]));
+        ->add($mvc_class_set, ...[$rule_1]);
 };

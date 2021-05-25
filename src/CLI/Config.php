@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI;
 
+use Arkitect\ClassSet;
 use Arkitect\ClassSetRules;
+use Arkitect\Rules\DSL\ArchRule;
 
 class Config
 {
@@ -15,9 +17,9 @@ class Config
         $this->classSetRules = [];
     }
 
-    public function add(ClassSetRules $classSetRules): self
+    public function add(ClassSet $classSet, ArchRule ...$rules): self
     {
-        $this->classSetRules[] = $classSetRules;
+        $this->classSetRules[] = ClassSetRules::create($classSet, ...$rules);
 
         return $this;
     }

@@ -90,7 +90,7 @@ return static function (Config $config): void {
         ->because('we want protect our domain');
 
     $config
-        ->add(ClassSetRules::create($mvc_class_set, ...[$rule_1, $rule_2]));
+        ->add($mvc_class_set, ...[$rule_1, $rule_2]);
 };
 ```
 
