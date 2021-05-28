@@ -29,6 +29,17 @@ class FileVisitor extends NodeVisitorAbstract
             }
         }
 
+        /**
+         * adding static function classes as dependencies
+         * $static = StaticClass::foo();.
+         *
+         * @see FileVisitorTest::test_should_returns_all_dependencies
+         */
+        if ($node instanceof Node\Expr\StaticCall && method_exists($node->class, 'toString')) {
+            $this->classDescriptionBuilder
+                ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
+        }
+
         if ($node instanceof Node\Expr\Instanceof_ && method_exists($node->class, 'toString')) {
             $this->classDescriptionBuilder
                 ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));

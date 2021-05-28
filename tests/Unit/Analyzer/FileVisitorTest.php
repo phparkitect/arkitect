@@ -136,12 +136,14 @@ namespace Foo\Bar;
 use Doctrine\MongoDB\Collection;
 use Foo\Baz\Baz;
 use Symfony\Component\HttpFoundation\Request;
+use Foo\Baz\StaticClass;
 
 class MyClass implements Baz
 {
     public function __construct(Request $request)
     {
         $collection = new Collection($request);
+        $static = StaticClass::foo();
     }
 }
 EOF;
@@ -152,9 +154,10 @@ EOF;
         $cd = $fp->getClassDescriptions();
 
         $expectedDependencies = [
-            new ClassDependency('Foo\Baz\Baz', 8),
-            new ClassDependency('Symfony\Component\HttpFoundation\Request', 10),
-            new ClassDependency('Doctrine\MongoDB\Collection', 12),
+            new ClassDependency('Foo\Baz\Baz', 9),
+            new ClassDependency('Symfony\Component\HttpFoundation\Request', 11),
+            new ClassDependency('Doctrine\MongoDB\Collection', 13),
+            new ClassDependency('Foo\Baz\StaticClass', 14),
         ];
 
         $this->assertEquals($expectedDependencies, $cd[0]->getDependencies());
