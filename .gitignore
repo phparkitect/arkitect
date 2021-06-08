@@ -6,3 +6,4 @@
 /bin
 phparkitect.phar
 !/bin/box.phar
+composer.lock

@@ -13,6 +13,7 @@ jobs:
     strategy:
       matrix:
         php-versions: [ '7.1', '7.2', '7.3', '7.4', '8.0' ]
+        coverage-driver: [ 'pcov' ]
 
     steps:
     - uses: actions/checkout@v2
@@ -39,8 +40,8 @@ jobs:
       uses: php-actions/composer@v5
       with:
         args: --prefer-dist
-        composer_version: 2
-        php_version: 7.1
+        version: 2
+        php_version: ${{ matrix.php-versions }}
 
     - name: Coding Standard Checks
       run: PHP_CS_FIXER_IGNORE_ENV=1 ./bin/php-cs-fixer fix --dry-run -v
@@ -49,7 +50,13 @@ jobs:
       run: ./bin/psalm
 
     - name: Test
-      run: ./bin/phpunit
+      run: ./bin/phpunit -d memory_limit=-1 --coverage-clover clover.xml
+
+    - name: Upload coverage to Codecov
+      if: ${{ matrix.php-versions  == '7.1' }}
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
 
   publish_docker_images:
     needs: build
