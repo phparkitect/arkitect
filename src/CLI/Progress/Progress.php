@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Arkitect\CLI;
+namespace Arkitect\CLI\Progress;
 
 use Arkitect\ClassSet;
 

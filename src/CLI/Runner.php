@@ -8,6 +8,7 @@ use Arkitect\Analyzer\FileParser;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\Analyzer\Parser;
 use Arkitect\ClassSetRules;
+use Arkitect\CLI\Progress\Progress;
 use Arkitect\Rules\Violations;
 use Symfony\Component\Finder\SplFileInfo;
 

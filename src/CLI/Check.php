@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI;
 
+use Arkitect\CLI\Progress\DebugProgress;
+use Arkitect\CLI\Progress\ProgressBarProgress;
 use Arkitect\Rules\Violations;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

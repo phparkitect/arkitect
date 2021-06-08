@@ -1,17 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace Arkitect\CLI;
+namespace Arkitect\CLI\Progress;
 
 use Arkitect\ClassSet;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ProgressBarProgress implements Progress
+class DebugProgress implements Progress
 {
     private $output;
-
-    private $progress;
 
     public function __construct(OutputInterface $output)
     {
@@ -20,26 +17,19 @@ class ProgressBarProgress implements Progress
 
     public function startFileSetAnalysis(ClassSet $set): void
     {
-        $this->output->writeln("analyze class set {$set->getDir()}");
-        $this->output->writeln('');
-        $this->progress = new ProgressBar($this->output, iterator_count($set));
-
-        $this->progress->start();
+        $this->output->writeln("Start analyze dir {$set->getDir()}");
     }
 
     public function startParsingFile(string $file): void
     {
+        $this->output->writeln("parsing $file");
     }
 
     public function endParsingFile(string $file): void
     {
-        $this->progress->advance();
     }
 
     public function endFileSetAnalysis(ClassSet $set): void
     {
-        $this->progress->finish();
-        $this->output->writeln('');
-        $this->output->writeln('');
     }
 }
