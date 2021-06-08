@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Arkitect\Tests\E2E;
+namespace Arkitect\Tests\E2E\PHPUnit;
 
 use Arkitect\ClassSet;
 use Arkitect\Expression\ForClasses\HaveNameMatching;
@@ -14,7 +14,7 @@ class CheckClassNamingTest extends TestCase
 {
     public function test_code_in_happy_island_should_have_name_matching_prefix(): void
     {
-        $set = ClassSet::fromDir(__DIR__.'/fixtures/happy_island');
+        $set = ClassSet::fromDir(__DIR__.'/../_fixtures/happy_island');
 
         $rule = Rule::allClasses()
             ->that(new ResideInOneOfTheseNamespaces('App\HappyIsland'))

@@ -10,7 +10,7 @@ use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\Rules\Rule;
 
 return static function (Config $config): void {
-    $mvc_class_set = ClassSet::fromDir(__DIR__.'/fixtures/mvc');
+    $mvc_class_set = ClassSet::fromDir(__DIR__.'/../_fixtures/mvc');
 
     $rule_1 = Rule::allClasses()
         ->that(new ResideInOneOfTheseNamespaces('App\Controller'))

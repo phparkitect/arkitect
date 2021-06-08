@@ -64,14 +64,15 @@ class Check extends Command
             if ($violations->count() > 0) {
                 $this->printViolations($violations, $output);
 
-                exit(self::ERROR_CODE);
+                return self::ERROR_CODE;
             }
         } catch (\Throwable $e) {
             $output->writeln($e->getMessage());
-            exit(self::ERROR_CODE);
+
+            return self::ERROR_CODE;
         }
 
-        exit(self::SUCCESS_CODE);
+        return self::SUCCESS_CODE;
     }
 
     protected function readRules(Config $ruleChecker, string $rulesFilename): void
@@ -98,7 +99,10 @@ class Check extends Command
 
     protected function printHeadingLine(OutputInterface $output): void
     {
-        $version = Version::get();
+        $app = $this->getApplication();
+
+        $version = $app ? $app->getVersion() : 'unknown';
+
         $output->writeln("<info>PHPArkitect $version</info>\n");
     }
 

@@ -11,7 +11,7 @@ class Version
         'composer.json',
         '../composer.json',
         '../../composer.json',
-        '../../composer.json',
+        '../../../composer.json',
     ];
 
     public static function get(): string

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Arkitect\Tests\E2E;
+namespace Arkitect\Tests\E2E\PHPUnit;
 
 use Arkitect\ClassSet;
 use Arkitect\Expression\ForClasses\Implement;
@@ -18,7 +18,7 @@ class CheckClassImplementInterfaceTest extends TestCase
 {
     public function test_assertion_should_fail_on_broken_rule(): void
     {
-        $set = ClassSet::fromDir(__DIR__.'/fixtures/mvc');
+        $set = ClassSet::fromDir(__DIR__.'/../_fixtures/mvc');
 
         $rule = Rule::allClasses()
             ->that(new ResideInOneOfTheseNamespaces('App\Controller', 'App\Services'))

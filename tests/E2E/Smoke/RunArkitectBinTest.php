@@ -7,18 +7,18 @@ namespace Arkitect\Tests\E2E;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
-class CliTest extends TestCase
+class RunArkitectBinTest extends TestCase
 {
     const SUCCESS_CODE = 0;
 
     const ERROR_CODE = 1;
 
     /** @var string */
-    private $phparkitect = __DIR__.'/../../bin-stub/phparkitect';
+    private $phparkitect = __DIR__.'/../../../bin-stub/phparkitect';
 
     public function test_returns_error_with_multiple_violations(): void
     {
-        $process = $this->runArkitectPassingConfigFilePath(__DIR__.'/fixtures/configMvc.php');
+        $process = $this->runArkitectPassingConfigFilePath(__DIR__.'/../_fixtures/configMvc.php');
 
         $expectedErrors = 'ERRORS!
 
@@ -43,7 +43,7 @@ App\Domain\Model violates rules
         $this->assertStringContainsString($expectedErrors, $process->getOutput());
     }
 
-    public function test_returns_error_with_mulitple_violations_without_passing_config_file(): void
+    public function test_returns_error_with_multiple_violations_without_passing_config_file(): void
     {
         $process = $this->runArkitect();
 
@@ -66,20 +66,20 @@ App\Domain\Model violates rules
   should not depend on classes outside in namespace App\Domain (on line 14)
   should not depend on classes outside in namespace App\Domain (on line 15)';
 
-        $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
         $this->assertStringContainsString($expectedErrors, $process->getOutput());
+        $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
     }
 
     public function test_does_not_explode_if_an_exception_is_thrown(): void
     {
-        $process = $this->runArkitectPassingConfigFilePath(__DIR__.'/fixtures/configThrowsException.php');
+        $process = $this->runArkitectPassingConfigFilePath(__DIR__.'/../_fixtures/configThrowsException.php');
 
         $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
     }
 
     public function test_run_command_with_success(): void
     {
-        $process = $this->runArkitectPassingConfigFilePath(__DIR__.'/fixtures/configMvcWithoutErrors.php');
+        $process = $this->runArkitectPassingConfigFilePath(__DIR__.'/../_fixtures/configMvcWithoutErrors.php');
 
         $this->assertEquals(self::SUCCESS_CODE, $process->getExitCode());
         $this->assertStringNotContainsString('ERRORS!', $process->getOutput());
@@ -87,7 +87,7 @@ App\Domain\Model violates rules
 
     public function test_bug_yield(): void
     {
-        $process = $this->runArkitectPassingConfigFilePath(__DIR__.'/fixtures/configMvcForYieldBug.php');
+        $process = $this->runArkitectPassingConfigFilePath(__DIR__.'/../_fixtures/configMvcForYieldBug.php');
 
         $expectedErrors = 'ERRORS!
 
