@@ -2,7 +2,7 @@
 [![Latest Stable Version](https://poser.pugx.org/phparkitect/phparkitect/v/stable)](https://packagist.org/packages/phparkitect/phparkitect)  ![Arkitect](https://github.com/phparkitect/arkitect/workflows/Arkitect/badge.svg?branch=master)
 [![codecov](https://codecov.io/gh/phparkitect/arkitect/branch/main/graph/badge.svg)](https://codecov.io/gh/phparkitect/arkitect)
 
-Arkitect helps you to keep your PHP codebase coherent and solid, by permitting to add some architectural costraint check to your workflow.
+Arkitect helps you to keep your PHP codebase coherent and solid, by permitting to add some architectural constraint check to your workflow.
 You can express the costraint that you want to enforce, in simple and readable PHP code, for example:
 
 ```php
@@ -96,4 +96,4 @@ return static function (Config $config): void {
 };
 ```
 
-By default, a progress bar will show the status of the ongoing analysis. If you like to get more informaitions on what is happening you can pass the verbose option `-v` on the command line
+By default, a progress bar will show the status of the ongoing analysis. If you like to get more information on what is happening you can pass the verbose option `-v` on the command line
