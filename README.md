@@ -3,7 +3,7 @@
 [![codecov](https://codecov.io/gh/phparkitect/arkitect/branch/main/graph/badge.svg)](https://codecov.io/gh/phparkitect/arkitect)
 
 Arkitect helps you to keep your PHP codebase coherent and solid, by permitting to add some architectural constraint check to your workflow.
-You can express the costraint that you want to enforce, in simple and readable PHP code, for example:
+You can express the constraint that you want to enforce, in simple and readable PHP code, for example:
 
 ```php
 Rule::allClasses()
@@ -14,7 +14,7 @@ Rule::allClasses()
 
 ## What kind of rules can I enforce with Arkitect
 
-Currently you can check if a class:
+Currently, you can check if a class:
  - implements an interface
  - have a name matching a pattern
  - depends on a namespace
@@ -31,7 +31,7 @@ composer require phparkitect/phparkitect
 ## Using a phar
 Sometimes your project can conflict with one or more of Phparkitect's dependencies. In that case you may find the Phar (a self-contained PHP executable) useful.
 
-The Phar can be downloaded from Github:
+The Phar can be downloaded from GitHub:
 
 ```
 wget https://github.com/phparkitect/arkitect/releases/latest/download/phparkitect.phar
