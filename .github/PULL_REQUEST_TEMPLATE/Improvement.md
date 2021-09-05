@@ -10,7 +10,6 @@ about: Do you have some improvement to make arkitect better? 🎁
 |    Q        |   A
 |------------ | ------
 | New Feature | yes
-| RFC         | yes/no
 | BC Break    | yes/no
 | Issue       | Close #...
 
