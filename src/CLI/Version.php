@@ -12,6 +12,7 @@ class Version
         '../composer.json',
         '../../composer.json',
         '../../../composer.json',
+        './vendor/phparkitect/phparkitect/composer.json',
     ];
 
     public static function get(): string
@@ -21,7 +22,9 @@ class Version
                 $content = file_get_contents($composerPath);
                 $composerData = json_decode($content, true);
 
-                return $composerData['version'];
+                if (isset($composerData['version'])) {
+                    return $composerData['version'];
+                }
             }
         }
 
