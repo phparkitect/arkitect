@@ -4,7 +4,7 @@ In this example, we would like to share some simple rules to apply some naming c
 
 Naming conventions can help the team to create and rename new classes with a common shared standard.   
 
-In the following rules, written into `phparkitect.php` file into the root of a project, we said that:
+In this example, the desired rules are:
 ```
 * All classes inside namespace App\Infrastructure\Controller should end with Controller
 * All classes inside namespace App\Domain\Auction\Bids should start with Bid
