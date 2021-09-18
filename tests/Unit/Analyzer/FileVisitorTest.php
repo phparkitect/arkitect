@@ -188,4 +188,38 @@ EOF;
 
         $this->assertEquals($expectedDependencies, $cd[0]->getDependencies());
     }
+
+    /**
+     * @requires PHP >= 7.4
+     */
+    public function test_it_should_parse_arrow_function(): void
+    {
+        $code = <<< 'EOF'
+<?php
+
+namespace Root\Animals;
+
+class Animal
+{
+    public function __construct()
+    {
+        $y = 1;
+        $fn1 = fn($x) => $x + $y;
+    }
+}
+EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser();
+        $fp->parse($code);
+
+        $cd = $fp->getClassDescriptions();
+
+        $violations = new Violations();
+
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Foo', 'Symfony', 'Doctrine');
+        $dependsOnTheseNamespaces->evaluate($cd[0], $violations);
+
+        $this->assertCount(0, $violations);
+    }
 }
