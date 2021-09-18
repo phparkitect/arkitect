@@ -10,7 +10,6 @@ use PhpParser\ParserFactory;
 
 class FileParser implements Parser
 {
-    private const PHP_VERSION = '7.1';
     /** @var \PhpParser\Parser */
     private $parser;
 
@@ -26,7 +25,7 @@ class FileParser implements Parser
 
         $lexer = new Emulative([
             'usedAttributes' => ['comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos'],
-             'phpVersion' => self::PHP_VERSION,
+             'phpVersion' => phpversion('tidy'),
         ]);
 
         $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
