@@ -36,6 +36,7 @@ return (new PhpCsFixer\Config())
     'general_phpdoc_annotation_remove' => ['annotations' => ['author', 'package']],
     'list_syntax' => ['syntax' => 'short'],
     'phpdoc_to_comment' => false,
-    'php_unit_method_casing' => ['case' => 'snake_case']
+    'php_unit_method_casing' => ['case' => 'snake_case'],
+      'function_to_constant' => false
   ])
 ;
