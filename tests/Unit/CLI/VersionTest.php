@@ -11,6 +11,6 @@ class VersionTest extends TestCase
 {
     public function test_it_should_return_version(): void
     {
-        $this->assertEquals('0.1.14', Version::get());
+        $this->assertEquals('0.1.15', Version::get());
     }
 }
