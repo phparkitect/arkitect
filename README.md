@@ -19,6 +19,8 @@ Currently, you can check if a class:
  - have a name matching a pattern
  - depends on a namespace
  - don't have dependency outside a namespace 
+ - extends another class 
+ - not extends another class
 
 # How to install
 
