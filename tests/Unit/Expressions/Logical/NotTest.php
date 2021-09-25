@@ -40,6 +40,7 @@ class NotTest extends TestCase
 
     public function test_describe_not_expression(): void
     {
+        $this->markTestSkipped('Not is deprecated');
         $expected = new NegativeDescription(
             new PositiveDescription('should [have|not have] a name that matches Domain')
         );

@@ -25,7 +25,7 @@ class DependsOnlyOnTheseNamespaces implements Expression
     {
         $desc = implode(', ', $this->namespaces);
 
-        return new PositiveDescription("should [depend|not depend] only on classes in one of these namespaces: $desc");
+        return new PositiveDescription("should depend only on classes in one of these namespaces: $desc");
     }
 
     public function evaluate(ClassDescription $theClass, Violations $violations): void

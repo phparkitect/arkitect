@@ -4,32 +4,39 @@ declare(strict_types=1);
 namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
-use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Expression\PositiveDescription;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
 
-class HaveNameMatching implements Expression
+class NotResideInOneOfTheseNamespaces implements Expression
 {
-    /** @var string */
-    private $name;
+    /** @var string[] */
+    private $namespaces;
 
-    public function __construct(string $name)
+    public function __construct(string ...$namespaces)
     {
-        $this->name = $name;
+        $this->namespaces = $namespaces;
     }
 
     public function describe(ClassDescription $theClass): Description
     {
-        return new PositiveDescription("should have a name that matches {$this->name}");
+        $descr = implode(', ', $this->namespaces);
+
+        return new PositiveDescription("should not reside in one of these namespaces: $descr");
     }
 
     public function evaluate(ClassDescription $theClass, Violations $violations): void
     {
-        $fqcn = FullyQualifiedClassName::fromString($theClass->getFQCN());
-        if (!$fqcn->classMatches($this->name)) {
+        $resideInNamespace = false;
+        foreach ($this->namespaces as $namespace) {
+            if ($theClass->namespaceMatches($namespace)) {
+                $resideInNamespace = true;
+            }
+        }
+
+        if ($resideInNamespace) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
                 $this->describe($theClass)->toString()

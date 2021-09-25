@@ -9,6 +9,9 @@ use Arkitect\Expression\Expression;
 use Arkitect\Expression\NegativeDescription;
 use Arkitect\Rules\Violations;
 
+/**
+ * @deprecated deprecated
+ */
 class Not implements Expression
 {
     /** @var Expression */
