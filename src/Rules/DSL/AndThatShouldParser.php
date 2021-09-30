@@ -10,6 +10,4 @@ interface AndThatShouldParser
     public function andThat(Expression $expression): self;
 
     public function should(Expression $expression): BecauseParser;
-
-    public function shouldNot(Expression $expression): BecauseParser;
 }

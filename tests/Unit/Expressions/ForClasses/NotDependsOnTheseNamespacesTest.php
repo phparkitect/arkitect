@@ -37,7 +37,7 @@ class NotDependsOnTheseNamespacesTest extends TestCase
         $notDependOnClasses->evaluate($classDescription, $violations);
 
         self::assertEquals(1, $violations->count());
-        $this->assertEquals('should not depend on these namespaces: myNamespace' , $notDependOnClasses->describe($classDescription)->toString());
+        $this->assertEquals('should not depend on these namespaces: myNamespace', $notDependOnClasses->describe($classDescription)->toString());
     }
 
     public function test_it_should_return_true_if_depends_on_class_in_root_namespace(): void
@@ -55,7 +55,7 @@ class NotDependsOnTheseNamespacesTest extends TestCase
         $notDependOnClasses->evaluate($classDescription, $violations);
 
         self::assertCount(1, $violations);
-        $this->assertEquals('should not depend on these namespaces: myNamespace' , $notDependOnClasses->describe($classDescription)->toString());
+        $this->assertEquals('should not depend on these namespaces: myNamespace', $notDependOnClasses->describe($classDescription)->toString());
     }
 
     public function test_it_should_return_false_if_depends_on_namespace(): void
@@ -71,6 +71,6 @@ class NotDependsOnTheseNamespacesTest extends TestCase
         $notDependOnClasses->evaluate($classDescription, $violations);
 
         self::assertEquals(2, $violations->count());
-        $this->assertEquals('should not depend on these namespaces: myNamespace' , $notDependOnClasses->describe($classDescription)->toString());
+        $this->assertEquals('should not depend on these namespaces: myNamespace', $notDependOnClasses->describe($classDescription)->toString());
     }
 }

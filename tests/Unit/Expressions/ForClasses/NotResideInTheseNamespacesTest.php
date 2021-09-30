@@ -34,7 +34,7 @@ class NotResideInTheseNamespacesTest extends TestCase
         $haveNameMatching->evaluate($classDesc, $violations);
 
         self::assertEquals(1, $violations->count());
-        $this->assertEquals('should not reside in these namespaces: '.$namespace, $haveNameMatching->describe($classDesc)->toString());
+        $this->assertEquals('should not reside in one of these namespaces: '.$namespace, $haveNameMatching->describe($classDesc)->toString());
     }
 
     public function test_it_should_check_multiple_namespaces_in_or(): void

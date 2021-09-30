@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Arkitect\Rules;
 
 use Arkitect\Expression\Expression;
-use Arkitect\Expression\Logical\Not;
 
 class RuleBuilder
 {
@@ -34,13 +33,6 @@ class RuleBuilder
     public function addShould(Expression $should): self
     {
         $this->shoulds->add($should);
-
-        return $this;
-    }
-
-    public function addShouldNot(Expression $should): self
-    {
-        $this->shoulds->add(new Not($should));
 
         return $this;
     }
