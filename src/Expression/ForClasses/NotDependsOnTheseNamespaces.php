@@ -11,7 +11,7 @@ use Arkitect\Expression\PositiveDescription;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
 
-class DependsOnlyOnTheseNamespaces implements Expression
+class NotDependsOnTheseNamespaces implements Expression
 {
     /** @var string[] */
     private $namespaces;
@@ -25,7 +25,7 @@ class DependsOnlyOnTheseNamespaces implements Expression
     {
         $desc = implode(', ', $this->namespaces);
 
-        return new PositiveDescription("should depend only on classes in one of these namespaces: $desc");
+        return new PositiveDescription("should not depend on these namespaces: $desc");
     }
 
     public function evaluate(ClassDescription $theClass, Violations $violations): void
@@ -38,7 +38,7 @@ class DependsOnlyOnTheseNamespaces implements Expression
                 continue;
             }
 
-            if (!$dependency->matchesOneOf(...$this->namespaces)) {
+            if ($dependency->matchesOneOf(...$this->namespaces)) {
                 $violation = Violation::createWithErrorLine(
                     $theClass->getFQCN(),
                     $this->describe($theClass)->toString(),

@@ -24,7 +24,7 @@ class Extend extends Expressions
 
     public function describe(ClassDescription $theClass): Description
     {
-        return new PositiveDescription("should [extend|not extend] {$this->className}");
+        return new PositiveDescription("should extend {$this->className}");
     }
 
     public function evaluate(ClassDescription $theClass, Violations $violations): void

@@ -11,25 +11,30 @@ use Arkitect\Expression\PositiveDescription;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
 
-class HaveNameMatching implements Expression
+class NotImplement implements Expression
 {
     /** @var string */
-    private $name;
+    private $interface;
 
-    public function __construct(string $name)
+    public function __construct(string $interface)
     {
-        $this->name = $name;
+        $this->interface = $interface;
     }
 
     public function describe(ClassDescription $theClass): Description
     {
-        return new PositiveDescription("should have a name that matches {$this->name}");
+        return new PositiveDescription("should not implement {$this->interface}");
     }
 
     public function evaluate(ClassDescription $theClass, Violations $violations): void
     {
-        $fqcn = FullyQualifiedClassName::fromString($theClass->getFQCN());
-        if (!$fqcn->classMatches($this->name)) {
+        $interface = $this->interface;
+        $interfaces = $theClass->getInterfaces();
+        $implements = function (FullyQualifiedClassName $FQCN) use ($interface) {
+            return $FQCN->matches($interface);
+        };
+
+        if (\count(array_filter($interfaces, $implements)) > 0) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
                 $this->describe($theClass)->toString()

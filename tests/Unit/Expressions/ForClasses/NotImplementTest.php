@@ -6,17 +6,17 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
-use Arkitect\Expression\ForClasses\Implement;
+use Arkitect\Expression\ForClasses\NotImplement;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
-class ImplementConstraintTest extends TestCase
+class NotImplementTest extends TestCase
 {
     public function test_it_should_return_violation_error(): void
     {
         $interface = 'interface';
 
-        $implementConstraint = new Implement($interface);
+        $implementConstraint = new NotImplement($interface);
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
@@ -28,16 +28,14 @@ class ImplementConstraintTest extends TestCase
 
         $violations = new Violations();
         $implementConstraint->evaluate($classDescription, $violations);
-        self::assertNotEquals(0, $violations->count());
-
-        $this->assertEquals('should implement '.$interface, $violationError);
+        self::assertEquals(0, $violations->count());
     }
 
     public function test_it_should_return_true_if_not_depends_on_namespace(): void
     {
         $interface = 'interface';
 
-        $implementConstraint = new Implement($interface);
+        $implementConstraint = new NotImplement($interface);
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
@@ -47,14 +45,14 @@ class ImplementConstraintTest extends TestCase
 
         $violations = new Violations();
         $implementConstraint->evaluate($classDescription, $violations);
-        self::assertNotEquals(0, $violations->count());
+        self::assertEquals(0, $violations->count());
     }
 
     public function test_it_should_return_false_if_depends_on_namespace(): void
     {
         $interface = 'interface';
 
-        $implementConstraint = new Implement($interface);
+        $implementConstraint = new NotImplement($interface);
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
@@ -64,6 +62,10 @@ class ImplementConstraintTest extends TestCase
 
         $violations = new Violations();
         $implementConstraint->evaluate($classDescription, $violations);
-        self::assertEquals(0, $violations->count());
+
+        $violationError = $implementConstraint->describe($classDescription)->toString();
+        self::assertNotEquals(0, $violations->count());
+
+        $this->assertEquals('should not implement '.$interface, $violationError);
     }
 }

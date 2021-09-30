@@ -15,12 +15,17 @@ Rule::allClasses()
 ## What kind of rules can I enforce with Arkitect
 
 Currently, you can check if a class:
- - implements an interface
- - have a name matching a pattern
  - depends on a namespace
- - don't have dependency outside a namespace 
- - extends another class 
+ - extends another class
  - not extends another class
+ - have a name matching a pattern
+ - not have a name matching a pattern
+ - implements an interface
+ - not implements an interface
+ - depends on a namespace
+ - don't have dependency outside a namespace
+ - reside in a namespace
+ - not reside in a namespace
 
 # How to install
 

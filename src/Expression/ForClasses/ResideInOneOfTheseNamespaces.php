@@ -24,7 +24,7 @@ class ResideInOneOfTheseNamespaces implements Expression
     {
         $descr = implode(', ', $this->namespaces);
 
-        return new PositiveDescription("should [reside|not reside] in one of these namespaces: $descr");
+        return new PositiveDescription("should reside in one of these namespaces: $descr");
     }
 
     public function evaluate(ClassDescription $theClass, Violations $violations): void

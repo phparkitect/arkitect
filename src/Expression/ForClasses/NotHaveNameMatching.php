@@ -11,7 +11,7 @@ use Arkitect\Expression\PositiveDescription;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
 
-class HaveNameMatching implements Expression
+class NotHaveNameMatching implements Expression
 {
     /** @var string */
     private $name;
@@ -23,13 +23,13 @@ class HaveNameMatching implements Expression
 
     public function describe(ClassDescription $theClass): Description
     {
-        return new PositiveDescription("should have a name that matches {$this->name}");
+        return new PositiveDescription("should not have a name that matches {$this->name}");
     }
 
     public function evaluate(ClassDescription $theClass, Violations $violations): void
     {
         $fqcn = FullyQualifiedClassName::fromString($theClass->getFQCN());
-        if (!$fqcn->classMatches($this->name)) {
+        if ($fqcn->classMatches($this->name)) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
                 $this->describe($theClass)->toString()
