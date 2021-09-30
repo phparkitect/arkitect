@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
-use Arkitect\Expression\ForClasses\NotResideInOneOfTheseNamespaces;
+use Arkitect\Expression\ForClasses\NotResideInTheseNamespaces;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
-class NotResideInOneOfTheseNamespacesTest extends TestCase
+class NotResideInTheseNamespacesTest extends TestCase
 {
     public function test_it_should_return_true_if_not_reside_in_namespace(): void
     {
-        $haveNameMatching = new NotResideInOneOfTheseNamespaces('MyNamespace');
+        $haveNameMatching = new NotResideInTheseNamespaces('MyNamespace');
 
         $classDesc = ClassDescription::build('AnotherNamespace\HappyIsland')->get();
 
@@ -26,7 +26,7 @@ class NotResideInOneOfTheseNamespacesTest extends TestCase
     public function test_it_should_return_false_if_reside_in_namespace(): void
     {
         $namespace = 'MyNamespace';
-        $haveNameMatching = new NotResideInOneOfTheseNamespaces($namespace);
+        $haveNameMatching = new NotResideInTheseNamespaces($namespace);
 
         $classDesc = ClassDescription::build('MyNamespace\HappyIsland')->get();
 
@@ -34,12 +34,12 @@ class NotResideInOneOfTheseNamespacesTest extends TestCase
         $haveNameMatching->evaluate($classDesc, $violations);
 
         self::assertEquals(1, $violations->count());
-        $this->assertEquals('should not reside in one of these namespaces: '.$namespace, $haveNameMatching->describe($classDesc)->toString());
+        $this->assertEquals('should not reside in these namespaces: '.$namespace, $haveNameMatching->describe($classDesc)->toString());
     }
 
     public function test_it_should_check_multiple_namespaces_in_or(): void
     {
-        $haveNameMatching = new NotResideInOneOfTheseNamespaces('AnotherNamespace', 'ASecondNamespace', 'AThirdNamespace');
+        $haveNameMatching = new NotResideInTheseNamespaces('AnotherNamespace', 'ASecondNamespace', 'AThirdNamespace');
 
         $classDesc = ClassDescription::build('AnotherNamespace\HappyIsland')->get();
         $violations = new Violations();

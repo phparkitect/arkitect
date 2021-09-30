@@ -10,7 +10,7 @@ use Arkitect\Expression\PositiveDescription;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
 
-class NotResideInOneOfTheseNamespaces implements Expression
+class NotResideInTheseNamespaces implements Expression
 {
     /** @var string[] */
     private $namespaces;
