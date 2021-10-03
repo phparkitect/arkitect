@@ -6,8 +6,15 @@ namespace Arkitect\Rules;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\Expression;
 
-class Specs extends Expressions
+class Specs
 {
+    private $expressions = [];
+
+    public function add(Expression $expression): void
+    {
+        $this->expressions[] = $expression;
+    }
+
     public function allSpecsAreMatchedBy(ClassDescription $classDescription): bool
     {
         /** @var Expression $spec */
