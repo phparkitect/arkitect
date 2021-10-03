@@ -51,7 +51,7 @@ class ClassDescription
 
     public function dependsOnClass(string $pattern): bool
     {
-        $depends = function (ClassDependency $dependency) use ($pattern) {
+        $depends = function (ClassDependency $dependency) use ($pattern): bool {
             return $dependency->getFQCN()->matches($pattern);
         };
 
@@ -60,7 +60,7 @@ class ClassDescription
 
     public function dependsOnNamespace(string $pattern): bool
     {
-        $depends = function (ClassDependency $dependency) use ($pattern) {
+        $depends = function (ClassDependency $dependency) use ($pattern): bool {
             return $dependency->getFQCN()->namespaceMatches($pattern);
         };
 
@@ -69,7 +69,7 @@ class ClassDescription
 
     public function dependsOn(string $pattern): bool
     {
-        $depends = function (ClassDependency $dependency) use ($pattern) {
+        $depends = function (ClassDependency $dependency) use ($pattern): bool {
             return $dependency->matches($pattern);
         };
 
