@@ -5,12 +5,12 @@ namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\Description;
+use Arkitect\Expression\Expression;
 use Arkitect\Expression\PositiveDescription;
-use Arkitect\Rules\Expressions;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
 
-class Extend extends Expressions
+class Extend implements Expression
 {
     /**
      * @var string
