@@ -105,4 +105,14 @@ class ClassDescription
     {
         return $this->extends;
     }
+
+    public function addDependencies(array $dependencies): void
+    {
+        $this->dependencies = array_merge($this->dependencies, $dependencies);
+    }
+
+    public function addInterfaces(array $interfaces): void
+    {
+        $this->interfaces = array_merge($this->interfaces, $interfaces);
+    }
 }

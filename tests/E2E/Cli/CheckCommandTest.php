@@ -36,7 +36,10 @@ App\Controller\YieldController violates rules
 
 App\Domain\Model violates rules
   should not depend on classes outside in namespace App\Domain (on line 14)
-  should not depend on classes outside in namespace App\Domain (on line 15)';
+  should not depend on classes outside in namespace App\Domain (on line 15)
+
+App\View\UserView violates rules
+  should implement AbstractView';
 
         $this->assertEquals(self::ERROR_CODE, $cmdTester->getStatusCode());
         $this->assertStringContainsString($expectedErrors, $cmdTester->getDisplay());

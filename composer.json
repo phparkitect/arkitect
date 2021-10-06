@@ -42,7 +42,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Arkitect\\": "src/"
+            "Arkitect\\": "src/",
+            "Tests\\": "tests/"
         }
     },
     "autoload-dev": {

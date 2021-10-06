@@ -27,6 +27,11 @@ return static function (Config $config): void {
         ->should(new NotHaveDependencyOutsideNamespace('App\Domain'))
         ->because('we want protect our domain');
 
+    $rule_4 = Rule::allClasses()
+        ->that(new ResideInOneOfTheseNamespaces('App\View'))
+        ->should(new Implement('AbstractView'))
+        ->because('all view should be implement AbstractView');
+
     $config
-        ->add($mvc_class_set, ...[$rule_1, $rule_2, $rule_3]);
+        ->add($mvc_class_set, ...[$rule_1, $rule_2, $rule_3, $rule_4]);
 };
