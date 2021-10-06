@@ -16,4 +16,3 @@ class FakeRule implements ArchRule
         $violations->add(Violation::create('fqcn', 'error'));
     }
 }
-

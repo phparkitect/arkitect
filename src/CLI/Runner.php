@@ -62,7 +62,8 @@ class Runner
         $progress->endParsingFile($classDescription->getName());
     }
 
-    private function classExtendsOtherClass(ClassDescription $classDescription, array $classDescriptionsFiles): bool {
+    private function classExtendsOtherClass(ClassDescription $classDescription, array $classDescriptionsFiles): bool
+    {
         $extends = $classDescription->getExtends();
         if (null === $extends) {
             return false;

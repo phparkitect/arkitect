@@ -3,15 +3,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Rules;
 
-use Arkitect\Analyzer\ClassDescription;
-use Arkitect\Analyzer\Parser;
-use Arkitect\ClassSet;
 use Arkitect\ClassSetRules;
 use Arkitect\CLI\Progress\VoidProgress;
 use Arkitect\CLI\Runner;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Finder\SplFileInfo;
 
 class RuleCheckerTest extends TestCase
 {

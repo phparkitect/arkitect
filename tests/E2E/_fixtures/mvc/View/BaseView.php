@@ -6,5 +6,4 @@ namespace App\View;
 
 class BaseView implements \AbstractView
 {
-
 }

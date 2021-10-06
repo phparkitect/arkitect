@@ -24,7 +24,7 @@ class GetClassDescriptionsTest extends TestCase
         $getClassDescriptions = GetClassDescriptions::execute($classSetRule, $parser);
 
         $this->assertEquals([
-            'uno' => new ClassDescription(FullyQualifiedClassName::fromString('uno'), [], [], null)
+            'uno' => new ClassDescription(FullyQualifiedClassName::fromString('uno'), [], [], null),
         ], $getClassDescriptions);
     }
 }
