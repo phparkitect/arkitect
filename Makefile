@@ -16,7 +16,7 @@ test: ## it launches tests
 test_%: ## it launches a test
 	bin/phpunit --filter $@
 
-%Test: ## lancia un test
+%Test: ## it launches a test
 	bin/phpunit --filter $@
 
 phar: ## it creates phar
@@ -32,7 +32,7 @@ outdated:
 coverage: ## it launches coverage
 	phpdbg -qrr ./bin/phpunit --coverage-html build/coverage
 
-csfix: ## cs fix
+csfix: ## it launches cs fix
 	bin/php-cs-fixer fix -v
 
 psalm: ## it launches psalm
