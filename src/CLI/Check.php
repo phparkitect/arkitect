@@ -16,6 +16,8 @@ class Check extends Command
 {
     private const CONFIG_FILENAME_PARAM = 'config';
 
+    private const TARGET_PHP_PARAM = 'target-php-version';
+
     private const DEFAULT_FILENAME = 'phparkitect.php';
 
     private const SUCCESS_CODE = 0;
@@ -37,6 +39,12 @@ class Check extends Command
                 'c',
                 InputOption::VALUE_OPTIONAL,
                 'File containing configs, such as rules to be matched'
+            )
+            ->addOption(
+                self::TARGET_PHP_PARAM,
+                't',
+                InputOption::VALUE_OPTIONAL,
+                'Target php version to use for parsing'
             );
     }
 
@@ -46,6 +54,10 @@ class Check extends Command
 
         try {
             $verbose = $input->getOption('verbose');
+
+            /** @var string|null $phpVersion */
+            $phpVersion = $input->getOption('target-php-version');
+            $targetPhpVersion = TargetPhpVersion::create($phpVersion);
 
             $progress = $verbose ? new DebugProgress($output) : new ProgressBarProgress($output);
 
@@ -59,7 +71,7 @@ class Check extends Command
             $this->readRules($config, $rulesFilename);
 
             $runner = new Runner();
-            $violations = $runner->run($config, $progress);
+            $violations = $runner->run($config, $progress, $targetPhpVersion);
 
             if ($violations->count() > 0) {
                 $this->printViolations($violations, $output);

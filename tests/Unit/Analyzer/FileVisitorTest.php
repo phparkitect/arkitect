@@ -7,6 +7,7 @@ use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FileParser;
 use Arkitect\Analyzer\FileParserFactory;
+use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
@@ -33,7 +34,7 @@ class Cat implements AnInterface
 EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser();
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
         $fp->parse($code);
         $cd = $fp->getClassDescriptions();
 
@@ -78,7 +79,7 @@ class Cat implements AnInterface
 EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser();
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
         $fp->parse($code);
         $cd = $fp->getClassDescriptions();
 
@@ -113,7 +114,7 @@ class Cat extends Animal
 EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser();
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
         $fp->parse($code);
 
         $cd = $fp->getClassDescriptions()[1];
@@ -141,7 +142,7 @@ class MyClass implements Baz
 EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser();
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
         $fp->parse($code);
         $cd = $fp->getClassDescriptions();
 
@@ -175,7 +176,7 @@ class MyClass implements Baz
 EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser();
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
         $fp->parse($code);
         $cd = $fp->getClassDescriptions();
 
@@ -210,7 +211,7 @@ class Animal
 EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser();
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
         $fp->parse($code);
 
         $cd = $fp->getClassDescriptions();

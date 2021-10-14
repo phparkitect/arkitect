@@ -9,6 +9,7 @@ use Arkitect\ClassSet;
 use Arkitect\ClassSetRules;
 use Arkitect\CLI\Progress\VoidProgress;
 use Arkitect\CLI\Runner;
+use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Rules\ArchRule;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\Constraint\Constraint;
@@ -29,8 +30,9 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
 
     public function __construct(ClassSet $classSet)
     {
+        $targetPhpVersion = TargetPhpVersion::create(null);
         $this->runner = new Runner();
-        $this->fileparser = FileParserFactory::createFileParser();
+        $this->fileparser = FileParserFactory::createFileParser($targetPhpVersion);
         $this->classSet = $classSet;
         $this->violations = new Violations();
     }
