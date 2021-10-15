@@ -20,23 +20,22 @@ class TargetPhpVersion
     /** @var string|null */
     private $version;
 
+    private function __construct(?string $version)
+    {
+        $this->version = $version;
+    }
+
     public static function create(?string $version): self
     {
-        $targetPhpVersion = new self();
-
         if (null === $version) {
-            $targetPhpVersion->version = phpversion();
-
-            return $targetPhpVersion;
+            return new self(phpversion());
         }
 
-        if (!\in_array($version, (new self())::VALID_PHP_VERSIONS)) {
+        if (!\in_array($version, (new self(null))::VALID_PHP_VERSIONS)) {
             throw new PhpVersionNotValidException($version);
         }
 
-        $targetPhpVersion->version = $version;
-
-        return $targetPhpVersion;
+        return new self($version);
     }
 
     public function get(): ?string

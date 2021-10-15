@@ -21,8 +21,6 @@ class TargetPhpVersionTest extends TestCase
     {
         $this->expectException(PhpVersionNotValidException::class);
         $this->expectExceptionMessage('PHP version not valid for parser foo');
-        $targetPhpVersion = TargetPhpVersion::create('foo');
-
-        $this->assertEquals('7.4', $targetPhpVersion->get());
+        TargetPhpVersion::create('foo');
     }
 }
