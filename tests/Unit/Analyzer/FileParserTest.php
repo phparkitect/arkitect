@@ -6,6 +6,7 @@ namespace Arkitect\Tests\Unit\Analyzer;
 
 use Arkitect\Analyzer\FileParser;
 use Arkitect\Analyzer\FileVisitor;
+use Arkitect\CLI\TargetPhpVersion;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
 use PHPUnit\Framework\TestCase;
@@ -24,7 +25,12 @@ class FileParserTest extends TestCase
 
         $fileVisitor->clearParsedClassDescriptions()->shouldBeCalled();
 
-        $fileParser = new FileParser($traverser->reveal(), $fileVisitor->reveal(), $nameResolver->reveal());
+        $fileParser = new FileParser(
+            $traverser->reveal(),
+            $fileVisitor->reveal(),
+            $nameResolver->reveal(),
+            TargetPhpVersion::create('7.4')
+        );
 
         $content = '<?php
         class Foo {}
@@ -48,7 +54,12 @@ class FileParserTest extends TestCase
 
         $fileVisitor->clearParsedClassDescriptions()->shouldBeCalled();
 
-        $fileParser = new FileParser($traverser->reveal(), $fileVisitor->reveal(), $nameResolver->reveal());
+        $fileParser = new FileParser(
+            $traverser->reveal(),
+            $fileVisitor->reveal(),
+            $nameResolver->reveal(),
+            TargetPhpVersion::create('7.4')
+        );
 
         $content = '<?php
         class Match {}

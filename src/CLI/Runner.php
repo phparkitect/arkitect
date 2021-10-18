@@ -14,10 +14,10 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class Runner
 {
-    public function run(Config $config, Progress $progress): Violations
+    public function run(Config $config, Progress $progress, TargetPhpVersion $targetPhpVersion): Violations
     {
         /** @var FileParser $fileParser */
-        $fileParser = FileParserFactory::createFileParser();
+        $fileParser = FileParserFactory::createFileParser($targetPhpVersion);
         $violations = new Violations();
 
         /** @var ClassSetRules $classSetRule */

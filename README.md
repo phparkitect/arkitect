@@ -103,4 +103,14 @@ return static function (Config $config): void {
 };
 ```
 
-By default, a progress bar will show the status of the ongoing analysis. If you like to get more information on what is happening you can pass the verbose option `-v` on the command line
+By default, a progress bar will show the status of the ongoing analysis.
+
+## Optional parameters and options
+You can add parameters when you launch the tool. At the moment you can add these parameters and options: 
+* `-v` : with this option you launch Arkitect with the verbose mode to see every parsed file
+* `--config`: with this parameter, you can specify your config file instead of the default. like this:
+```
+phparkitect check --config=/project/yourConfigFile.php
+```
+* `--target-php-version`: with this parameter, you can specify which PHP version should use the parser. This can be useful to debug problems and to understand if there are problems with a different PHP version.
+Supported PHP versions are: 7.1, 7.2, 7.3, 7.4, 8.0, 8.1
