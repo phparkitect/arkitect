@@ -5,7 +5,9 @@ namespace Arkitect\Analyzer;
 
 interface Parser
 {
-    public function parse(string $fileContent): void;
+    public function parse(string $fileContent, string $filename): void;
 
     public function getClassDescriptions(): array;
+
+    public function getParsingErrors(): array;
 }

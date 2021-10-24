@@ -10,6 +10,7 @@ use Arkitect\ClassSetRules;
 use Arkitect\CLI\Progress\VoidProgress;
 use Arkitect\CLI\Runner;
 use Arkitect\Rules\DSL\ArchRule;
+use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
@@ -22,6 +23,7 @@ class RuleCheckerTest extends TestCase
         $violations = new Violations();
         $fileParser = new FakeParser();
         $rule = new FakeRule();
+        $parsingErrors = new ParsingErrors();
 
         $runner = new Runner();
 
@@ -29,7 +31,8 @@ class RuleCheckerTest extends TestCase
             ClassSetRules::create(new FakeClassSet(), ...[$rule]),
             new VoidProgress(),
             $fileParser,
-            $violations
+            $violations,
+            $parsingErrors
         );
 
         self::assertCount(3, $violations);
@@ -70,12 +73,17 @@ class FakeRule implements ArchRule
 
 class FakeParser implements Parser
 {
-    public function parse(string $fileContent): void
+    public function parse(string $fileContent, string $filename): void
     {
     }
 
     public function getClassDescriptions(): array
     {
         return [ClassDescription::build('uno')->get()];
+    }
+
+    public function getParsingErrors(): array
+    {
+        return [];
     }
 }

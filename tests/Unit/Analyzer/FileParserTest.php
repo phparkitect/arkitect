@@ -37,7 +37,7 @@ class FileParserTest extends TestCase
         ';
 
         $traverser->traverse(Argument::type('array'))->shouldBeCalled();
-        $fileParser->parse($content);
+        $fileParser->parse($content, 'foo');
     }
 
     /**
@@ -66,6 +66,6 @@ class FileParserTest extends TestCase
         ';
 
         $traverser->traverse(Argument::type('array'))->shouldBeCalled();
-        $fileParser->parse($content);
+        $fileParser->parse($content, 'foo');
     }
 }
