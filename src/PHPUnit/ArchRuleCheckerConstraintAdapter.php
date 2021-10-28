@@ -11,6 +11,7 @@ use Arkitect\CLI\Progress\VoidProgress;
 use Arkitect\CLI\Runner;
 use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Rules\ArchRule;
+use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\Constraint\Constraint;
 
@@ -28,6 +29,9 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
     /** @var FileParser */
     private $fileparser;
 
+    /** @var ParsingErrors */
+    private $parsingErrors;
+
     public function __construct(ClassSet $classSet)
     {
         $targetPhpVersion = TargetPhpVersion::create(null);
@@ -35,6 +39,7 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
         $this->fileparser = FileParserFactory::createFileParser($targetPhpVersion);
         $this->classSet = $classSet;
         $this->violations = new Violations();
+        $this->parsingErrors = new ParsingErrors();
     }
 
     public function toString(): string
@@ -48,7 +53,8 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
             ClassSetRules::create($this->classSet, $other),
             new VoidProgress(),
             $this->fileparser,
-            $this->violations
+            $this->violations,
+            $this->parsingErrors
         );
 
         return 0 === $this->violations->count();

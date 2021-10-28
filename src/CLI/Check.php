@@ -5,6 +5,7 @@ namespace Arkitect\CLI;
 
 use Arkitect\CLI\Progress\DebugProgress;
 use Arkitect\CLI\Progress\ProgressBarProgress;
+use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violations;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -71,10 +72,17 @@ class Check extends Command
             $this->readRules($config, $rulesFilename);
 
             $runner = new Runner();
-            $violations = $runner->run($config, $progress, $targetPhpVersion);
-
+            $runner->run($config, $progress, $targetPhpVersion);
+            $violations = $runner->getViolations();
             if ($violations->count() > 0) {
                 $this->printViolations($violations, $output);
+
+                return self::ERROR_CODE;
+            }
+
+            $parsedErrors = $runner->getParsingErrors();
+            if ($parsedErrors->count() > 0) {
+                $this->printParsedErrors($parsedErrors, $output);
 
                 return self::ERROR_CODE;
             }
@@ -135,5 +143,11 @@ class Check extends Command
     {
         $output->writeln('<error>ERRORS!</error>');
         $output->writeln(sprintf('%s', $violations->toString()));
+    }
+
+    private function printParsedErrors(ParsingErrors $parsingErrors, OutputInterface $output): void
+    {
+        $output->writeln('<error>ERROR ON PARSING THESE FILES:</error>');
+        $output->writeln(sprintf('%s', $parsingErrors->toString()));
     }
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Arkitect\Analyzer;
 
 use Arkitect\CLI\TargetPhpVersion;
+use Arkitect\Rules\ParsingError;
+use PhpParser\ErrorHandler\Collecting;
 use PhpParser\Lexer\Emulative;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
@@ -19,6 +21,9 @@ class FileParser implements Parser
 
     /** @var FileVisitor */
     private $fileVisitor;
+
+    /** @var array */
+    private $parsingErrors;
 
     public function __construct(
         NodeTraverser $traverser,
@@ -47,12 +52,20 @@ class FileParser implements Parser
         return $this->fileVisitor->getClassDescriptions();
     }
 
-    public function parse(string $fileContent): void
+    public function parse(string $fileContent, string $filename): void
     {
+        $this->parsingErrors = [];
         try {
             $this->fileVisitor->clearParsedClassDescriptions();
 
-            $stmts = $this->parser->parse($fileContent);
+            $errorHandler = new Collecting();
+            $stmts = $this->parser->parse($fileContent, $errorHandler);
+
+            if ($errorHandler->hasErrors()) {
+                foreach ($errorHandler->getErrors() as $error) {
+                    $this->parsingErrors[] = ParsingError::create($filename, $error->getMessage());
+                }
+            }
 
             if (null === $stmts) {
                 return;
@@ -63,5 +76,10 @@ class FileParser implements Parser
             echo 'Parse Error: ', $e->getMessage();
             print_r($e->getTraceAsString());
         }
+    }
+
+    public function getParsingErrors(): array
+    {
+        return $this->parsingErrors;
     }
 }

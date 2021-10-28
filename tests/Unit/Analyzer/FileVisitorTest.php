@@ -9,6 +9,7 @@ use Arkitect\Analyzer\FileParser;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
+use Arkitect\Rules\ParsingError;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
@@ -35,7 +36,7 @@ EOF;
 
         /** @var FileParser $fp */
         $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
-        $fp->parse($code);
+        $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
         self::assertCount(2, $cd);
@@ -80,7 +81,7 @@ EOF;
 
         /** @var FileParser $fp */
         $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
-        $fp->parse($code);
+        $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
         self::assertCount(3, $cd);
@@ -115,7 +116,7 @@ EOF;
 
         /** @var FileParser $fp */
         $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
-        $fp->parse($code);
+        $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions()[1];
 
@@ -143,7 +144,7 @@ EOF;
 
         /** @var FileParser $fp */
         $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
-        $fp->parse($code);
+        $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
         $violations = new Violations();
@@ -177,7 +178,7 @@ EOF;
 
         /** @var FileParser $fp */
         $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
-        $fp->parse($code);
+        $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
         $expectedDependencies = [
@@ -212,7 +213,7 @@ EOF;
 
         /** @var FileParser $fp */
         $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
-        $fp->parse($code);
+        $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
 
@@ -222,5 +223,31 @@ EOF;
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations);
 
         $this->assertCount(0, $violations);
+    }
+
+    public function test_it_should_catch_parsing_errors(): void
+    {
+        $code = <<< 'EOF'
+<?php
+
+namespace Root\Animals;
+
+class Animal
+{
+    public function __construct()
+    {
+       FOO
+    }
+}
+EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp->parse($code, 'relativePathName');
+
+        $parsingErrors = $fp->getParsingErrors();
+        $this->assertEquals([
+            ParsingError::create('relativePathName', 'Syntax error, unexpected \'}\' on line 10'),
+        ], $parsingErrors);
     }
 }
