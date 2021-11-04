@@ -67,4 +67,18 @@ Syntax error, unexpected T_STRING on line 8 in file: App\Controller\Foo
 
         $this->assertEquals($expected, $this->parsingStore->toString());
     }
+
+    public function test_calling_iterator(): void
+    {
+        $this->assertInstanceOf(\Generator::class, $this->parsingStore->getIterator());
+    }
+
+    public function test_convert_to_array(): void
+    {
+        $expected = [
+            $this->parsingError,
+        ];
+
+        $this->assertEquals($expected, $this->parsingStore->toArray());
+    }
 }
