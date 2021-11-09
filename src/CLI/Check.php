@@ -92,6 +92,8 @@ class Check extends Command
             return self::ERROR_CODE;
         }
 
+        $this->printNoViolationsDetectedMessage($output);
+
         return self::SUCCESS_CODE;
     }
 
