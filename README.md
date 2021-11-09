@@ -32,7 +32,7 @@ Currently, you can check if a class:
 ## Using composer
 
 ```bash
-composer require phparkitect/phparkitect
+composer require --dev phparkitect/phparkitect
 ```
 
 ## Using a phar
