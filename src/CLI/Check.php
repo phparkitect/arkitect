@@ -150,4 +150,8 @@ class Check extends Command
         $output->writeln('<error>ERROR ON PARSING THESE FILES:</error>');
         $output->writeln(sprintf('%s', $parsingErrors->toString()));
     }
+
+    private function printNoViolationsDetectedMessage(OutputInterface $output): void {
+        $output->writeln('<info>NO VIOLATIONS DETECTED!</info>');
+    }
 }
