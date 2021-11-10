@@ -84,7 +84,7 @@ use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\Rules\Rule;
 
 return static function (Config $config): void {
-    $mvc_class_set = ClassSet::fromDir(__DIR__.'/mvc');
+    $mvcClassSet = ClassSet::fromDir(__DIR__.'/mvc');
 
     $rule_1 = Rule::allClasses()
         ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
@@ -97,7 +97,7 @@ return static function (Config $config): void {
         ->because('we want protect our domain');
 
     $config
-        ->add($mvc_class_set, ...[$rule_1, $rule_2]);
+        ->add($mvcClassSet, ...[$rule_1, $rule_2]);
 };
 ```
 
