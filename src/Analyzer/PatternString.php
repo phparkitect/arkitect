@@ -23,18 +23,7 @@ class PatternString
             return true;
         }
 
-        return (boolean)(preg_match('#^' . $this->convertShellToRegExPattern($pattern) . '#', $this->value)===1);
-    }
-
-    private function convertShellToRegExPattern(string $pattern): string
-    {
-        return strtr($pattern, [
-            '*' => '.*',
-            '?' => '.',
-            '.' => '\.',
-            '[!' => '[^',
-            '\\' => '\\\\',
-        ]);
+        return (bool) (1 === preg_match('#^'.$this->convertShellToRegExPattern($pattern).'#', $this->value));
     }
 
     public function explode(string $delimiter): array
@@ -54,5 +43,16 @@ class PatternString
             str_contains($pattern, '?') ||
             str_contains($pattern, '.') ||
             str_contains($pattern, '[');
+    }
+
+    private function convertShellToRegExPattern(string $pattern): string
+    {
+        return strtr($pattern, [
+            '*' => '.*',
+            '?' => '.',
+            '.' => '\.',
+            '[!' => '[^',
+            '\\' => '\\\\',
+        ]);
     }
 }
