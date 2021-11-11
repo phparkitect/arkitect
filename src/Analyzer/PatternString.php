@@ -23,7 +23,18 @@ class PatternString
             return true;
         }
 
-        return fnmatch($pattern, $this->value, \FNM_NOESCAPE);
+        return (boolean)(preg_match('#^' . $this->convertShellToRegExPattern($pattern) . '#', $this->value)===1);
+    }
+
+    private function convertShellToRegExPattern(string $pattern): string
+    {
+        return strtr($pattern, [
+            '*' => '.*',
+            '?' => '.',
+            '.' => '\.',
+            '[!' => '[^',
+            '\\' => '\\\\',
+        ]);
     }
 
     public function explode(string $delimiter): array
