@@ -17,6 +17,10 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
             ['Food\Vegetables', 'Food\Vegetables\Carrot', 'matches a class in the root namespace'],
             ['Food\Vegetables', 'Food\Vegetables\Roots\Carrot', 'matches a class in a child namespace'],
             ['Food\Vegetables', 'Food\Vegetables\Roots\Orange\Carrot', 'matches a class in a child of a child namespace'],
+            //
+            ['*\Vegetables', 'Food\Vegetables\Carrot', 'matches a class in the root namespace'],
+            //
+            ['Food\*', 'Food\Vegetables\Carrot', 'matches a class in the root namespace'],
         ];
     }
 
