@@ -23,7 +23,7 @@ class PatternString
             return true;
         }
 
-        return (bool) (1 === preg_match('#^'.$this->convertShellToRegExPattern($pattern).'#', $this->value));
+        return (1 === preg_match('#^'.$this->convertShellToRegExPattern($pattern).'#', $this->value));
     }
 
     public function explode(string $delimiter): array
