@@ -39,7 +39,12 @@ App\Domain\Model violates rules
   should not depend on classes outside in namespace App\Domain (on line 15)';
 
         $this->assertEquals(self::ERROR_CODE, $cmdTester->getStatusCode());
-        $this->assertStringContainsString($expectedErrors, $cmdTester->getDisplay());
+
+        $display = $cmdTester->getDisplay();
+        $display = str_replace(["\r", "\n"], '', $display);
+        $expectedErrors = str_replace(["\r", "\n"], '', $expectedErrors);
+
+        $this->assertStringContainsString($expectedErrors, $display);
     }
 
     public function test_does_not_explode_if_an_exception_is_thrown(): void
@@ -66,8 +71,12 @@ App\Domain\Model violates rules
 App\Controller\Foo violates rules
   should have a name that matches *Controller';
 
+        $display = $cmdTester->getDisplay();
+        $display = str_replace(["\r", "\n"], '', $display);
+        $expectedErrors = str_replace(["\r", "\n"], '', $expectedErrors);
+
         $this->assertEquals(self::ERROR_CODE, $cmdTester->getStatusCode());
-        $this->assertStringContainsString($expectedErrors, $cmdTester->getDisplay());
+        $this->assertStringContainsString($expectedErrors, $display);
     }
 
     protected function runCheck($configFilePath = null): CommandTester
