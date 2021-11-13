@@ -6,11 +6,9 @@ namespace Arkitect\Tests\E2E\Cli;
 
 use Arkitect\CLI\Application;
 use Arkitect\CLI\Command\Init;
-use org\bovigo\vfs\vfsStreamDirectory;
+use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
-use org\bovigo\vfs\vfsStream;
-
 
 class InitCommandTest extends TestCase
 {
@@ -22,7 +20,7 @@ class InitCommandTest extends TestCase
 
         $output = $appTester->getDisplay();
 
-        $this->assertFileExists($fs . '/phparkitect.php');
+        $this->assertFileExists($fs.'/phparkitect.php');
         $this->assertStringContainsString('Creating phparkitect.php file...', $output);
         $this->assertStringContainsString('customize it and run with php bin/phparkitect check', $output);
     }
@@ -31,17 +29,17 @@ class InitCommandTest extends TestCase
     {
         $structure = [
             'nested' => [
-                'path' => []
+                'path' => [],
             ],
         ];
 
         $fs = vfsStream::setup('root', null, $structure)->url();
 
-        $appTester = $this->runInit($fs . '/nested/path');
+        $appTester = $this->runInit($fs.'/nested/path');
 
         $output = $appTester->getDisplay();
 
-        $this->assertFileExists($fs . '/nested/path/phparkitect.php');
+        $this->assertFileExists($fs.'/nested/path/phparkitect.php');
         $this->assertStringContainsString('Creating phparkitect.php file...', $output);
         $this->assertStringContainsString('customize it and run with php bin/phparkitect check', $output);
     }
@@ -51,14 +49,14 @@ class InitCommandTest extends TestCase
         $structure = [
             'nested' => [
                 'path' => [
-                    'phparkitect.php' => ''
-                ]
+                    'phparkitect.php' => '',
+                ],
             ],
         ];
 
         $fs = vfsStream::setup('root', null, $structure)->url();
 
-        $appTester = $this->runInit($fs . '/nested/path');
+        $appTester = $this->runInit($fs.'/nested/path');
 
         $this->assertStringContainsString(
             'File phparkitect.php found in current directory, nothing to do',
