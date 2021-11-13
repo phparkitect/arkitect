@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Arkitect\CLI\Application;
 use Arkitect\CLI\Check;
+use Arkitect\CLI\Command\Init;
 use Arkitect\CLI\Version;
 
 foreach (array(__DIR__ . '/../../../autoload.php', __DIR__ . '/../../autoload.php', __DIR__ . '/../vendor/autoload.php', __DIR__ . '/vendor/autoload.php') as $file) {
@@ -32,5 +33,6 @@ require PHPARKITECT_COMPOSER_INSTALL;
 $application = new Application('PHPArkitect', Version::get());
 
 $application->add(new Check());
+$application->add(new Init());
 
 $application->run();
