@@ -13,11 +13,11 @@ class Init extends Command
 {
     public static $defaultName = 'init';
 
-    public static $defaultDescription = <<< EOT
+    public static $defaultDescription = <<< 'EOT'
 Creates a new phparkitect.php file
 EOT;
 
-    public static $help = <<< EOT
+    public static $help = <<< 'EOT'
 This command creates a new phparkitect.php in the current directory
 You can customize the directory where the file is created specifying <comment>-d /dest/path</comment>
 EOT;
@@ -40,41 +40,39 @@ EOT;
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-
-        $output->writeln("");
+        $output->writeln('');
 
         try {
-
-            $sourceFilePath = __DIR__ . '/../../../phparkitect-stub.php';
-            $destPath = $input->getOption('dest-dir');
+            $sourceFilePath = __DIR__.'/../../../phparkitect-stub.php';
+            /** @psalm-suppress PossiblyInvalidCast $destPath */
+            $destPath = (string) $input->getOption('dest-dir');
             $destFilePath = "$destPath/phparkitect.php";
 
             if (file_exists($destFilePath)) {
-                $output->writeln("<info>File</info> phparkitect.php <info>found in current directory, nothing to do</info>");
-                $output->writeln("<info>You are good to go, customize it and run with </info>php bin/phparkitect check");
+                $output->writeln('<info>File</info> phparkitect.php <info>found in current directory, nothing to do</info>');
+                $output->writeln('<info>You are good to go, customize it and run with </info>php bin/phparkitect check');
 
                 return 0;
             }
 
             if (!is_writable($destPath)) {
                 $output->writeln("<error>Ops, it seems I cannot create the file in {$destPath}</error>");
-                $output->writeln("Please check the directory is writable");
+                $output->writeln('Please check the directory is writable');
 
                 return -1;
             }
 
-            $output->write("<info>Creating phparkitect.php file...</info>");
+            $output->write('<info>Creating phparkitect.php file...</info>');
 
             Assert::file($sourceFilePath);
 
             copy($sourceFilePath, $destFilePath);
 
-            $output->writeln("<info> done</info>");
-            $output->writeln("<info>customize it and run with </info>php bin/phparkitect check");
-
+            $output->writeln('<info> done</info>');
+            $output->writeln('<info>customize it and run with </info>php bin/phparkitect check');
         } catch (\Throwable $e) {
-            $output->writeln("");
-            $output->writeln("<error>Ops, something went wrong: </error>");
+            $output->writeln('');
+            $output->writeln('<error>Ops, something went wrong: </error>');
             $output->writeln("<error>{$e->getMessage()}</error>");
 
             return -1;
