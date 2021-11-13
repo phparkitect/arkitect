@@ -5,91 +5,88 @@ declare(strict_types=1);
 namespace Arkitect\Tests\E2E\Cli;
 
 use Arkitect\CLI\Application;
-use Arkitect\CLI\Check;
+use Arkitect\CLI\Command\Init;
+use org\bovigo\vfs\vfsStreamDirectory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use org\bovigo\vfs\vfsStream;
 
-class CheckCommandTest extends TestCase
+
+class InitCommandTest extends TestCase
 {
-    const SUCCESS_CODE = 0;
-
-    const ERROR_CODE = 1;
-
-    public function test_app_returns_error_with_multiple_violations(): void
+    public function test_it_creates_a_file_in_default_dir(): void
     {
-        $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvc.php');
+        $fs = vfsStream::setup()->url();
 
-        $expectedErrors = 'ERRORS!
+        $appTester = $this->runInit($fs);
 
-App\Controller\Foo violates rules
-  should implement ContainerAwareInterface
-  should have a name that matches *Controller
+        $output = $appTester->getDisplay();
 
-App\Controller\ProductsController violates rules
-  should implement ContainerAwareInterface
-
-App\Controller\UserController violates rules
-  should implement ContainerAwareInterface
-
-App\Controller\YieldController violates rules
-  should implement ContainerAwareInterface
-
-App\Domain\Model violates rules
-  should not depend on classes outside in namespace App\Domain (on line 14)
-  should not depend on classes outside in namespace App\Domain (on line 15)';
-
-        $this->assertEquals(self::ERROR_CODE, $cmdTester->getStatusCode());
-
-        $display = $cmdTester->getDisplay();
-        $display = str_replace(["\r", "\n"], '', $display);
-        $expectedErrors = str_replace(["\r", "\n"], '', $expectedErrors);
-
-        $this->assertStringContainsString($expectedErrors, $display);
+        $this->assertFileExists($fs . '/phparkitect.php');
+        $this->assertStringContainsString('Creating phparkitect.php file...', $output);
+        $this->assertStringContainsString('customize it and run with php bin/phparkitect check', $output);
     }
 
-    public function test_does_not_explode_if_an_exception_is_thrown(): void
+    public function test_it_creates_a_file_in_a_custom_dir(): void
     {
-        $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configThrowsException.php');
+        $structure = [
+            'nested' => [
+                'path' => []
+            ],
+        ];
 
-        $this->assertEquals(self::ERROR_CODE, $cmdTester->getStatusCode());
+        $fs = vfsStream::setup('root', null, $structure)->url();
+
+        $appTester = $this->runInit($fs . '/nested/path');
+
+        $output = $appTester->getDisplay();
+
+        $this->assertFileExists($fs . '/nested/path/phparkitect.php');
+        $this->assertStringContainsString('Creating phparkitect.php file...', $output);
+        $this->assertStringContainsString('customize it and run with php bin/phparkitect check', $output);
     }
 
-    public function test_run_command_with_success(): void
+    public function test_do_nothing_if_file_exists(): void
     {
-        $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvcWithoutErrors.php');
+        $structure = [
+            'nested' => [
+                'path' => [
+                    'phparkitect.php' => ''
+                ]
+            ],
+        ];
 
-        $this->assertEquals(self::SUCCESS_CODE, $cmdTester->getStatusCode());
-        $this->assertStringNotContainsString('ERRORS!', $cmdTester->getDisplay());
+        $fs = vfsStream::setup('root', null, $structure)->url();
+
+        $appTester = $this->runInit($fs . '/nested/path');
+
+        $this->assertStringContainsString(
+            'File phparkitect.php found in current directory, nothing to do',
+            $appTester->getDisplay()
+        );
     }
 
-    public function test_bug_yield(): void
+    public function test_returns_error_if_directory_is_not_writable(): void
     {
-        $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvcForYieldBug.php');
+        $fs = vfsStream::setup('root', 0000)->url();
 
-        $expectedErrors = 'ERRORS!
+        $appTester = $this->runInit($fs);
 
-App\Controller\Foo violates rules
-  should have a name that matches *Controller';
-
-        $display = $cmdTester->getDisplay();
-        $display = str_replace(["\r", "\n"], '', $display);
-        $expectedErrors = str_replace(["\r", "\n"], '', $expectedErrors);
-
-        $this->assertEquals(self::ERROR_CODE, $cmdTester->getStatusCode());
-        $this->assertStringContainsString($expectedErrors, $display);
+        $this->assertStringContainsString(
+            'Ops, it seems I cannot create the file in vfs://root',
+            $appTester->getDisplay()
+        );
     }
 
-    protected function runCheck($configFilePath = null): CommandTester
+    private function runInit(string $path): CommandTester
     {
-        $input = $configFilePath ? ['--config' => $configFilePath] : [];
-
         $app = new Application('PHPArkitect', 'dunno');
-        $app->add(new Check());
+        $app->add(new Init());
 
-        $command = $app->find('check');
+        $command = $app->find('init');
 
         $appTester = new CommandTester($command);
-        $appTester->execute($input);
+        $appTester->execute(['--dest-dir' => $path]);
 
         return $appTester;
     }
