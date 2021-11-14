@@ -7,7 +7,6 @@ How Can I Contribute?
 To report bugs you can open an issue on this repository. Please provide as much information as you can to help discover and fix the bug.
 Useful information are:
 - Which PHP version are you running?
-- How do you run arkitect? Is it via docker or installed via composer?
 - Which problem are you experiencing?
 
 If possible, a test highlihting the bug would be great.
