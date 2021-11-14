@@ -23,3 +23,23 @@ The build must be green for the PR being merged.
 
 In order to fix a bug or submit a new enhancement we suggest to run the build locally or using docker (with the dockerfile provided).
 Some common tasks are available in the Makefile file (you still can use it to see how run things even your system does not support make).
+
+To create the docker image and then enter the docker container shell:
+
+```shell
+docker image build -t phparkitect .
+docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect bash
+```
+
+If you prefer use more shorter make commands (use `make` without arguments for help):
+
+```shell
+make dbi
+make shell
+```
+
+The first time, after the docker container has been created, remember to install the packages with composer:
+
+```shell
+composer install
+```
