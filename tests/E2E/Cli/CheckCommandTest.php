@@ -38,28 +38,21 @@ App\Domain\Model violates rules
   should not depend on classes outside in namespace App\Domain (on line 14)
   should not depend on classes outside in namespace App\Domain (on line 15)';
 
-        $this->assertEquals(self::ERROR_CODE, $cmdTester->getStatusCode());
-
-        $display = $cmdTester->getDisplay();
-        $display = str_replace(["\r", "\n"], '', $display);
-        $expectedErrors = str_replace(["\r", "\n"], '', $expectedErrors);
-
-        $this->assertStringContainsString($expectedErrors, $display);
+        $this->assertCheckHasErrors($cmdTester, $expectedErrors);
     }
 
     public function test_does_not_explode_if_an_exception_is_thrown(): void
     {
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configThrowsException.php');
 
-        $this->assertEquals(self::ERROR_CODE, $cmdTester->getStatusCode());
+        $this->assertCheckHasErrors($cmdTester);
     }
 
     public function test_run_command_with_success(): void
     {
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvcWithoutErrors.php');
 
-        $this->assertEquals(self::SUCCESS_CODE, $cmdTester->getStatusCode());
-        $this->assertStringNotContainsString('ERRORS!', $cmdTester->getDisplay());
+        $this->assertCheckHasSuccess($cmdTester);
     }
 
     public function test_bug_yield(): void
@@ -71,12 +64,7 @@ App\Domain\Model violates rules
 App\Controller\Foo violates rules
   should have a name that matches *Controller';
 
-        $display = $cmdTester->getDisplay();
-        $display = str_replace(["\r", "\n"], '', $display);
-        $expectedErrors = str_replace(["\r", "\n"], '', $expectedErrors);
-
-        $this->assertEquals(self::ERROR_CODE, $cmdTester->getStatusCode());
-        $this->assertStringContainsString($expectedErrors, $display);
+        $this->assertCheckHasErrors($cmdTester, $expectedErrors);
     }
 
     protected function runCheck($configFilePath = null): CommandTester
@@ -92,5 +80,21 @@ App\Controller\Foo violates rules
         $appTester->execute($input);
 
         return $appTester;
+    }
+
+    protected function assertCheckHasErrors(CommandTester $commandTester, string $expectedOutput = null): void
+    {
+        $this->assertEquals(self::ERROR_CODE, $commandTester->getStatusCode());
+        if (null != $expectedOutput) {
+            $actualOutput = str_replace(["\r", "\n"], '', $commandTester->getDisplay());
+            $expectedOutput = str_replace(["\r", "\n"], '', $expectedOutput);
+            $this->assertStringContainsString($expectedOutput, $actualOutput);
+        }
+    }
+
+    protected function assertCheckHasSuccess(CommandTester $commandTester): void
+    {
+        $this->assertEquals(self::SUCCESS_CODE, $commandTester->getStatusCode());
+        $this->assertStringNotContainsString('ERRORS!', $commandTester->getDisplay());
     }
 }
