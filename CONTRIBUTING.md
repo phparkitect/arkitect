@@ -21,5 +21,5 @@ The build must be green for the PR being merged.
 
 ## How to develop arkitect
 
-In order to fix a bug o submit a new enhancement we suggest to run the build locally or using docker (with the dockerfile provided).
+In order to fix a bug or submit a new enhancement we suggest to run the build locally or using docker (with the dockerfile provided).
 Some common tasks are available in the Makefile file (you still can use it to see how run things even your system does not support make).
