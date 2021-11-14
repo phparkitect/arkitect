@@ -23,7 +23,7 @@ class PatternString
             return true;
         }
 
-        return fnmatch($pattern, $this->value, \FNM_NOESCAPE);
+        return $this->startsWithPattern($pattern);
     }
 
     public function explode(string $delimiter): array
@@ -43,5 +43,21 @@ class PatternString
             str_contains($pattern, '?') ||
             str_contains($pattern, '.') ||
             str_contains($pattern, '[');
+    }
+
+    private function startsWithPattern(string $pattern): bool
+    {
+        return 1 === preg_match('#^'.$this->convertShellToRegExPattern($pattern).'#', $this->value);
+    }
+
+    private function convertShellToRegExPattern(string $pattern): string
+    {
+        return strtr($pattern, [
+            '*' => '.*',
+            '?' => '.',
+            '.' => '\.',
+            '[!' => '[^',
+            '\\' => '\\\\',
+        ]);
     }
 }
