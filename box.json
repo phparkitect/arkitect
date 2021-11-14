@@ -7,7 +7,8 @@
     "vendor"
   ],
   "files": [
-    "composer.json"
+    "composer.json",
+    "phparkitect-stub.php"
   ],
   "compression": "GZ",
   "compactors": [
