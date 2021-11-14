@@ -38,21 +38,21 @@ App\Domain\Model violates rules
   should not depend on classes outside in namespace App\Domain (on line 14)
   should not depend on classes outside in namespace App\Domain (on line 15)';
 
-        $this->assertCheckErrors($cmdTester, $expectedErrors);
+        $this->assertCheckHasErrors($cmdTester, $expectedErrors);
     }
 
     public function test_does_not_explode_if_an_exception_is_thrown(): void
     {
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configThrowsException.php');
 
-        $this->assertCheckErrors($cmdTester);
+        $this->assertCheckHasErrors($cmdTester);
     }
 
     public function test_run_command_with_success(): void
     {
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvcWithoutErrors.php');
 
-        $this->assertCheckSuccess($cmdTester);
+        $this->assertCheckHasSuccess($cmdTester);
     }
 
     public function test_bug_yield(): void
@@ -64,7 +64,7 @@ App\Domain\Model violates rules
 App\Controller\Foo violates rules
   should have a name that matches *Controller';
 
-        $this->assertCheckErrors($cmdTester, $expectedErrors);
+        $this->assertCheckHasErrors($cmdTester, $expectedErrors);
     }
 
     protected function runCheck($configFilePath = null): CommandTester
@@ -82,7 +82,7 @@ App\Controller\Foo violates rules
         return $appTester;
     }
 
-    protected function assertCheckErrors(CommandTester $commandTester, string $expectedOutput = null): void
+    protected function assertCheckHasErrors(CommandTester $commandTester, string $expectedOutput = null): void
     {
         $this->assertEquals(self::ERROR_CODE, $commandTester->getStatusCode());
         if (null != $expectedOutput) {
@@ -92,7 +92,7 @@ App\Controller\Foo violates rules
         }
     }
 
-    protected function assertCheckSuccess(CommandTester $commandTester): void
+    protected function assertCheckHasSuccess(CommandTester $commandTester): void
     {
         $this->assertEquals(self::SUCCESS_CODE, $commandTester->getStatusCode());
         $this->assertStringNotContainsString('ERRORS!', $commandTester->getDisplay());
