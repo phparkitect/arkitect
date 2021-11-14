@@ -48,18 +48,9 @@ chmod +x phparkitect.phar
 ./phparkitect.phar check
 ```
 
-## Using docker
-
-If you would like to use Arkitect with Docker you can launch this command:
-
-```
-docker run --rm -it -v $(PWD):/project phparkitect/phparkitect:latest check --config=/project/yourConfigFile.php
-```
-If you have a project with an incompatible version of PHP with Arkitect, using Docker can help you use Arkitect despite the PHP version.
-
 # How to use it
 
-To use this tool you need to launch a command via bash or with Docker like this:
+To use this tool you need to launch a command via bash:
 
 ```
 phparkitect check
@@ -88,7 +79,7 @@ use Arkitect\Rules\Rule;
 return static function (Config $config): void {
     $mvcClassSet = ClassSet::fromDir(__DIR__.'/mvc');
 
-    $rules = []
+    $rules = [];
 
     $rules[] = Rule::allClasses()
         ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
