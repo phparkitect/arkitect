@@ -88,7 +88,7 @@ use Arkitect\Rules\Rule;
 return static function (Config $config): void {
     $mvcClassSet = ClassSet::fromDir(__DIR__.'/mvc');
 
-    $rules = []
+    $rules = [];
 
     $rules[] = Rule::allClasses()
         ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
