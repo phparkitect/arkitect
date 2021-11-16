@@ -41,17 +41,30 @@ class FileVisitor extends NodeVisitorAbstract
          * @see FileVisitorTest::test_should_returns_all_dependencies
          */
         if ($node instanceof Node\Expr\StaticCall && method_exists($node->class, 'toString')) {
+            if ($this->isSelfOrStaticOrParent($node->class->toString())) {
+                return;
+            }
+
             $this->classDescriptionBuilder
                 ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
         }
 
         if ($node instanceof Node\Expr\Instanceof_ && method_exists($node->class, 'toString')) {
+            if ($this->isSelfOrStaticOrParent($node->class->toString())) {
+                return;
+            }
+
             $this->classDescriptionBuilder
                 ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
         }
 
         if ($node instanceof Node\Expr\New_ && !($node->class instanceof Node\Expr\Variable)) {
-            if (method_exists($node->class, 'isAnonymous') && $node->class->isAnonymous()) {
+            if (method_exists($node->class, 'isAnonymous')
+                && $node->class->isAnonymous()) {
+                return;
+            }
+
+            if ($this->isSelfOrStaticOrParent($node->class->toString())) {
                 return;
             }
 
@@ -87,6 +100,11 @@ class FileVisitor extends NodeVisitorAbstract
 
             $this->classDescriptions[] = $classDescription;
         }
+    }
+
+    private function isSelfOrStaticOrParent(string $dependencyClass): bool
+    {
+        return 'self' === $dependencyClass || 'static' === $dependencyClass || 'parent' === $dependencyClass;
     }
 
     private function addParamDependency(Node\Param $node): void

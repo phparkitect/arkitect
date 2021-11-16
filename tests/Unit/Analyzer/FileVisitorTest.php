@@ -9,6 +9,7 @@ use Arkitect\Analyzer\FileParser;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
+use Arkitect\Expression\ForClasses\NotHaveDependencyOutsideNamespace;
 use Arkitect\Rules\ParsingError;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
@@ -276,6 +277,41 @@ EOF;
         $fp->parse($code, 'relativePathName');
 
         $violations = new Violations();
+
+        $this->assertCount(0, $violations);
+    }
+
+    public function test_it_should_parse_self_correctly(): void
+    {
+        $code = <<< 'EOF'
+<?php
+
+namespace Root\Animals;
+
+class Tiger extends Animal
+{
+    public function foo()
+    {
+       self::bar();
+       static::bar();
+       parent::baz();
+    }
+    public static function bar()
+    {
+    }
+}
+EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp->parse($code, 'relativePathName');
+
+        $cd = $fp->getClassDescriptions();
+
+        $violations = new Violations();
+
+        $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('Root\Animals');
+        $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations);
 
         $this->assertCount(0, $violations);
     }
