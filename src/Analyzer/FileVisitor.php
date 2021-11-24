@@ -65,7 +65,7 @@ class FileVisitor extends NodeVisitorAbstract
          *
          * @see FileVisitorTest::test_should_returns_all_dependencies
          */
-        if ($node instanceof Node\Param) {
+        if ($node instanceof Node\Param && null !== $this->classDescriptionBuilder) {
             $this->addParamDependency($node);
         }
     }

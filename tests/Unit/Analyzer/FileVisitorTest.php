@@ -250,4 +250,33 @@ EOF;
             ParsingError::create('relativePathName', 'Syntax error, unexpected \'}\' on line 10'),
         ], $parsingErrors);
     }
+
+    public function test_null_class_description_builder(): void
+    {
+        $code = <<< 'EOF'
+<?php
+
+declare(strict_types=1);
+
+namespace App\Application\Command;
+
+use App\Domain\Quote\Quote;
+
+interface QuoteCommandInterface
+{
+    /**
+     * Save a stock quote.
+     */
+    public function save(Quote $quote): void;
+}
+EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp->parse($code, 'relativePathName');
+
+        $violations = new Violations();
+
+        $this->assertCount(0, $violations);
+    }
 }
