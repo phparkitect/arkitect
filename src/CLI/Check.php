@@ -153,7 +153,8 @@ class Check extends Command
         $output->writeln(sprintf('%s', $parsingErrors->toString()));
     }
 
-    private function printNoViolationsDetectedMessage(OutputInterface $output): void {
+    private function printNoViolationsDetectedMessage(OutputInterface $output): void
+    {
         $output->writeln('<info>NO VIOLATIONS DETECTED!</info>');
     }
 }
