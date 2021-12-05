@@ -26,7 +26,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
 
         $violationError = $notHaveDependencyOutsideNamespace->describe($classDescription)->toString();
 
-        $this->assertEquals('should not depend on classes outside in namespace '.$namespace, $violationError);
+        $this->assertEquals('should not depend on classes outside namespace '.$namespace, $violationError);
     }
 
     public function test_it_should_return_true_if_not_depends_on_namespace(): void

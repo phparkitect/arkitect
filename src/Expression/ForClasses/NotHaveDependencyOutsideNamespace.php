@@ -23,7 +23,7 @@ class NotHaveDependencyOutsideNamespace implements Expression
 
     public function describe(ClassDescription $theClass): Description
     {
-        return new PositiveDescription("should not depend on classes outside in namespace {$this->namespace}");
+        return new PositiveDescription("should not depend on classes outside namespace {$this->namespace}");
     }
 
     public function evaluate(ClassDescription $theClass, Violations $violations): void
