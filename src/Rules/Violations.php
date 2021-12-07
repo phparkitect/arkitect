@@ -31,7 +31,7 @@ class Violations implements \IteratorAggregate, \Countable
         return $this->violations[$index];
     }
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         foreach ($this->violations as $violation) {
             yield $violation;
