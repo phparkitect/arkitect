@@ -31,4 +31,24 @@ class ExtendTest extends TestCase
         self::assertEquals(1, $violations->count());
         self::assertEquals('should extend My\BaseClass', $violationError);
     }
+
+    public function test_it_should_return_violation_error_if_extend_is_null(): void
+    {
+        $extend = new Extend('My\BaseClass');
+
+        $classDescription = new ClassDescription(
+            FullyQualifiedClassName::fromString('HappyIsland'),
+            [],
+            [],
+            null
+        );
+
+        $violationError = $extend->describe($classDescription)->toString();
+
+        $violations = new Violations();
+        $extend->evaluate($classDescription, $violations);
+
+        self::assertEquals(1, $violations->count());
+        self::assertEquals('should extend My\BaseClass', $violationError);
+    }
 }

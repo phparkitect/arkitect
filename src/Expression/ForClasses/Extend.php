@@ -31,11 +31,7 @@ class Extend implements Expression
     {
         $extends = $theClass->getExtends();
 
-        if (null === $extends) {
-            return;
-        }
-
-        if ($extends->toString() === $this->className) {
+        if (null !== $extends && $extends->toString() === $this->className) {
             return;
         }
 
