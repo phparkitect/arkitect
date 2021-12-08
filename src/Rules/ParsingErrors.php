@@ -31,7 +31,7 @@ class ParsingErrors implements \IteratorAggregate, \Countable
         return $this->parsingErrors[$index];
     }
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         foreach ($this->parsingErrors as $parsingError) {
             yield $parsingError;

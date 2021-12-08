@@ -36,7 +36,7 @@ class ClassSet implements \IteratorAggregate
         return $this->directory;
     }
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         $finder = (new Finder())
             ->files()

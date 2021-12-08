@@ -45,7 +45,7 @@ class FakeClassSet extends ClassSet
     {
     }
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator([
             new FakeSplFileInfo('uno', '.', 'dir'),
