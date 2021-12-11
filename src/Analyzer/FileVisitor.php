@@ -113,6 +113,10 @@ class FileVisitor extends NodeVisitorAbstract
             return;
         }
 
+        if (method_exists($node->type, 'isSpecialClassName') && ($node->type->isSpecialClassName())) {
+            return;
+        }
+
         if (!method_exists($node->type, 'toString')) {
             return;
         }
