@@ -79,6 +79,10 @@ class FileVisitor extends NodeVisitorAbstract
          * @see FileVisitorTest::test_should_returns_all_dependencies
          */
         if ($node instanceof Node\Param && null !== $this->classDescriptionBuilder) {
+            if ($this->isSelfOrStatic($node->type->toString())) {
+                return;
+            }
+
             $this->addParamDependency($node);
         }
     }
@@ -102,9 +106,29 @@ class FileVisitor extends NodeVisitorAbstract
         }
     }
 
+    private function isSelf(string $dependencyClass): bool
+    {
+        return 'self' === $dependencyClass;
+    }
+
+    private function isStatic(string $dependencyClass): bool
+    {
+        return 'static' === $dependencyClass;
+    }
+
+    private function isParent(string $dependencyClass): bool
+    {
+        return 'parent' === $dependencyClass;
+    }
+
+    private function isSelfOrStatic(string $dependencyClass): bool
+    {
+        return $this->isSelf($dependencyClass) || $this->isStatic($dependencyClass);
+    }
+
     private function isSelfOrStaticOrParent(string $dependencyClass): bool
     {
-        return 'self' === $dependencyClass || 'static' === $dependencyClass || 'parent' === $dependencyClass;
+        return $this->isSelf($dependencyClass) || $this->isStatic($dependencyClass) || $this->isParent($dependencyClass);
     }
 
     private function addParamDependency(Node\Param $node): void
