@@ -299,6 +299,9 @@ class Tiger extends Animal
     public static function bar()
     {
     }
+    public function doSomething(self $self, static $static)
+    {
+    }
 }
 EOF;
 
