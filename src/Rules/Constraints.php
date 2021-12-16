@@ -10,16 +10,19 @@ class Constraints
 {
     private $expressions = [];
 
-    public function add(Expression $expression): void
+    public function add(Expression $expression, RuleException $except): void
     {
-        $this->expressions[] = $expression;
+        $this->expressions[] = [
+            'expression' => $expression,
+            'except' => $except
+        ];
     }
 
     public function checkAll(ClassDescription $classDescription, Violations $violations): void
     {
         /** @var Expression $expression */
         foreach ($this->expressions as $expression) {
-            $expression->evaluate($classDescription, $violations);
+            $expression['expression']->evaluate($classDescription, $violations, $expression['except']);
         }
     }
 }

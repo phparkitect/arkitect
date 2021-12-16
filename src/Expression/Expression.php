@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Arkitect\Expression;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Rules\RuleException;
 use Arkitect\Rules\Violations;
 
 /**
@@ -24,5 +25,5 @@ interface Expression
      * Evaluates the expression for the class passed as parameter.
      * It should adds violations if rule is violated.
      */
-    public function evaluate(ClassDescription $theClass, Violations $violations): void;
+    public function evaluate(ClassDescription $theClass, Violations $violations, RuleException $except): void;
 }

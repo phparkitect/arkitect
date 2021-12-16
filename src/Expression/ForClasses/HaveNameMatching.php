@@ -8,6 +8,7 @@ use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Expression\PositiveDescription;
+use Arkitect\Rules\RuleException;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
 
@@ -26,10 +27,10 @@ class HaveNameMatching implements Expression
         return new PositiveDescription("should have a name that matches {$this->name}");
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, RuleException $except): void
     {
         $fqcn = FullyQualifiedClassName::fromString($theClass->getFQCN());
-        if (!$fqcn->classMatches($this->name)) {
+        if (!$fqcn->classMatches($this->name) && $except->isAllowed($theClass->getFQCN())) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
                 $this->describe($theClass)->toString()

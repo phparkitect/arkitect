@@ -24,9 +24,13 @@ class AndThatShould implements AndThatShouldParser
         return $this;
     }
 
-    public function should(Expression $expression): BecauseParser
+    public function should(Expression $expression, ?RuleException $ruleException = null): BecauseParser
     {
-        $this->ruleBuilder->addShould($expression);
+        if (null === $ruleException) {
+            $ruleException = new RuleException();
+        }
+
+        $this->ruleBuilder->addShould($expression, $ruleException);
 
         return new Because($this->ruleBuilder);
     }

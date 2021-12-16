@@ -30,9 +30,9 @@ class RuleBuilder
         return $this;
     }
 
-    public function addShould(Expression $should): self
+    public function addShould(Expression $should, RuleException $except): self
     {
-        $this->shoulds->add($should);
+        $this->shoulds->add($should, $except);
 
         return $this;
     }

@@ -8,6 +8,7 @@ use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Expression\PositiveDescription;
+use Arkitect\Rules\RuleException;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
 
@@ -26,7 +27,7 @@ class NotImplement implements Expression
         return new PositiveDescription("should not implement {$this->interface}");
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, RuleException $except): void
     {
         $interface = $this->interface;
         $interfaces = $theClass->getInterfaces();
@@ -34,7 +35,7 @@ class NotImplement implements Expression
             return $FQCN->matches($interface);
         };
 
-        if (\count(array_filter($interfaces, $implements)) > 0) {
+        if (\count(array_filter($interfaces, $implements)) > 0 && $except->isAllowed($theClass->getFQCN())) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
                 $this->describe($theClass)->toString()

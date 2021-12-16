@@ -8,6 +8,7 @@ use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Expression\PositiveDescription;
+use Arkitect\Rules\RuleException;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
 
@@ -28,7 +29,7 @@ class NotDependsOnTheseNamespaces implements Expression
         return new PositiveDescription("should not depend on these namespaces: $desc");
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, RuleException $except): void
     {
         $dependencies = $theClass->getDependencies();
 
@@ -38,7 +39,7 @@ class NotDependsOnTheseNamespaces implements Expression
                 continue;
             }
 
-            if ($dependency->matchesOneOf(...$this->namespaces)) {
+            if ($dependency->matchesOneOf(...$this->namespaces) && $except->isAllowed($theClass->getFQCN())) {
                 $violation = Violation::createWithErrorLine(
                     $theClass->getFQCN(),
                     $this->describe($theClass)->toString(),

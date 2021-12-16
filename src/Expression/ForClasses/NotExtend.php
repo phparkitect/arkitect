@@ -7,6 +7,7 @@ use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Expression\PositiveDescription;
+use Arkitect\Rules\RuleException;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
 
@@ -27,7 +28,7 @@ class NotExtend implements Expression
         return new PositiveDescription("should not extend {$this->className}");
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, RuleException $except): void
     {
         $extends = $theClass->getExtends();
 
@@ -35,7 +36,7 @@ class NotExtend implements Expression
             return;
         }
 
-        if ($extends->toString() !== $this->className) {
+        if ($extends->toString() !== $this->className || !$except->isAllowed($theClass->getFQCN())) {
             return;
         }
 

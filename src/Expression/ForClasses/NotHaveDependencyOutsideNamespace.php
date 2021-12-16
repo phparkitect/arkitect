@@ -8,6 +8,7 @@ use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Expression\PositiveDescription;
+use Arkitect\Rules\RuleException;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
 
@@ -26,7 +27,7 @@ class NotHaveDependencyOutsideNamespace implements Expression
         return new PositiveDescription("should not depend on classes outside namespace {$this->namespace}");
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, RuleException $except): void
     {
         $namespace = $this->namespace;
         $depends = function (ClassDependency $dependency) use ($namespace): bool {
@@ -38,12 +39,14 @@ class NotHaveDependencyOutsideNamespace implements Expression
 
         /** @var ClassDependency $externalDep */
         foreach ($externalDeps as $externalDep) {
-            $violation = Violation::createWithErrorLine(
-                $theClass->getFQCN(),
-                $this->describe($theClass)->toString(),
-                $externalDep->getLine()
-            );
-            $violations->add($violation);
+            if ($except->isAllowed($theClass->getFQCN())) {
+                $violation = Violation::createWithErrorLine(
+                    $theClass->getFQCN(),
+                    $this->describe($theClass)->toString(),
+                    $externalDep->getLine()
+                );
+                $violations->add($violation);
+            }
         }
     }
 }

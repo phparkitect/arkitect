@@ -7,6 +7,7 @@ use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Expression\PositiveDescription;
+use Arkitect\Rules\RuleException;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
 
@@ -27,7 +28,7 @@ class NotResideInTheseNamespaces implements Expression
         return new PositiveDescription("should not reside in one of these namespaces: $descr");
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, RuleException $except): void
     {
         $resideInNamespace = false;
         foreach ($this->namespaces as $namespace) {
@@ -36,7 +37,7 @@ class NotResideInTheseNamespaces implements Expression
             }
         }
 
-        if ($resideInNamespace) {
+        if ($resideInNamespace && $except->isAllowed($theClass->getFQCN())) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
                 $this->describe($theClass)->toString()

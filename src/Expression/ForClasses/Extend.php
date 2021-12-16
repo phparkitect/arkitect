@@ -7,6 +7,7 @@ use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Expression\PositiveDescription;
+use Arkitect\Rules\RuleException;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
 
@@ -27,7 +28,7 @@ class Extend implements Expression
         return new PositiveDescription("should extend {$this->className}");
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, RuleException $except): void
     {
         $extends = $theClass->getExtends();
 
@@ -35,11 +36,13 @@ class Extend implements Expression
             return;
         }
 
-        $violation = Violation::create(
-            $theClass->getFQCN(),
-            $this->describe($theClass)->toString()
-        );
+        if ($except->isAllowed($theClass->getFQCN())) {
+            $violation = Violation::create(
+                $theClass->getFQCN(),
+                $this->describe($theClass)->toString()
+            );
 
-        $violations->add($violation);
+            $violations->add($violation);
+        }
     }
 }
