@@ -11,6 +11,7 @@ return static function (Config $config): void {
     $mvc_class_set = ClassSet::fromDir(__DIR__.'/mvc');
 
     $rule_1 = Rule::allClasses()
+        ->exclude('App\Controller\BaseController')
         ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
         ->should(new HaveNameMatching('*Controller'))
         ->because('all controllers should be end name with Controller');
