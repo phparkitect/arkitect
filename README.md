@@ -103,11 +103,13 @@ If you want to exclude some classes from the parser you can use the `except` fun
 
 ```php
 $rules[] = Rule::allClasses()
-->except('App\Controller\BaseController')
+->except('App\Controller\FolderController\*')
 ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
 ->should(new HaveNameMatching('*Controller'))
 ->because('we want uniform naming');
 ```
+
+You can use wildcards or the exact name of a class.
 
 ## Optional parameters and options
 You can add parameters when you launch the tool. At the moment you can add these parameters and options: 

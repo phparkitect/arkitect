@@ -14,7 +14,6 @@ class AllClasses implements ThatParser
 
     public function __construct()
     {
-        $this->classesToBeExcluded = [];
         $this->ruleBuilder = new RuleBuilder();
     }
 
