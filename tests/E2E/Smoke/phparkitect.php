@@ -13,7 +13,7 @@ return static function (Config $config): void {
     $mvc_class_set = ClassSet::fromDir(__DIR__.'/../_fixtures/mvc');
 
     $rule_1 = Rule::allClasses()
-        ->exclude('App\Controller\BaseController')
+        ->except('App\Controller\BaseController')
         ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
         ->should(new Implement('ContainerAwareInterface'))
         ->because('all controllers should be container aware');

@@ -11,8 +11,6 @@ class AllClasses implements ThatParser
 {
     /** @var RuleBuilder */
     protected $ruleBuilder;
-    /** @var array */
-    private $classesToBeExcluded;
 
     public function __construct()
     {
@@ -27,7 +25,7 @@ class AllClasses implements ThatParser
         return new AndThatShould($this->ruleBuilder);
     }
 
-    public function exclude(string ...$classesToBeExcluded): ThatParser
+    public function except(string ...$classesToBeExcluded): ThatParser
     {
         $this->ruleBuilder->classesToBeExcluded(...$classesToBeExcluded);
 

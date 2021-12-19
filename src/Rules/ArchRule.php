@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Arkitect\Rules;
 
 use Arkitect\Analyzer\ClassDescription;
-use Arkitect\Analyzer\FullyQualifiedClassName;
 
 class ArchRule implements DSL\ArchRule
 {
@@ -30,9 +29,7 @@ class ArchRule implements DSL\ArchRule
 
     public function check(ClassDescription $classDescription, Violations $violations): void
     {
-        $fqcn = FullyQualifiedClassName::fromString($classDescription->getFQCN());
-
-        if (\in_array($fqcn->toString(), $this->classesToBeExcluded)) {
+        if ($classDescription->namespaceMatchesOneOfTheseNamespaces($this->classesToBeExcluded)) {
             return;
         }
 

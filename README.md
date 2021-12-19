@@ -99,11 +99,11 @@ return static function (Config $config): void {
 By default, a progress bar will show the status of the ongoing analysis.
 
 ## Excluding classes when parser run
-If you want to exclude some classes from the parser you can use the `exclude` function inside your config file like this:
+If you want to exclude some classes from the parser you can use the `except` function inside your config file like this:
 
 ```php
 $rules[] = Rule::allClasses()
-->exclude('App\Controller\BaseController')
+->except('App\Controller\BaseController')
 ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
 ->should(new HaveNameMatching('*Controller'))
 ->because('we want uniform naming');

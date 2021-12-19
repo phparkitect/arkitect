@@ -86,6 +86,17 @@ class ClassDescription
         return $this->FQCN->matches($pattern);
     }
 
+    public function namespaceMatchesOneOfTheseNamespaces(array $classesToBeExcluded): bool
+    {
+        foreach ($classesToBeExcluded as $classToBeExcluded) {
+            if ($this->namespaceMatches($classToBeExcluded)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function fullPath(): string
     {
         return $this->fullPath;
