@@ -23,4 +23,11 @@ class AllClasses implements ThatParser
 
         return new AndThatShould($this->ruleBuilder);
     }
+
+    public function except(string ...$classesToBeExcluded): ThatParser
+    {
+        $this->ruleBuilder->classesToBeExcluded(...$classesToBeExcluded);
+
+        return $this;
+    }
 }

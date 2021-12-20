@@ -51,4 +51,11 @@ class ClassDescriptionTest extends TestCase
 
         $this->assertEquals('Banana', $cd->getName());
     }
+
+    public function test_should_return_true_if_there_class_is_in_namespace_array(): void
+    {
+        $cd = $this->builder->get();
+
+        $this->assertTrue($cd->namespaceMatchesOneOfTheseNamespaces(['Fruit']));
+    }
 }

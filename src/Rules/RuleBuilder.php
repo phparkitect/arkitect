@@ -16,11 +16,15 @@ class RuleBuilder
     /** @var string */
     private $because;
 
+    /** @var array */
+    private $classesToBeExcluded;
+
     public function __construct()
     {
         $this->thats = new Specs();
         $this->shoulds = new Constraints();
         $this->because = '';
+        $this->classesToBeExcluded = [];
     }
 
     public function addThat(Expression $that): self
@@ -46,6 +50,18 @@ class RuleBuilder
 
     public function build(): ArchRule
     {
-        return new ArchRule($this->thats, $this->shoulds, $this->because);
+        return new ArchRule(
+            $this->thats,
+            $this->shoulds,
+            $this->because,
+            $this->classesToBeExcluded
+        );
+    }
+
+    public function classesToBeExcluded(string ...$classesToBeExcluded): self
+    {
+        $this->classesToBeExcluded = $classesToBeExcluded;
+
+        return $this;
     }
 }
