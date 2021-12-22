@@ -12,9 +12,7 @@ use Arkitect\Rules\Violations;
 
 class NotExtend implements Expression
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $className;
 
     public function __construct(string $className)

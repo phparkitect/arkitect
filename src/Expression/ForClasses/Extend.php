@@ -12,9 +12,7 @@ use Arkitect\Rules\Violations;
 
 class Extend implements Expression
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $className;
 
     public function __construct(string $className)

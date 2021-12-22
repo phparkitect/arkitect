@@ -58,4 +58,19 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
         $notHaveDependencyOutsideNamespace->evaluate($classDescription, $violations);
         self::assertNotEquals(0, $violations->count());
     }
+
+    public function test_it_should_not_return_violation_error_if_dependency_excluded(): void
+    {
+        $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('myNamespace', ['foo']);
+        $classDescription = new ClassDescription(
+            FullyQualifiedClassName::fromString('HappyIsland'),
+            [new ClassDependency('foo', 100)],
+            [],
+            null
+        );
+
+        $violations = new Violations();
+        $notHaveDependencyOutsideNamespace->evaluate($classDescription, $violations);
+        self::assertEquals(0, $violations->count());
+    }
 }
