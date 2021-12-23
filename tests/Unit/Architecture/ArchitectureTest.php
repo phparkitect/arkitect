@@ -90,8 +90,10 @@ class ArchitectureTest extends TestCase
         $rules = Architecture::withComponents()
             ->component('Doctrine')->definedBy('App\InvoiceReconciliation\Infrastructure\Doctrine\*')
             ->component('InvoiceStorage')->definedBy('App\InvoiceReconciliation\Infrastructure\InvoiceStorage\*')
+
             ->where('Doctrine')->shouldNotDependOnAnyComponent()
             ->where('InvoiceStorage')->mayDependOnComponents('Doctrine')
+
             ->rules();
 
         $expectedRules = [
