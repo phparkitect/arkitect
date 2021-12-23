@@ -40,7 +40,7 @@ psalm: ## it launches psalm
 
 build: ## it launches all the build
 	composer install
-	bin/php-cs-fixer fix -v
+	PHP_CS_FIXER_IGNORE_ENV=1 bin/php-cs-fixer fix -v
 	bin/psalm
 	bin/phpunit
 
