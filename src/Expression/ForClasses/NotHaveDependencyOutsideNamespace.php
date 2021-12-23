@@ -15,10 +15,13 @@ class NotHaveDependencyOutsideNamespace implements Expression
 {
     /** @var string */
     private $namespace;
+    /** @var array */
+    private $externalDependenciesToExclude;
 
-    public function __construct(string $namespace)
+    public function __construct(string $namespace, array $externalDependenciesToExclude = [])
     {
         $this->namespace = $namespace;
+        $this->externalDependenciesToExclude = $externalDependenciesToExclude;
     }
 
     public function describe(ClassDescription $theClass): Description
@@ -38,6 +41,10 @@ class NotHaveDependencyOutsideNamespace implements Expression
 
         /** @var ClassDependency $externalDep */
         foreach ($externalDeps as $externalDep) {
+            if ($externalDep->matchesOneOf(...$this->externalDependenciesToExclude)) {
+                continue;
+            }
+
             $violation = Violation::createWithErrorLine(
                 $theClass->getFQCN(),
                 $this->describe($theClass)->toString(),
