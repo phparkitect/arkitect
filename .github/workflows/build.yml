@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-20.04"
     strategy:
       matrix:
         php-versions: [ '7.1', '7.2', '7.3', '7.4', '8.0', '8.1' ]
@@ -37,10 +37,10 @@ jobs:
 
     - name: Install dependencies
       #if: steps.composer-cache.outputs.cache-hit != 'true'
-      uses: php-actions/composer@v5
+      uses: php-actions/composer@v6
       with:
         args: --prefer-dist
-        version: 2
+        version: 1
         php_version: ${{ matrix.php-versions }}
 
     - name: Coding Standard Checks
@@ -60,7 +60,7 @@ jobs:
 
   publish_docker_images:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-20.04"
 
     if: github.ref == 'refs/heads/main' || github.event_name == 'release'
     steps:
