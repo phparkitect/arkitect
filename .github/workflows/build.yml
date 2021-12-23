@@ -40,7 +40,7 @@ jobs:
       uses: php-actions/composer@v6
       with:
         args: --prefer-dist
-        version: 1
+        version: 2.2
         php_version: ${{ matrix.php-versions }}
 
     - name: Coding Standard Checks
