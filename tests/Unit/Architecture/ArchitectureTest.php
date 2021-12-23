@@ -42,6 +42,37 @@ class ArchitectureTest extends TestCase
         self::assertEquals($expectedRules, iterator_to_array($rules));
     }
 
+    public function test_another_layered_architecture(): void
+    {
+        $rules = Architecture::withLayers()
+            ->layer('Controller')->definedBy('App\Controller\*')
+            ->layer('Repository')->definedBy('App\Repository\*')
+            ->layer('Service')->definedBy('App\Service\*')
+
+            ->where('Controller')->mayDependOnLayers('Service')
+            ->where('Service')->mayDependOnLayers('Repository')
+            ->where('Repository')->shouldNotDependOnAnyLayer()
+
+            ->rules();
+
+        $expectedRules = [
+            Rule::allClasses()
+                ->that(new ResideInOneOfTheseNamespaces('App\*\Domain\*'))
+                ->should(new NotDependsOnTheseNamespaces('App\*\Application\*', 'App\*\Infrastructure\*'))
+                ->because('of the layered architecture'),
+            Rule::allClasses()
+                ->that(new ResideInOneOfTheseNamespaces('App\*\Application\*'))
+                ->should(new NotDependsOnTheseNamespaces('App\*\Infrastructure\*'))
+                ->because('of the layered architecture'),
+            Rule::allClasses()
+                ->that(new ResideInOneOfTheseNamespaces('App\*\Infrastructure\*'))
+                ->should(new NotDependsOnTheseNamespaces())
+                ->because('of the layered architecture'),
+        ];
+
+        self::assertEquals($expectedRules, iterator_to_array($rules));
+    }
+
     public function test_modular_architecture(): void
     {
         $rules = Architecture::withModules()
