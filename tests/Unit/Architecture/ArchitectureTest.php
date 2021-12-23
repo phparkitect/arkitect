@@ -57,16 +57,16 @@ class ArchitectureTest extends TestCase
 
         $expectedRules = [
             Rule::allClasses()
-                ->that(new ResideInOneOfTheseNamespaces('App\*\Domain\*'))
-                ->should(new NotDependsOnTheseNamespaces('App\*\Application\*', 'App\*\Infrastructure\*'))
+                ->that(new ResideInOneOfTheseNamespaces('App\Controller\*'))
+                ->should(new NotDependsOnTheseNamespaces('App\Repository\*'))
                 ->because('of the layered architecture'),
             Rule::allClasses()
-                ->that(new ResideInOneOfTheseNamespaces('App\*\Application\*'))
-                ->should(new NotDependsOnTheseNamespaces('App\*\Infrastructure\*'))
+                ->that(new ResideInOneOfTheseNamespaces('App\Repository\*'))
+                ->should(new NotDependsOnTheseNamespaces('App\Controller\*', 'App\Service\*'))
                 ->because('of the layered architecture'),
             Rule::allClasses()
-                ->that(new ResideInOneOfTheseNamespaces('App\*\Infrastructure\*'))
-                ->should(new NotDependsOnTheseNamespaces())
+                ->that(new ResideInOneOfTheseNamespaces('App\Service\*'))
+                ->should(new NotDependsOnTheseNamespaces('App\Controller\*'))
                 ->because('of the layered architecture'),
         ];
 
