@@ -5,6 +5,6 @@ namespace Arkitect\Architecture\DSL\Modular;
 
 interface Where
 {
-    /** @return MayNotDependOnAnyModule&MayDependOnModules&MayDependOnAnyModule */
+    /** @return ShouldNotDependOnAnyModule&MayDependOnModules&MayDependOnAnyModule */
     public function where(string $moduleName);
 }

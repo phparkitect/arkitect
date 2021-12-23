@@ -7,11 +7,11 @@ use Arkitect\Architecture\DSL\Layered\DefinedBy;
 use Arkitect\Architecture\DSL\Layered\Layer;
 use Arkitect\Architecture\DSL\Layered\MayDependOnAnyLayer;
 use Arkitect\Architecture\DSL\Layered\MayDependOnLayers;
-use Arkitect\Architecture\DSL\Layered\MayNotDependOnAnyLayer;
 use Arkitect\Architecture\DSL\Layered\Rules;
+use Arkitect\Architecture\DSL\Layered\ShouldNotDependOnAnyLayer;
 use Arkitect\Architecture\DSL\Layered\Where;
 
-class LayeredArchitecture implements Layer, DefinedBy, Where, MayNotDependOnAnyLayer, MayDependOnLayers, MayDependOnAnyLayer, Rules
+class LayeredArchitecture implements Layer, DefinedBy, Where, ShouldNotDependOnAnyLayer, MayDependOnLayers, MayDependOnAnyLayer, Rules
 {
     /** @var Architecture */
     private $architecture;
@@ -42,9 +42,9 @@ class LayeredArchitecture implements Layer, DefinedBy, Where, MayNotDependOnAnyL
         return $this;
     }
 
-    public function mayNotDependOnAnyLayer(): self
+    public function shouldNotDependOnAnyLayer(): self
     {
-        $this->architecture->mayNotDependOnAnyComponent();
+        $this->architecture->shouldNotDependOnAnyComponent();
 
         return $this;
     }

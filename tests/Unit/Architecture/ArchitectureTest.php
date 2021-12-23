@@ -18,7 +18,7 @@ class ArchitectureTest extends TestCase
             ->layer('Application')->definedBy('App\*\Application\*')
             ->layer('Infrastructure')->definedBy('App\*\Infrastructure\*')
 
-            ->where('Domain')->mayNotDependOnAnyLayer()
+            ->where('Domain')->shouldNotDependOnAnyLayer()
             ->where('Application')->mayDependOnLayers('Domain')
             ->where('Infrastructure')->mayDependOnLayers('Application', 'Domain')
 
@@ -51,7 +51,7 @@ class ArchitectureTest extends TestCase
             ->module('Shared')->definedBy('App\Shared\*')
             ->module('Bridge')->definedBy('App\Bridge\*')
 
-            ->where('Shared')->mayNotDependOnAnyModule()
+            ->where('Shared')->shouldNotDependOnAnyModule()
             ->where('CRM')->mayDependOnModules('Shared')
             ->where('InvoiceReconciliation')->mayDependOnModules('Shared')
             ->where('Bridge')->mayDependOnAnyModule()
@@ -80,6 +80,29 @@ class ArchitectureTest extends TestCase
                 ->that(new ResideInOneOfTheseNamespaces('App\Bridge\*'))
                 ->should(new NotDependsOnTheseNamespaces())
                 ->because('of the modular architecture'),
+        ];
+
+        self::assertEquals($expectedRules, iterator_to_array($rules));
+    }
+
+    public function test_component_architecture(): void
+    {
+        $rules = Architecture::withComponents()
+            ->component('Doctrine')->definedBy('App\InvoiceReconciliation\Infrastructure\Doctrine\*')
+            ->component('InvoiceStorage')->definedBy('App\InvoiceReconciliation\Infrastructure\InvoiceStorage\*')
+            ->where('Doctrine')->shouldNotDependOnAnyComponent()
+            ->where('InvoiceStorage')->mayDependOnComponents('Doctrine')
+            ->rules();
+
+        $expectedRules = [
+            Rule::allClasses()
+                ->that(new ResideInOneOfTheseNamespaces('App\InvoiceReconciliation\Infrastructure\Doctrine\*'))
+                ->should(new NotDependsOnTheseNamespaces('App\InvoiceReconciliation\Infrastructure\InvoiceStorage\*'))
+                ->because('of component architecture'),
+            Rule::allClasses()
+                ->that(new ResideInOneOfTheseNamespaces('App\InvoiceReconciliation\Infrastructure\InvoiceStorage\*'))
+                ->should(new NotDependsOnTheseNamespaces())
+                ->because('of component architecture'),
         ];
 
         self::assertEquals($expectedRules, iterator_to_array($rules));

@@ -6,12 +6,12 @@ namespace Arkitect\Architecture;
 use Arkitect\Architecture\DSL\Modular\DefinedBy;
 use Arkitect\Architecture\DSL\Modular\MayDependOnAnyModule;
 use Arkitect\Architecture\DSL\Modular\MayDependOnModules;
-use Arkitect\Architecture\DSL\Modular\MayNotDependOnAnyModule;
 use Arkitect\Architecture\DSL\Modular\Module;
 use Arkitect\Architecture\DSL\Modular\Rules;
+use Arkitect\Architecture\DSL\Modular\ShouldNotDependOnAnyModule;
 use Arkitect\Architecture\DSL\Modular\Where;
 
-class ModularArchitecture implements Module, DefinedBy, Where, MayNotDependOnAnyModule, MayDependOnModules, MayDependOnAnyModule, Rules
+class ModularArchitecture implements Module, DefinedBy, Where, ShouldNotDependOnAnyModule, MayDependOnModules, MayDependOnAnyModule, Rules
 {
     /** @var Architecture */
     private $architecture;
@@ -42,9 +42,9 @@ class ModularArchitecture implements Module, DefinedBy, Where, MayNotDependOnAny
         return $this;
     }
 
-    public function mayNotDependOnAnyModule(): self
+    public function shouldNotDependOnAnyModule(): self
     {
-        $this->architecture->mayNotDependOnAnyComponent();
+        $this->architecture->shouldNotDependOnAnyComponent();
 
         return $this;
     }

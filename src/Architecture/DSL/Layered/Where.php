@@ -5,6 +5,6 @@ namespace Arkitect\Architecture\DSL\Layered;
 
 interface Where
 {
-    /** @return MayNotDependOnAnyLayer&MayDependOnLayers&MayDependOnAnyLayer */
+    /** @return ShouldNotDependOnAnyLayer&MayDependOnLayers&MayDependOnAnyLayer */
     public function where(string $layerName);
 }

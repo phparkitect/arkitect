@@ -3,13 +3,20 @@ declare(strict_types=1);
 
 namespace Arkitect\Architecture;
 
+use Arkitect\Architecture\DSL\Component\Component;
+use Arkitect\Architecture\DSL\Component\DefinedBy;
+use Arkitect\Architecture\DSL\Component\MayDependOnAnyComponent;
+use Arkitect\Architecture\DSL\Component\MayDependOnComponents;
+use Arkitect\Architecture\DSL\Component\Rules;
+use Arkitect\Architecture\DSL\Component\ShouldNotDependOnAnyComponent;
+use Arkitect\Architecture\DSL\Component\Where;
 use Arkitect\Architecture\DSL\Layered\Layer;
 use Arkitect\Architecture\DSL\Modular\Module;
 use Arkitect\Expression\ForClasses\NotDependsOnTheseNamespaces;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\Rules\Rule;
 
-class Architecture
+class Architecture implements Component, DefinedBy, Where, MayDependOnComponents, MayDependOnAnyComponent, ShouldNotDependOnAnyComponent, Rules
 {
     /** @var string */
     private $componentName;
@@ -32,14 +39,19 @@ class Architecture
         return new LayeredArchitecture(new self());
     }
 
-    public function component(string $name): self
+    public static function withComponents(): Component
+    {
+        return new self();
+    }
+
+    public function component(string $name): DefinedBy
     {
         $this->componentName = $name;
 
         return $this;
     }
 
-    public function definedBy(string $selector): self
+    public function definedBy(string $selector)
     {
         $this->componentSelectors[$this->componentName] = $selector;
         $this->allowedDependencies[$this->componentName] = [];
@@ -47,28 +59,28 @@ class Architecture
         return $this;
     }
 
-    public function where(string $layerName): self
+    public function where(string $componentName)
     {
-        $this->componentName = $layerName;
+        $this->componentName = $componentName;
 
         return $this;
     }
 
-    public function mayNotDependOnAnyComponent(): self
+    public function shouldNotDependOnAnyComponent()
     {
         $this->allowedDependencies[$this->componentName] = [];
 
         return $this;
     }
 
-    public function mayDependOnComponents(string ...$componentNames): self
+    public function mayDependOnComponents(string ...$componentNames)
     {
         $this->allowedDependencies[$this->componentName] = $componentNames;
 
         return $this;
     }
 
-    public function mayDependOnAnyComponent(): self
+    public function mayDependOnAnyComponent()
     {
         $this->allowedDependencies[$this->componentName] = array_keys($this->componentSelectors);
 
@@ -91,5 +103,10 @@ class Architecture
                 ->should(new NotDependsOnTheseNamespaces(...$forbiddenSelectors))
                 ->because($reason);
         }
+    }
+
+    public function rules(): iterable
+    {
+        return $this->rulesBecause('of component architecture');
     }
 }
