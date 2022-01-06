@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Arkitect\Architecture\DSL\Component;
+namespace Arkitect\RuleBuilders\Architecture;
 
 interface ShouldNotDependOnAnyComponent
 {

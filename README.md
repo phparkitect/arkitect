@@ -27,6 +27,11 @@ Currently, you can check if a class:
  - reside in a namespace
  - not reside in a namespace
 
+You can also define components and ensure a component:
+- should not depend on any component
+- may depend on specific components
+- may depend on any component
+
 Check out [this demo project](https://github.com/phparkitect/arkitect-demo) to get an idea on how write rules
 
 # How to install
@@ -120,3 +125,39 @@ phparkitect check --config=/project/yourConfigFile.php
 ```
 * `--target-php-version`: with this parameter, you can specify which PHP version should use the parser. This can be useful to debug problems and to understand if there are problems with a different PHP version.
 Supported PHP versions are: 7.1, 7.2, 7.3, 7.4, 8.0, 8.1
+
+## Component Architecture
+
+You can define your components with a simplified DSL. 
+
+```php
+<?php
+declare(strict_types=1);
+
+use Arkitect\ClassSet;
+use Arkitect\CLI\Config;
+use Arkitect\Expression\ForClasses\HaveNameMatching;
+use Arkitect\Expression\ForClasses\NotHaveDependencyOutsideNamespace;
+use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
+use Arkitect\Rules\Rule;
+
+return static function (Config $config): void {
+    $classSet = ClassSet::fromDir(__DIR__.'/clean-architecture');
+    
+    $layeredArchitectureRules = Architecture::withComponents()
+        ->component('Domain')->definedBy('App\*\Domain\*')
+        ->component('Application')->definedBy('App\*\Application\*')
+        ->component('Infrastructure')->definedBy('App\*\Infrastructure\*')
+    
+        ->where('Domain')->shouldNotDependOnAnyComponent()
+        ->where('Application')->mayDependOnComponents('Domain')
+        ->where('Infrastructure')->mayDependOnAnyComponent()
+    
+        ->rules();
+
+    // Some other arch rules...
+
+    $config ->add($classSet, ...$rules, ...$layeredArchitectureRules);
+};
+```
+

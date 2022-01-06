@@ -1,17 +1,8 @@
 <?php
 declare(strict_types=1);
 
-namespace Arkitect\Architecture;
+namespace Arkitect\RuleBuilders\Architecture;
 
-use Arkitect\Architecture\DSL\Component\Component;
-use Arkitect\Architecture\DSL\Component\DefinedBy;
-use Arkitect\Architecture\DSL\Component\MayDependOnAnyComponent;
-use Arkitect\Architecture\DSL\Component\MayDependOnComponents;
-use Arkitect\Architecture\DSL\Component\Rules;
-use Arkitect\Architecture\DSL\Component\ShouldNotDependOnAnyComponent;
-use Arkitect\Architecture\DSL\Component\Where;
-use Arkitect\Architecture\DSL\Layered\Layer;
-use Arkitect\Architecture\DSL\Modular\Module;
 use Arkitect\Expression\ForClasses\NotDependsOnTheseNamespaces;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\Rules\Rule;
@@ -27,16 +18,6 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
 
     private function __construct()
     {
-    }
-
-    public static function withModules(): Module
-    {
-        return new ModularArchitecture(new self());
-    }
-
-    public static function withLayers(): Layer
-    {
-        return new LayeredArchitecture(new self());
     }
 
     public static function withComponents(): Component
@@ -87,12 +68,16 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
         return $this;
     }
 
-    public function rulesBecause(string $reason): iterable
+    public function rules(): iterable
     {
         $layerNames = array_keys($this->componentSelectors);
 
         foreach ($this->componentSelectors as $name => $selector) {
             $forbiddenComponents = array_diff($layerNames, [$name], $this->allowedDependencies[$name]);
+
+            if (empty($forbiddenComponents)) {
+                continue;
+            }
 
             $forbiddenSelectors = array_map(function (string $componentName): string {
                 return $this->componentSelectors[$componentName];
@@ -101,12 +86,7 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
             yield Rule::allClasses()
                 ->that(new ResideInOneOfTheseNamespaces($selector))
                 ->should(new NotDependsOnTheseNamespaces(...$forbiddenSelectors))
-                ->because($reason);
+                ->because('of component architecture');
         }
-    }
-
-    public function rules(): iterable
-    {
-        return $this->rulesBecause('of component architecture');
     }
 }

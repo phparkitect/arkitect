@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Arkitect\Architecture\DSL\Layered;
+namespace Arkitect\RuleBuilders\Architecture;
 
 interface DefinedBy
 {
-    /** @return Layer&Where */
+    /** @return Component&Where */
     public function definedBy(string $selector);
 }
