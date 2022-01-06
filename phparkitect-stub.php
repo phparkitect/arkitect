@@ -21,6 +21,7 @@ return static function (Config $config): void {
         ->where('Controller')->mayDependOnComponents('Service', 'Entity')
         ->where('Service')->mayDependOnComponents('Repository', 'Entity')
         ->where('Repository')->mayDependOnComponents('Entity')
+        ->where('Entity')->shouldNotDependOnAnyComponent()
 
         ->rules();
 
