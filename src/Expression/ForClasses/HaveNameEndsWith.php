@@ -30,7 +30,7 @@ class HaveNameEndsWith implements Expression
 	{
 		$fqcn = FullyQualifiedClassName::fromString($theClass->getFQCN());
 
-		if (!str_ends_with($fqcn->className(), trim($this->name))) {
+		if (!(strpos($fqcn->className(), $this->name) != 0)) {
 			$violation = Violation::create(
 				$theClass->getFQCN(),
 				$this->describe($theClass)->toString()
