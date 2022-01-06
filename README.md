@@ -27,7 +27,7 @@ Currently, you can check if a class:
  - reside in a namespace
  - not reside in a namespace
 
-You can also define components and ensure a component:
+You can also define components and ensure that a component:
 - should not depend on any component
 - may depend on specific components
 - may depend on any component
@@ -68,6 +68,10 @@ You can also specify your configuration file using `--config` option like this:
 phparkitect check --config=/project/yourConfigFile.php
 ```
 
+By default, a progress bar will show the status of the ongoing analysis.
+
+# Configuration
+
 Example of configuration file `phparkitect.php`
 
 ```php
@@ -101,9 +105,49 @@ return static function (Config $config): void {
 };
 ```
 
-By default, a progress bar will show the status of the ongoing analysis.
+## Rule Builders
 
-## Excluding classes when parser run
+PHPArkitect offers some builders that enable you to implement more readable rules for specific contexts. 
+
+### Component Architecture Rule Builder
+
+Thanks to this builder you can define components and enforce dependency constraints between them in a more readable fashion.
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Arkitect\ClassSet;
+use Arkitect\CLI\Config;
+use Arkitect\Expression\ForClasses\HaveNameMatching;
+use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
+use Arkitect\RuleBuilders\Architecture\Architecture;
+use Arkitect\Rules\Rule;
+
+return static function (Config $config): void {
+    $classSet = ClassSet::fromDir(__DIR__.'/src');
+
+    $layeredArchitectureRules = Architecture::withComponents()
+        ->component('Controller')->definedBy('App\Controller\*')
+        ->component('Service')->definedBy('App\Service\*')
+        ->component('Repository')->definedBy('App\Repository\*')
+        ->component('Entity')->definedBy('App\Entity\*')
+
+        ->where('Controller')->mayDependOnComponents('Service', 'Entity')
+        ->where('Service')->mayDependOnComponents('Repository', 'Entity')
+        ->where('Repository')->mayDependOnComponents('Entity')
+        ->where('Entity')->shouldNotDependOnAnyComponent()
+
+        ->rules();
+        
+    // Other rule definitions...
+
+    $config->add($classSet, $serviceNamingRule, $repositoryNamingRule, ...$layeredArchitectureRules);
+};
+```
+
+### Excluding classes when parser run
 If you want to exclude some classes from the parser you can use the `except` function inside your config file like this:
 
 ```php
@@ -125,39 +169,3 @@ phparkitect check --config=/project/yourConfigFile.php
 ```
 * `--target-php-version`: with this parameter, you can specify which PHP version should use the parser. This can be useful to debug problems and to understand if there are problems with a different PHP version.
 Supported PHP versions are: 7.1, 7.2, 7.3, 7.4, 8.0, 8.1
-
-## Component Architecture
-
-You can define your components with a simplified DSL. 
-
-```php
-<?php
-declare(strict_types=1);
-
-use Arkitect\ClassSet;
-use Arkitect\CLI\Config;
-use Arkitect\Expression\ForClasses\HaveNameMatching;
-use Arkitect\Expression\ForClasses\NotHaveDependencyOutsideNamespace;
-use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
-use Arkitect\Rules\Rule;
-
-return static function (Config $config): void {
-    $classSet = ClassSet::fromDir(__DIR__.'/clean-architecture');
-    
-    $layeredArchitectureRules = Architecture::withComponents()
-        ->component('Domain')->definedBy('App\*\Domain\*')
-        ->component('Application')->definedBy('App\*\Application\*')
-        ->component('Infrastructure')->definedBy('App\*\Infrastructure\*')
-    
-        ->where('Domain')->shouldNotDependOnAnyComponent()
-        ->where('Application')->mayDependOnComponents('Domain')
-        ->where('Infrastructure')->mayDependOnAnyComponent()
-    
-        ->rules();
-
-    // Some other arch rules...
-
-    $config ->add($classSet, ...$rules, ...$layeredArchitectureRules);
-};
-```
-
