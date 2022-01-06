@@ -13,30 +13,30 @@ use Arkitect\Rules\Violations;
 
 class HaveNameStartsWith implements Expression
 {
-	/** @var string */
-	private $name;
+    /** @var string */
+    private $name;
 
-	public function __construct(string $name)
-	{
-		$this->name = $name;
-	}
+    public function __construct(string $name)
+    {
+        $this->name = $name;
+    }
 
-	public function describe(ClassDescription $theClass): Description
-	{
-		return new PositiveDescription("should have a name that starts with {$this->name}");
-	}
+    public function describe(ClassDescription $theClass): Description
+    {
+        return new PositiveDescription("should have a name that starts with {$this->name}");
+    }
 
-	public function evaluate(ClassDescription $theClass, Violations $violations): void
-	{
-		$fqcn = FullyQualifiedClassName::fromString($theClass->getFQCN());
+    public function evaluate(ClassDescription $theClass, Violations $violations): void
+    {
+        $fqcn = FullyQualifiedClassName::fromString($theClass->getFQCN());
 
-		if (!(strpos($fqcn->className(), $this->name) === 0)) {
-			$violation = Violation::create(
-				$theClass->getFQCN(),
-				$this->describe($theClass)->toString()
-			);
+        if (!(0 === strpos($fqcn->className(), $this->name))) {
+            $violation = Violation::create(
+                $theClass->getFQCN(),
+                $this->describe($theClass)->toString()
+            );
 
-			$violations->add($violation);
-		}
-	}
+            $violations->add($violation);
+        }
+    }
 }
