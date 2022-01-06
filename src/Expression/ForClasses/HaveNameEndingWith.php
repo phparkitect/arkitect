@@ -11,7 +11,7 @@ use Arkitect\Expression\PositiveDescription;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
 
-class HaveNameEndsWith implements Expression
+class HaveNameEndingWith implements Expression
 {
     /** @var string */
     private $name;
@@ -30,7 +30,7 @@ class HaveNameEndsWith implements Expression
     {
         $fqcn = FullyQualifiedClassName::fromString($theClass->getFQCN());
 
-        if (!(0 != strpos($fqcn->className(), $this->name))) {
+        if (0 == strpos($fqcn->className(), $this->name)) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
                 $this->describe($theClass)->toString()
