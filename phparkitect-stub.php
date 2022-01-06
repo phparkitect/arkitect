@@ -9,9 +9,8 @@ use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\RuleBuilders\Architecture\Architecture;
 use Arkitect\Rules\Rule;
 
-return static function(Config $config): void
-{
-    $classSet = ClassSet::fromDir(__DIR__ . '/src');
+return static function (Config $config): void {
+    $classSet = ClassSet::fromDir(__DIR__.'/src');
 
     $layeredArchitectureRules = Architecture::withComponents()
         ->component('Controller')->definedBy('App\Controller\*')
@@ -28,12 +27,12 @@ return static function(Config $config): void
     $serviceNamingRule = Rule::allClasses()
         ->that(new ResideInOneOfTheseNamespaces('App\Service'))
         ->should(new HaveNameMatching('*Service'))
-        ->because("we want uniform naming for services");
+        ->because('we want uniform naming for services');
 
     $repositoryNamingRule = Rule::allClasses()
         ->that(new ResideInOneOfTheseNamespaces('App\Repository'))
         ->should(new HaveNameMatching('*Repository'))
-        ->because("we want uniform naming for repositories");
+        ->because('we want uniform naming for repositories');
 
     $config->add($classSet, $serviceNamingRule, $repositoryNamingRule, ...$layeredArchitectureRules);
 };
