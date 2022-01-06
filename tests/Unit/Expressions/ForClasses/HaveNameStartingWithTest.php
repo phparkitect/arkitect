@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class HaveNameStartingWithTest extends TestCase
 {
-    public function test_check_class_name_starts_with(): void
+    public function test_check_class_name_starts_with_given_string(): void
     {
         $expression = new HaveNameStartingWith('Prefix');
 
@@ -21,7 +21,7 @@ class HaveNameStartingWithTest extends TestCase
         self::assertEquals(0, $violations->count());
     }
 
-    public function test_show_violation_when_class_name_does_not_start_with(): void
+    public function test_show_violation_when_class_name_does_not_start_with_given_string(): void
     {
         $expression = new HaveNameStartingWith('Prefix');
 
