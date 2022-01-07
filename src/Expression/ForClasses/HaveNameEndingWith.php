@@ -30,7 +30,9 @@ class HaveNameEndingWith implements Expression
     {
         $fqcn = FullyQualifiedClassName::fromString($theClass->getFQCN());
 
-        if (0 == strpos($fqcn->className(), $this->name)) {
+        $sub_str = substr($fqcn->className(), (-1 * strlen($this->name)));
+
+        if ($this->name !== $sub_str) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
                 $this->describe($theClass)->toString()
