@@ -49,6 +49,9 @@ jobs:
     - name: Static Analysis
       run: ./bin/psalm
 
+    - name: Architectural Rules
+      run: ./bin-stub/phparkitect check
+
     - name: Test
       run: ./bin/phpunit -d memory_limit=-1 --coverage-clover clover.xml
 
