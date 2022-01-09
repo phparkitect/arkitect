@@ -51,6 +51,8 @@ jobs:
 
     - name: Architectural Rules
       uses: docker://phparkitect/phparkitect
+      env:
+        PHP_VERSION: ${{ matrix.php-versions }}
       with:
         args: check
 
