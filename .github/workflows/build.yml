@@ -49,13 +49,6 @@ jobs:
     - name: Static Analysis
       run: ./bin/psalm
 
-    - name: Architectural Rules
-      uses: docker://phparkitect/phparkitect
-      env:
-        PHP_VERSION: ${{ matrix.php-versions }}
-      with:
-        args: check
-
     - name: Test
       run: ./bin/phpunit -d memory_limit=-1 --coverage-clover clover.xml
 
@@ -64,6 +57,13 @@ jobs:
       uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
+
+    - name: Architectural Rules
+      uses: docker://phparkitect/arkitect-github-actions:latest
+      env:
+        PHP_VERSION: ${{ matrix.php-versions }}
+      with:
+        args: check
 
   publish_docker_images:
     needs: build
