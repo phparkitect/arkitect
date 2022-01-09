@@ -169,3 +169,4 @@ phparkitect check --config=/project/yourConfigFile.php
 ```
 * `--target-php-version`: with this parameter, you can specify which PHP version should use the parser. This can be useful to debug problems and to understand if there are problems with a different PHP version.
 Supported PHP versions are: 7.1, 7.2, 7.3, 7.4, 8.0, 8.1
+*`ignore-syntax-errors`: with this argument, you can specify to ignore syntax errors.

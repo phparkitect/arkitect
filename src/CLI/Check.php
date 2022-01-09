@@ -19,6 +19,8 @@ class Check extends Command
 
     private const TARGET_PHP_PARAM = 'target-php-version';
 
+    private const IGNORE_SYNTAX_ERRORS_ARG = 'ignore-syntax-errors';
+
     private const DEFAULT_FILENAME = 'phparkitect.php';
 
     private const SUCCESS_CODE = 0;
@@ -46,6 +48,12 @@ class Check extends Command
                 't',
                 InputOption::VALUE_OPTIONAL,
                 'Target php version to use for parsing'
+            )
+            ->addArgument(
+                self::IGNORE_SYNTAX_ERRORS_ARG,
+                null,
+                'Ignore syntax errors',
+                ''
             );
     }
 
@@ -59,6 +67,9 @@ class Check extends Command
             /** @var string|null $phpVersion */
             $phpVersion = $input->getOption('target-php-version');
             $targetPhpVersion = TargetPhpVersion::create($phpVersion);
+
+            /** @var string|null $ignoreSyntaxErrors */
+            $ignoreSyntaxErrors = (string) $input->getArgument(self::IGNORE_SYNTAX_ERRORS_ARG);
 
             $progress = $verbose ? new DebugProgress($output) : new ProgressBarProgress($output);
 
@@ -81,7 +92,7 @@ class Check extends Command
             }
 
             $parsedErrors = $runner->getParsingErrors();
-            if ($parsedErrors->count() > 0) {
+            if ($parsedErrors->count() > 0 && self::IGNORE_SYNTAX_ERRORS_ARG !== $ignoreSyntaxErrors) {
                 $this->printParsedErrors($parsedErrors, $output);
 
                 return self::ERROR_CODE;
