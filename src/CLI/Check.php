@@ -143,7 +143,6 @@ class Check extends Command
 
     private function printViolations(Violations $violations, OutputInterface $output): void
     {
-        $output->writeln('<error>ERRORS!</error>');
         $output->writeln(sprintf('%s', $violations->toString()));
         $output->writeln(sprintf('<error>%s VIOLATIONS DETECTED!</error>', \count($violations)));
     }

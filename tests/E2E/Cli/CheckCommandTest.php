@@ -19,7 +19,7 @@ class CheckCommandTest extends TestCase
     {
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvc.php');
 
-        $expectedErrors = 'ERRORS!
+        $expectedErrors = '
 
 App\Controller\Foo violates rules
   should implement ContainerAwareInterface
@@ -36,7 +36,9 @@ App\Controller\YieldController violates rules
 
 App\Domain\Model violates rules
   should not depend on classes outside namespace App\Domain (on line 14)
-  should not depend on classes outside namespace App\Domain (on line 15)';
+  should not depend on classes outside namespace App\Domain (on line 15)
+
+7 VIOLATIONS DETECTED!';
 
         $this->assertCheckHasErrors($cmdTester, $expectedErrors);
     }
@@ -59,11 +61,12 @@ App\Domain\Model violates rules
     {
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvcForYieldBug.php');
 
-        $expectedErrors = 'ERRORS!
+        $expectedErrors = '
 
 App\Controller\Foo violates rules
-  should have a name that matches *Controller';
+  should have a name that matches *Controller
 
+1 VIOLATIONS DETECTED!';
         $this->assertCheckHasErrors($cmdTester, $expectedErrors);
     }
 
@@ -95,6 +98,6 @@ App\Controller\Foo violates rules
     protected function assertCheckHasSuccess(CommandTester $commandTester): void
     {
         $this->assertEquals(self::SUCCESS_CODE, $commandTester->getStatusCode());
-        $this->assertStringNotContainsString('ERRORS!', $commandTester->getDisplay());
+        $this->assertStringContainsString('NO VIOLATIONS DETECTED!', $commandTester->getDisplay());
     }
 }

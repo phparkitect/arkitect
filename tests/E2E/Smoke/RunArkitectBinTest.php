@@ -20,7 +20,7 @@ class RunArkitectBinTest extends TestCase
     {
         $process = $this->runArkitectPassingConfigFilePath(__DIR__.'/../_fixtures/configMvc.php');
 
-        $expectedErrors = 'ERRORS!
+        $expectedErrors = '
 
 App\Controller\Foo violates rules
   should implement ContainerAwareInterface
@@ -37,7 +37,9 @@ App\Controller\YieldController violates rules
 
 App\Domain\Model violates rules
   should not depend on classes outside namespace App\Domain (on line 14)
-  should not depend on classes outside namespace App\Domain (on line 15)';
+  should not depend on classes outside namespace App\Domain (on line 15)
+
+7 VIOLATIONS DETECTED!';
 
         $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
         $this->assertStringContainsString($expectedErrors, $process->getOutput());
@@ -47,7 +49,7 @@ App\Domain\Model violates rules
     {
         $process = $this->runArkitect();
 
-        $expectedErrors = 'ERRORS!
+        $expectedErrors = '
 
 App\Controller\Foo violates rules
   should implement ContainerAwareInterface
@@ -64,7 +66,9 @@ App\Controller\YieldController violates rules
 
 App\Domain\Model violates rules
   should not depend on classes outside namespace App\Domain (on line 14)
-  should not depend on classes outside namespace App\Domain (on line 15)';
+  should not depend on classes outside namespace App\Domain (on line 15)
+
+7 VIOLATIONS DETECTED!';
 
         $this->assertStringContainsString($expectedErrors, $process->getOutput());
         $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
@@ -82,17 +86,19 @@ App\Domain\Model violates rules
         $process = $this->runArkitectPassingConfigFilePath(__DIR__.'/../_fixtures/configMvcWithoutErrors.php');
 
         $this->assertEquals(self::SUCCESS_CODE, $process->getExitCode());
-        $this->assertStringNotContainsString('ERRORS!', $process->getOutput());
+        $this->assertStringContainsString('NO VIOLATIONS DETECTED!', $process->getOutput());
     }
 
     public function test_bug_yield(): void
     {
         $process = $this->runArkitectPassingConfigFilePath(__DIR__.'/../_fixtures/configMvcForYieldBug.php');
 
-        $expectedErrors = 'ERRORS!
+        $expectedErrors = '
 
 App\Controller\Foo violates rules
-  should have a name that matches *Controller';
+  should have a name that matches *Controller
+
+1 VIOLATIONS DETECTED!';
 
         $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
         $this->assertStringContainsString($expectedErrors, $process->getOutput());
