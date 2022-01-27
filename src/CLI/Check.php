@@ -145,6 +145,7 @@ class Check extends Command
     {
         $output->writeln('<error>ERRORS!</error>');
         $output->writeln(sprintf('%s', $violations->toString()));
+        $output->writeln(sprintf('<error>%s VIOLATIONS DETECTED!</error>', \count($violations)));
     }
 
     private function printParsedErrors(ParsingErrors $parsingErrors, OutputInterface $output): void
