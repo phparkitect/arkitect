@@ -318,4 +318,37 @@ EOF;
 
         $this->assertCount(0, $violations);
     }
+
+    public function test_it_should_return_errors_for_class_outside_namespace(): void
+    {
+        $code = <<< 'EOF'
+<?php
+
+namespace MyNamespace\MyClasses;
+
+use AnotherNamespace\Baz;
+
+class Foo
+{
+    public function foo()
+    {
+        $bar = new Bar();
+        $baz = new Baz();
+    }
+}
+EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp->parse($code, 'relativePathName');
+
+        $cd = $fp->getClassDescriptions();
+
+        $violations = new Violations();
+
+        $dependsOnlyOnTheseNamespaces = new DependsOnlyOnTheseNamespaces();
+        $dependsOnlyOnTheseNamespaces->evaluate($cd[0], $violations);
+
+        $this->assertCount(1, $violations);
+    }
 }
