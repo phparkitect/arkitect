@@ -34,7 +34,8 @@ class DependsOnlyOnTheseNamespaces implements Expression
 
         /** @var ClassDependency $dependency */
         foreach ($dependencies as $dependency) {
-            if ('' === $dependency->getFQCN()->namespace()) {
+            if ('' === $dependency->getFQCN()->namespace() ||
+                ($theClass->namespaceMatches($dependency->getFQCN()->namespace()))) {
                 continue;
             }
 
