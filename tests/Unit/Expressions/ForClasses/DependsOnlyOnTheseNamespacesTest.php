@@ -71,4 +71,19 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
 
         self::assertEquals(0, $violations->count());
     }
+
+    public function test_it_should_return_true_if_depends_on_same_namespace_without_specifing_it(): void
+    {
+        $dependOnClasses = new DependsOnlyOnTheseNamespaces();
+
+        $classDescription = ClassDescription::build('HappyIsland\Myclass')
+            ->addDependency(new ClassDependency('HappyIsland\Banana', 0))
+            ->addDependency(new ClassDependency('myNamespace\Mango', 10))
+            ->get();
+
+        $violations = new Violations();
+        $dependOnClasses->evaluate($classDescription, $violations);
+
+        self::assertEquals(1, $violations->count());
+    }
 }
