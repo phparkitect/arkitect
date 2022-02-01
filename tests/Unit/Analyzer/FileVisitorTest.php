@@ -333,7 +333,7 @@ class Foo
     public function foo()
     {
         $bar = new Bar();
-        $baz = new Baz();  
+        $baz = new Baz();
     }
 }
 EOF;
