@@ -5,46 +5,21 @@ namespace Arkitect\Tests\Unit\Analyzer;
 
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptionCollection;
 use Arkitect\Analyzer\FileParser;
-use Arkitect\Analyzer\FileParserFactory;
+use Arkitect\Analyzer\FileVisitor;
+use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
 use Arkitect\Expression\ForClasses\NotHaveDependencyOutsideNamespace;
 use Arkitect\Rules\ParsingError;
 use Arkitect\Rules\Violations;
+use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\NameResolver;
 use PHPUnit\Framework\TestCase;
 
 class FileVisitorTest extends TestCase
 {
-    public function test_should_create_a_class_description(): void
-    {
-        $code = <<< 'EOF'
-<?php
-
-namespace Root\Namespace1;
-
-use Root\Namespace2\D;
-
-class Dog implements AnInterface, InterfaceTwo
-{
-}
-
-class Cat implements AnInterface
-{
-
-}
-EOF;
-
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
-        $fp->parse($code, 'relativePathName');
-        $cd = $fp->getClassDescriptions();
-
-        self::assertCount(2, $cd);
-        self::assertInstanceOf(ClassDescription::class, $cd[0]);
-        self::assertInstanceOf(ClassDescription::class, $cd[1]);
-    }
-
     public function test_should_create_a_class_description_and_parse_anonymous_class(): void
     {
         $code = <<< 'EOF'
@@ -52,13 +27,15 @@ EOF;
 
 namespace Root\Namespace1;
 
-use Root\Namespace2\D;
+use Root\Namespace2\AnInterface;
+use Root\Namespace2\InterfaceTwo;
+use Another\ForbiddenInterface;
 
 class Dog implements AnInterface, InterfaceTwo
 {
     public function foo()
     {
-        $projector2 = new class() implements Another\ForbiddenInterface
+        $projector2 = new class() implements ForbiddenInterface
             {
                 public function applyDummyDomainEvent(int $anInteger): void
                 {
@@ -69,30 +46,59 @@ class Dog implements AnInterface, InterfaceTwo
                     return "";
                 }
             };
-
-            $projector = new Proj();
     }
-}
-
-class Cat implements AnInterface
-{
-
 }
 EOF;
 
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
-        $fp->parse($code, 'relativePathName');
-        $cd = $fp->getClassDescriptions();
+        $fileContentGetter = new FakeFileContentGetter();
+        $classDescription1 = new ClassDescription(
+            FullyQualifiedClassName::fromString('Root\Namespace2\Dog'),
+            [
+                new ClassDependency('Another\ForbiddenInterface', 13),
+                new ClassDependency('Root\Namespace2\AnInterface', 9),
+                new ClassDependency('Root\Namespace2\InterfaceTwo', 9),
+            ],
+            [],
+            null
+        );
+        $classDescription2 = new ClassDescription(
+            FullyQualifiedClassName::fromString('Another\ForbiddenInterface'),
+            [],
+            [],
+            null
+        );
+        $classDescription3 = new ClassDescription(
+            FullyQualifiedClassName::fromString('Root\Namespace2\AnInterface'),
+            [],
+            [],
+            null
+        );
+        $classDescription4 = new ClassDescription(
+            FullyQualifiedClassName::fromString('Root\Namespace2\InterfaceTwo'),
+            [],
+            [],
+            null
+        );
 
-        self::assertCount(3, $cd);
-        self::assertInstanceOf(ClassDescription::class, $cd[0]);
-        self::assertInstanceOf(ClassDescription::class, $cd[1]);
+        $classDescriptionCollection = new ClassDescriptionCollection();
+        $classDescriptionCollection->add($classDescription1);
+        $classDescriptionCollection->add($classDescription2);
+        $classDescriptionCollection->add($classDescription3);
+        $classDescriptionCollection->add($classDescription4);
+        $fp = new FileParser(
+            new NodeTraverser(),
+            new FileVisitor(),
+            new NameResolver(),
+            TargetPhpVersion::create('7.1'),
+            $fileContentGetter
+        );
+        /** @var ClassDescription $cd */
+        $cd = $fp->parse($code, 'relativePathName', []);
 
         $expectedInterfaces = [
-            new ClassDependency('Root\Namespace1\AnInterface', 7),
-            new ClassDependency('Root\Namespace1\InterfaceTwo', 7),
-            new ClassDependency('Root\Namespace1\Another\ForbiddenInterface', 11),
+            'Root\Namespace2\AnInterface' => new ClassDependency('Root\Namespace2\AnInterface', 9),
+            'Root\Namespace2\InterfaceTwo' => new ClassDependency('Root\Namespace2\InterfaceTwo', 9),
+            'Another\ForbiddenInterface' => new ClassDependency('Another\ForbiddenInterface', 13),
         ];
 
         $this->assertEquals($expectedInterfaces, $cd[0]->getDependencies());
@@ -105,23 +111,44 @@ EOF;
 
 namespace Root\Animals;
 
-class Animal
+class Feline
 {
 }
 
-class Cat extends Animal
+class Cat extends Feline
 {
 
 }
 EOF;
 
+        $fileContentGetter = new FakeFileContentGetter();
+        $classDescription1 = new ClassDescription(
+            FullyQualifiedClassName::fromString('Root\Animals\Feline'),
+            [],
+            [],
+            null
+        );
+        $classDescription2 = new ClassDescription(
+            FullyQualifiedClassName::fromString('Root\Animals\Cat'),
+            [],
+            [],
+            FullyQualifiedClassName::fromString('Root\Animals\Feline')
+        );
+        $classDescriptionCollection = new ClassDescriptionCollection();
+        $classDescriptionCollection->add($classDescription1);
+        $classDescriptionCollection->add($classDescription2);
+
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
-        $fp->parse($code, 'relativePathName');
+        $fp = new FileParser(
+            new NodeTraverser(),
+            new FileVisitor(),
+            new NameResolver(),
+            TargetPhpVersion::create('7.1'),
+            $fileContentGetter
+        );
+        $cd = $fp->parse($code, 'relativePathName', [])[1];
 
-        $cd = $fp->getClassDescriptions()[1];
-
-        $this->assertEquals('Root\Animals\Animal', $cd->getExtends()->toString());
+        $this->assertEquals('Root\Animals\Feline', $cd->getExtends()->toString());
     }
 
     public function test_should_depends_on_these_namespaces(): void
@@ -130,28 +157,48 @@ EOF;
 <?php
 namespace Foo\Bar;
 
-use Doctrine\MongoDB\Collection;
-use Foo\Baz\Baz;
 use Symfony\Component\HttpFoundation\Request;
 
-class MyClass implements Baz
+class MyClass
 {
     public function __construct(Request $request)
     {
-        $collection = new Collection($request);
     }
 }
 EOF;
 
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
-        $fp->parse($code, 'relativePathName');
-        $cd = $fp->getClassDescriptions();
+        $fileContentGetter = new FakeFileContentGetter();
+        $classDescription1 = new ClassDescription(
+            FullyQualifiedClassName::fromString('Foo\Bar\MyClass'),
+            [new ClassDependency('Symfony\Component\HttpFoundation\Request', 10)],
+            [],
+            null
+        );
+
+        $classDescription2 = new ClassDescription(
+            FullyQualifiedClassName::fromString('Symfony\Component\HttpFoundation\Request'),
+            [],
+            [],
+            null
+        );
+
+        $classDescriptionCollection = new ClassDescriptionCollection();
+        $classDescriptionCollection->add($classDescription1);
+        $classDescriptionCollection->add($classDescription2);
+
+        $fp = new FileParser(
+            new NodeTraverser(),
+            new FileVisitor(),
+            new NameResolver(),
+            TargetPhpVersion::create('7.1'),
+            $fileContentGetter
+        );
+        $cd = $fp->parse($code, 'relativePathName', []);
 
         $violations = new Violations();
 
-        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Foo', 'Symfony', 'Doctrine');
-        $dependsOnTheseNamespaces->evaluate($cd[0], $violations);
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Symfony');
+        $dependsOnTheseNamespaces->evaluate($cd[0], $violations, $classDescriptionCollection);
 
         $this->assertCount(0, $violations);
     }
@@ -167,7 +214,7 @@ use Foo\Baz\Baz;
 use Symfony\Component\HttpFoundation\Request;
 use Foo\Baz\StaticClass;
 
-class MyClass implements Baz
+class MyClassShouldReturnAllDependencies implements Baz
 {
     public function __construct(Request $request)
     {
@@ -177,16 +224,65 @@ class MyClass implements Baz
 }
 EOF;
 
+        $fileContentGetter = new FakeFileContentGetter();
+        $classDescription1 = new ClassDescription(
+            FullyQualifiedClassName::fromString('Foo\Bar\MyClassShouldReturnAllDependencies'),
+            [
+                new ClassDependency('Doctrine\MongoDB\Collection', 10),
+                new ClassDependency('Foo\Baz\Baz', 11),
+                new ClassDependency('Foo\Baz\StaticClass', 12),
+                new ClassDependency('Symfony\Component\HttpFoundation\Request', 13),
+            ],
+            [],
+            null
+        );
+
+        $classDescription2 = new ClassDescription(
+            FullyQualifiedClassName::fromString('Symfony\Component\HttpFoundation\Request'),
+            [],
+            [],
+            null
+        );
+        $classDescription3 = new ClassDescription(
+            FullyQualifiedClassName::fromString('Doctrine\MongoDB\Collection'),
+            [],
+            [],
+            null
+        );
+        $classDescription4 = new ClassDescription(
+            FullyQualifiedClassName::fromString('Foo\Baz\Baz'),
+            [],
+            [],
+            null
+        );
+        $classDescription5 = new ClassDescription(
+            FullyQualifiedClassName::fromString('Foo\Baz\StaticClass'),
+            [],
+            [],
+            null
+        );
+
+        $classDescriptionCollection = new ClassDescriptionCollection();
+        $classDescriptionCollection->add($classDescription1);
+        $classDescriptionCollection->add($classDescription2);
+        $classDescriptionCollection->add($classDescription3);
+        $classDescriptionCollection->add($classDescription4);
+        $classDescriptionCollection->add($classDescription5);
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
-        $fp->parse($code, 'relativePathName');
-        $cd = $fp->getClassDescriptions();
+        $fp = new FileParser(
+            new NodeTraverser(),
+            new FileVisitor(),
+            new NameResolver(),
+            TargetPhpVersion::create('7.1'),
+            $fileContentGetter
+        );
+        $cd = $fp->parse($code, 'relativePathName', []);
 
         $expectedDependencies = [
-            new ClassDependency('Foo\Baz\Baz', 9),
-            new ClassDependency('Symfony\Component\HttpFoundation\Request', 11),
-            new ClassDependency('Doctrine\MongoDB\Collection', 13),
-            new ClassDependency('Foo\Baz\StaticClass', 14),
+            'Foo\Baz\Baz' => new ClassDependency('Foo\Baz\Baz', 9),
+            'Symfony\Component\HttpFoundation\Request' => new ClassDependency('Symfony\Component\HttpFoundation\Request', 11),
+            'Doctrine\MongoDB\Collection' => new ClassDependency('Doctrine\MongoDB\Collection', 13),
+            'Foo\Baz\StaticClass' => new ClassDependency('Foo\Baz\StaticClass', 14),
         ];
 
         $this->assertEquals($expectedDependencies, $cd[0]->getDependencies());
@@ -211,17 +307,31 @@ class Animal
     }
 }
 EOF;
+        $classDescription1 = new ClassDescription(
+            FullyQualifiedClassName::fromString('Root\Animals\Animal'),
+            [],
+            [],
+            null
+        );
 
+        $classDescriptionCollection = new ClassDescriptionCollection();
+        $classDescriptionCollection->add($classDescription1);
+
+        $fileContentGetter = new FakeFileContentGetter();
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
-        $fp->parse($code, 'relativePathName');
-
-        $cd = $fp->getClassDescriptions();
+        $fp = new FileParser(
+            new NodeTraverser(),
+            new FileVisitor(),
+            new NameResolver(),
+            TargetPhpVersion::create('7.4'),
+            $fileContentGetter
+        );
+        $cd = $fp->parse($code, 'relativePathName', []);
 
         $violations = new Violations();
 
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Foo', 'Symfony', 'Doctrine');
-        $dependsOnTheseNamespaces->evaluate($cd[0], $violations);
+        $dependsOnTheseNamespaces->evaluate($cd[0], $violations, $classDescriptionCollection);
 
         $this->assertCount(0, $violations);
     }
@@ -231,9 +341,9 @@ EOF;
         $code = <<< 'EOF'
 <?php
 
-namespace Root\Animals;
+namespace Foo\Bar;
 
-class Animal
+class BrokenClass
 {
     public function __construct()
     {
@@ -242,43 +352,30 @@ class Animal
 }
 EOF;
 
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
-        $fp->parse($code, 'relativePathName');
+        $classDescription1 = new ClassDescription(
+            FullyQualifiedClassName::fromString('Foo\Bar\BrokenClass'),
+            [],
+            [],
+            null
+        );
+
+        $classDescriptionCollection = new ClassDescriptionCollection();
+        $classDescriptionCollection->add($classDescription1);
+
+        $fileContentGetter = new FakeFileContentGetter();
+        $fp = new FileParser(
+            new NodeTraverser(),
+            new FileVisitor(),
+            new NameResolver(),
+            TargetPhpVersion::create('7.4'),
+            $fileContentGetter
+        );
+        $fp->parse($code, 'relativePathName', []);
 
         $parsingErrors = $fp->getParsingErrors();
         $this->assertEquals([
             ParsingError::create('relativePathName', 'Syntax error, unexpected \'}\' on line 10'),
         ], $parsingErrors);
-    }
-
-    public function test_null_class_description_builder(): void
-    {
-        $code = <<< 'EOF'
-<?php
-
-declare(strict_types=1);
-
-namespace App\Application\Command;
-
-use App\Domain\Quote\Quote;
-
-interface QuoteCommandInterface
-{
-    /**
-     * Save a stock quote.
-     */
-    public function save(Quote $quote): void;
-}
-EOF;
-
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
-        $fp->parse($code, 'relativePathName');
-
-        $violations = new Violations();
-
-        $this->assertCount(0, $violations);
     }
 
     public function test_it_should_parse_self_correctly(): void
@@ -288,7 +385,7 @@ EOF;
 
 namespace Root\Animals;
 
-class Tiger extends Animal
+class Tiger extends Feline
 {
     public function foo()
     {
@@ -305,50 +402,41 @@ class Tiger extends Animal
 }
 EOF;
 
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
-        $fp->parse($code, 'relativePathName');
+        $classDescription1 = new ClassDescription(
+            FullyQualifiedClassName::fromString('Root\Animals\Tiger'),
+            [
+                new ClassDependency('Root\Animals\Feline', 10),
+            ],
+            [],
+            null
+        );
 
-        $cd = $fp->getClassDescriptions();
+        $classDescription2 = new ClassDescription(
+            FullyQualifiedClassName::fromString('Root\Animals\Feline'),
+            [],
+            [],
+            null
+        );
+
+        $classDescriptionCollection = new ClassDescriptionCollection();
+        $classDescriptionCollection->add($classDescription1);
+        $classDescriptionCollection->add($classDescription2);
+
+        $fileContentGetter = new FakeFileContentGetter();
+        $fp = new FileParser(
+            new NodeTraverser(),
+            new FileVisitor(),
+            new NameResolver(),
+            TargetPhpVersion::create('7.4'),
+            $fileContentGetter
+        );
+        $cd = $fp->parse($code, 'relativePathName', []);
 
         $violations = new Violations();
 
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('Root\Animals');
-        $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations);
+        $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, $classDescriptionCollection);
 
         $this->assertCount(0, $violations);
-    }
-
-    public function test_it_should_return_errors_for_class_outside_namespace(): void
-    {
-        $code = <<< 'EOF'
-<?php
-
-namespace MyNamespace\MyClasses;
-
-use AnotherNamespace\Baz;
-
-class Foo
-{
-    public function foo()
-    {
-        $bar = new Bar();
-        $baz = new Baz();
-    }
-}
-EOF;
-
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
-        $fp->parse($code, 'relativePathName');
-
-        $cd = $fp->getClassDescriptions();
-
-        $violations = new Violations();
-
-        $dependsOnlyOnTheseNamespaces = new DependsOnlyOnTheseNamespaces();
-        $dependsOnlyOnTheseNamespaces->evaluate($cd[0], $violations);
-
-        $this->assertCount(1, $violations);
     }
 }

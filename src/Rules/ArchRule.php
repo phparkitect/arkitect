@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Arkitect\Rules;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptionCollection;
 
 class ArchRule implements DSL\ArchRule
 {
@@ -27,7 +28,7 @@ class ArchRule implements DSL\ArchRule
         $this->classesToBeExcluded = $classesToBeExcluded;
     }
 
-    public function check(ClassDescription $classDescription, Violations $violations): void
+    public function check(ClassDescription $classDescription, Violations $violations, ClassDescriptionCollection $collection): void
     {
         if ($classDescription->namespaceMatchesOneOfTheseNamespaces($this->classesToBeExcluded)) {
             return;
@@ -37,6 +38,6 @@ class ArchRule implements DSL\ArchRule
             return;
         }
 
-        $this->shoulds->checkAll($classDescription, $violations);
+        $this->shoulds->checkAll($classDescription, $violations, $collection);
     }
 }

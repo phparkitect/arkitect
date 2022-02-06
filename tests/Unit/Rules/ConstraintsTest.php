@@ -5,6 +5,7 @@ namespace Arkitect\Tests\Unit\Rules;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
+use Arkitect\Analyzer\ClassDescriptionCollection;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Expression\PositiveDescription;
@@ -23,7 +24,7 @@ class ConstraintsTest extends TestCase
                 return new PositiveDescription('');
             }
 
-            public function evaluate(ClassDescription $theClass, Violations $violations): void
+            public function evaluate(ClassDescription $theClass, Violations $violations, ClassDescriptionCollection $collection): void
             {
             }
         };
@@ -34,7 +35,8 @@ class ConstraintsTest extends TestCase
 
         $expressionStore->checkAll(
             ClassDescriptionBuilder::create('Banana')->get(),
-            $violations
+            $violations,
+            new ClassDescriptionCollection()
         );
 
         $this->assertCount(0, $violations);
@@ -48,7 +50,7 @@ class ConstraintsTest extends TestCase
                 return new PositiveDescription('bar');
             }
 
-            public function evaluate(ClassDescription $theClass, Violations $violations): void
+            public function evaluate(ClassDescription $theClass, Violations $violations, ClassDescriptionCollection $collection): void
             {
                 $violation = Violation::create(
                     $theClass->getFQCN(),
@@ -65,7 +67,8 @@ class ConstraintsTest extends TestCase
 
         $expressionStore->checkAll(
             ClassDescriptionBuilder::create('Banana')->get(),
-            $violations
+            $violations,
+            new ClassDescriptionCollection()
         );
 
         $this->assertCount(1, $violations);

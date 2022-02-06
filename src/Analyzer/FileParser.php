@@ -25,23 +25,43 @@ class FileParser implements Parser
     /** @var array */
     private $parsingErrors;
 
+    /** @var ClassDescriptionCollection */
+    private $classDescriptionsParsed;
+    /**
+     * @var array
+     */
+    private $classDescriptions;
+    /**
+     * @var FileContentGetterInterface
+     */
+    private $fileContentGetter;
+    /**
+     * @var array
+     */
+    private $skippedClasses;
+
     public function __construct(
         NodeTraverser $traverser,
         FileVisitor $fileVisitor,
         NameResolver $nameResolver,
-        TargetPhpVersion $targetPhpVersion
+        TargetPhpVersion $targetPhpVersion,
+        FileContentGetterInterface $fileContentGetter
     ) {
         $this->fileVisitor = $fileVisitor;
+        $this->fileContentGetter = $fileContentGetter;
 
         $lexer = new Emulative([
             'usedAttributes' => ['comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos'],
-             'phpVersion' => $targetPhpVersion->get() ?? phpversion(),
+            'phpVersion' => $targetPhpVersion->get() ?? phpversion(),
         ]);
 
         $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
         $this->traverser = $traverser;
         $this->traverser->addVisitor($nameResolver);
         $this->traverser->addVisitor($this->fileVisitor);
+        $this->classDescriptionsParsed = new ClassDescriptionCollection();
+        $this->classDescriptions = [];
+        $this->skippedClasses = [];
     }
 
     /**
@@ -49,37 +69,160 @@ class FileParser implements Parser
      */
     public function getClassDescriptions(): array
     {
-        return $this->fileVisitor->getClassDescriptions();
+        return $this->classDescriptions;
     }
 
-    public function parse(string $fileContent, string $filename): void
+    public function parse(string $fileContent, string $filename, array $classDescriptionToParse): array
     {
         $this->parsingErrors = [];
         try {
             $this->fileVisitor->clearParsedClassDescriptions();
 
-            $errorHandler = new Collecting();
-            $stmts = $this->parser->parse($fileContent, $errorHandler);
+            $classDescriptionsToParse = $this->generateClassDescriptions($filename, $fileContent);
 
-            if ($errorHandler->hasErrors()) {
-                foreach ($errorHandler->getErrors() as $error) {
-                    $this->parsingErrors[] = ParsingError::create($filename, $error->getMessage());
+            /** @var ClassDescription $classDescription */
+            foreach ($classDescriptionsToParse as $classDescription) {
+                $classDescriptionToParse[] = $classDescription;
+                if ($this->classDescriptionsParsed->exists($classDescription->getFQCN())) {
+                    continue;
                 }
-            }
 
-            if (null === $stmts) {
-                return;
+                $this->classDescriptionsParsed->add($classDescription);
+                $this->parseDependencies($classDescription);
             }
-
-            $this->traverser->traverse($stmts);
         } catch (\Throwable $e) {
             echo 'Parse Error: ', $e->getMessage();
             print_r($e->getTraceAsString());
         }
+
+        return $classDescriptionToParse;
     }
 
     public function getParsingErrors(): array
     {
         return $this->parsingErrors;
+    }
+
+    public function getFileVisitor(): FileVisitor
+    {
+        return $this->fileVisitor;
+    }
+
+    public function getClassDescriptionsParsed(): ClassDescriptionCollection
+    {
+        return $this->classDescriptionsParsed;
+    }
+
+    private function parseDependencies(ClassDescription $classDescription): void
+    {
+        $classDependencies = $classDescription->getDependencies();
+
+        $missingDeps = array_diff_key(
+            $classDependencies,
+            $this->classDescriptionsParsed->getClassDescriptions()
+        );
+
+        $this->searchDependencies($missingDeps);
+    }
+
+    private function searchDependencies(array $classDependencies): void
+    {
+        /** @var ClassDependency $dependency */
+        foreach ($classDependencies as $dependency) {
+            $this->fileVisitor->clearParsedClassDescriptions();
+
+            if ($this->classDescriptionsParsed->exists($dependency->getFQCN()->toString()) ||
+                \in_array($dependency->getFQCN()->toString(), $this->skippedClasses)
+            ) {
+                //echo "\n in array";
+                continue;
+            }
+
+            $this->fileContentGetter->open($dependency->getFQCN()->toString());
+
+            if (!$this->fileContentGetter->isContentAvailable()) {
+                $cd = ClassDescription::build($dependency->getFQCN()->toString());
+                $this->classDescriptionsParsed->add($cd->get());
+
+                $this->skippedClasses[] = $dependency->getFQCN()->toString();
+                $errorRetrieved = $this->fileContentGetter->getError();
+                if (null === $errorRetrieved) {
+                    continue;
+                }
+
+                if (!$this->isAlreadyInErrors($errorRetrieved->getRelativeFilePath(), $errorRetrieved->getError())) {
+                    $this->parsingErrors[] = $errorRetrieved;
+                }
+                continue;
+            }
+
+            $content = $this->fileContentGetter->getContent();
+            $filename = $this->fileContentGetter->getFileName();
+
+            if (null === $content || null === $filename) {
+                $cd = ClassDescription::build($dependency->getFQCN()->toString());
+                $this->classDescriptionsParsed->add($cd->get());
+
+                $this->skippedClasses[] = $dependency->getFQCN()->toString();
+                $errorRetrieved = $this->fileContentGetter->getError();
+                if (null === $errorRetrieved) {
+                    continue;
+                }
+
+                if (!$this->isAlreadyInErrors($errorRetrieved->getRelativeFilePath(), $errorRetrieved->getError())) {
+                    $this->parsingErrors[] = $errorRetrieved;
+                }
+
+                continue;
+            }
+
+            $classDescriptionsFound = $this->generateClassDescriptions($filename, $content);
+
+            /** @var ClassDescription $classDescriptionFound */
+            foreach ($classDescriptionsFound as $classDescriptionFound) {
+                if ($this->classDescriptionsParsed->exists($classDescriptionFound->getFQCN())) {
+                    continue;
+                }
+
+                $this->classDescriptionsParsed->add($classDescriptionFound);
+                $this->parseDependencies($classDescriptionFound);
+            }
+        }
+    }
+
+    private function generateClassDescriptions(string $filename, string $fileContent): array
+    {
+        $errorHandler = new Collecting();
+        $stmts = $this->parser->parse($fileContent, $errorHandler);
+
+        if ($errorHandler->hasErrors()) {
+            foreach ($errorHandler->getErrors() as $error) {
+                if (!$this->isAlreadyInErrors($filename, $error->getMessage())) {
+                    $this->parsingErrors[] = ParsingError::create($filename, $error->getMessage());
+                }
+            }
+        }
+
+        if (null === $stmts) {
+            return [];
+        }
+
+        $this->traverser->traverse($stmts);
+
+        return $this->fileVisitor->getClassDescriptions();
+    }
+
+    private function isAlreadyInErrors(string $relativeFilePath, string $error): bool
+    {
+        /** @var ParsingError $errorParsed */
+        foreach ($this->parsingErrors as $errorParsed) {
+            if ($errorParsed->getRelativeFilePath() === $relativeFilePath &&
+                $errorParsed->getError() === $error
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

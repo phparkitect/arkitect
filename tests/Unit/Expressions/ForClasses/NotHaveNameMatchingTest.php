@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptionCollection;
 use Arkitect\Expression\ForClasses\NotHaveNameMatching;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
@@ -16,8 +17,11 @@ class NotHaveNameMatchingTest extends TestCase
 
         $myClass = ClassDescription::build('\App\MyClass')->get();
 
+        $classDescriptionCollection = new ClassDescriptionCollection();
+        $classDescriptionCollection->add($myClass);
+
         $violations = new Violations();
-        $expression->evaluate($myClass, $violations);
+        $expression->evaluate($myClass, $violations, $classDescriptionCollection);
         self::assertEquals(1, $violations->count());
         $this->assertEquals('should not have a name that matches *Class', $expression->describe($myClass)->toString());
     }
@@ -28,8 +32,11 @@ class NotHaveNameMatchingTest extends TestCase
 
         $badClass = ClassDescription::build('\App\BadNameClass')->get();
 
+        $classDescriptionCollection = new ClassDescriptionCollection();
+        $classDescriptionCollection->add($badClass);
+
         $violations = new Violations();
-        $expression->evaluate($badClass, $violations);
+        $expression->evaluate($badClass, $violations, $classDescriptionCollection);
         self::assertEquals(0, $violations->count());
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptionCollection;
 use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
@@ -26,10 +27,10 @@ class NotImplement implements Expression
         return new PositiveDescription("should not implement {$this->interface}");
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, ClassDescriptionCollection $collection): void
     {
         $interface = $this->interface;
-        $interfaces = $theClass->getInterfaces();
+        $interfaces = $collection->getInterfaces($theClass->getFQCN());
         $implements = function (FullyQualifiedClassName $FQCN) use ($interface): bool {
             return $FQCN->matches($interface);
         };

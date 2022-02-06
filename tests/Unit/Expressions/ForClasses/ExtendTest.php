@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptionCollection;
 use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\ForClasses\Extend;
 use Arkitect\Rules\Violations;
@@ -25,8 +26,12 @@ class ExtendTest extends TestCase
 
         $violationError = $extend->describe($classDescription)->toString();
 
+        $classDescriptionCollection = new ClassDescriptionCollection();
+        $classDescriptionCollection->add($classDescription);
+        $classDescriptionCollection->add(ClassDescription::build('My\AnotherClass')->get());
+
         $violations = new Violations();
-        $extend->evaluate($classDescription, $violations);
+        $extend->evaluate($classDescription, $violations, $classDescriptionCollection);
 
         self::assertEquals(1, $violations->count());
         self::assertEquals('should extend My\BaseClass', $violationError);
@@ -43,10 +48,13 @@ class ExtendTest extends TestCase
             null
         );
 
+        $classDescriptionCollection = new ClassDescriptionCollection();
+        $classDescriptionCollection->add($classDescription);
+
         $violationError = $extend->describe($classDescription)->toString();
 
         $violations = new Violations();
-        $extend->evaluate($classDescription, $violations);
+        $extend->evaluate($classDescription, $violations, $classDescriptionCollection);
 
         self::assertEquals(1, $violations->count());
         self::assertEquals('should extend My\BaseClass', $violationError);

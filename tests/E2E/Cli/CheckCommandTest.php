@@ -17,51 +17,53 @@ class CheckCommandTest extends TestCase
 
     public function test_app_returns_error_with_multiple_violations(): void
     {
-        $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvc.php');
+        $cmdTester = $this->runCheck(__DIR__.'/../Fixtures/configMvc.php');
 
         $expectedErrors = 'ERRORS!
 
-App\Controller\Foo violates rules
-  should implement ContainerAwareInterface
+Arkitect\Tests\E2E\Fixtures\MvcExample\Controller\Foo violates rules
+  should implement Arkitect\Tests\E2E\Fixtures\MvcExample\ContainerAwareInterface
   should have a name that matches *Controller
 
-App\Controller\ProductsController violates rules
-  should implement ContainerAwareInterface
+Arkitect\Tests\E2E\Fixtures\MvcExample\Controller\JsonController violates rules
+  should implement Arkitect\Tests\E2E\Fixtures\MvcExample\ContainerAwareInterface
 
-App\Controller\UserController violates rules
-  should implement ContainerAwareInterface
+Arkitect\Tests\E2E\Fixtures\MvcExample\Controller\ProductsController violates rules
+  should implement Arkitect\Tests\E2E\Fixtures\MvcExample\ContainerAwareInterface
 
-App\Controller\YieldController violates rules
-  should implement ContainerAwareInterface
+Arkitect\Tests\E2E\Fixtures\MvcExample\Controller\UserController violates rules
+  should implement Arkitect\Tests\E2E\Fixtures\MvcExample\ContainerAwareInterface
 
-App\Domain\Model violates rules
-  should not depend on classes outside namespace App\Domain (on line 14)
-  should not depend on classes outside namespace App\Domain (on line 15)';
+Arkitect\Tests\E2E\Fixtures\MvcExample\Controller\YieldController violates rules
+  should implement Arkitect\Tests\E2E\Fixtures\MvcExample\ContainerAwareInterface
+
+Arkitect\Tests\E2E\Fixtures\MvcExample\Domain\Model violates rules
+  should not depend on classes outside namespace Arkitect\Tests\E2E\Fixtures\MvcExample\Domain (on line 13)';
 
         $this->assertCheckHasErrors($cmdTester, $expectedErrors);
     }
 
     public function test_does_not_explode_if_an_exception_is_thrown(): void
     {
-        $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configThrowsException.php');
+        $cmdTester = $this->runCheck(__DIR__.'/../Fixtures/configThrowsException.php');
 
         $this->assertCheckHasErrors($cmdTester);
     }
 
     public function test_run_command_with_success(): void
     {
-        $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvcWithoutErrors.php');
+        $cmdTester = $this->runCheck(__DIR__.'/../Fixtures/configMvcWithoutErrors.php');
 
         $this->assertCheckHasSuccess($cmdTester);
     }
 
     public function test_bug_yield(): void
     {
-        $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvcForYieldBug.php');
+        $cmdTester = $this->runCheck(__DIR__.'/../Fixtures/configMvcForYieldBug.php');
 
         $expectedErrors = 'ERRORS!
 
-App\Controller\Foo violates rules
+Arkitect\Tests\E2E\Fixtures\MvcExample\Controller\Foo violates rules
   should have a name that matches *Controller';
 
         $this->assertCheckHasErrors($cmdTester, $expectedErrors);

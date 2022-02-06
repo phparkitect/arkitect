@@ -5,6 +5,7 @@ namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptionCollection;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Expression\PositiveDescription;
@@ -28,9 +29,9 @@ class DependsOnlyOnTheseNamespaces implements Expression
         return new PositiveDescription("should depend only on classes in one of these namespaces: $desc");
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, ClassDescriptionCollection $collection): void
     {
-        $dependencies = $theClass->getDependencies();
+        $dependencies = $collection->getDependencies($theClass->getFQCN());
 
         /** @var ClassDependency $dependency */
         foreach ($dependencies as $dependency) {

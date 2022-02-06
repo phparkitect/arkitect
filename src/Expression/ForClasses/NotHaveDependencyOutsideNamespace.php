@@ -5,6 +5,7 @@ namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptionCollection;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Expression\PositiveDescription;
@@ -29,14 +30,14 @@ class NotHaveDependencyOutsideNamespace implements Expression
         return new PositiveDescription("should not depend on classes outside namespace {$this->namespace}");
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, ClassDescriptionCollection $collection): void
     {
         $namespace = $this->namespace;
         $depends = function (ClassDependency $dependency) use ($namespace): bool {
             return !$dependency->getFQCN()->matches($namespace);
         };
 
-        $dependencies = $theClass->getDependencies();
+        $dependencies = $collection->getDependencies($theClass->getFQCN());
         $externalDeps = array_filter($dependencies, $depends);
 
         /** @var ClassDependency $externalDep */

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptionCollection;
 use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\ForClasses\Implement;
 use Arkitect\Rules\Violations;
@@ -26,8 +27,11 @@ class ImplementTest extends TestCase
 
         $violationError = $implementConstraint->describe($classDescription)->toString();
 
+        $classDescriptionCollection = new ClassDescriptionCollection();
+        $classDescriptionCollection->add($classDescription);
+
         $violations = new Violations();
-        $implementConstraint->evaluate($classDescription, $violations);
+        $implementConstraint->evaluate($classDescription, $violations, $classDescriptionCollection);
         self::assertNotEquals(0, $violations->count());
 
         $this->assertEquals('should implement '.$interface, $violationError);
@@ -45,8 +49,12 @@ class ImplementTest extends TestCase
             null
         );
 
+        $classDescriptionCollection = new ClassDescriptionCollection();
+        $classDescriptionCollection->add($classDescription);
+        $classDescriptionCollection->add(ClassDescription::build('foo')->get());
+
         $violations = new Violations();
-        $implementConstraint->evaluate($classDescription, $violations);
+        $implementConstraint->evaluate($classDescription, $violations, $classDescriptionCollection);
         self::assertNotEquals(0, $violations->count());
     }
 
@@ -62,8 +70,12 @@ class ImplementTest extends TestCase
             null
         );
 
+        $classDescriptionCollection = new ClassDescriptionCollection();
+        $classDescriptionCollection->add($classDescription);
+        $classDescriptionCollection->add(ClassDescription::build('interface')->get());
+
         $violations = new Violations();
-        $implementConstraint->evaluate($classDescription, $violations);
+        $implementConstraint->evaluate($classDescription, $violations, $classDescriptionCollection);
         self::assertEquals(0, $violations->count());
     }
 }

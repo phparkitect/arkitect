@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI;
 
+use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FileParser;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\Analyzer\Parser;
@@ -45,24 +46,46 @@ class Runner
         Violations $violations,
         ParsingErrors $parsingErrors
     ): void {
+        $classDescriptionsToParse = [];
+
         /** @var SplFileInfo $file */
         foreach ($classSetRule->getClassSet() as $file) {
             $progress->startParsingFile($file->getRelativePathname());
-
-            $fileParser->parse($file->getContents(), $file->getRelativePathname());
+            $classDescriptionsToParse = $fileParser->parse(
+                $file->getContents(),
+                $file->getRelativePathname(),
+                $classDescriptionsToParse
+            );
             $parsedErrors = $fileParser->getParsingErrors();
 
             foreach ($parsedErrors as $parsedError) {
                 $parsingErrors->add($parsedError);
             }
 
-            foreach ($fileParser->getClassDescriptions() as $classDescription) {
-                foreach ($classSetRule->getRules() as $rule) {
-                    $rule->check($classDescription, $violations);
-                }
+            $progress->endParsingFile($file->getRelativePathname());
+        }
+
+        $classDescriptionsCollection = $fileParser->getClassDescriptionsParsed();
+
+        /** @var ClassDescription $classDescriptionToParse */
+        foreach ($classDescriptionsToParse as $classDescriptionToParse) {
+            $classDescriptionToParseFQCN = $classDescriptionToParse->getFQCN();
+
+            /** @var ClassDescription $classDescriptionToParse */
+            $classDescriptionToParse = $classDescriptionsCollection->get($classDescriptionToParseFQCN);
+
+            if (null === $classDescriptionToParse) {
+                continue;
             }
 
-            $progress->endParsingFile($file->getRelativePathname());
+            foreach ($classSetRule->getRules() as $rule) {
+                $rule->check($classDescriptionToParse, $violations, $classDescriptionsCollection);
+            }
+        }
+
+        $errorsFromCollection = $classDescriptionsCollection->getErrors();
+        foreach ($errorsFromCollection as $parsedError) {
+            $parsingErrors->add($parsedError);
         }
     }
 

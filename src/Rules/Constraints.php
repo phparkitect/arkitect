@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Arkitect\Rules;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptionCollection;
 use Arkitect\Expression\Expression;
 
 class Constraints
@@ -15,11 +16,11 @@ class Constraints
         $this->expressions[] = $expression;
     }
 
-    public function checkAll(ClassDescription $classDescription, Violations $violations): void
+    public function checkAll(ClassDescription $classDescription, Violations $violations, ClassDescriptionCollection $collection): void
     {
         /** @var Expression $expression */
         foreach ($this->expressions as $expression) {
-            $expression->evaluate($classDescription, $violations);
+            $expression->evaluate($classDescription, $violations, $collection);
         }
     }
 }

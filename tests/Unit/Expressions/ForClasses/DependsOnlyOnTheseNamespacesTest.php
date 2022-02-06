@@ -6,6 +6,7 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptionCollection;
 use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
@@ -17,9 +18,11 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
         $dependOnClasses = new DependsOnlyOnTheseNamespaces('myNamespace');
 
         $classDescription = ClassDescription::build('HappyIsland\Myclass')->get();
+        $classDescriptionCollection = new ClassDescriptionCollection();
+        $classDescriptionCollection->add($classDescription);
 
         $violations = new Violations();
-        $dependOnClasses->evaluate($classDescription, $violations);
+        $dependOnClasses->evaluate($classDescription, $violations, $classDescriptionCollection);
 
         self::assertEquals(0, $violations->count());
         self::assertEquals('should depend only on classes in one of these namespaces: myNamespace', $dependOnClasses->describe($classDescription)->toString());
@@ -34,8 +37,13 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
             ->addDependency(new ClassDependency('anotherNamespace\Banana', 1))
             ->get();
 
+        $classDescriptionCollection = new ClassDescriptionCollection();
+        $classDescriptionCollection->add($classDescription);
+        $classDescriptionCollection->add(ClassDescription::build('myNamespace\Banana')->get());
+        $classDescriptionCollection->add(ClassDescription::build('anotherNamespace\Banana')->get());
+
         $violations = new Violations();
-        $dependOnClasses->evaluate($classDescription, $violations);
+        $dependOnClasses->evaluate($classDescription, $violations, $classDescriptionCollection);
 
         self::assertNotEquals(0, $violations->count());
     }
@@ -50,9 +58,15 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
             ->addDependency(new ClassDependency('\DateTime', 10))
             ->get();
 
+        $classDescriptionCollection = new ClassDescriptionCollection();
+        $classDescriptionCollection->add($classDescription);
+        $classDescriptionCollection->add(ClassDescription::build('\anotherNamespace\Banana')->get());
+        $classDescriptionCollection->add(ClassDescription::build('myNamespace\Banana')->get());
+        $classDescriptionCollection->add(ClassDescription::build('\DateTime')->get());
+
         $violations = new Violations();
 
-        $dependOnClasses->evaluate($classDescription, $violations);
+        $dependOnClasses->evaluate($classDescription, $violations, $classDescriptionCollection);
 
         self::assertCount(1, $violations);
     }
@@ -66,8 +80,13 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
             ->addDependency(new ClassDependency('myNamespace\Mango', 10))
             ->get();
 
+        $classDescriptionCollection = new ClassDescriptionCollection();
+        $classDescriptionCollection->add($classDescription);
+        $classDescriptionCollection->add(ClassDescription::build('myNamespace\Mango')->get());
+        $classDescriptionCollection->add(ClassDescription::build('myNamespace\Banana')->get());
+
         $violations = new Violations();
-        $dependOnClasses->evaluate($classDescription, $violations);
+        $dependOnClasses->evaluate($classDescription, $violations, $classDescriptionCollection);
 
         self::assertEquals(0, $violations->count());
     }
@@ -82,7 +101,11 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
             ->get();
 
         $violations = new Violations();
-        $dependOnClasses->evaluate($classDescription, $violations);
+        $classDescriptionCollection = new ClassDescriptionCollection();
+        $classDescriptionCollection->add($classDescription);
+        $classDescriptionCollection->add(ClassDescription::build('HappyIsland\Banana')->get());
+        $classDescriptionCollection->add(ClassDescription::build('myNamespace\Mango')->get());
+        $dependOnClasses->evaluate($classDescription, $violations, $classDescriptionCollection);
 
         self::assertEquals(1, $violations->count());
     }

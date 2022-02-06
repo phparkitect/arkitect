@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Arkitect\Rules;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptionCollection;
 use Arkitect\Expression\Expression;
 
 class Specs
@@ -20,7 +21,7 @@ class Specs
         /** @var Expression $spec */
         foreach ($this->expressions as $spec) {
             $violations = new Violations();
-            $spec->evaluate($classDescription, $violations);
+            $spec->evaluate($classDescription, $violations, new ClassDescriptionCollection());
 
             if ($violations->count() > 0) {
                 return false;

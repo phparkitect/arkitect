@@ -14,7 +14,7 @@ class CheckClassNamingTest extends TestCase
 {
     public function test_code_in_happy_island_should_have_name_matching_prefix(): void
     {
-        $set = ClassSet::fromDir(__DIR__.'/../_fixtures/happy_island');
+        $set = ClassSet::fromDir(__DIR__.'/../Fixtures/HappyIsland');
 
         $rule = Rule::allClasses()
             ->that(new ResideInOneOfTheseNamespaces('App\HappyIsland'))

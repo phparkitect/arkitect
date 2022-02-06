@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptionCollection;
 use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\ForClasses\NotExtend;
 use Arkitect\Rules\Violations;
@@ -23,10 +24,14 @@ class NotExtendTest extends TestCase
             FullyQualifiedClassName::fromString('My\BaseClass')
         );
 
+        $classDescriptionCollection = new ClassDescriptionCollection();
+        $classDescriptionCollection->add($classDescription);
+        $classDescriptionCollection->add(ClassDescription::build('My\BaseClass')->get());
+
         $violationError = $notExtend->describe($classDescription)->toString();
 
         $violations = new Violations();
-        $notExtend->evaluate($classDescription, $violations);
+        $notExtend->evaluate($classDescription, $violations, $classDescriptionCollection);
 
         self::assertEquals(1, $violations->count());
         self::assertEquals('should not extend My\BaseClass', $violationError);

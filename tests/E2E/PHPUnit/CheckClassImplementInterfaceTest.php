@@ -18,28 +18,34 @@ class CheckClassImplementInterfaceTest extends TestCase
 {
     public function test_assertion_should_fail_on_broken_rule(): void
     {
-        $set = ClassSet::fromDir(__DIR__.'/../_fixtures/mvc');
+        $set = ClassSet::fromDir(__DIR__.'/../Fixtures/MvcExample');
 
         $rule = Rule::allClasses()
-            ->that(new ResideInOneOfTheseNamespaces('App\Controller', 'App\Services'))
-            ->should(new Implement('ContainerAwareInterface'))
+            ->that(new ResideInOneOfTheseNamespaces('Arkitect\Tests\E2E\Fixtures\MvcExample\Controller', 'Arkitect\Tests\E2E\Fixtures\MvcExample\Services'))
+            ->should(new Implement('Arkitect\Tests\E2E\Fixtures\MvcExample\ContainerAwareInterface'))
             ->because('i said so');
 
         $expectedExceptionMessage = '
-App\Controller\Foo violates rules
-  should implement ContainerAwareInterface
+Arkitect\Tests\E2E\Fixtures\MvcExample\Controller\BaseController violates rules
+  should implement Arkitect\Tests\E2E\Fixtures\MvcExample\ContainerAwareInterface
 
-App\Controller\ProductsController violates rules
-  should implement ContainerAwareInterface
+Arkitect\Tests\E2E\Fixtures\MvcExample\Controller\Foo violates rules
+  should implement Arkitect\Tests\E2E\Fixtures\MvcExample\ContainerAwareInterface
 
-App\Controller\UserController violates rules
-  should implement ContainerAwareInterface
+Arkitect\Tests\E2E\Fixtures\MvcExample\Controller\JsonController violates rules
+  should implement Arkitect\Tests\E2E\Fixtures\MvcExample\ContainerAwareInterface
 
-App\Controller\YieldController violates rules
-  should implement ContainerAwareInterface
+Arkitect\Tests\E2E\Fixtures\MvcExample\Controller\ProductsController violates rules
+  should implement Arkitect\Tests\E2E\Fixtures\MvcExample\ContainerAwareInterface
 
-App\Services\UserService violates rules
-  should implement ContainerAwareInterface';
+Arkitect\Tests\E2E\Fixtures\MvcExample\Controller\UserController violates rules
+  should implement Arkitect\Tests\E2E\Fixtures\MvcExample\ContainerAwareInterface
+
+Arkitect\Tests\E2E\Fixtures\MvcExample\Controller\YieldController violates rules
+  should implement Arkitect\Tests\E2E\Fixtures\MvcExample\ContainerAwareInterface
+
+Arkitect\Tests\E2E\Fixtures\MvcExample\Services\UserService violates rules
+  should implement Arkitect\Tests\E2E\Fixtures\MvcExample\ContainerAwareInterface';
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);

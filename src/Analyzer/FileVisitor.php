@@ -15,6 +15,19 @@ class FileVisitor extends NodeVisitorAbstract
 
     public function enterNode(Node $node): void
     {
+        if ($node instanceof Node\Stmt\Interface_) {
+            $this->classDescriptionBuilder = ClassDescriptionBuilder::create(
+                $node->namespacedName->toCodeString()
+            );
+
+            foreach ($node->extends as $extend) {
+                $this->classDescriptionBuilder
+                    ->setExtends($extend->toString(), $node->getLine());
+            }
+
+            return;
+        }
+
         if ($node instanceof Node\Stmt\Class_) {
             if (!$node->isAnonymous()) {
                 /** @psalm-suppress UndefinedPropertyFetch */
@@ -95,10 +108,10 @@ class FileVisitor extends NodeVisitorAbstract
 
     public function leaveNode(Node $node): void
     {
-        if ($node instanceof Node\Stmt\Class_) {
+        if ($node instanceof Node\Stmt\Class_ || $node instanceof Node\Stmt\Interface_) {
             $classDescription = $this->classDescriptionBuilder->get();
 
-            $this->classDescriptions[] = $classDescription;
+            $this->classDescriptions[$classDescription->getFQCN()] = $classDescription;
         }
     }
 

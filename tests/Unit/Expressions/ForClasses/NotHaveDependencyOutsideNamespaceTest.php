@@ -6,6 +6,7 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptionCollection;
 use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\ForClasses\NotHaveDependencyOutsideNamespace;
 use Arkitect\Rules\Violations;
@@ -39,8 +40,12 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
             null
         );
 
+        $classDescriptionCollection = new ClassDescriptionCollection();
+        $classDescriptionCollection->add($classDescription);
+        $classDescriptionCollection->add(ClassDescription::build('myNamespace')->get());
+
         $violations = new Violations();
-        $notHaveDependencyOutsideNamespace->evaluate($classDescription, $violations);
+        $notHaveDependencyOutsideNamespace->evaluate($classDescription, $violations, $classDescriptionCollection);
         self::assertEquals(0, $violations->count());
     }
 
@@ -54,8 +59,13 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
             null
         );
 
+        $classDescriptionCollection = new ClassDescriptionCollection();
+        $classDescriptionCollection->add($classDescription);
+        $classDescriptionCollection->add(ClassDescription::build('myNamespace')->get());
+        $classDescriptionCollection->add(ClassDescription::build('another\class')->get());
+
         $violations = new Violations();
-        $notHaveDependencyOutsideNamespace->evaluate($classDescription, $violations);
+        $notHaveDependencyOutsideNamespace->evaluate($classDescription, $violations, $classDescriptionCollection);
         self::assertNotEquals(0, $violations->count());
     }
 
@@ -69,8 +79,12 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
             null
         );
 
+        $classDescriptionCollection = new ClassDescriptionCollection();
+        $classDescriptionCollection->add($classDescription);
+        $classDescriptionCollection->add(ClassDescription::build('foo')->get());
+
         $violations = new Violations();
-        $notHaveDependencyOutsideNamespace->evaluate($classDescription, $violations);
+        $notHaveDependencyOutsideNamespace->evaluate($classDescription, $violations, $classDescriptionCollection);
         self::assertEquals(0, $violations->count());
     }
 }

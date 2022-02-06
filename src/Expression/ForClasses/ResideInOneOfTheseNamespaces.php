@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptionCollection;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Expression\PositiveDescription;
@@ -27,7 +28,7 @@ class ResideInOneOfTheseNamespaces implements Expression
         return new PositiveDescription("should reside in one of these namespaces: $descr");
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, ClassDescriptionCollection $collection): void
     {
         $resideInNamespace = false;
         foreach ($this->namespaces as $namespace) {

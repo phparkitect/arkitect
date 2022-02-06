@@ -16,7 +16,7 @@ class ClassSetRulesTest extends TestCase
 {
     public function test_create_class_set_rules_correctly(): void
     {
-        $classSet = ClassSet::fromDir(__DIR__.'/../E2E/fixtures/happy_island');
+        $classSet = ClassSet::fromDir(__DIR__.'/../E2E/fixtures/HappyIsland');
 
         $rule_1 = Rule::allClasses()
             ->that(new ResideInOneOfTheseNamespaces('App\Controller'))

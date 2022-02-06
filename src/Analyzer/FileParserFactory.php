@@ -16,7 +16,8 @@ class FileParserFactory
             new NodeTraverser(),
             new FileVisitor(),
             new NameResolver(),
-            $targetPhpVersion
+            $targetPhpVersion,
+            new FileContentGetter()
         );
     }
 }

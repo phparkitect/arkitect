@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Unit\Rules;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptionCollection;
 use Arkitect\Analyzer\Parser;
 use Arkitect\ClassSet;
 use Arkitect\ClassSetRules;
@@ -65,7 +66,7 @@ class FakeSplFileInfo extends SplFileInfo
 
 class FakeRule implements ArchRule
 {
-    public function check(ClassDescription $classDescription, Violations $violations): void
+    public function check(ClassDescription $classDescription, Violations $violations, ClassDescriptionCollection $collection): void
     {
         $violations->add(Violation::create('fqcn', 'error'));
     }
@@ -73,8 +74,13 @@ class FakeRule implements ArchRule
 
 class FakeParser implements Parser
 {
-    public function parse(string $fileContent, string $filename): void
+    public function parse(string $fileContent, string $filename, array $classDescriptionToParse): array
     {
+        return [
+            ClassDescription::build('uno')->get(),
+            ClassDescription::build('due')->get(),
+            ClassDescription::build('tre')->get(),
+        ];
     }
 
     public function getClassDescriptions(): array
@@ -85,5 +91,15 @@ class FakeParser implements Parser
     public function getParsingErrors(): array
     {
         return [];
+    }
+
+    public function getClassDescriptionsParsed(): ClassDescriptionCollection
+    {
+        $classDescriptionCollection = new ClassDescriptionCollection();
+        $classDescriptionCollection->add(ClassDescription::build('uno')->get());
+        $classDescriptionCollection->add(ClassDescription::build('due')->get());
+        $classDescriptionCollection->add(ClassDescription::build('tre')->get());
+
+        return $classDescriptionCollection;
     }
 }

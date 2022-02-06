@@ -52,7 +52,7 @@ class ClassDescriptionBuilder
 
     public function addDependency(ClassDependency $cd): self
     {
-        $this->classDependencies[] = $cd;
+        $this->classDependencies[$cd->getFQCN()->toString()] = $cd;
 
         return $this;
     }

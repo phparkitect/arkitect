@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptionCollection;
+use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Expression\PositiveDescription;
@@ -25,19 +27,31 @@ class Extend implements Expression
         return new PositiveDescription("should extend {$this->className}");
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, ClassDescriptionCollection $collection): void
     {
-        $extends = $theClass->getExtends();
+        $extends = $collection->getExtends($theClass->getFQCN());
 
-        if (null !== $extends && $extends->toString() === $this->className) {
-            return;
+        if (0 === \count($extends)) {
+            $violation = Violation::create(
+                $theClass->getFQCN(),
+                $this->describe($theClass)->toString()
+            );
+
+            $violations->add($violation);
         }
 
-        $violation = Violation::create(
-            $theClass->getFQCN(),
-            $this->describe($theClass)->toString()
-        );
+        /** @var FullyQualifiedClassName|null $extend */
+        foreach ($extends as $extend) {
+            if (null !== $extend && $extend->toString() === $this->className) {
+                continue;
+            }
 
-        $violations->add($violation);
+            $violation = Violation::create(
+                $theClass->getFQCN(),
+                $this->describe($theClass)->toString()
+            );
+
+            $violations->add($violation);
+        }
     }
 }
