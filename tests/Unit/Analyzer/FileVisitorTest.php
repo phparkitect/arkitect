@@ -13,6 +13,7 @@ use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
 use Arkitect\Expression\ForClasses\NotHaveDependencyOutsideNamespace;
 use Arkitect\Rules\ParsingError;
+use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violations;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
@@ -93,7 +94,7 @@ EOF;
             $fileContentGetter
         );
         /** @var ClassDescription $cd */
-        $cd = $fp->parse($code, 'relativePathName', []);
+        $cd = $fp->parse($code, 'relativePathName', [], new ParsingErrors());
 
         $expectedInterfaces = [
             'Root\Namespace2\AnInterface' => new ClassDependency('Root\Namespace2\AnInterface', 9),
@@ -146,7 +147,7 @@ EOF;
             TargetPhpVersion::create('7.1'),
             $fileContentGetter
         );
-        $cd = $fp->parse($code, 'relativePathName', [])[1];
+        $cd = $fp->parse($code, 'relativePathName', [], new ParsingErrors())[1];
 
         $this->assertEquals('Root\Animals\Feline', $cd->getExtends()->toString());
     }
@@ -193,7 +194,7 @@ EOF;
             TargetPhpVersion::create('7.1'),
             $fileContentGetter
         );
-        $cd = $fp->parse($code, 'relativePathName', []);
+        $cd = $fp->parse($code, 'relativePathName', [], new ParsingErrors());
 
         $violations = new Violations();
 
@@ -276,7 +277,7 @@ EOF;
             TargetPhpVersion::create('7.1'),
             $fileContentGetter
         );
-        $cd = $fp->parse($code, 'relativePathName', []);
+        $cd = $fp->parse($code, 'relativePathName', [], new ParsingErrors());
 
         $expectedDependencies = [
             'Foo\Baz\Baz' => new ClassDependency('Foo\Baz\Baz', 9),
@@ -326,7 +327,7 @@ EOF;
             TargetPhpVersion::create('7.4'),
             $fileContentGetter
         );
-        $cd = $fp->parse($code, 'relativePathName', []);
+        $cd = $fp->parse($code, 'relativePathName', [], new ParsingErrors());
 
         $violations = new Violations();
 
@@ -370,12 +371,14 @@ EOF;
             TargetPhpVersion::create('7.4'),
             $fileContentGetter
         );
-        $fp->parse($code, 'relativePathName', []);
+        $fp->parse($code, 'relativePathName', [], new ParsingErrors());
 
         $parsingErrors = $fp->getParsingErrors();
-        $this->assertEquals([
-            ParsingError::create('relativePathName', 'Syntax error, unexpected \'}\' on line 10'),
-        ], $parsingErrors);
+
+        $expected = new ParsingErrors();
+        $expected->add(ParsingError::create('relativePathName', 'Syntax error, unexpected \'}\' on line 10'));
+
+        $this->assertEquals($expected, $parsingErrors);
     }
 
     public function test_it_should_parse_self_correctly(): void
@@ -430,7 +433,7 @@ EOF;
             TargetPhpVersion::create('7.4'),
             $fileContentGetter
         );
-        $cd = $fp->parse($code, 'relativePathName', []);
+        $cd = $fp->parse($code, 'relativePathName', [], new ParsingErrors());
 
         $violations = new Violations();
 

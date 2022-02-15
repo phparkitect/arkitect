@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Unit\Analyzer;
 
 use Arkitect\Analyzer\FileContentGetterInterface;
+use Arkitect\Rules\NotParsedClasses;
 use Arkitect\Rules\ParsingError;
 
 class FakeFileContentGetter implements FileContentGetterInterface
@@ -170,6 +171,11 @@ class Cat extends Feline
     public function getFileName(): ?string
     {
         return $this->classFQCN;
+    }
+
+    public function getNotParsedClasses(): NotParsedClasses
+    {
+        return new NotParsedClasses();
     }
 
     private function simpleClass(string $namespace, string $className): string

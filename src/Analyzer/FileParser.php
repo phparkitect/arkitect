@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace Arkitect\Analyzer;
 
 use Arkitect\CLI\TargetPhpVersion;
+use Arkitect\Rules\NotParsedClasses;
 use Arkitect\Rules\ParsingError;
+use Arkitect\Rules\ParsingErrors;
 use PhpParser\ErrorHandler\Collecting;
 use PhpParser\Lexer\Emulative;
 use PhpParser\NodeTraverser;
@@ -22,9 +24,6 @@ class FileParser implements Parser
     /** @var FileVisitor */
     private $fileVisitor;
 
-    /** @var array */
-    private $parsingErrors;
-
     /** @var ClassDescriptionCollection */
     private $classDescriptionsParsed;
     /**
@@ -39,6 +38,9 @@ class FileParser implements Parser
      * @var array
      */
     private $skippedClasses;
+
+    /** @var ParsingErrors */
+    private $parsingErrors;
 
     public function __construct(
         NodeTraverser $traverser,
@@ -72,9 +74,9 @@ class FileParser implements Parser
         return $this->classDescriptions;
     }
 
-    public function parse(string $fileContent, string $filename, array $classDescriptionToParse): array
+    public function parse(string $fileContent, string $filename, array $classDescriptionToParse, ParsingErrors $parsingErrors): array
     {
-        $this->parsingErrors = [];
+        $this->parsingErrors = $parsingErrors;
         try {
             $this->fileVisitor->clearParsedClassDescriptions();
 
@@ -98,7 +100,7 @@ class FileParser implements Parser
         return $classDescriptionToParse;
     }
 
-    public function getParsingErrors(): array
+    public function getParsingErrors(): ParsingErrors
     {
         return $this->parsingErrors;
     }
@@ -111,6 +113,11 @@ class FileParser implements Parser
     public function getClassDescriptionsParsed(): ClassDescriptionCollection
     {
         return $this->classDescriptionsParsed;
+    }
+
+    public function getNotParsedClasses(): NotParsedClasses
+    {
+        return $this->fileContentGetter->getNotParsedClasses();
     }
 
     private function parseDependencies(ClassDescription $classDescription): void
@@ -134,7 +141,6 @@ class FileParser implements Parser
             if ($this->classDescriptionsParsed->exists($dependency->getFQCN()->toString()) ||
                 \in_array($dependency->getFQCN()->toString(), $this->skippedClasses)
             ) {
-                //echo "\n in array";
                 continue;
             }
 
@@ -150,8 +156,8 @@ class FileParser implements Parser
                     continue;
                 }
 
-                if (!$this->isAlreadyInErrors($errorRetrieved->getRelativeFilePath(), $errorRetrieved->getError())) {
-                    $this->parsingErrors[] = $errorRetrieved;
+                if (!$this->isAlreadyInErrors($errorRetrieved->getError())) {
+                    $this->parsingErrors->add($errorRetrieved);
                 }
                 continue;
             }
@@ -169,8 +175,8 @@ class FileParser implements Parser
                     continue;
                 }
 
-                if (!$this->isAlreadyInErrors($errorRetrieved->getRelativeFilePath(), $errorRetrieved->getError())) {
-                    $this->parsingErrors[] = $errorRetrieved;
+                if (!$this->isAlreadyInErrors($errorRetrieved->getError())) {
+                    $this->parsingErrors->add($errorRetrieved);
                 }
 
                 continue;
@@ -197,8 +203,8 @@ class FileParser implements Parser
 
         if ($errorHandler->hasErrors()) {
             foreach ($errorHandler->getErrors() as $error) {
-                if (!$this->isAlreadyInErrors($filename, $error->getMessage())) {
-                    $this->parsingErrors[] = ParsingError::create($filename, $error->getMessage());
+                if (!$this->isAlreadyInErrors($error->getMessage())) {
+                    $this->parsingErrors->add(ParsingError::create($filename, $error->getMessage()));
                 }
             }
         }
@@ -212,13 +218,11 @@ class FileParser implements Parser
         return $this->fileVisitor->getClassDescriptions();
     }
 
-    private function isAlreadyInErrors(string $relativeFilePath, string $error): bool
+    private function isAlreadyInErrors(string $error): bool
     {
         /** @var ParsingError $errorParsed */
-        foreach ($this->parsingErrors as $errorParsed) {
-            if ($errorParsed->getRelativeFilePath() === $relativeFilePath &&
-                $errorParsed->getError() === $error
-            ) {
+        foreach ($this->parsingErrors->toArray() as $errorParsed) {
+            if ($errorParsed->getError() === $error) {
                 return true;
             }
         }

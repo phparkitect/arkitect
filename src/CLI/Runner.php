@@ -10,6 +10,7 @@ use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\Analyzer\Parser;
 use Arkitect\ClassSetRules;
 use Arkitect\CLI\Progress\Progress;
+use Arkitect\Rules\NotParsedClasses;
 use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violations;
 use Symfony\Component\Finder\SplFileInfo;
@@ -18,9 +19,10 @@ class Runner
 {
     /** @var Violations */
     private $violations;
-
     /** @var ParsingErrors */
     private $parsingErrors;
+    /** @var NotParsedClasses */
+    private $notParsedClasses;
 
     public function run(Config $config, Progress $progress, TargetPhpVersion $targetPhpVersion): void
     {
@@ -47,23 +49,22 @@ class Runner
         ParsingErrors $parsingErrors
     ): void {
         $classDescriptionsToParse = [];
-
+        ini_set('xdebug.max_nesting_level', '3000');
         /** @var SplFileInfo $file */
         foreach ($classSetRule->getClassSet() as $file) {
             $progress->startParsingFile($file->getRelativePathname());
             $classDescriptionsToParse = $fileParser->parse(
                 $file->getContents(),
                 $file->getRelativePathname(),
-                $classDescriptionsToParse
+                $classDescriptionsToParse,
+                $parsingErrors
             );
-            $parsedErrors = $fileParser->getParsingErrors();
-
-            foreach ($parsedErrors as $parsedError) {
-                $parsingErrors->add($parsedError);
-            }
 
             $progress->endParsingFile($file->getRelativePathname());
         }
+
+        $parsingErrors = $fileParser->getParsingErrors();
+        $this->notParsedClasses = $fileParser->getNotParsedClasses();
 
         $classDescriptionsCollection = $fileParser->getClassDescriptionsParsed();
 
@@ -97,5 +98,10 @@ class Runner
     public function getParsingErrors(): ParsingErrors
     {
         return $this->parsingErrors;
+    }
+
+    public function getNotParsedClasses(): NotParsedClasses
+    {
+        return $this->notParsedClasses;
     }
 }

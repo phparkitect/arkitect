@@ -4,20 +4,27 @@ declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
 
+use Arkitect\Rules\NotParsedClasses;
 use Arkitect\Rules\ParsingError;
 
 class FileContentGetter implements FileContentGetterInterface
 {
     /** @var ?string */
     private $content;
-    /**
-     * @var ParsingError
-     */
+
+    /** @var ParsingError */
     private $parsingError;
-    /**
-     * @var ?string
-     */
+
+    /** @var ?string */
     private $fileName;
+
+    /** @var NotParsedClasses */
+    private $notParsedClasses;
+
+    public function __construct()
+    {
+        $this->notParsedClasses = new NotParsedClasses();
+    }
 
     public function open(string $classFQCN): void
     {
@@ -25,7 +32,7 @@ class FileContentGetter implements FileContentGetterInterface
         $this->fileName = null;
         try {
             if (!class_exists($classFQCN) && !interface_exists($classFQCN)) {
-                $this->parsingError = ParsingError::create($classFQCN, 'Class "'.$classFQCN.'" does not exist');
+                $this->notParsedClasses->add($classFQCN);
 
                 return;
             }
@@ -69,5 +76,10 @@ class FileContentGetter implements FileContentGetterInterface
     public function getFileName(): ?string
     {
         return $this->fileName;
+    }
+
+    public function getNotParsedClasses(): NotParsedClasses
+    {
+        return $this->notParsedClasses;
     }
 }

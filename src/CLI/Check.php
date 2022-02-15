@@ -86,6 +86,12 @@ class Check extends Command
 
                 return self::ERROR_CODE;
             }
+
+            if ($verbose) {
+                $notParsedClasses = $runner->getNotParsedClasses();
+                $notParsedClassesToPrint = $notParsedClasses->toString();
+                $output->writeln(sprintf('%s', $notParsedClassesToPrint));
+            }
         } catch (\Throwable $e) {
             $output->writeln($e->getMessage());
 

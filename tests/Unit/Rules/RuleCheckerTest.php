@@ -11,6 +11,7 @@ use Arkitect\ClassSetRules;
 use Arkitect\CLI\Progress\VoidProgress;
 use Arkitect\CLI\Runner;
 use Arkitect\Rules\DSL\ArchRule;
+use Arkitect\Rules\NotParsedClasses;
 use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
@@ -74,7 +75,7 @@ class FakeRule implements ArchRule
 
 class FakeParser implements Parser
 {
-    public function parse(string $fileContent, string $filename, array $classDescriptionToParse): array
+    public function parse(string $fileContent, string $filename, array $classDescriptionToParse, ParsingErrors $parsingErrors): array
     {
         return [
             ClassDescription::build('uno')->get(),
@@ -88,9 +89,9 @@ class FakeParser implements Parser
         return [ClassDescription::build('uno')->get()];
     }
 
-    public function getParsingErrors(): array
+    public function getParsingErrors(): ParsingErrors
     {
-        return [];
+        return new ParsingErrors();
     }
 
     public function getClassDescriptionsParsed(): ClassDescriptionCollection
@@ -101,5 +102,10 @@ class FakeParser implements Parser
         $classDescriptionCollection->add(ClassDescription::build('tre')->get());
 
         return $classDescriptionCollection;
+    }
+
+    public function getNotParsedClasses(): NotParsedClasses
+    {
+        return new NotParsedClasses();
     }
 }

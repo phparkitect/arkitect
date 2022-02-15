@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
 
+use Arkitect\Rules\NotParsedClasses;
 use Arkitect\Rules\ParsingError;
 
 interface FileContentGetterInterface
@@ -17,4 +18,6 @@ interface FileContentGetterInterface
     public function getError(): ?ParsingError;
 
     public function getFileName(): ?string;
+
+    public function getNotParsedClasses(): NotParsedClasses;
 }

@@ -108,9 +108,11 @@ class ClassDescriptionCollection
         $classDescriptionFiltered = $this->classDescriptions[$classDescriptionFQCN];
 
         $interfacesFound = $classDescriptionFiltered->getInterfaces();
+        $extendsFound = $this->getExtends($classDescriptionFQCN, []);
+        $classToParse = array_merge($interfacesFound, $extendsFound);
 
         /** @var FullyQualifiedClassName $interface */
-        foreach ($interfacesFound as $interface) {
+        foreach ($classToParse as $interface) {
             if ($interface->toString() === $classDescriptionFQCN ||
                 \array_key_exists($interface->toString(), $interfaces)) {
                 continue;

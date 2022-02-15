@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Unit\Analyzer;
 
 use Arkitect\Analyzer\FileContentGetter;
-use Arkitect\Rules\ParsingError;
+use Arkitect\Rules\NotParsedClasses;
 use PHPUnit\Framework\TestCase;
 
 class FileContentGetterTest extends TestCase
@@ -37,11 +37,12 @@ class BaseController
         $fileContentGetter = new FileContentGetter();
         $fileContentGetter->open('Arkitect\Dir\NotExistingFile');
 
+        $notParsedClasses = new NotParsedClasses();
+        $notParsedClasses->add('Arkitect\Dir\NotExistingFile');
+
         $this->assertFalse($fileContentGetter->isContentAvailable());
-        $this->assertEquals(
-            ParsingError::create('Arkitect\Dir\NotExistingFile', 'Class "Arkitect\Dir\NotExistingFile" does not exist'),
-            $fileContentGetter->getError()
-        );
+        $this->assertNull($fileContentGetter->getError());
+        $this->assertEquals($notParsedClasses, $fileContentGetter->getNotParsedClasses());
     }
 
     public function test_it_should_with_core_file(): void
