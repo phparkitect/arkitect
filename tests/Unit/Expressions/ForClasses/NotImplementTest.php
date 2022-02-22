@@ -21,7 +21,8 @@ class NotImplementTest extends TestCase
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             [],
-            null
+            null,
+            false
         );
 
         $violationError = $implementConstraint->describe($classDescription)->toString();
@@ -40,7 +41,8 @@ class NotImplementTest extends TestCase
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             [FullyQualifiedClassName::fromString('foo')],
-            null
+            null,
+            false
         );
 
         $violations = new Violations();
@@ -57,7 +59,8 @@ class NotImplementTest extends TestCase
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             [FullyQualifiedClassName::fromString('interface')],
-            null
+            null,
+            false
         );
 
         $violations = new Violations();

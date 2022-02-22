@@ -21,12 +21,21 @@ class ClassDescription
      */
     private $extends;
 
-    public function __construct(FullyQualifiedClassName $FQCN, array $dependencies, array $interfaces, ?FullyQualifiedClassName $extends)
-    {
+    /** @var bool */
+    private $final;
+
+    public function __construct(
+        FullyQualifiedClassName $FQCN,
+        array $dependencies,
+        array $interfaces,
+        ?FullyQualifiedClassName $extends,
+        bool $final
+    ) {
         $this->FQCN = $FQCN;
         $this->dependencies = $dependencies;
         $this->interfaces = $interfaces;
         $this->extends = $extends;
+        $this->final = $final;
     }
 
     public function setFullPath(string $fullPath): void
@@ -115,5 +124,10 @@ class ClassDescription
     public function getExtends(): ?FullyQualifiedClassName
     {
         return $this->extends;
+    }
+
+    public function isFinal(): bool
+    {
+        return $this->final;
     }
 }

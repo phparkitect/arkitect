@@ -32,6 +32,10 @@ class FileVisitor extends NodeVisitorAbstract
                 $this->classDescriptionBuilder
                     ->setExtends($node->extends->toString(), $node->getLine());
             }
+
+            if ($node->isFinal()) {
+                $this->classDescriptionBuilder->setFinal(true);
+            }
         }
 
         /**
