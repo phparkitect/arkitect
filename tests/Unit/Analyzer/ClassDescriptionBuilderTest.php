@@ -28,4 +28,30 @@ class ClassDescriptionBuilderTest extends TestCase
         $this->assertEquals($FQCN, $classDescription->getName());
         $this->assertEquals($FQCN, $classDescription->getFQCN());
     }
+
+    public function test_it_should_create_final_class(): void
+    {
+        $FQCN = 'HappyIsland';
+        $classDescriptionBuilder = ClassDescriptionBuilder::create($FQCN);
+        $classDescriptionBuilder->setFinal(true);
+
+        $classDescription = $classDescriptionBuilder->get();
+
+        $this->assertInstanceOf(ClassDescription::class, $classDescription);
+
+        $this->assertTrue($classDescription->isFinal());
+    }
+
+    public function test_it_should_create_not_final_class(): void
+    {
+        $FQCN = 'HappyIsland';
+        $classDescriptionBuilder = ClassDescriptionBuilder::create($FQCN);
+        $classDescriptionBuilder->setFinal(false);
+
+        $classDescription = $classDescriptionBuilder->get();
+
+        $this->assertInstanceOf(ClassDescription::class, $classDescription);
+
+        $this->assertFalse($classDescription->isFinal());
+    }
 }

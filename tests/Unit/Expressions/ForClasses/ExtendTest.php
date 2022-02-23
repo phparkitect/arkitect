@@ -20,7 +20,8 @@ class ExtendTest extends TestCase
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             [],
-            FullyQualifiedClassName::fromString('My\AnotherClass')
+            FullyQualifiedClassName::fromString('My\AnotherClass'),
+            false
         );
 
         $violationError = $extend->describe($classDescription)->toString();
@@ -40,7 +41,8 @@ class ExtendTest extends TestCase
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             [],
-            null
+            null,
+            false
         );
 
         $violationError = $extend->describe($classDescription)->toString();

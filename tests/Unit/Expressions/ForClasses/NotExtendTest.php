@@ -20,7 +20,8 @@ class NotExtendTest extends TestCase
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             [],
-            FullyQualifiedClassName::fromString('My\BaseClass')
+            FullyQualifiedClassName::fromString('My\BaseClass'),
+            false
         );
 
         $violationError = $notExtend->describe($classDescription)->toString();
