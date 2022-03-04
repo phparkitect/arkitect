@@ -22,6 +22,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
             [],
             [],
             null,
+            false,
             false
         );
 
@@ -38,6 +39,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
             [new ClassDependency('myNamespace', 100)],
             [],
             null,
+            false,
             false
         );
 
@@ -54,6 +56,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
             [new ClassDependency('myNamespace', 100), new ClassDependency('another\class', 200)],
             [],
             null,
+            false,
             false
         );
 
@@ -70,6 +73,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
             [new ClassDependency('foo', 100)],
             [],
             null,
+            false,
             false
         );
 

@@ -22,6 +22,7 @@ class NotImplementTest extends TestCase
             [],
             [],
             null,
+            false,
             false
         );
 
@@ -42,6 +43,7 @@ class NotImplementTest extends TestCase
             [],
             [FullyQualifiedClassName::fromString('foo')],
             null,
+            false,
             false
         );
 
@@ -60,6 +62,7 @@ class NotImplementTest extends TestCase
             [],
             [FullyQualifiedClassName::fromString('interface')],
             null,
+            false,
             false
         );
 

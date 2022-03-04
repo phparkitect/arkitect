@@ -6,36 +6,36 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
-use Arkitect\Expression\ForClasses\IsNotFinal;
+use Arkitect\Expression\ForClasses\IsNotAbstract;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
-class IsNotFinalTest extends TestCase
+class IsNotAbstractTest extends TestCase
 {
     public function test_it_should_return_violation_error(): void
     {
-        $isFinal = new IsNotFinal();
+        $isAbstract = new IsNotAbstract();
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
             [],
             null,
             true,
-            false
+            true
         );
 
-        $violationError = $isFinal->describe($classDescription)->toString();
+        $violationError = $isAbstract->describe($classDescription)->toString();
 
         $violations = new Violations();
-        $isFinal->evaluate($classDescription, $violations);
+        $isAbstract->evaluate($classDescription, $violations);
         self::assertNotEquals(0, $violations->count());
 
-        $this->assertEquals('HappyIsland should not be final', $violationError);
+        $this->assertEquals('HappyIsland should not be abstract', $violationError);
     }
 
-    public function test_it_should_return_true_if_is_final(): void
+    public function test_it_should_return_true_if_is_abstract(): void
     {
-        $isFinal = new IsNotFinal();
+        $isAbstract = new IsNotAbstract();
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
@@ -46,7 +46,7 @@ class IsNotFinalTest extends TestCase
         );
 
         $violations = new Violations();
-        $isFinal->evaluate($classDescription, $violations);
+        $isAbstract->evaluate($classDescription, $violations);
         self::assertEquals(0, $violations->count());
     }
 }
