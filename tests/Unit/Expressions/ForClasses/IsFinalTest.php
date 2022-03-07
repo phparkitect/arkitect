@@ -20,6 +20,7 @@ class IsFinalTest extends TestCase
             [],
             [],
             null,
+            false,
             false
         );
 
@@ -42,7 +43,8 @@ class IsFinalTest extends TestCase
             [],
             [],
             null,
-            true
+            true,
+            false
         );
 
         $violations = new Violations();

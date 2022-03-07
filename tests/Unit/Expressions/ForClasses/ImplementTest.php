@@ -22,6 +22,7 @@ class ImplementTest extends TestCase
             [],
             [],
             null,
+            false,
             false
         );
 
@@ -44,6 +45,7 @@ class ImplementTest extends TestCase
             [],
             [FullyQualifiedClassName::fromString('foo')],
             null,
+            false,
             false
         );
 
@@ -62,6 +64,7 @@ class ImplementTest extends TestCase
             [],
             [FullyQualifiedClassName::fromString('interface')],
             null,
+            false,
             false
         );
 

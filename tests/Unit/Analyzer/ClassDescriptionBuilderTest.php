@@ -54,4 +54,30 @@ class ClassDescriptionBuilderTest extends TestCase
 
         $this->assertFalse($classDescription->isFinal());
     }
+
+    public function test_it_should_create_abstract_class(): void
+    {
+        $FQCN = 'HappyIsland';
+        $classDescriptionBuilder = ClassDescriptionBuilder::create($FQCN);
+        $classDescriptionBuilder->setAbstract(true);
+
+        $classDescription = $classDescriptionBuilder->get();
+
+        $this->assertInstanceOf(ClassDescription::class, $classDescription);
+
+        $this->assertTrue($classDescription->isAbstract());
+    }
+
+    public function test_it_should_create_not_abstract_class(): void
+    {
+        $FQCN = 'HappyIsland';
+        $classDescriptionBuilder = ClassDescriptionBuilder::create($FQCN);
+        $classDescriptionBuilder->setAbstract(false);
+
+        $classDescription = $classDescriptionBuilder->get();
+
+        $this->assertInstanceOf(ClassDescription::class, $classDescription);
+
+        $this->assertFalse($classDescription->isAbstract());
+    }
 }

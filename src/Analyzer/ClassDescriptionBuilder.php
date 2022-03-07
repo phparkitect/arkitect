@@ -23,6 +23,9 @@ class ClassDescriptionBuilder
     /** @var bool */
     private $final;
 
+    /** @var bool */
+    private $abstract;
+
     private function __construct()
     {
     }
@@ -35,6 +38,7 @@ class ClassDescriptionBuilder
         $cdb->classDependencies = [];
         $cdb->interfaces = [];
         $cdb->final = false;
+        $cdb->abstract = false;
 
         return $cdb;
     }
@@ -71,7 +75,14 @@ class ClassDescriptionBuilder
 
     public function get(): ClassDescription
     {
-        $cd = new ClassDescription($this->FQCN, $this->classDependencies, $this->interfaces, $this->extend, $this->final);
+        $cd = new ClassDescription(
+            $this->FQCN,
+            $this->classDependencies,
+            $this->interfaces,
+            $this->extend,
+            $this->final,
+            $this->abstract
+        );
         $cd->setFullPath($this->filePath);
 
         return $cd;
@@ -80,6 +91,13 @@ class ClassDescriptionBuilder
     public function setFinal(bool $final): self
     {
         $this->final = $final;
+
+        return $this;
+    }
+
+    public function setAbstract(bool $abstract): self
+    {
+        $this->abstract = $abstract;
 
         return $this;
     }

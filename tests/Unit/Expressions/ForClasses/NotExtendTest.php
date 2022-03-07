@@ -21,6 +21,7 @@ class NotExtendTest extends TestCase
             [],
             [],
             FullyQualifiedClassName::fromString('My\BaseClass'),
+            false,
             false
         );
 
