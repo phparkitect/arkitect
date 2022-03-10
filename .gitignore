@@ -4,7 +4,7 @@
 .php_cs.cache
 .php-cs-fixer.cache
 /web
-/bin
-phparkitect.phar
+/bin/
 !/bin/box.phar
+phparkitect.phar
 composer.lock

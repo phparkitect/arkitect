@@ -44,6 +44,12 @@ build: ## it launches all the build
 	bin/psalm
 	bin/phpunit
 
+sfbuild: ## it launches all the build
+	symfony composer install
+	PHP_CS_FIXER_IGNORE_ENV=1 symfony php bin/php-cs-fixer fix -v
+	symfony php bin/psalm
+	symfony php bin/phpunit
+
 dt: ##it launches tests using container
 	docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect make test
 
