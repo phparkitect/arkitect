@@ -83,7 +83,7 @@ jobs:
           php_version: 7.1
 
       - name: "Compile phparkitect phar"
-        run: ./bin/box.phar compile -c ./box.json
+        run: php bin/box.phar compile -c ./box.json
 
       - name: "Upload phar file artifact"
         uses: actions/upload-artifact@v3
@@ -115,7 +115,7 @@ jobs:
         run: php ./phparkitect-${{ github.sha }}.phar
 
   publish_docker_images:
-    needs: build
+    needs: [build, smoke-test-phar]
     runs-on: "ubuntu-20.04"
 
     if: github.ref == 'refs/heads/main' || github.event_name == 'release'
