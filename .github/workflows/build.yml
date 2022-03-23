@@ -8,7 +8,6 @@ on:
 
 jobs:
   build:
-
     runs-on: "ubuntu-20.04"
     strategy:
       matrix:
@@ -64,6 +63,56 @@ jobs:
         PHP_VERSION: ${{ matrix.php-versions }}
       with:
         args: check
+
+  phar:
+    runs-on: "ubuntu-20.04"
+    needs: build
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.1
+
+      - name: Install dependencies
+        uses: php-actions/composer@v5
+        with:
+          args: --prefer-dist --no-dev -o
+          composer_version: 2
+          php_version: 7.1
+
+      - name: "Compile phparkitect phar"
+        run: ./bin/box.phar compile -c ./box.json
+
+      - name: "Upload phar file artifact"
+        uses: actions/upload-artifact@v3
+        with:
+          name: phparkitect.phar
+          path: ./phparkitect-${{ github.sha }}.phar
+          retention-days: 1
+
+  smoke-test-phar:
+    needs: phar
+    runs-on: "ubuntu-20.04"
+    strategy:
+      matrix:
+        php-versions: [ '7.1', '7.2', '7.3', '7.4', '8.0', '8.1' ]
+        coverage-driver: [ 'pcov' ]
+
+    steps:
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+
+      - name: "Download phar ./phparkitect-${{ github.sha }}.phar"
+        uses: actions/download-artifact@v3
+        with:
+          name: phparkitect-${{ github.sha }}.phar
+
+      - name: "Smoke test phar"
+        run: php ./phparkitect-${{ github.sha }}.phar
 
   publish_docker_images:
     needs: build
