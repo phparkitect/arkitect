@@ -7,8 +7,8 @@ namespace Arkitect\CLI;
 class Version
 {
     private const COMPOSER_PATHS = [
-        'phar:///composer.json',
-        'composer.json',
+        //'phar:///composer.json',
+        './composer.json',
         '../composer.json',
         '../../composer.json',
         '../../../composer.json',
