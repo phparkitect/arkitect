@@ -7,7 +7,7 @@ namespace Arkitect\CLI;
 class Version
 {
     private const COMPOSER_PATHS = [
-        'phar://phparkitect.phar/composer.json',
+        'phar:///composer.json',
         'composer.json',
         '../composer.json',
         '../../composer.json',
