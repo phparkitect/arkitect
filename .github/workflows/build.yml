@@ -91,6 +91,7 @@ jobs:
       - name: "Upload phar file artifact"
         uses: actions/upload-artifact@v3
         with:
+          name: phar-artifact
           path: ./phparkitect-${{ github.sha }}.phar
           retention-days: 1
 
@@ -111,7 +112,8 @@ jobs:
       - name: "Download phar ./phparkitect-${{ github.sha }}.phar"
         uses: actions/download-artifact@v3
         with:
-          name: phparkitect-${{ github.sha }}.phar
+          # will download phar in project root
+          name: phar-artifact
 
       - name: "Smoke test phar"
         run: php ./phparkitect-${{ github.sha }}.phar
