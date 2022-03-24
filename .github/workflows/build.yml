@@ -85,10 +85,12 @@ jobs:
       - name: "Compile phparkitect phar"
         run: php bin/box.phar compile -c ./box.json
 
+      - name: "Rename phar to avoid conflicts"
+        run: mv ./phparkitect.phar phparkitect-${{ github.sha }}.phar
+
       - name: "Upload phar file artifact"
         uses: actions/upload-artifact@v3
         with:
-          name: phparkitect.phar
           path: ./phparkitect-${{ github.sha }}.phar
           retention-days: 1
 
