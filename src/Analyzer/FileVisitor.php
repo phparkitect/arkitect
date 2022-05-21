@@ -8,9 +8,10 @@ use PhpParser\NodeVisitorAbstract;
 
 class FileVisitor extends NodeVisitorAbstract
 {
-    /** @var ClassDescriptionBuilder */
+    /** @var ?ClassDescriptionBuilder */
     private $classDescriptionBuilder;
 
+    /** @var array */
     private $classDescriptions = [];
 
     public function enterNode(Node $node): void
@@ -21,6 +22,10 @@ class FileVisitor extends NodeVisitorAbstract
                 $this->classDescriptionBuilder = ClassDescriptionBuilder::create(
                     $node->namespacedName->toCodeString()
                 );
+            }
+
+            if (null === $this->classDescriptionBuilder) {
+                return;
             }
 
             foreach ($node->implements as $interface) {
@@ -48,7 +53,10 @@ class FileVisitor extends NodeVisitorAbstract
          *
          * @see FileVisitorTest::test_should_returns_all_dependencies
          */
-        if ($node instanceof Node\Expr\StaticCall && method_exists($node->class, 'toString')) {
+        if ($node instanceof Node\Expr\StaticCall &&
+            method_exists($node->class, 'toString') &&
+            null !== $this->classDescriptionBuilder
+        ) {
             if ($this->isSelfOrStaticOrParent($node->class->toString())) {
                 return;
             }
@@ -57,7 +65,10 @@ class FileVisitor extends NodeVisitorAbstract
                 ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
         }
 
-        if ($node instanceof Node\Expr\Instanceof_ && method_exists($node->class, 'toString')) {
+        if ($node instanceof Node\Expr\Instanceof_ &&
+            method_exists($node->class, 'toString') &&
+            null !== $this->classDescriptionBuilder
+        ) {
             if ($this->isSelfOrStaticOrParent($node->class->toString())) {
                 return;
             }
@@ -66,7 +77,10 @@ class FileVisitor extends NodeVisitorAbstract
                 ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
         }
 
-        if ($node instanceof Node\Expr\New_ && !($node->class instanceof Node\Expr\Variable)) {
+        if ($node instanceof Node\Expr\New_ &&
+            !($node->class instanceof Node\Expr\Variable) &&
+             null !== $this->classDescriptionBuilder
+        ) {
             if ((method_exists($node->class, 'isAnonymous') && $node->class->isAnonymous()) ||
                 !method_exists($node->class, 'toString')) {
                 return;
@@ -103,7 +117,7 @@ class FileVisitor extends NodeVisitorAbstract
 
     public function leaveNode(Node $node): void
     {
-        if ($node instanceof Node\Stmt\Class_) {
+        if ($node instanceof Node\Stmt\Class_ && null !== $this->classDescriptionBuilder) {
             $classDescription = $this->classDescriptionBuilder->get();
 
             $this->classDescriptions[] = $classDescription;
@@ -126,6 +140,10 @@ class FileVisitor extends NodeVisitorAbstract
         }
 
         if (!method_exists($node->type, 'toString')) {
+            return;
+        }
+
+        if (null === $this->classDescriptionBuilder) {
             return;
         }
 

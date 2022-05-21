@@ -14,7 +14,7 @@ class ClassDescriptionBuilder
     /** @var array */
     private $interfaces;
 
-    /** @var FullyQualifiedClassName */
+    /** @var ?FullyQualifiedClassName */
     private $extend;
 
     /** @var string */
@@ -26,21 +26,32 @@ class ClassDescriptionBuilder
     /** @var bool */
     private $abstract;
 
-    private function __construct()
-    {
+    private function __construct(
+        FullyQualifiedClassName $FQCN,
+        string $filePath,
+        array $classDependencies,
+        array $interfaces,
+        bool $final,
+        bool $abstract
+    ) {
+        $this->FQCN = $FQCN;
+        $this->filePath = $filePath;
+        $this->classDependencies = $classDependencies;
+        $this->interfaces = $interfaces;
+        $this->final = $final;
+        $this->abstract = $abstract;
     }
 
     public static function create(string $FQCN): self
     {
-        $cdb = new self();
-        $cdb->FQCN = FullyQualifiedClassName::fromString($FQCN);
-        $cdb->filePath = '';
-        $cdb->classDependencies = [];
-        $cdb->interfaces = [];
-        $cdb->final = false;
-        $cdb->abstract = false;
-
-        return $cdb;
+        return new self(
+            FullyQualifiedClassName::fromString($FQCN),
+            '',
+            [],
+            [],
+            false,
+            false
+        );
     }
 
     public function setFilePath(string $filePath): self

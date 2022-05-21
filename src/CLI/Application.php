@@ -5,6 +5,7 @@ namespace Arkitect\CLI;
 
 class Application extends \Symfony\Component\Console\Application
 {
+    /** @var string */
     private static $logo = <<< 'EOD'
   ____  _   _ ____   _         _    _ _            _
  |  _ \| | | |  _ \ / \   _ __| | _(_) |_ ___  ___| |_

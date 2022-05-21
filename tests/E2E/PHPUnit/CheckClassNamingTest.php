@@ -6,7 +6,6 @@ namespace Arkitect\Tests\E2E\PHPUnit;
 use Arkitect\ClassSet;
 use Arkitect\Expression\ForClasses\HaveNameMatching;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
-use Arkitect\PHPUnit\ArchRuleTestCase;
 use Arkitect\Rules\Rule;
 use PHPUnit\Framework\TestCase;
 

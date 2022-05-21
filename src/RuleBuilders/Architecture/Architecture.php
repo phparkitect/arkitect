@@ -18,6 +18,9 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
 
     private function __construct()
     {
+        $this->componentName = '';
+        $this->componentSelectors = [];
+        $this->allowedDependencies = [];
     }
 
     public static function withComponents(): Component

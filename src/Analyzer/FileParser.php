@@ -32,6 +32,7 @@ class FileParser implements Parser
         TargetPhpVersion $targetPhpVersion
     ) {
         $this->fileVisitor = $fileVisitor;
+        $this->parsingErrors = [];
 
         $lexer = new Emulative([
             'usedAttributes' => ['comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos'],

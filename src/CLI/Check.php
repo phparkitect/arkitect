@@ -100,7 +100,8 @@ class Check extends Command
 
     protected function readRules(Config $ruleChecker, string $rulesFilename): void
     {
-        \Closure::fromCallable(function () use ($ruleChecker, $rulesFilename) {
+        \Closure::fromCallable(function () use ($ruleChecker, $rulesFilename): ?bool {
+            /** @psalm-suppress UnresolvableInclude $config */
             $config = require $rulesFilename;
 
             Assert::isCallable($config);
@@ -129,7 +130,7 @@ class Check extends Command
         $output->writeln("<info>PHPArkitect $version</info>\n");
     }
 
-    private function getConfigFilename(InputInterface $input)
+    private function getConfigFilename(InputInterface $input): string
     {
         $filename = $input->getOption(self::CONFIG_FILENAME_PARAM);
 
