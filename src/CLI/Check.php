@@ -52,6 +52,7 @@ class Check extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         ini_set('memory_limit', '-1');
+        ini_set('xdebug.max_nesting_level', '10000');
 
         try {
             $verbose = $input->getOption('verbose');
