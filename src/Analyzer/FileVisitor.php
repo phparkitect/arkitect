@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
 
+use PhpParser\Comment\Doc;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -44,6 +45,12 @@ class FileVisitor extends NodeVisitorAbstract
 
             if ($node->isAbstract()) {
                 $this->classDescriptionBuilder->setAbstract(true);
+            }
+
+            if (null !== $node->getDocComment()) {
+                /** @var Doc $docComment */
+                $docComment = $node->getDocComment();
+                $this->classDescriptionBuilder->setDocBlock($docComment->getText());
             }
         }
 

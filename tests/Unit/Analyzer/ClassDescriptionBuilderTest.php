@@ -80,4 +80,24 @@ class ClassDescriptionBuilderTest extends TestCase
 
         $this->assertFalse($classDescription->isAbstract());
     }
+
+    public function test_it_should_create_annotated_class(): void
+    {
+        $FQCN = 'HappyIsland';
+        $classDescriptionBuilder = ClassDescriptionBuilder::create($FQCN);
+        $classDescriptionBuilder->setDocBlock('/**
+ * @psalm-immutable
+ */');
+
+        $classDescription = $classDescriptionBuilder->get();
+
+        $this->assertInstanceOf(ClassDescription::class, $classDescription);
+
+        $this->assertEquals(
+            '/**
+ * @psalm-immutable
+ */',
+            $classDescription->getDocBlock()
+        );
+    }
 }

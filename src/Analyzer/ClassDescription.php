@@ -27,13 +27,17 @@ class ClassDescription
     /** @var bool */
     private $abstract;
 
+    /** @var string */
+    private $docBlock;
+
     public function __construct(
         FullyQualifiedClassName $FQCN,
         array $dependencies,
         array $interfaces,
         ?FullyQualifiedClassName $extends,
         bool $final,
-        bool $abstract
+        bool $abstract,
+        string $docBlock = ''
     ) {
         $this->FQCN = $FQCN;
         $this->dependencies = $dependencies;
@@ -42,6 +46,7 @@ class ClassDescription
         $this->final = $final;
         $this->abstract = $abstract;
         $this->fullPath = '';
+        $this->docBlock = $docBlock;
     }
 
     public function setFullPath(string $fullPath): void
@@ -140,5 +145,19 @@ class ClassDescription
     public function isAbstract(): bool
     {
         return $this->abstract;
+    }
+
+    public function getDocBlock(): string
+    {
+        return $this->docBlock;
+    }
+
+    public function containsDocBlock(string $search): bool
+    {
+        if (str_contains($this->docBlock, $search)) {
+            return true;
+        }
+
+        return false;
     }
 }

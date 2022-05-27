@@ -58,4 +58,26 @@ class ClassDescriptionTest extends TestCase
 
         $this->assertTrue($cd->namespaceMatchesOneOfTheseNamespaces(['Fruit']));
     }
+
+    public function test_should_return_true_if_is_annotated_with(): void
+    {
+        $cd = $this->builder
+            ->setDocBlock('/**
+ * @psalm-immutable
+ */')
+            ->get();
+
+        $this->assertTrue($cd->containsDocBlock('@psalm-immutable'));
+    }
+
+    public function test_should_return_false_if_not_annotated_with(): void
+    {
+        $cd = $this->builder
+            ->setDocBlock('/**
+ * @psalm-immutable
+ */')
+            ->get();
+
+        $this->assertFalse($cd->containsDocBlock('@another-annotation'));
+    }
 }
