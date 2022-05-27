@@ -8,6 +8,7 @@ use Arkitect\Expression\Expression;
 
 class Constraints
 {
+    /** @var array */
     private $expressions = [];
 
     public function add(Expression $expression): void

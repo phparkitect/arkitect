@@ -41,6 +41,7 @@ class ClassDescription
         $this->extends = $extends;
         $this->final = $final;
         $this->abstract = $abstract;
+        $this->fullPath = '';
     }
 
     public function setFullPath(string $fullPath): void

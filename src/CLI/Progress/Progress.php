@@ -7,11 +7,11 @@ use Arkitect\ClassSet;
 
 interface Progress
 {
-    public function startFileSetAnalysis(ClassSet $set);
+    public function startFileSetAnalysis(ClassSet $set): void;
 
-    public function startParsingFile(string $file);
+    public function startParsingFile(string $file): void;
 
-    public function endParsingFile(string $file);
+    public function endParsingFile(string $file): void;
 
-    public function endFileSetAnalysis(ClassSet $set);
+    public function endFileSetAnalysis(ClassSet $set): void;
 }

@@ -21,12 +21,16 @@ class Runner
     /** @var ParsingErrors */
     private $parsingErrors;
 
+    public function __construct()
+    {
+        $this->violations = new Violations();
+        $this->parsingErrors = new ParsingErrors();
+    }
+
     public function run(Config $config, Progress $progress, TargetPhpVersion $targetPhpVersion): void
     {
         /** @var FileParser $fileParser */
         $fileParser = FileParserFactory::createFileParser($targetPhpVersion);
-        $this->violations = new Violations();
-        $this->parsingErrors = new ParsingErrors();
 
         /** @var ClassSetRules $classSetRule */
         foreach ($config->getClassSetRules() as $classSetRule) {

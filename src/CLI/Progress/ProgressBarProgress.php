@@ -9,13 +9,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ProgressBarProgress implements Progress
 {
+    /** @var OutputInterface */
     private $output;
 
+    /** @var ProgressBar */
     private $progress;
 
     public function __construct(OutputInterface $output)
     {
         $this->output = $output;
+        $this->progress = new ProgressBar($output);
     }
 
     public function startFileSetAnalysis(ClassSet $set): void
