@@ -26,6 +26,11 @@ Currently, you can check if a class:
  - don't have dependency outside a namespace
  - reside in a namespace
  - not reside in a namespace
+ - is final
+ - is not final
+ - is abstract
+ - is not abstract
+ - doc block contains a string
 
 You can also define components and ensure that a component:
 - should not depend on any component
