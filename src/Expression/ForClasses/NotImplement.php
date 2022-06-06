@@ -21,12 +21,12 @@ class NotImplement implements Expression
         $this->interface = $interface;
     }
 
-    public function describe(ClassDescription $theClass): Description
+    public function describe(ClassDescription $theClass, string $because): Description
     {
-        return new PositiveDescription("should not implement {$this->interface}");
+        return new PositiveDescription("should not implement {$this->interface}", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
         $interface = $this->interface;
         $interfaces = $theClass->getInterfaces();
@@ -37,7 +37,7 @@ class NotImplement implements Expression
         if (\count(array_filter($interfaces, $implements)) > 0) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
-                $this->describe($theClass)->toString()
+                $this->describe($theClass, $because)->toString()
             );
             $violations->add($violation);
         }

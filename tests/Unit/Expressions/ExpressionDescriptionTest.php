@@ -11,8 +11,8 @@ class ExpressionDescriptionTest extends TestCase
     public function descriptionProvider(): array
     {
         return [
-            ['My class [have|not have] a dependency', 'My class have a dependency', 'My class not have a dependency'],
-            ['My class have a dependency', 'My class have a dependency', 'My class have a dependency'],
+            ['My class [have|not have] a dependency', 'My class have a dependency because we want to add this rule', 'My class not have a dependency because we want to add this rule'],
+            ['My class have a dependency', 'My class have a dependency because we want to add this rule', 'My class have a dependency because we want to add this rule'],
         ];
     }
 
@@ -25,7 +25,7 @@ class ExpressionDescriptionTest extends TestCase
      */
     public function test_should_return_expression_description_in_positive_form($msg, $positive, $negative): void
     {
-        $desc = new PositiveDescription($msg);
+        $desc = new PositiveDescription($msg, 'we want to add this rule');
 
         $this->assertEquals($positive, $desc->toString());
     }

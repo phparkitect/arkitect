@@ -25,10 +25,13 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
             false,
             false
         );
+        $because = 'we want to add this rule for our software';
+        $violationError = $notHaveDependencyOutsideNamespace->describe($classDescription, $because)->toString();
 
-        $violationError = $notHaveDependencyOutsideNamespace->describe($classDescription)->toString();
-
-        $this->assertEquals('should not depend on classes outside namespace '.$namespace, $violationError);
+        $this->assertEquals(
+            'should not depend on classes outside namespace '.$namespace.' because we want to add this rule for our software',
+            $violationError
+        );
     }
 
     public function test_it_should_return_true_if_not_depends_on_namespace(): void
@@ -42,9 +45,9 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
             false,
             false
         );
-
+        $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $notHaveDependencyOutsideNamespace->evaluate($classDescription, $violations);
+        $notHaveDependencyOutsideNamespace->evaluate($classDescription, $violations, $because);
         self::assertEquals(0, $violations->count());
     }
 
@@ -59,9 +62,9 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
             false,
             false
         );
-
+        $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $notHaveDependencyOutsideNamespace->evaluate($classDescription, $violations);
+        $notHaveDependencyOutsideNamespace->evaluate($classDescription, $violations, $because);
         self::assertNotEquals(0, $violations->count());
     }
 
@@ -76,9 +79,9 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
             false,
             false
         );
-
+        $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $notHaveDependencyOutsideNamespace->evaluate($classDescription, $violations);
+        $notHaveDependencyOutsideNamespace->evaluate($classDescription, $violations, $because);
         self::assertEquals(0, $violations->count());
     }
 }

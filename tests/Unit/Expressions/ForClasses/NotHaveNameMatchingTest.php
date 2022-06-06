@@ -17,9 +17,13 @@ class NotHaveNameMatchingTest extends TestCase
         $myClass = ClassDescription::build('\App\MyClass')->get();
 
         $violations = new Violations();
-        $expression->evaluate($myClass, $violations);
+        $because = 'we want to add this rule for our software';
+        $expression->evaluate($myClass, $violations, $because);
         self::assertEquals(1, $violations->count());
-        $this->assertEquals('should not have a name that matches *Class', $expression->describe($myClass)->toString());
+        $this->assertEquals(
+            'should not have a name that matches *Class because we want to add this rule for our software',
+            $expression->describe($myClass, $because)->toString()
+        );
     }
 
     public function test_show_violation_when_class_name_does_not_match(): void
@@ -28,8 +32,9 @@ class NotHaveNameMatchingTest extends TestCase
 
         $badClass = ClassDescription::build('\App\BadNameClass')->get();
 
+        $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $expression->evaluate($badClass, $violations);
+        $expression->evaluate($badClass, $violations, $because);
         self::assertEquals(0, $violations->count());
     }
 }

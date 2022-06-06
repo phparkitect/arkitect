@@ -20,12 +20,12 @@ class Extend implements Expression
         $this->className = $className;
     }
 
-    public function describe(ClassDescription $theClass): Description
+    public function describe(ClassDescription $theClass, string $because): Description
     {
-        return new PositiveDescription("should extend {$this->className}");
+        return new PositiveDescription("should extend {$this->className}", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
         $extends = $theClass->getExtends();
 
@@ -35,7 +35,7 @@ class Extend implements Expression
 
         $violation = Violation::create(
             $theClass->getFQCN(),
-            $this->describe($theClass)->toString()
+            $this->describe($theClass, $because)->toString()
         );
 
         $violations->add($violation);

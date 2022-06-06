@@ -23,14 +23,14 @@ class IsFinalTest extends TestCase
             false,
             false
         );
-
-        $violationError = $isFinal->describe($classDescription)->toString();
+        $because = 'we want to add this rule for our software';
+        $violationError = $isFinal->describe($classDescription, $because)->toString();
 
         $violations = new Violations();
-        $isFinal->evaluate($classDescription, $violations);
+        $isFinal->evaluate($classDescription, $violations, $because);
         self::assertNotEquals(0, $violations->count());
 
-        $this->assertEquals('HappyIsland should be final', $violationError);
+        $this->assertEquals('HappyIsland should be final because we want to add this rule for our software', $violationError);
     }
 
     public function test_it_should_return_true_if_is_final(): void
@@ -46,9 +46,9 @@ class IsFinalTest extends TestCase
             true,
             false
         );
-
+        $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $isFinal->evaluate($classDescription, $violations);
+        $isFinal->evaluate($classDescription, $violations, $because);
         self::assertEquals(0, $violations->count());
     }
 }

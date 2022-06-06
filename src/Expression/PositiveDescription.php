@@ -8,9 +8,13 @@ class PositiveDescription implements Description
     /** @var string */
     private $description;
 
-    public function __construct(string $description)
+    public function __construct(string $description, string $because)
     {
         $this->description = $description;
+
+        if ('' !== $because) {
+            $this->description .= ' because '.$because;
+        }
     }
 
     public function toString(): string

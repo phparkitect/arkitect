@@ -21,18 +21,18 @@ class HaveNameMatching implements Expression
         $this->name = $name;
     }
 
-    public function describe(ClassDescription $theClass): Description
+    public function describe(ClassDescription $theClass, string $because): Description
     {
-        return new PositiveDescription("should have a name that matches {$this->name}");
+        return new PositiveDescription("should have a name that matches {$this->name}", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
         $fqcn = FullyQualifiedClassName::fromString($theClass->getFQCN());
         if (!$fqcn->classMatches($this->name)) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
-                $this->describe($theClass)->toString()
+                $this->describe($theClass, $because)->toString()
             );
             $violations->add($violation);
         }

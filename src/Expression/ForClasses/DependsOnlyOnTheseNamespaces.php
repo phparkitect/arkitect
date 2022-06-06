@@ -21,14 +21,14 @@ class DependsOnlyOnTheseNamespaces implements Expression
         $this->namespaces = $namespace;
     }
 
-    public function describe(ClassDescription $theClass): Description
+    public function describe(ClassDescription $theClass, string $because): Description
     {
         $desc = implode(', ', $this->namespaces);
 
-        return new PositiveDescription("should depend only on classes in one of these namespaces: $desc");
+        return new PositiveDescription("should depend only on classes in one of these namespaces: $desc", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
         $dependencies = $theClass->getDependencies();
 
@@ -42,7 +42,7 @@ class DependsOnlyOnTheseNamespaces implements Expression
             if (!$dependency->matchesOneOf(...$this->namespaces)) {
                 $violation = Violation::createWithErrorLine(
                     $theClass->getFQCN(),
-                    $this->describe($theClass)->toString(),
+                    $this->describe($theClass, $because)->toString(),
                     $dependency->getLine()
                 );
 

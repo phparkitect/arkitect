@@ -16,11 +16,12 @@ class Constraints
         $this->expressions[] = $expression;
     }
 
-    public function checkAll(ClassDescription $classDescription, Violations $violations): void
+    //TODO
+    public function checkAll(ClassDescription $classDescription, Violations $violations, string $because): void
     {
         /** @var Expression $expression */
         foreach ($this->expressions as $expression) {
-            $expression->evaluate($classDescription, $violations);
+            $expression->evaluate($classDescription, $violations, $because);
         }
     }
 }

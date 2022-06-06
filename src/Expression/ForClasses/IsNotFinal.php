@@ -12,12 +12,12 @@ use Arkitect\Rules\Violations;
 
 class IsNotFinal implements Expression
 {
-    public function describe(ClassDescription $theClass): Description
+    public function describe(ClassDescription $theClass, string $because): Description
     {
-        return new PositiveDescription("{$theClass->getName()} should not be final");
+        return new PositiveDescription("{$theClass->getName()} should not be final", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
         if (!$theClass->isFinal()) {
             return;
@@ -25,7 +25,7 @@ class IsNotFinal implements Expression
 
         $violation = Violation::create(
             $theClass->getFQCN(),
-            $this->describe($theClass)->toString()
+            $this->describe($theClass, $because)->toString()
         );
 
         $violations->add($violation);
