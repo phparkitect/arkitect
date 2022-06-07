@@ -26,13 +26,14 @@ class ImplementTest extends TestCase
             false
         );
 
-        $violationError = $implementConstraint->describe($classDescription)->toString();
+        $because = 'we want to add this rule for our software';
+        $violationError = $implementConstraint->describe($classDescription, $because)->toString();
 
         $violations = new Violations();
-        $implementConstraint->evaluate($classDescription, $violations);
+        $implementConstraint->evaluate($classDescription, $violations, $because);
         self::assertNotEquals(0, $violations->count());
 
-        $this->assertEquals('should implement '.$interface, $violationError);
+        $this->assertEquals('should implement '.$interface.' because we want to add this rule for our software', $violationError);
     }
 
     public function test_it_should_return_true_if_not_depends_on_namespace(): void
@@ -48,9 +49,9 @@ class ImplementTest extends TestCase
             false,
             false
         );
-
+        $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $implementConstraint->evaluate($classDescription, $violations);
+        $implementConstraint->evaluate($classDescription, $violations, $because);
         self::assertNotEquals(0, $violations->count());
     }
 
@@ -67,9 +68,10 @@ class ImplementTest extends TestCase
             false,
             false
         );
+        $because = 'we want to add this rule for our software';
 
         $violations = new Violations();
-        $implementConstraint->evaluate($classDescription, $violations);
+        $implementConstraint->evaluate($classDescription, $violations, $because);
         self::assertEquals(0, $violations->count());
     }
 }

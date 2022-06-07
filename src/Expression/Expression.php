@@ -18,11 +18,11 @@ interface Expression
      * Returns a human readable description of the expression
      * $theClass can be used to add contextual information.
      */
-    public function describe(ClassDescription $theClass): Description;
+    public function describe(ClassDescription $theClass, string $because): Description;
 
     /**
      * Evaluates the expression for the class passed as parameter.
      * It should adds violations if rule is violated.
      */
-    public function evaluate(ClassDescription $theClass, Violations $violations): void;
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void;
 }

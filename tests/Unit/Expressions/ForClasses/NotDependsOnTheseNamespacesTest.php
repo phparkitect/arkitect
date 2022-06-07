@@ -17,9 +17,9 @@ class NotDependsOnTheseNamespacesTest extends TestCase
         $notDependOnClasses = new NotDependsOnTheseNamespaces('myNamespace');
 
         $classDescription = ClassDescription::build('HappyIsland\Myclass')->get();
-
+        $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $notDependOnClasses->evaluate($classDescription, $violations);
+        $notDependOnClasses->evaluate($classDescription, $violations, $because);
 
         self::assertEquals(0, $violations->count());
     }
@@ -33,11 +33,15 @@ class NotDependsOnTheseNamespacesTest extends TestCase
             ->addDependency(new ClassDependency('anotherNamespace\Banana', 1))
             ->get();
 
+        $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $notDependOnClasses->evaluate($classDescription, $violations);
+        $notDependOnClasses->evaluate($classDescription, $violations, $because);
 
         self::assertEquals(1, $violations->count());
-        $this->assertEquals('should not depend on these namespaces: myNamespace', $notDependOnClasses->describe($classDescription)->toString());
+        $this->assertEquals(
+            'should not depend on these namespaces: myNamespace because we want to add this rule for our software',
+            $notDependOnClasses->describe($classDescription, $because)->toString()
+        );
     }
 
     public function test_it_should_return_true_if_depends_on_class_in_root_namespace(): void
@@ -51,11 +55,14 @@ class NotDependsOnTheseNamespacesTest extends TestCase
             ->get();
 
         $violations = new Violations();
-
-        $notDependOnClasses->evaluate($classDescription, $violations);
+        $because = 'we want to add this rule for our software';
+        $notDependOnClasses->evaluate($classDescription, $violations, $because);
 
         self::assertCount(1, $violations);
-        $this->assertEquals('should not depend on these namespaces: myNamespace', $notDependOnClasses->describe($classDescription)->toString());
+        $this->assertEquals(
+            'should not depend on these namespaces: myNamespace because we want to add this rule for our software',
+            $notDependOnClasses->describe($classDescription, $because)->toString()
+        );
     }
 
     public function test_it_should_return_false_if_depends_on_namespace(): void
@@ -67,10 +74,14 @@ class NotDependsOnTheseNamespacesTest extends TestCase
             ->addDependency(new ClassDependency('myNamespace\Mango', 10))
             ->get();
 
+        $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $notDependOnClasses->evaluate($classDescription, $violations);
+        $notDependOnClasses->evaluate($classDescription, $violations, $because);
 
         self::assertEquals(2, $violations->count());
-        $this->assertEquals('should not depend on these namespaces: myNamespace', $notDependOnClasses->describe($classDescription)->toString());
+        $this->assertEquals(
+            'should not depend on these namespaces: myNamespace because we want to add this rule for our software',
+            $notDependOnClasses->describe($classDescription, $because)->toString()
+        );
     }
 }

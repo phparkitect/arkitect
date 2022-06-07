@@ -16,12 +16,12 @@ class Specs
         $this->expressions[] = $expression;
     }
 
-    public function allSpecsAreMatchedBy(ClassDescription $classDescription): bool
+    public function allSpecsAreMatchedBy(ClassDescription $classDescription, string $because): bool
     {
         /** @var Expression $spec */
         foreach ($this->expressions as $spec) {
             $violations = new Violations();
-            $spec->evaluate($classDescription, $violations);
+            $spec->evaluate($classDescription, $violations, $because);
 
             if ($violations->count() > 0) {
                 return false;

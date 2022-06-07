@@ -26,10 +26,11 @@ class NotImplementTest extends TestCase
             false
         );
 
-        $violationError = $implementConstraint->describe($classDescription)->toString();
+        $because = 'we want to add this rule for our software';
+        $violationError = $implementConstraint->describe($classDescription, $because)->toString();
 
         $violations = new Violations();
-        $implementConstraint->evaluate($classDescription, $violations);
+        $implementConstraint->evaluate($classDescription, $violations, $because);
         self::assertEquals(0, $violations->count());
     }
 
@@ -46,9 +47,9 @@ class NotImplementTest extends TestCase
             false,
             false
         );
-
+        $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $implementConstraint->evaluate($classDescription, $violations);
+        $implementConstraint->evaluate($classDescription, $violations, $because);
         self::assertEquals(0, $violations->count());
     }
 
@@ -66,12 +67,16 @@ class NotImplementTest extends TestCase
             false
         );
 
+        $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $implementConstraint->evaluate($classDescription, $violations);
+        $implementConstraint->evaluate($classDescription, $violations, $because);
 
-        $violationError = $implementConstraint->describe($classDescription)->toString();
+        $violationError = $implementConstraint->describe($classDescription, $because)->toString();
         self::assertNotEquals(0, $violations->count());
 
-        $this->assertEquals('should not implement '.$interface, $violationError);
+        $this->assertEquals(
+            'should not implement '.$interface.' because we want to add this rule for our software',
+            $violationError
+        );
     }
 }

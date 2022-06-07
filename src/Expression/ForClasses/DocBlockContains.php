@@ -20,17 +20,17 @@ class DocBlockContains implements Expression
         $this->docBlock = $docBlock;
     }
 
-    public function describe(ClassDescription $theClass): Description
+    public function describe(ClassDescription $theClass, string $because): Description
     {
-        return new PositiveDescription("should have a doc block that contains {$this->docBlock}");
+        return new PositiveDescription("should have a doc block that contains {$this->docBlock}", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
         if (!$theClass->containsDocBlock($this->docBlock)) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
-                $this->describe($theClass)->toString()
+                $this->describe($theClass, $because)->toString()
             );
             $violations->add($violation);
         }

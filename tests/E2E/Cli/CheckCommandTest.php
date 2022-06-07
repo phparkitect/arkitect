@@ -22,21 +22,21 @@ class CheckCommandTest extends TestCase
         $expectedErrors = 'ERRORS!
 
 App\Controller\Foo violates rules
-  should implement ContainerAwareInterface
-  should have a name that matches *Controller
+  should implement ContainerAwareInterface because all controllers should be container aware
+  should have a name that matches *Controller because we want uniform naming
 
 App\Controller\ProductsController violates rules
-  should implement ContainerAwareInterface
+  should implement ContainerAwareInterface because all controllers should be container aware
 
 App\Controller\UserController violates rules
-  should implement ContainerAwareInterface
+  should implement ContainerAwareInterface because all controllers should be container aware
 
 App\Controller\YieldController violates rules
-  should implement ContainerAwareInterface
+  should implement ContainerAwareInterface because all controllers should be container aware
 
 App\Domain\Model violates rules
-  should not depend on classes outside namespace App\Domain (on line 14)
-  should not depend on classes outside namespace App\Domain (on line 15)';
+  should not depend on classes outside namespace App\Domain because we want protect our domain (on line 14)
+  should not depend on classes outside namespace App\Domain because we want protect our domain (on line 15)';
 
         $this->assertCheckHasErrors($cmdTester, $expectedErrors);
     }

@@ -33,10 +33,11 @@ class ArchRule implements DSL\ArchRule
             return;
         }
 
-        if (!$this->thats->allSpecsAreMatchedBy($classDescription)) {
+        if (!$this->thats->allSpecsAreMatchedBy($classDescription, $this->because)) {
             return;
         }
 
-        $this->shoulds->checkAll($classDescription, $violations);
+        //TODO
+        $this->shoulds->checkAll($classDescription, $violations, $this->because);
     }
 }

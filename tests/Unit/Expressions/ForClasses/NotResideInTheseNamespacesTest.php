@@ -16,9 +16,9 @@ class NotResideInTheseNamespacesTest extends TestCase
         $haveNameMatching = new NotResideInTheseNamespaces('MyNamespace');
 
         $classDesc = ClassDescription::build('AnotherNamespace\HappyIsland')->get();
-
+        $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $haveNameMatching->evaluate($classDesc, $violations);
+        $haveNameMatching->evaluate($classDesc, $violations, $because);
 
         self::assertEquals(0, $violations->count());
     }
@@ -29,12 +29,15 @@ class NotResideInTheseNamespacesTest extends TestCase
         $haveNameMatching = new NotResideInTheseNamespaces($namespace);
 
         $classDesc = ClassDescription::build('MyNamespace\HappyIsland')->get();
-
+        $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $haveNameMatching->evaluate($classDesc, $violations);
+        $haveNameMatching->evaluate($classDesc, $violations, $because);
 
         self::assertEquals(1, $violations->count());
-        $this->assertEquals('should not reside in one of these namespaces: '.$namespace, $haveNameMatching->describe($classDesc)->toString());
+        $this->assertEquals(
+            'should not reside in one of these namespaces: '.$namespace.' because we want to add this rule for our software',
+            $haveNameMatching->describe($classDesc, $because)->toString()
+        );
     }
 
     public function test_it_should_check_multiple_namespaces_in_or(): void
@@ -43,17 +46,18 @@ class NotResideInTheseNamespacesTest extends TestCase
 
         $classDesc = ClassDescription::build('AnotherNamespace\HappyIsland')->get();
         $violations = new Violations();
-        $haveNameMatching->evaluate($classDesc, $violations);
+        $because = 'we want to add this rule for our software';
+        $haveNameMatching->evaluate($classDesc, $violations, $because);
         self::assertEquals(1, $violations->count());
 
         $classDesc = ClassDescription::build('MyNamespace\HappyIsland')->get();
         $violations = new Violations();
-        $haveNameMatching->evaluate($classDesc, $violations);
+        $haveNameMatching->evaluate($classDesc, $violations, $because);
         self::assertEquals(0, $violations->count());
 
         $classDesc = ClassDescription::build('AThirdNamespace\HappyIsland')->get();
         $violations = new Violations();
-        $haveNameMatching->evaluate($classDesc, $violations);
+        $haveNameMatching->evaluate($classDesc, $violations, $because);
         self::assertEquals(1, $violations->count());
     }
 }

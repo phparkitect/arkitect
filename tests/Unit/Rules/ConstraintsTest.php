@@ -18,12 +18,12 @@ class ConstraintsTest extends TestCase
     public function test_it_should_not_add_to_violation_if_constraint_is_not_violated(): void
     {
         $trueExpression = new class() implements Expression {
-            public function describe(ClassDescription $theClass): Description
+            public function describe(ClassDescription $theClass, string $because): Description
             {
                 return new PositiveDescription('');
             }
 
-            public function evaluate(ClassDescription $theClass, Violations $violations): void
+            public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
             {
             }
         };
@@ -31,10 +31,12 @@ class ConstraintsTest extends TestCase
         $expressionStore = new Constraints();
         $expressionStore->add($trueExpression);
         $violations = new Violations();
+        $because = 'we want to add this rule for our software';
 
         $expressionStore->checkAll(
             ClassDescriptionBuilder::create('Banana')->get(),
-            $violations
+            $violations,
+            $because
         );
 
         $this->assertCount(0, $violations);
@@ -43,16 +45,16 @@ class ConstraintsTest extends TestCase
     public function test_it_should_add_to_violation_store_if_constraint_is_violated(): void
     {
         $falseExpression = new class() implements Expression {
-            public function describe(ClassDescription $theClass): Description
+            public function describe(ClassDescription $theClass, string $because): Description
             {
-                return new PositiveDescription('bar');
+                return new PositiveDescription('bar', 'we want to add this rule');
             }
 
-            public function evaluate(ClassDescription $theClass, Violations $violations): void
+            public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
             {
                 $violation = Violation::create(
                     $theClass->getFQCN(),
-                    $this->describe($theClass)->toString()
+                    $this->describe($theClass, $because)->toString()
                 );
 
                 $violations->add($violation);
@@ -62,10 +64,12 @@ class ConstraintsTest extends TestCase
         $expressionStore = new Constraints();
         $expressionStore->add($falseExpression);
         $violations = new Violations();
+        $because = 'we want to add this rule for our software';
 
         $expressionStore->checkAll(
             ClassDescriptionBuilder::create('Banana')->get(),
-            $violations
+            $violations,
+            $because
         );
 
         $this->assertCount(1, $violations);

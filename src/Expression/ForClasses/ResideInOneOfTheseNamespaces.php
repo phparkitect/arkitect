@@ -20,14 +20,14 @@ class ResideInOneOfTheseNamespaces implements Expression
         $this->namespaces = $namespaces;
     }
 
-    public function describe(ClassDescription $theClass): Description
+    public function describe(ClassDescription $theClass, string $because): Description
     {
         $descr = implode(', ', $this->namespaces);
 
-        return new PositiveDescription("should reside in one of these namespaces: $descr");
+        return new PositiveDescription("should reside in one of these namespaces: $descr", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
         $resideInNamespace = false;
         foreach ($this->namespaces as $namespace) {
@@ -39,7 +39,7 @@ class ResideInOneOfTheseNamespaces implements Expression
         if (!$resideInNamespace) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
-                $this->describe($theClass)->toString()
+                $this->describe($theClass, $because)->toString()
             );
             $violations->add($violation);
         }

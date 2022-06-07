@@ -13,8 +13,8 @@ class PositiveDescriptionTest extends TestCase
     {
         $description = 'should [depend|not depend] only on classes: Domain';
 
-        $positiveDescription = new PositiveDescription($description);
-        $this->assertEquals($description, $positiveDescription->getPattern());
-        $this->assertEquals('should depend only on classes: Domain', $positiveDescription->toString());
+        $positiveDescription = new PositiveDescription($description, 'we want to add this rule');
+        $this->assertEquals($description.' because we want to add this rule', $positiveDescription->getPattern());
+        $this->assertEquals('should depend only on classes: Domain because we want to add this rule', $positiveDescription->toString());
     }
 }

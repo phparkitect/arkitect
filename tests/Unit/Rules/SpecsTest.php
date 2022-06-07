@@ -18,8 +18,9 @@ class SpecsTest extends TestCase
         $specStore->add(new HaveNameMatching('Foo'));
 
         $classDescription = ClassDescription::build('MyNamespace\HappyIsland')->get();
+        $because = 'we want to add this rule for our software';
 
-        $this->assertFalse($specStore->allSpecsAreMatchedBy($classDescription));
+        $this->assertFalse($specStore->allSpecsAreMatchedBy($classDescription, $because));
     }
 
     public function test_return_true_if_all_specs_are_matched(): void
@@ -30,7 +31,8 @@ class SpecsTest extends TestCase
         $classDescription = ClassDescription::build('MyNamespace\HappyIsland')
             ->addDependency(new ClassDependency('Foo', 100))
             ->get();
+        $because = 'we want to add this rule for our software';
 
-        $this->assertTrue($specStore->allSpecsAreMatchedBy($classDescription));
+        $this->assertTrue($specStore->allSpecsAreMatchedBy($classDescription, $because));
     }
 }
