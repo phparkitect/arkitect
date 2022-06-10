@@ -17,8 +17,7 @@ class ConstraintsTest extends TestCase
 {
     public function test_it_should_not_add_to_violation_if_constraint_is_not_violated(): void
     {
-        $trueExpression = new class() implements Expression
-        {
+        $trueExpression = new class() implements Expression {
             public function describe(ClassDescription $theClass, string $because): Description
             {
                 return new Description('');
@@ -45,8 +44,7 @@ class ConstraintsTest extends TestCase
 
     public function test_it_should_add_to_violation_store_if_constraint_is_violated(): void
     {
-        $falseExpression = new class() implements Expression
-        {
+        $falseExpression = new class() implements Expression {
             public function describe(ClassDescription $theClass, string $because): Description
             {
                 return new Description('bar', 'we want to add this rule');
