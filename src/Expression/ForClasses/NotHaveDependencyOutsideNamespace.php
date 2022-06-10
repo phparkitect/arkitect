@@ -29,7 +29,7 @@ class NotHaveDependencyOutsideNamespace implements Expression
         return new PositiveDescription("should not depend on classes outside namespace {$this->namespace}", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because, bool $stopOnFailure): void
     {
         $namespace = $this->namespace;
         $depends = function (ClassDependency $dependency) use ($namespace): bool {
@@ -51,6 +51,10 @@ class NotHaveDependencyOutsideNamespace implements Expression
                 $externalDep->getLine()
             );
             $violations->add($violation);
+
+            if ($stopOnFailure) {
+                return;
+            }
         }
     }
 }

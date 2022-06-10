@@ -25,7 +25,7 @@ class DocBlockContains implements Expression
         return new PositiveDescription("should have a doc block that contains {$this->docBlock}", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because, bool $stopOnFailure): void
     {
         if (!$theClass->containsDocBlock($this->docBlock)) {
             $violation = Violation::create(

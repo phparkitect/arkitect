@@ -24,10 +24,10 @@ class IsNotAbstractTest extends TestCase
             true
         );
         $because = 'we want to add this rule for our software';
-        $violationError = $isAbstract->describe($classDescription, $because)->toString();
+        $violationError = $isAbstract->describe($classDescription, $because, false)->toString();
 
         $violations = new Violations();
-        $isAbstract->evaluate($classDescription, $violations, $because);
+        $isAbstract->evaluate($classDescription, $violations, $because, false);
         self::assertNotEquals(0, $violations->count());
 
         $this->assertEquals('HappyIsland should not be abstract because we want to add this rule for our software', $violationError);
@@ -46,7 +46,7 @@ class IsNotAbstractTest extends TestCase
         );
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $isAbstract->evaluate($classDescription, $violations, $because);
+        $isAbstract->evaluate($classDescription, $violations, $because, false);
         self::assertEquals(0, $violations->count());
     }
 }

@@ -26,7 +26,7 @@ class HaveNameMatching implements Expression
         return new PositiveDescription("should have a name that matches {$this->name}", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because, bool $stopOnFailure): void
     {
         $fqcn = FullyQualifiedClassName::fromString($theClass->getFQCN());
         if (!$fqcn->classMatches($this->name)) {

@@ -151,7 +151,7 @@ EOF;
         $violations = new Violations();
 
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Foo', 'Symfony', 'Doctrine');
-        $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+        $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software', false);
 
         $this->assertCount(0, $violations);
     }
@@ -221,7 +221,7 @@ EOF;
         $violations = new Violations();
 
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Foo', 'Symfony', 'Doctrine');
-        $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+        $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software', false);
 
         $this->assertCount(0, $violations);
     }
@@ -314,7 +314,7 @@ EOF;
         $violations = new Violations();
 
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('Root\Animals');
-        $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+        $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software', false);
 
         $this->assertCount(0, $violations);
     }
@@ -347,7 +347,7 @@ EOF;
         $violations = new Violations();
 
         $dependsOnlyOnTheseNamespaces = new DependsOnlyOnTheseNamespaces();
-        $dependsOnlyOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+        $dependsOnlyOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software', false);
 
         $this->assertCount(1, $violations);
     }

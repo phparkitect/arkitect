@@ -28,7 +28,7 @@ class DependsOnlyOnTheseNamespaces implements Expression
         return new PositiveDescription("should depend only on classes in one of these namespaces: $desc", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because, bool $stopOnFailure): void
     {
         $dependencies = $theClass->getDependencies();
 
@@ -47,6 +47,10 @@ class DependsOnlyOnTheseNamespaces implements Expression
                 );
 
                 $violations->add($violation);
+
+                if ($stopOnFailure) {
+                    return;
+                }
             }
         }
     }

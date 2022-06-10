@@ -25,10 +25,10 @@ class NotExtendTest extends TestCase
             false
         );
         $because = 'we want to add this rule for our software';
-        $violationError = $notExtend->describe($classDescription, $because)->toString();
+        $violationError = $notExtend->describe($classDescription, $because, false)->toString();
 
         $violations = new Violations();
-        $notExtend->evaluate($classDescription, $violations, $because);
+        $notExtend->evaluate($classDescription, $violations, $because, false);
 
         self::assertEquals(1, $violations->count());
         self::assertEquals('should not extend My\BaseClass because we want to add this rule for our software', $violationError);

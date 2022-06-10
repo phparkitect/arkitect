@@ -41,6 +41,18 @@ App\Domain\Model violates rules
         $this->assertCheckHasErrors($cmdTester, $expectedErrors);
     }
 
+    public function test_app_returns_single_error_because_there_is_stop_on_failure_param(): void
+    {
+        $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvc.php', true);
+
+        $expectedErrors = 'ERRORS!
+
+App\Controller\Foo violates rules
+  should implement ContainerAwareInterface because all controllers should be container aware';
+
+        $this->assertCheckHasErrors($cmdTester, $expectedErrors);
+    }
+
     public function test_does_not_explode_if_an_exception_is_thrown(): void
     {
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configThrowsException.php');
@@ -67,9 +79,13 @@ App\Controller\Foo violates rules
         $this->assertCheckHasErrors($cmdTester, $expectedErrors);
     }
 
-    protected function runCheck($configFilePath = null): CommandTester
+    protected function runCheck($configFilePath = null, bool $stopOnFailure = null): CommandTester
     {
         $input = $configFilePath ? ['--config' => $configFilePath] : [];
+
+        if (null !== $stopOnFailure) {
+            $input['--stop-on-failure'] = true;
+        }
 
         $app = new Application('PHPArkitect', 'dunno');
         $app->add(new Check());

@@ -27,7 +27,7 @@ class NotResideInTheseNamespaces implements Expression
         return new PositiveDescription("should not reside in one of these namespaces: $descr", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because, bool $stopOnFailure): void
     {
         $resideInNamespace = false;
         foreach ($this->namespaces as $namespace) {

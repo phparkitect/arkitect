@@ -32,7 +32,8 @@ class RuleCheckerTest extends TestCase
             new VoidProgress(),
             $fileParser,
             $violations,
-            $parsingErrors
+            $parsingErrors,
+            false
         );
 
         self::assertCount(3, $violations);
@@ -65,7 +66,7 @@ class FakeSplFileInfo extends SplFileInfo
 
 class FakeRule implements ArchRule
 {
-    public function check(ClassDescription $classDescription, Violations $violations): void
+    public function check(ClassDescription $classDescription, Violations $violations, bool $stopOnFailure): void
     {
         $violations->add(Violation::create('fqcn', 'error'));
     }

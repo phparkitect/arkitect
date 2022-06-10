@@ -27,7 +27,7 @@ class ArchRule implements DSL\ArchRule
         $this->classesToBeExcluded = $classesToBeExcluded;
     }
 
-    public function check(ClassDescription $classDescription, Violations $violations): void
+    public function check(ClassDescription $classDescription, Violations $violations, bool $stopOnFailure): void
     {
         if ($classDescription->namespaceMatchesOneOfTheseNamespaces($this->classesToBeExcluded)) {
             return;
@@ -37,7 +37,6 @@ class ArchRule implements DSL\ArchRule
             return;
         }
 
-        //TODO
-        $this->shoulds->checkAll($classDescription, $violations, $this->because);
+        $this->shoulds->checkAll($classDescription, $violations, $this->because, $stopOnFailure);
     }
 }

@@ -54,7 +54,8 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
             new VoidProgress(),
             $this->fileparser,
             $this->violations,
-            $this->parsingErrors
+            $this->parsingErrors,
+            false
         );
 
         return 0 === $this->violations->count();

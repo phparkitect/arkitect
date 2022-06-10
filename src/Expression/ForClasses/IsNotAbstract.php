@@ -17,7 +17,7 @@ class IsNotAbstract implements Expression
         return new PositiveDescription("{$theClass->getName()} should not be abstract", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because, bool $stopOnFailure): void
     {
         if (!$theClass->isAbstract()) {
             return;

@@ -20,7 +20,7 @@ class SpecsTest extends TestCase
         $classDescription = ClassDescription::build('MyNamespace\HappyIsland')->get();
         $because = 'we want to add this rule for our software';
 
-        $this->assertFalse($specStore->allSpecsAreMatchedBy($classDescription, $because));
+        $this->assertFalse($specStore->allSpecsAreMatchedBy($classDescription, $because, false));
     }
 
     public function test_return_true_if_all_specs_are_matched(): void
@@ -33,6 +33,6 @@ class SpecsTest extends TestCase
             ->get();
         $because = 'we want to add this rule for our software';
 
-        $this->assertTrue($specStore->allSpecsAreMatchedBy($classDescription, $because));
+        $this->assertTrue($specStore->allSpecsAreMatchedBy($classDescription, $because, false));
     }
 }

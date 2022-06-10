@@ -41,7 +41,7 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
         $classDesc = ClassDescription::build($actualFQCN)->get();
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $haveNameMatching->evaluate($classDesc, $violations, $because);
+        $haveNameMatching->evaluate($classDesc, $violations, $because, false);
 
         self::assertEquals(0, $violations->count());
     }
@@ -53,7 +53,7 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
         $classDesc = ClassDescription::build('AnotherNamespace\HappyIsland')->get();
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $haveNameMatching->evaluate($classDesc, $violations, $because);
+        $haveNameMatching->evaluate($classDesc, $violations, $because, false);
 
         self::assertNotEquals(0, $violations->count());
     }
@@ -65,22 +65,22 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
         $classDesc = ClassDescription::build('AnotherNamespace\HappyIsland')->get();
         $violations = new Violations();
         $because = 'we want to add this rule for our software';
-        $haveNameMatching->evaluate($classDesc, $violations, $because);
+        $haveNameMatching->evaluate($classDesc, $violations, $because, false);
         self::assertEquals(0, $violations->count());
 
         $classDesc = ClassDescription::build('MyNamespace\HappyIsland')->get();
         $violations = new Violations();
-        $haveNameMatching->evaluate($classDesc, $violations, $because);
+        $haveNameMatching->evaluate($classDesc, $violations, $because, false);
         self::assertEquals(0, $violations->count());
 
         $classDesc = ClassDescription::build('AThirdNamespace\HappyIsland')->get();
         $violations = new Violations();
-        $haveNameMatching->evaluate($classDesc, $violations, $because);
+        $haveNameMatching->evaluate($classDesc, $violations, $because, false);
         self::assertEquals(0, $violations->count());
 
         $classDesc = ClassDescription::build('NopeNamespace\HappyIsland')->get();
         $violations = new Violations();
-        $haveNameMatching->evaluate($classDesc, $violations, $because);
+        $haveNameMatching->evaluate($classDesc, $violations, $because, false);
         self::assertNotEquals(0, $violations->count());
     }
 }

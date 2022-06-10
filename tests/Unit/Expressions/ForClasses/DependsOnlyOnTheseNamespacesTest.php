@@ -19,12 +19,12 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
         $classDescription = ClassDescription::build('HappyIsland\Myclass')->get();
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $dependOnClasses->evaluate($classDescription, $violations, $because);
+        $dependOnClasses->evaluate($classDescription, $violations, $because, false);
 
         self::assertEquals(0, $violations->count());
         self::assertEquals(
             'should depend only on classes in one of these namespaces: myNamespace because we want to add this rule for our software',
-            $dependOnClasses->describe($classDescription, $because)->toString()
+            $dependOnClasses->describe($classDescription, $because, false)->toString()
         );
     }
 
@@ -39,7 +39,7 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
 
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $dependOnClasses->evaluate($classDescription, $violations, $because);
+        $dependOnClasses->evaluate($classDescription, $violations, $because, false);
 
         self::assertNotEquals(0, $violations->count());
     }
@@ -57,7 +57,7 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
 
-        $dependOnClasses->evaluate($classDescription, $violations, $because);
+        $dependOnClasses->evaluate($classDescription, $violations, $because, false);
 
         self::assertCount(1, $violations);
     }
@@ -73,7 +73,7 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
 
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $dependOnClasses->evaluate($classDescription, $violations, $because);
+        $dependOnClasses->evaluate($classDescription, $violations, $because, false);
 
         self::assertEquals(0, $violations->count());
     }
@@ -89,7 +89,7 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
 
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $dependOnClasses->evaluate($classDescription, $violations, $because);
+        $dependOnClasses->evaluate($classDescription, $violations, $because, false);
 
         self::assertEquals(1, $violations->count());
     }

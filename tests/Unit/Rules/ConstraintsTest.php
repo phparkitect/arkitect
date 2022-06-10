@@ -20,10 +20,10 @@ class ConstraintsTest extends TestCase
         $trueExpression = new class() implements Expression {
             public function describe(ClassDescription $theClass, string $because): Description
             {
-                return new PositiveDescription('');
+                return new PositiveDescription('', '');
             }
 
-            public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+            public function evaluate(ClassDescription $theClass, Violations $violations, string $because, bool $stopOnFailure): void
             {
             }
         };
@@ -36,7 +36,8 @@ class ConstraintsTest extends TestCase
         $expressionStore->checkAll(
             ClassDescriptionBuilder::create('Banana')->get(),
             $violations,
-            $because
+            $because,
+            false
         );
 
         $this->assertCount(0, $violations);
@@ -50,11 +51,11 @@ class ConstraintsTest extends TestCase
                 return new PositiveDescription('bar', 'we want to add this rule');
             }
 
-            public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+            public function evaluate(ClassDescription $theClass, Violations $violations, string $because, bool $stopOnFailure): void
             {
                 $violation = Violation::create(
                     $theClass->getFQCN(),
-                    $this->describe($theClass, $because)->toString()
+                    $this->describe($theClass, $because, false)->toString()
                 );
 
                 $violations->add($violation);
@@ -69,7 +70,8 @@ class ConstraintsTest extends TestCase
         $expressionStore->checkAll(
             ClassDescriptionBuilder::create('Banana')->get(),
             $violations,
-            $because
+            $because,
+            false
         );
 
         $this->assertCount(1, $violations);

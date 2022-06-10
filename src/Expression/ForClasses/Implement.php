@@ -26,7 +26,7 @@ class Implement implements Expression
         return new PositiveDescription("should implement {$this->interface}", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because, bool $stopOnFailure): void
     {
         $interface = $this->interface;
         $interfaces = $theClass->getInterfaces();

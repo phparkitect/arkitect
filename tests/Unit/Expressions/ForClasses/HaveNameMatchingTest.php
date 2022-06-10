@@ -17,7 +17,7 @@ class HaveNameMatchingTest extends TestCase
         $goodClass = ClassDescription::build('\App\MyClass')->get();
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $expression->evaluate($goodClass, $violations, $because);
+        $expression->evaluate($goodClass, $violations, $because, false);
         self::assertEquals(0, $violations->count());
     }
 
@@ -28,11 +28,11 @@ class HaveNameMatchingTest extends TestCase
         $badClass = ClassDescription::build('\App\BadNameClass')->get();
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $expression->evaluate($badClass, $violations, $because);
+        $expression->evaluate($badClass, $violations, $because, false);
         self::assertNotEquals(0, $violations->count());
         $this->assertEquals(
             'should have a name that matches *GoodName* because we want to add this rule for our software',
-            $expression->describe($badClass, $because)->toString()
+            $expression->describe($badClass, $because, false)->toString()
         );
     }
 }

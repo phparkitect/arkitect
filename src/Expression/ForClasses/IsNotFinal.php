@@ -17,7 +17,7 @@ class IsNotFinal implements Expression
         return new PositiveDescription("{$theClass->getName()} should not be final", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because, bool $stopOnFailure): void
     {
         if (!$theClass->isFinal()) {
             return;

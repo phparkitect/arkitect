@@ -19,6 +19,8 @@ class Check extends Command
 
     private const TARGET_PHP_PARAM = 'target-php-version';
 
+    private const STOP_ON_FAILURE_PARAM = 'stop-on-failure';
+
     private const DEFAULT_FILENAME = 'phparkitect.php';
 
     private const SUCCESS_CODE = 0;
@@ -46,6 +48,12 @@ class Check extends Command
                 't',
                 InputOption::VALUE_OPTIONAL,
                 'Target php version to use for parsing'
+            )
+            ->addOption(
+                self::STOP_ON_FAILURE_PARAM,
+                's',
+                InputOption::VALUE_OPTIONAL,
+                'Stop on failure'
             );
     }
 
@@ -56,6 +64,10 @@ class Check extends Command
 
         try {
             $verbose = $input->getOption('verbose');
+            $stopOnFailure = false;
+            if (null !== $input->getOption(self::STOP_ON_FAILURE_PARAM)) {
+                $stopOnFailure = true;
+            }
 
             /** @var string|null $phpVersion */
             $phpVersion = $input->getOption('target-php-version');
@@ -73,7 +85,7 @@ class Check extends Command
             $this->readRules($config, $rulesFilename);
 
             $runner = new Runner();
-            $runner->run($config, $progress, $targetPhpVersion);
+            $runner->run($config, $progress, $targetPhpVersion, $stopOnFailure);
             $violations = $runner->getViolations();
             if ($violations->count() > 0) {
                 $this->printViolations($violations, $output);

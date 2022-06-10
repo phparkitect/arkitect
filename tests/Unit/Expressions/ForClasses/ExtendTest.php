@@ -26,10 +26,10 @@ class ExtendTest extends TestCase
         );
 
         $because = 'we want to add this rule for our software';
-        $violationError = $extend->describe($classDescription, $because)->toString();
+        $violationError = $extend->describe($classDescription, $because, false)->toString();
 
         $violations = new Violations();
-        $extend->evaluate($classDescription, $violations, $because);
+        $extend->evaluate($classDescription, $violations, $because, false);
 
         self::assertEquals(1, $violations->count());
         self::assertEquals('should extend My\BaseClass because we want to add this rule for our software', $violationError);
@@ -49,10 +49,10 @@ class ExtendTest extends TestCase
         );
 
         $because = 'we want to add this rule for our software';
-        $violationError = $extend->describe($classDescription, $because)->toString();
+        $violationError = $extend->describe($classDescription, $because, false)->toString();
 
         $violations = new Violations();
-        $extend->evaluate($classDescription, $violations, $because);
+        $extend->evaluate($classDescription, $violations, $because, false);
 
         self::assertEquals(1, $violations->count());
         self::assertEquals('should extend My\BaseClass because we want to add this rule for our software', $violationError);

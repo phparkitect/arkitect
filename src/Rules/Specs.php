@@ -21,7 +21,7 @@ class Specs
         /** @var Expression $spec */
         foreach ($this->expressions as $spec) {
             $violations = new Violations();
-            $spec->evaluate($classDescription, $violations, $because);
+            $spec->evaluate($classDescription, $violations, $because, false);
 
             if ($violations->count() > 0) {
                 return false;

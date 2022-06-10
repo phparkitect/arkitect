@@ -19,7 +19,7 @@ class NotDependsOnTheseNamespacesTest extends TestCase
         $classDescription = ClassDescription::build('HappyIsland\Myclass')->get();
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $notDependOnClasses->evaluate($classDescription, $violations, $because);
+        $notDependOnClasses->evaluate($classDescription, $violations, $because, false);
 
         self::assertEquals(0, $violations->count());
     }
@@ -35,12 +35,12 @@ class NotDependsOnTheseNamespacesTest extends TestCase
 
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $notDependOnClasses->evaluate($classDescription, $violations, $because);
+        $notDependOnClasses->evaluate($classDescription, $violations, $because, false);
 
         self::assertEquals(1, $violations->count());
         $this->assertEquals(
             'should not depend on these namespaces: myNamespace because we want to add this rule for our software',
-            $notDependOnClasses->describe($classDescription, $because)->toString()
+            $notDependOnClasses->describe($classDescription, $because, false)->toString()
         );
     }
 
@@ -56,12 +56,12 @@ class NotDependsOnTheseNamespacesTest extends TestCase
 
         $violations = new Violations();
         $because = 'we want to add this rule for our software';
-        $notDependOnClasses->evaluate($classDescription, $violations, $because);
+        $notDependOnClasses->evaluate($classDescription, $violations, $because, false);
 
         self::assertCount(1, $violations);
         $this->assertEquals(
             'should not depend on these namespaces: myNamespace because we want to add this rule for our software',
-            $notDependOnClasses->describe($classDescription, $because)->toString()
+            $notDependOnClasses->describe($classDescription, $because, false)->toString()
         );
     }
 
@@ -76,12 +76,12 @@ class NotDependsOnTheseNamespacesTest extends TestCase
 
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $notDependOnClasses->evaluate($classDescription, $violations, $because);
+        $notDependOnClasses->evaluate($classDescription, $violations, $because, false);
 
         self::assertEquals(2, $violations->count());
         $this->assertEquals(
             'should not depend on these namespaces: myNamespace because we want to add this rule for our software',
-            $notDependOnClasses->describe($classDescription, $because)->toString()
+            $notDependOnClasses->describe($classDescription, $because, false)->toString()
         );
     }
 }

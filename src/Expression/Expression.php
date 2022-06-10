@@ -24,5 +24,5 @@ interface Expression
      * Evaluates the expression for the class passed as parameter.
      * It should adds violations if rule is violated.
      */
-    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void;
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because, bool $stopOnFailure): void;
 }

@@ -27,8 +27,12 @@ class Runner
         $this->parsingErrors = new ParsingErrors();
     }
 
-    public function run(Config $config, Progress $progress, TargetPhpVersion $targetPhpVersion): void
-    {
+    public function run(
+        Config $config,
+        Progress $progress,
+        TargetPhpVersion $targetPhpVersion,
+        bool $stopOnFailure
+    ): void {
         /** @var FileParser $fileParser */
         $fileParser = FileParserFactory::createFileParser($targetPhpVersion);
 
@@ -36,9 +40,13 @@ class Runner
         foreach ($config->getClassSetRules() as $classSetRule) {
             $progress->startFileSetAnalysis($classSetRule->getClassSet());
 
-            $this->check($classSetRule, $progress, $fileParser, $this->violations, $this->parsingErrors);
+            $this->check($classSetRule, $progress, $fileParser, $this->violations, $this->parsingErrors, $stopOnFailure);
 
             $progress->endFileSetAnalysis($classSetRule->getClassSet());
+
+            if ($stopOnFailure && $this->violations->count() > 0) {
+                return;
+            }
         }
     }
 
@@ -47,7 +55,8 @@ class Runner
         Progress $progress,
         Parser $fileParser,
         Violations $violations,
-        ParsingErrors $parsingErrors
+        ParsingErrors $parsingErrors,
+        bool $stopOnFailure
     ): void {
         /** @var SplFileInfo $file */
         foreach ($classSetRule->getClassSet() as $file) {
@@ -62,7 +71,11 @@ class Runner
 
             foreach ($fileParser->getClassDescriptions() as $classDescription) {
                 foreach ($classSetRule->getRules() as $rule) {
-                    $rule->check($classDescription, $violations);
+                    $rule->check($classDescription, $violations, $stopOnFailure);
+
+                    if ($stopOnFailure && $violations->count() > 0) {
+                        return;
+                    }
                 }
             }
 
