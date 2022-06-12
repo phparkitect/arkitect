@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Rules;
@@ -7,7 +8,6 @@ use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
-use Arkitect\Expression\PositiveDescription;
 use Arkitect\Rules\Constraints;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
@@ -20,7 +20,7 @@ class ConstraintsTest extends TestCase
         $trueExpression = new class() implements Expression {
             public function describe(ClassDescription $theClass, string $because): Description
             {
-                return new PositiveDescription('');
+                return new Description('');
             }
 
             public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
@@ -47,7 +47,7 @@ class ConstraintsTest extends TestCase
         $falseExpression = new class() implements Expression {
             public function describe(ClassDescription $theClass, string $because): Description
             {
-                return new PositiveDescription('bar', 'we want to add this rule');
+                return new Description('bar', 'we want to add this rule');
             }
 
             public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void

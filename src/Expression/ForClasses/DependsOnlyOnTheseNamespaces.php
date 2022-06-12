@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Arkitect\Expression\ForClasses;
@@ -7,7 +8,6 @@ use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
-use Arkitect\Expression\PositiveDescription;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
 
@@ -25,7 +25,7 @@ class DependsOnlyOnTheseNamespaces implements Expression
     {
         $desc = implode(', ', $this->namespaces);
 
-        return new PositiveDescription("should depend only on classes in one of these namespaces: $desc", $because);
+        return new Description("should depend only on classes in one of these namespaces: $desc", $because);
     }
 
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
@@ -34,8 +34,10 @@ class DependsOnlyOnTheseNamespaces implements Expression
 
         /** @var ClassDependency $dependency */
         foreach ($dependencies as $dependency) {
-            if ('' === $dependency->getFQCN()->namespace() ||
-                ($theClass->namespaceMatches($dependency->getFQCN()->namespace()))) {
+            if (
+                '' === $dependency->getFQCN()->namespace() ||
+                ($theClass->namespaceMatches($dependency->getFQCN()->namespace()))
+            ) {
                 continue;
             }
 
