@@ -41,6 +41,18 @@ App\Domain\Model violates rules
         $this->assertCheckHasErrors($cmdTester, $expectedErrors);
     }
 
+    public function test_app_returns_single_error_because_there_is_stop_on_failure_param(): void
+    {
+        $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvc.php', true);
+
+        $expectedErrors = 'ERRORS!
+App\Controller\Foo violates rules
+  should implement ContainerAwareInterface because all controllers should be container aware';
+
+        $this->assertCheckHasErrors($cmdTester, $expectedErrors);
+        $this->assertCheckHasNoErrorsLike($cmdTester, "App\Controller\ProductsController violates rules");
+    }
+
     public function test_does_not_explode_if_an_exception_is_thrown(): void
     {
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configThrowsException.php');
@@ -67,9 +79,12 @@ App\Controller\Foo violates rules
         $this->assertCheckHasErrors($cmdTester, $expectedErrors);
     }
 
-    protected function runCheck($configFilePath = null): CommandTester
+    protected function runCheck($configFilePath = null, bool $stopOnFailure = null): CommandTester
     {
         $input = $configFilePath ? ['--config' => $configFilePath] : [];
+        if (null !== $stopOnFailure) {
+            $input['--stop-on-failure'] = true;
+        }
 
         $app = new Application('PHPArkitect', 'dunno');
         $app->add(new Check());
@@ -89,6 +104,16 @@ App\Controller\Foo violates rules
             $actualOutput = str_replace(["\r", "\n"], '', $commandTester->getDisplay());
             $expectedOutput = str_replace(["\r", "\n"], '', $expectedOutput);
             $this->assertStringContainsString($expectedOutput, $actualOutput);
+        }
+    }
+
+    protected function assertCheckHasNoErrorsLike(CommandTester $commandTester, string $expectedOutput = null): void
+    {
+        $this->assertEquals(self::ERROR_CODE, $commandTester->getStatusCode());
+        if (null != $expectedOutput) {
+            $actualOutput = str_replace(["\r", "\n"], '', $commandTester->getDisplay());
+            $expectedOutput = str_replace(["\r", "\n"], '', $expectedOutput);
+            $this->assertStringNotContainsString($expectedOutput, $actualOutput);
         }
     }
 
