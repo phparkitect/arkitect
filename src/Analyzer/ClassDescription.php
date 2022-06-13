@@ -8,17 +8,16 @@ class ClassDescription
     /** @var FullyQualifiedClassName */
     private $FQCN;
 
-    /** @var array */
+    /** @var list<ClassDependency> */
     private $dependencies;
 
-    /** @var array */
+    /** @var list<FullyQualifiedClassName> */
     private $interfaces;
 
     /** @var string */
     private $fullPath;
-    /**
-     * @var ?FullyQualifiedClassName
-     */
+
+    /** @var ?FullyQualifiedClassName */
     private $extends;
 
     /** @var bool */
@@ -30,6 +29,15 @@ class ClassDescription
     /** @var string */
     private $docBlock;
 
+    /** @var list<FullyQualifiedClassName> */
+    private $attributes;
+
+    /**
+     * @param list<ClassDependency>         $dependencies
+     * @param list<FullyQualifiedClassName> $interfaces
+     * @param ?FullyQualifiedClassName      $extends
+     * @param list<FullyQualifiedClassName> $attributes
+     */
     public function __construct(
         FullyQualifiedClassName $FQCN,
         array $dependencies,
@@ -37,7 +45,8 @@ class ClassDescription
         ?FullyQualifiedClassName $extends,
         bool $final,
         bool $abstract,
-        string $docBlock = ''
+        string $docBlock = '',
+        array $attributes = []
     ) {
         $this->FQCN = $FQCN;
         $this->dependencies = $dependencies;
@@ -47,6 +56,7 @@ class ClassDescription
         $this->abstract = $abstract;
         $this->fullPath = '';
         $this->docBlock = $docBlock;
+        $this->attributes = $attributes;
     }
 
     public function setFullPath(string $fullPath): void
@@ -122,11 +132,17 @@ class ClassDescription
         return $this->fullPath;
     }
 
+    /**
+     * @return list<ClassDependency>
+     */
     public function getDependencies(): array
     {
         return $this->dependencies;
     }
 
+    /**
+     * @return list<FullyQualifiedClassName>
+     */
     public function getInterfaces(): array
     {
         return $this->interfaces;
@@ -159,5 +175,24 @@ class ClassDescription
         }
 
         return false;
+    }
+
+    /**
+     * @return list<FullyQualifiedClassName>
+     */
+    public function getAttributes(): array
+    {
+        return $this->attributes;
+    }
+
+    public function hasAttribute(string $pattern): bool
+    {
+        return array_reduce(
+            $this->attributes,
+            static function (bool $carry, FullyQualifiedClassName $attribute) use ($pattern): bool {
+                return $carry || $attribute->matches($pattern);
+            },
+            false
+        );
     }
 }
