@@ -54,7 +54,7 @@ class Check extends Command
             ->addOption(
                 self::STOP_ON_FAILURE_PARAM,
                 's',
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_NONE,
                 'Stop on failure'
             );
     }
@@ -66,10 +66,7 @@ class Check extends Command
 
         try {
             $verbose = $input->getOption('verbose');
-            $stopOnFailure = false;
-            if (null !== $input->getOption(self::STOP_ON_FAILURE_PARAM)) {
-                $stopOnFailure = true;
-            }
+            $stopOnFailure = $input->getOption(self::STOP_ON_FAILURE_PARAM);
 
             /** @var string|null $phpVersion */
             $phpVersion = $input->getOption('target-php-version');
