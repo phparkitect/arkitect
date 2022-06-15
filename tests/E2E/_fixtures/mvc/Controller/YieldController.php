@@ -5,6 +5,7 @@ namespace App\Controller;
 
 use App\Model\Products;
 
+#[\AsController]
 class YieldController
 {
     public function testingBug()

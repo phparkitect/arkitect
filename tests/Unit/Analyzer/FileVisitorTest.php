@@ -7,6 +7,7 @@ use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FileParser;
 use Arkitect\Analyzer\FileParserFactory;
+use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
 use Arkitect\Expression\ForClasses\NotHaveDependencyOutsideNamespace;
@@ -350,5 +351,33 @@ EOF;
         $dependsOnlyOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         $this->assertCount(1, $violations);
+    }
+
+    /**
+     * @requires PHP >= 8.0
+     */
+    public function test_should_parse_class_attributes(): void
+    {
+        $code = <<< 'EOF'
+<?php
+
+use Bar\FooAttr;
+
+#[FooAttr('bar')]
+#[Baz]
+class Foo {}
+EOF;
+
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.0'));
+        $fp->parse($code, 'relativePathName');
+        $cd = $fp->getClassDescriptions();
+
+        self::assertEquals(
+            [
+                FullyQualifiedClassName::fromString('Bar\\FooAttr'),
+                FullyQualifiedClassName::fromString('Baz'),
+            ],
+            $cd[0]->getAttributes()
+        );
     }
 }

@@ -5,13 +5,13 @@ namespace Arkitect\Analyzer;
 
 class ClassDescriptionBuilder
 {
-    /** @var array */
+    /** @var list<ClassDependency> */
     private $classDependencies;
 
     /** @var FullyQualifiedClassName */
     private $FQCN;
 
-    /** @var array */
+    /** @var list<FullyQualifiedClassName> */
     private $interfaces;
 
     /** @var ?FullyQualifiedClassName */
@@ -29,6 +29,14 @@ class ClassDescriptionBuilder
     /** @var string */
     private $docBlock;
 
+    /** @var list<FullyQualifiedClassName> */
+    private $attributes;
+
+    /**
+     * @param list<ClassDependency>         $classDependencies
+     * @param list<FullyQualifiedClassName> $interfaces
+     * @param list<FullyQualifiedClassName> $attributes
+     */
     private function __construct(
         FullyQualifiedClassName $FQCN,
         string $filePath,
@@ -36,7 +44,8 @@ class ClassDescriptionBuilder
         array $interfaces,
         bool $final,
         bool $abstract,
-        string $docBlock = ''
+        string $docBlock = '',
+        array $attributes = []
     ) {
         $this->FQCN = $FQCN;
         $this->filePath = $filePath;
@@ -45,6 +54,7 @@ class ClassDescriptionBuilder
         $this->final = $final;
         $this->abstract = $abstract;
         $this->docBlock = $docBlock;
+        $this->attributes = $attributes;
     }
 
     public static function create(string $FQCN): self
@@ -56,7 +66,8 @@ class ClassDescriptionBuilder
             [],
             false,
             false,
-            ''
+            '',
+            []
         );
     }
 
@@ -99,7 +110,8 @@ class ClassDescriptionBuilder
             $this->extend,
             $this->final,
             $this->abstract,
-            $this->docBlock
+            $this->docBlock,
+            $this->attributes
         );
         $cd->setFullPath($this->filePath);
 
@@ -123,6 +135,14 @@ class ClassDescriptionBuilder
     public function setDocBlock(string $docBlock): self
     {
         $this->docBlock = $docBlock;
+
+        return $this;
+    }
+
+    public function addAttribute(string $FQCN, int $line): self
+    {
+        $this->addDependency(new ClassDependency($FQCN, $line));
+        $this->attributes[] = FullyQualifiedClassName::fromString($FQCN);
 
         return $this;
     }

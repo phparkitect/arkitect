@@ -32,6 +32,7 @@ Currently, you can check if a class:
  - is not abstract
  - doc block contains a string
  - doc block not contains a string
+ - has an attribute (requires PHP >= 8.0)
 
 You can also define components and ensure that a component:
 - should not depend on any component

@@ -80,4 +80,23 @@ class ClassDescriptionTest extends TestCase
 
         $this->assertFalse($cd->containsDocBlock('@another-annotation'));
     }
+
+    public function test_should_return_true_if_has_attribute(): void
+    {
+        $cd = $this->builder
+            ->addAttribute('FooAttr', 27)
+            ->get();
+
+        self::assertTrue($cd->hasAttribute('FooAttr'));
+        self::assertTrue($cd->hasAttribute('Foo*'));
+    }
+
+    public function test_should_return_false_if_not_has_attribute(): void
+    {
+        $cd = $this->builder
+            ->addAttribute('FooAttr', 27)
+            ->get();
+
+        self::assertFalse($cd->hasAttribute('Bar'));
+    }
 }

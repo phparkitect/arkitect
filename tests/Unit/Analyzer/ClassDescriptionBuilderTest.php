@@ -7,6 +7,7 @@ namespace Arkitect\Tests\Unit\Analyzer;
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
+use Arkitect\Analyzer\FullyQualifiedClassName;
 use PHPUnit\Framework\TestCase;
 
 class ClassDescriptionBuilderTest extends TestCase
@@ -98,6 +99,20 @@ class ClassDescriptionBuilderTest extends TestCase
  * @psalm-immutable
  */',
             $classDescription->getDocBlock()
+        );
+    }
+
+    public function test_it_should_add_attributes(): void
+    {
+        $FQCN = 'HappyIsland';
+        $classDescriptionBuilder = ClassDescriptionBuilder::create($FQCN);
+        $classDescriptionBuilder->addAttribute('AttrClass', 27);
+
+        $classDescription = $classDescriptionBuilder->get();
+
+        self::assertEquals(
+            [FullyQualifiedClassName::fromString('AttrClass')],
+            $classDescription->getAttributes()
         );
     }
 }

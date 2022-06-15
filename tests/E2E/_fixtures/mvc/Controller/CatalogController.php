@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+#[\AsController]
 class CatalogController implements \ContainerAwareInterface
 {
     public function viewAction(string $id)
