@@ -1,10 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Arkitect\CLI;
 
 use Arkitect\CLI\Progress\DebugProgress;
 use Arkitect\CLI\Progress\ProgressBarProgress;
+use Arkitect\Exceptions\FailOnFirstViolationException;
 use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violations;
 use Symfony\Component\Console\Command\Command;
@@ -18,6 +20,8 @@ class Check extends Command
     private const CONFIG_FILENAME_PARAM = 'config';
 
     private const TARGET_PHP_PARAM = 'target-php-version';
+
+    private const STOP_ON_FAILURE_PARAM = 'stop-on-failure';
 
     private const DEFAULT_FILENAME = 'phparkitect.php';
 
@@ -46,6 +50,12 @@ class Check extends Command
                 't',
                 InputOption::VALUE_OPTIONAL,
                 'Target php version to use for parsing'
+            )
+            ->addOption(
+                self::STOP_ON_FAILURE_PARAM,
+                's',
+                InputOption::VALUE_NONE,
+                'Stop on failure'
             );
     }
 
@@ -56,6 +66,7 @@ class Check extends Command
 
         try {
             $verbose = $input->getOption('verbose');
+            $stopOnFailure = $input->getOption(self::STOP_ON_FAILURE_PARAM);
 
             /** @var string|null $phpVersion */
             $phpVersion = $input->getOption('target-php-version');
@@ -72,8 +83,11 @@ class Check extends Command
 
             $this->readRules($config, $rulesFilename);
 
-            $runner = new Runner();
-            $runner->run($config, $progress, $targetPhpVersion);
+            $runner = new Runner($stopOnFailure);
+            try {
+                $runner->run($config, $progress, $targetPhpVersion);
+            } catch (FailOnFirstViolationException $e) {
+            }
             $violations = $runner->getViolations();
             if ($violations->count() > 0) {
                 $this->printViolations($violations, $output);

@@ -1,8 +1,10 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Arkitect\Rules;
 
+use Arkitect\Exceptions\FailOnFirstViolationException;
 use Arkitect\Exceptions\IndexNotFoundException;
 
 class Violations implements \IteratorAggregate, \Countable
@@ -11,15 +13,23 @@ class Violations implements \IteratorAggregate, \Countable
      * @var Violation[]
      */
     private $violations;
+    /**
+     * @var bool
+     */
+    private $stopOnFailure;
 
-    public function __construct(array $violations = [])
+    public function __construct(bool $stopOnFailure = false)
     {
-        $this->violations = $violations;
+        $this->violations = [];
+        $this->stopOnFailure = $stopOnFailure;
     }
 
     public function add(Violation $violation): void
     {
         $this->violations[] = $violation;
+        if ($this->stopOnFailure) {
+            throw new FailOnFirstViolationException();
+        }
     }
 
     public function get(int $index): Violation

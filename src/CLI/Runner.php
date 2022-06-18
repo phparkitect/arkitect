@@ -21,9 +21,9 @@ class Runner
     /** @var ParsingErrors */
     private $parsingErrors;
 
-    public function __construct()
+    public function __construct(bool $stopOnFailure = false)
     {
-        $this->violations = new Violations();
+        $this->violations = new Violations($stopOnFailure);
         $this->parsingErrors = new ParsingErrors();
     }
 
