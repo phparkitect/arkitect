@@ -15,24 +15,169 @@ Rule::allClasses()
 ## What kind of rules can I enforce with Arkitect
 
 Currently, you can check if a class:
- - depends on a namespace
- - extends another class
- - not extends another class
- - have a name matching a pattern
- - not have a name matching a pattern
- - implements an interface
- - not implements an interface
- - depends on a namespace
- - don't have dependency outside a namespace
- - reside in a namespace
- - not reside in a namespace
- - is final
- - is not final
- - is abstract
- - is not abstract
- - doc block contains a string
- - doc block not contains a string
- - has an attribute (requires PHP >= 8.0)
+
+### Depends on a namespace
+
+```
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
+    ->should(new DependsOnlyOnTheseNamespaces('App\Domain', 'Ramsey\Uuid'))
+    ->because('we want to protect our domain from external dependencies except for Ramsey\Uuid');
+```
+
+### Doc block contains a string
+
+```
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Domain\Events'))
+    ->should(new DocBlockContains('@psalm-immutable'))
+    ->because('we want to enforce immutability');
+```
+
+### Doc block not contains a string
+
+```
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
+    ->should(new DocBlockNotContains('@psalm-immutable'))
+    ->because('we don't want to enforce immutability');
+```
+
+### Extend another class
+
+```
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
+    ->should(new Extend('App\Controller\AbstractController'))
+    ->because('we want to be sure that all controllers extend AbstractController');
+```
+
+### Has an attribute (requires PHP >= 8.0)
+
+```
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
+    ->should(new HaveAttribute('AsController'))
+    ->because('it configures the service container');
+```
+
+### Have a name matching a pattern
+
+```
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Service'))
+    ->should(new HaveNameMatching('*Service'))
+    ->because('we want uniform naming for services');
+```
+
+### Implements an interface
+
+```
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
+    ->should(new Implement('ContainerAwareInterface'))
+    ->because('all controllers should be container aware');
+```
+
+### Not implements an interface
+
+```
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Infrastructure\RestApi\Public'))
+    ->should(new NotImplement('ContainerAwareInterface'))
+    ->because('all public controllers should not be container aware');
+```
+
+### Is abstract
+
+```
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Customer\Service'))
+    ->should(new IsAbstract())
+    ->because('we want to be sure that classes are abstract in a specific namespace');
+```
+
+### Is final
+
+```
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Domain\Aggregates'))
+    ->should(new IsFinal())
+    ->because('we want to be sure that aggregates are final classes');
+```
+
+### Is not abstract
+
+```
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
+    ->should(new IsNotAbstract())
+    ->because('we want to avoid abstract classes into our domain');
+```
+
+### Is not final
+
+```
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Infrastructure\Doctrine'))
+    ->should(new IsNotFinal())
+    ->because('we want to be sure that our adapters are not final classes');
+```
+
+### Not depends on a namespace
+
+```
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Application'))
+    ->should(new NotDependsOnTheseNamespaces('App\Infrastructure'))
+    ->because('we want to avoid coupling between application layer and infrastructure layer');
+```
+
+### Not extend another class
+
+```
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Controller\Admin'))
+    ->should(new NotExtend('App\Controller\AbstractController'))
+    ->because('we want to be sure that all admin controllers not extend AbstractController for security reasons');
+```
+
+### Don't have dependency outside a namespace
+
+```
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
+    ->should(new NotHaveDependencyOutsideNamespace('App\Domain', ['Ramsey\Uuid']))
+    ->because('we want protect our domain except for Ramsey\Uuid');
+```
+
+### Not have a name matching a pattern
+
+```
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App'))
+    ->should(new NotHaveNameMatching('*Manager'))
+    ->because('*Manager is too vague in naming classes');
+```
+
+### Reside in a namespace
+
+```
+$rules = Rule::allClasses()
+    ->that(new HaveNameMatching('*Handler'))
+    ->should(new ResideInOneOfTheseNamespaces('App\Application'))
+    ->because('we want to be sure that all CommandHandlers are in a specific namespace');
+```
+
+
+### Not reside in a namespace
+
+```
+$rules = Rule::allClasses()
+    ->that(new Extend('App\Domain\Event'))
+    ->should(new NotResideInOneOfTheseNamespaces('App\Application', 'App\Infrastructure'))
+    ->because('we want to be sure that all events not reside in wrong layers');
+```
 
 You can also define components and ensure that a component:
 - should not depend on any component
