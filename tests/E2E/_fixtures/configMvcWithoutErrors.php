@@ -13,6 +13,7 @@ return static function (Config $config): void {
     $rule_1 = Rule::allClasses()
         ->except('App\Services\Foo')
         ->that(new ResideInOneOfTheseNamespaces('App\Services'))
+        ->andThat(new ResideInOneOfTheseNamespaces('App\*\Services'))
         ->should(new HaveNameMatching('*Service'))
         ->because('all services should be end name with Service');
 
