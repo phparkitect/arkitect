@@ -11,9 +11,12 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class FileParserTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function test_parse_file(): void
     {
         $traverser = $this->prophesize(NodeTraverser::class);
