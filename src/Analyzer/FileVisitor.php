@@ -62,6 +62,20 @@ class FileVisitor extends NodeVisitorAbstract
         }
 
         /**
+         * adding static classes as dependencies
+         * $constantValue = StaticClass::constant;.
+         *
+         * @see FileVisitorTest::test_it_should_return_errors_for_const_outside_namespace
+         */
+        if ($node instanceof Node\Expr\ClassConstFetch &&
+            method_exists($node->class, 'toString') &&
+            null !== $this->classDescriptionBuilder
+        ) {
+            $this->classDescriptionBuilder
+                ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
+        }
+
+        /**
          * adding static function classes as dependencies
          * $static = StaticClass::foo();.
          *

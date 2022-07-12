@@ -380,4 +380,33 @@ EOF;
             $cd[0]->getAttributes()
         );
     }
+
+    public function test_it_should_return_errors_for_const_outside_namespace(): void
+    {
+        $code = <<< 'EOF'
+<?php
+namespace Root\Cars;
+use AnotherNamespace\CarMake;
+class KiaSportage extends AbstractCar
+{
+    public function __construct()
+    {
+        parent::__construct(CarMake::KIA, 'Sportage');
+    }
+}
+EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp->parse($code, 'relativePathName');
+
+        $cd = $fp->getClassDescriptions();
+
+        $violations = new Violations();
+
+        $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('Root\Cars');
+        $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+
+        $this->assertCount(1, $violations);
+    }
 }
