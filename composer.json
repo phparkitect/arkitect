@@ -3,7 +3,7 @@
     "description": "Enforce architectural constraints in your PHP applications",
     "type": "library",
     "license": "MIT",
-    "version": "0.2.24",
+    "version": "0.2.25",
     "authors": [
         {
             "name": "Pietro Campagnano",
