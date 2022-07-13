@@ -393,6 +393,16 @@ class KiaSportage extends AbstractCar
     {
         parent::__construct(CarMake::KIA, 'Sportage');
     }
+
+    public function getSelf(): self
+    {
+        return self::class;
+    }
+
+    public function getStatic(): self
+    {
+        return static::class;
+    }
 }
 EOF;
 
