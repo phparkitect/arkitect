@@ -10,6 +10,7 @@ use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
+use Arkitect\Expression\ForClasses\Implement;
 use Arkitect\Expression\ForClasses\NotHaveDependencyOutsideNamespace;
 use Arkitect\Rules\ParsingError;
 use Arkitect\Rules\Violations;
@@ -415,6 +416,34 @@ EOF;
         $violations = new Violations();
 
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('Root\Cars');
+        $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+
+        $this->assertCount(1, $violations);
+    }
+
+    public function test_it_can_parse_enum(): void
+    {
+        $code = <<< 'EOF'
+<?php
+namespace Root\Cars;
+enum Enum
+{
+    case Hearts;
+    case Diamonds;
+    case Clubs;
+    case Spades;
+}
+EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
+        $fp->parse($code, 'relativePathName');
+
+        $cd = $fp->getClassDescriptions();
+
+        $violations = new Violations();
+
+        $notHaveDependencyOutsideNamespace = new Implement('MyInterface');
         $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         $this->assertCount(1, $violations);

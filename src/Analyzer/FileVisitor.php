@@ -126,6 +126,13 @@ class FileVisitor extends NodeVisitorAbstract
                 ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
         }
 
+        if ($node instanceof Node\Stmt\Enum_ && null !== $node->namespacedName) {
+            /** @psalm-suppress UndefinedPropertyFetch */
+            $this->classDescriptionBuilder = ClassDescriptionBuilder::create(
+                $node->namespacedName->toCodeString()
+            );
+        }
+
         /**
          * matches parameters dependency in functions and method definitions like
          * public function __construct(Symfony\Component\HttpFoundation\Request $request).
@@ -150,6 +157,12 @@ class FileVisitor extends NodeVisitorAbstract
     public function leaveNode(Node $node): void
     {
         if ($node instanceof Node\Stmt\Class_ && null !== $this->classDescriptionBuilder) {
+            $classDescription = $this->classDescriptionBuilder->get();
+
+            $this->classDescriptions[] = $classDescription;
+        }
+
+        if ($node instanceof Node\Stmt\Enum_ && null !== $this->classDescriptionBuilder) {
             $classDescription = $this->classDescriptionBuilder->get();
 
             $this->classDescriptions[] = $classDescription;

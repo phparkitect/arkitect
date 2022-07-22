@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI;
 
+use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FileParser;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\Analyzer\Parser;
@@ -60,6 +61,7 @@ class Runner
                 $parsingErrors->add($parsedError);
             }
 
+            /** @var ClassDescription $classDescription */
             foreach ($fileParser->getClassDescriptions() as $classDescription) {
                 foreach ($classSetRule->getRules() as $rule) {
                     $rule->check($classDescription, $violations);
