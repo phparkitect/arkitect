@@ -5,6 +5,6 @@ namespace Arkitect\RuleBuilders\Architecture;
 
 interface Where
 {
-    /** @return ShouldNotDependOnAnyComponent&MayDependOnComponents&MayDependOnAnyComponent */
+    /** @return ShouldNotDependOnAnyComponent&ShouldOnlyDependOnComponents&MayDependOnComponents&MayDependOnAnyComponent */
     public function where(string $componentName);
 }

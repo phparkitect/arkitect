@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Architecture;
 
+use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
 use Arkitect\Expression\ForClasses\NotDependsOnTheseNamespaces;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\RuleBuilders\Architecture\Architecture;
@@ -32,6 +33,24 @@ class ArchitectureTest extends TestCase
             Rule::allClasses()
                 ->that(new ResideInOneOfTheseNamespaces('App\*\Application\*'))
                 ->should(new NotDependsOnTheseNamespaces('App\*\Infrastructure\*'))
+                ->because('of component architecture'),
+        ];
+
+        self::assertEquals($expectedRules, iterator_to_array($rules));
+    }
+
+    public function test_layered_architecture_with_depends_only_on_components(): void
+    {
+        $rules = Architecture::withComponents()
+            ->component('Domain')->definedBy('App\*\Domain\*')
+            ->where('Domain')->shouldOnlyDependOnComponents('Domain')
+
+            ->rules();
+
+        $expectedRules = [
+            Rule::allClasses()
+                ->that(new ResideInOneOfTheseNamespaces('App\*\Domain\*'))
+                ->should(new DependsOnlyOnTheseNamespaces('App\*\Domain\*'))
                 ->because('of component architecture'),
         ];
 
