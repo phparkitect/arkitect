@@ -37,7 +37,6 @@ class ArchRule implements DSL\ArchRule
             return;
         }
 
-        //TODO
         $this->shoulds->checkAll($classDescription, $violations, $this->because);
     }
 }

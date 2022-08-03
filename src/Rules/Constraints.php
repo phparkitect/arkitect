@@ -16,7 +16,6 @@ class Constraints
         $this->expressions[] = $expression;
     }
 
-    //TODO
     public function checkAll(ClassDescription $classDescription, Violations $violations, string $because): void
     {
         /** @var Expression $expression */
