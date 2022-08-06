@@ -13,13 +13,13 @@ Rule::allClasses()
     ->because("it's a symfony naming convention");
 ```
 
-## What kind of rules can I enforce with Arkitect
+## Available rules
 
 Currently, you can check if a class:
 
 ### Depends on a namespace
 
-```
+```php
 $rules = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
     ->should(new DependsOnlyOnTheseNamespaces('App\Domain', 'Ramsey\Uuid'))
@@ -28,7 +28,7 @@ $rules = Rule::allClasses()
 
 ### Doc block contains a string
 
-```
+```php
 $rules = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Domain\Events'))
     ->should(new DocBlockContains('@psalm-immutable'))
@@ -37,7 +37,7 @@ $rules = Rule::allClasses()
 
 ### Doc block not contains a string
 
-```
+```php
 $rules = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
     ->should(new DocBlockNotContains('@psalm-immutable'))
@@ -46,7 +46,7 @@ $rules = Rule::allClasses()
 
 ### Extend another class
 
-```
+```php
 $rules = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
     ->should(new Extend('App\Controller\AbstractController'))
@@ -55,7 +55,7 @@ $rules = Rule::allClasses()
 
 ### Has an attribute (requires PHP >= 8.0)
 
-```
+```php
 $rules = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
     ->should(new HaveAttribute('AsController'))
@@ -64,7 +64,7 @@ $rules = Rule::allClasses()
 
 ### Have a name matching a pattern
 
-```
+```php
 $rules = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Service'))
     ->should(new HaveNameMatching('*Service'))
@@ -73,7 +73,7 @@ $rules = Rule::allClasses()
 
 ### Implements an interface
 
-```
+```php
 $rules = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
     ->should(new Implement('ContainerAwareInterface'))
@@ -82,7 +82,7 @@ $rules = Rule::allClasses()
 
 ### Not implements an interface
 
-```
+```php
 $rules = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Infrastructure\RestApi\Public'))
     ->should(new NotImplement('ContainerAwareInterface'))
@@ -91,7 +91,7 @@ $rules = Rule::allClasses()
 
 ### Is abstract
 
-```
+```php
 $rules = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Customer\Service'))
     ->should(new IsAbstract())
@@ -100,7 +100,7 @@ $rules = Rule::allClasses()
 
 ### Is final
 
-```
+```php
 $rules = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Domain\Aggregates'))
     ->should(new IsFinal())
@@ -109,7 +109,7 @@ $rules = Rule::allClasses()
 
 ### Is not abstract
 
-```
+```php
 $rules = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
     ->should(new IsNotAbstract())
@@ -118,7 +118,7 @@ $rules = Rule::allClasses()
 
 ### Is not final
 
-```
+```php
 $rules = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Infrastructure\Doctrine'))
     ->should(new IsNotFinal())
@@ -127,7 +127,7 @@ $rules = Rule::allClasses()
 
 ### Not depends on a namespace
 
-```
+```php
 $rules = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Application'))
     ->should(new NotDependsOnTheseNamespaces('App\Infrastructure'))
@@ -136,7 +136,7 @@ $rules = Rule::allClasses()
 
 ### Not extend another class
 
-```
+```php
 $rules = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller\Admin'))
     ->should(new NotExtend('App\Controller\AbstractController'))
@@ -145,7 +145,7 @@ $rules = Rule::allClasses()
 
 ### Don't have dependency outside a namespace
 
-```
+```php
 $rules = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
     ->should(new NotHaveDependencyOutsideNamespace('App\Domain', ['Ramsey\Uuid']))
@@ -154,7 +154,7 @@ $rules = Rule::allClasses()
 
 ### Not have a name matching a pattern
 
-```
+```php
 $rules = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App'))
     ->should(new NotHaveNameMatching('*Manager'))
@@ -163,7 +163,7 @@ $rules = Rule::allClasses()
 
 ### Reside in a namespace
 
-```
+```php
 $rules = Rule::allClasses()
     ->that(new HaveNameMatching('*Handler'))
     ->should(new ResideInOneOfTheseNamespaces('App\Application'))
@@ -173,7 +173,7 @@ $rules = Rule::allClasses()
 
 ### Not reside in a namespace
 
-```
+```php
 $rules = Rule::allClasses()
     ->that(new Extend('App\Domain\Event'))
     ->should(new NotResideInOneOfTheseNamespaces('App\Application', 'App\Infrastructure'))
@@ -185,18 +185,18 @@ You can also define components and ensure that a component:
 - may depend on specific components
 - may depend on any component
 
-Check out [this demo project](https://github.com/phparkitect/arkitect-demo) to get an idea on how write rules
+Check out [this demo project](https://github.com/phparkitect/arkitect-demo) to get an idea on how write rules.
 
-# How to install
+# Installation
 
-## Using composer
+## Using Composer
 
 ```bash
 composer require --dev phparkitect/phparkitect
 ```
 
-## Using a phar
-Sometimes your project can conflict with one or more of Phparkitect's dependencies. In that case you may find the Phar (a self-contained PHP executable) useful.
+## Using a Phar
+Sometimes your project can conflict with one or more of PHPArkitect's dependencies. In that case you may find the Phar (a self-contained PHP executable) useful.
 
 The Phar can be downloaded from GitHub:
 
@@ -206,9 +206,9 @@ chmod +x phparkitect.phar
 ./phparkitect.phar check
 ```
 
-# How to use it
+# Usage
 
-To use this tool you need to launch a command via bash:
+To use this tool you need to launch a command via Bash:
 
 ```
 phparkitect check
@@ -320,6 +320,6 @@ You can add parameters when you launch the tool. At the moment you can add these
 ```
 phparkitect check --config=/project/yourConfigFile.php
 ```
-* `--target-php-version`: with this parameter, you can specify which PHP version should use the parser. This can be useful to debug problems and to understand if there are problems with a different PHP version.
+* `--target-php-version`: With this parameter, you can specify which PHP version should use the parser. This can be useful to debug problems and to understand if there are problems with a different PHP version.
 Supported PHP versions are: 7.1, 7.2, 7.3, 7.4, 8.0, 8.1
- * `--stop-on-failure` : with this option the process will end immediately after the first violation.
+ * `--stop-on-failure`: With this option the process will end immediately after the first violation.
