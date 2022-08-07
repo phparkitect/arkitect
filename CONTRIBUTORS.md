@@ -11,4 +11,5 @@ Shout out to our top contributors!
 - [stephpy](https://api.github.com/users/stephpy)
 - [frankverhoeven](https://api.github.com/users/frankverhoeven)
 - [mloru](https://api.github.com/users/mloru)
+- [smortexa](https://api.github.com/users/smortexa)
 - [DonCallisto](https://api.github.com/users/DonCallisto)
