@@ -17,14 +17,14 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
     /** @var array<string, string[]> */
     private $allowedDependencies;
     /** @var array<string, string[]> */
-    private $allowedSpecificDependencies;
+    private $componentDependsOnlyOnTheseNamespaces;
 
     private function __construct()
     {
         $this->componentName = '';
         $this->componentSelectors = [];
         $this->allowedDependencies = [];
-        $this->allowedSpecificDependencies = [];
+        $this->componentDependsOnlyOnTheseNamespaces = [];
     }
 
     public static function withComponents(): Component
@@ -62,7 +62,7 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
 
     public function shouldOnlyDependOnComponents(string ...$componentNames)
     {
-        $this->allowedSpecificDependencies[$this->componentName] = $componentNames;
+        $this->componentDependsOnlyOnTheseNamespaces[$this->componentName] = $componentNames;
 
         return $this;
     }
@@ -101,13 +101,13 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
                 }
             }
 
-            if (!isset($this->allowedSpecificDependencies[$name])) {
+            if (!isset($this->componentDependsOnlyOnTheseNamespaces[$name])) {
                 continue;
             }
 
             $allowedDependencies = array_map(function (string $componentName): string {
                 return $this->componentSelectors[$componentName];
-            }, $this->allowedSpecificDependencies[$name]);
+            }, $this->componentDependsOnlyOnTheseNamespaces[$name]);
 
             yield Rule::allClasses()
                 ->that(new ResideInOneOfTheseNamespaces($selector))
