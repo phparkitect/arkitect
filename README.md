@@ -286,11 +286,13 @@ return static function (Config $config): void {
         ->component('Service')->definedBy('App\Service\*')
         ->component('Repository')->definedBy('App\Repository\*')
         ->component('Entity')->definedBy('App\Entity\*')
+        ->component('Domain')->definedBy('App\Domain\*')
 
         ->where('Controller')->mayDependOnComponents('Service', 'Entity')
         ->where('Service')->mayDependOnComponents('Repository', 'Entity')
         ->where('Repository')->mayDependOnComponents('Entity')
         ->where('Entity')->shouldNotDependOnAnyComponent()
+        ->where('Domain')->shouldOnlyDependOnComponents('Domain')
 
         ->rules();
         
