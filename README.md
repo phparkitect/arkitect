@@ -3,6 +3,16 @@
 [![Packagist](https://img.shields.io/packagist/dt/phparkitect/phparkitect.svg)](https://packagist.org/packages/phparkitect/phparkitect)
 [![codecov](https://codecov.io/gh/phparkitect/arkitect/branch/main/graph/badge.svg)](https://codecov.io/gh/phparkitect/arkitect)
 
+
+1. Introduction
+2. Installation
+3. Available rules
+4. Rule Builders
+4. Usage
+5. Integrations
+
+#Introduction
+
 PHPArkitect helps you to keep your PHP codebase coherent and solid, by permitting to add some architectural constraint check to your workflow.
 You can express the constraint that you want to enforce, in simple and readable PHP code, for example:
 
@@ -223,7 +233,7 @@ phparkitect check --config=/project/yourConfigFile.php
 
 By default, a progress bar will show the status of the ongoing analysis.
 
-# Configuration
+## Configuration
 
 Example of configuration file `phparkitect.php`
 
