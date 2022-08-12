@@ -338,3 +338,6 @@ Supported PHP versions are: 7.1, 7.2, 7.3, 7.4, 8.0, 8.1
  * `--stop-on-failure`: With this option the process will end immediately after the first violation.
 
 # Integrations
+
+## Laravel
+If you plan to use Arkitect with Laravel, [smortexa](https://github.com/smortexa) wrote a nice wrapper with some predefined rules for laravel: https://github.com/smortexa/laravel-arkitect
