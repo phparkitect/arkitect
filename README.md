@@ -4,14 +4,14 @@
 [![codecov](https://codecov.io/gh/phparkitect/arkitect/branch/main/graph/badge.svg)](https://codecov.io/gh/phparkitect/arkitect)
 
 
-1. Introduction
-2. Installation
-3. Available rules
-4. Rule Builders
-4. Usage
-5. Integrations
+1. [Introduction](#introduction)
+1. [Installation](#installation)
+1. [Usage](#usage)
+1. [Available rules](#available-rules)
+1. [Rule Builders](#rule-builders)
+1. [Integrations](#integrations)
 
-#Introduction
+# Introduction
 
 PHPArkitect helps you to keep your PHP codebase coherent and solid, by permitting to add some architectural constraint check to your workflow.
 You can express the constraint that you want to enforce, in simple and readable PHP code, for example:
@@ -22,8 +22,79 @@ Rule::allClasses()
     ->should(new HaveNameMatching('*Controller'))
     ->because("it's a symfony naming convention");
 ```
+# Installation
 
-## Available rules
+## Using Composer
+
+```bash
+composer require --dev phparkitect/phparkitect
+```
+
+## Using a Phar
+Sometimes your project can conflict with one or more of PHPArkitect's dependencies. In that case you may find the Phar (a self-contained PHP executable) useful.
+
+The Phar can be downloaded from GitHub:
+
+```
+wget https://github.com/phparkitect/arkitect/releases/latest/download/phparkitect.phar
+chmod +x phparkitect.phar
+./phparkitect.phar check
+```
+
+# Usage
+
+To use this tool you need to launch a command via Bash:
+
+```
+phparkitect check
+```
+
+With this command `phparkitect` will search all rules in the root of your project the default config file called `phparkitect.php`.
+You can also specify your configuration file using `--config` option like this:
+
+```
+phparkitect check --config=/project/yourConfigFile.php
+```
+
+By default, a progress bar will show the status of the ongoing analysis.
+
+## Configuration
+
+Example of configuration file `phparkitect.php`
+
+```php
+<?php
+declare(strict_types=1);
+
+use Arkitect\ClassSet;
+use Arkitect\CLI\Config;
+use Arkitect\Expression\ForClasses\HaveNameMatching;
+use Arkitect\Expression\ForClasses\NotHaveDependencyOutsideNamespace;
+use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
+use Arkitect\Rules\Rule;
+
+return static function (Config $config): void {
+    $mvcClassSet = ClassSet::fromDir(__DIR__.'/mvc');
+
+    $rules = [];
+
+    $rules[] = Rule::allClasses()
+        ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
+        ->should(new HaveNameMatching('*Controller'))
+        ->because('we want uniform naming');
+
+    $rules[] = Rule::allClasses()
+        ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
+        ->should(new NotHaveDependencyOutsideNamespace('App\Domain'))
+        ->because('we want protect our domain');
+
+    $config
+        ->add($mvcClassSet, ...$rules);
+};
+```
+
+
+# Available rules
 
 Currently, you can check if a class:
 
@@ -197,78 +268,8 @@ You can also define components and ensure that a component:
 
 Check out [this demo project](https://github.com/phparkitect/arkitect-demo) to get an idea on how write rules.
 
-# Installation
 
-## Using Composer
-
-```bash
-composer require --dev phparkitect/phparkitect
-```
-
-## Using a Phar
-Sometimes your project can conflict with one or more of PHPArkitect's dependencies. In that case you may find the Phar (a self-contained PHP executable) useful.
-
-The Phar can be downloaded from GitHub:
-
-```
-wget https://github.com/phparkitect/arkitect/releases/latest/download/phparkitect.phar
-chmod +x phparkitect.phar
-./phparkitect.phar check
-```
-
-# Usage
-
-To use this tool you need to launch a command via Bash:
-
-```
-phparkitect check
-```
-
-With this command `phparkitect` will search all rules in the root of your project the default config file called `phparkitect.php`.
-You can also specify your configuration file using `--config` option like this:
-
-```
-phparkitect check --config=/project/yourConfigFile.php
-```
-
-By default, a progress bar will show the status of the ongoing analysis.
-
-## Configuration
-
-Example of configuration file `phparkitect.php`
-
-```php
-<?php
-declare(strict_types=1);
-
-use Arkitect\ClassSet;
-use Arkitect\CLI\Config;
-use Arkitect\Expression\ForClasses\HaveNameMatching;
-use Arkitect\Expression\ForClasses\NotHaveDependencyOutsideNamespace;
-use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
-use Arkitect\Rules\Rule;
-
-return static function (Config $config): void {
-    $mvcClassSet = ClassSet::fromDir(__DIR__.'/mvc');
-
-    $rules = [];
-
-    $rules[] = Rule::allClasses()
-        ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
-        ->should(new HaveNameMatching('*Controller'))
-        ->because('we want uniform naming');
-
-    $rules[] = Rule::allClasses()
-        ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
-        ->should(new NotHaveDependencyOutsideNamespace('App\Domain'))
-        ->because('we want protect our domain');
-
-    $config
-        ->add($mvcClassSet, ...$rules);
-};
-```
-
-## Rule Builders
+# Rule Builders
 
 PHPArkitect offers some builders that enable you to implement more readable rules for specific contexts. 
 
@@ -335,3 +336,5 @@ phparkitect check --config=/project/yourConfigFile.php
 * `--target-php-version`: With this parameter, you can specify which PHP version should use the parser. This can be useful to debug problems and to understand if there are problems with a different PHP version.
 Supported PHP versions are: 7.1, 7.2, 7.3, 7.4, 8.0, 8.1
  * `--stop-on-failure`: With this option the process will end immediately after the first violation.
+
+# Integrations
