@@ -38,7 +38,7 @@ final class CheckClassHaveAttributeTest extends TestCase
             ->because('its a symfony thing');
 
         $expectedExceptionMessage = '
-App\Controller\Foo violates rules
+App\Controller\Foo has 1 violations
   should have a name that matches *Controller because its a symfony thing';
 
         $this->expectException(ExpectationFailedException::class);

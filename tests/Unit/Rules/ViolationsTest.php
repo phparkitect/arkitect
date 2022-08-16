@@ -63,10 +63,10 @@ class ViolationsTest extends TestCase
 
         $this->violationStore->add($violation);
         $expected = '
-App\Controller\ProductController violates rules
+App\Controller\ProductController has 1 violations
   should implement ContainerInterface
 
-App\Controller\Foo violates rules
+App\Controller\Foo has 1 violations
   should have name end with Controller
 ';
 

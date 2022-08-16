@@ -72,7 +72,8 @@ class Violations implements \IteratorAggregate, \Countable
          * @var Violation[] $violationsByFqcn
          */
         foreach ($violationsCollection as $key => $violationsByFqcn) {
-            $errors .= "\n".$key.' violates rules';
+            $violationForThisFqcn = \count($violationsByFqcn);
+            $errors .= "\n$key has {$violationForThisFqcn} violations";
 
             foreach ($violationsByFqcn as $violation) {
                 $errors .= "\n  ".$violation->getError();

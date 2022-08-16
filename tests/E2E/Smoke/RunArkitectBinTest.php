@@ -22,20 +22,20 @@ class RunArkitectBinTest extends TestCase
 
         $expectedErrors = 'ERRORS!
 
-App\Controller\Foo violates rules
+App\Controller\Foo has 2 violations
   should implement ContainerAwareInterface because all controllers should be container aware
   should have a name that matches *Controller because we want uniform naming
 
-App\Controller\ProductsController violates rules
+App\Controller\ProductsController has 1 violations
   should implement ContainerAwareInterface because all controllers should be container aware
 
-App\Controller\UserController violates rules
+App\Controller\UserController has 1 violations
   should implement ContainerAwareInterface because all controllers should be container aware
 
-App\Controller\YieldController violates rules
+App\Controller\YieldController has 1 violations
   should implement ContainerAwareInterface because all controllers should be container aware
 
-App\Domain\Model violates rules
+App\Domain\Model has 2 violations
   depends on App\Services\UserService, but should not depend on classes outside namespace App\Domain because we want protect our domain (on line 14)
   depends on App\Services\CartService, but should not depend on classes outside namespace App\Domain because we want protect our domain (on line 15)';
 
@@ -49,20 +49,20 @@ App\Domain\Model violates rules
 
         $expectedErrors = 'ERRORS!
 
-App\Controller\Foo violates rules
+App\Controller\Foo has 2 violations
   should implement ContainerAwareInterface because all controllers should be container aware
   should have a name that matches *Controller because we want uniform naming
 
-App\Controller\ProductsController violates rules
+App\Controller\ProductsController has 1 violations
   should implement ContainerAwareInterface because all controllers should be container aware
 
-App\Controller\UserController violates rules
+App\Controller\UserController has 1 violations
   should implement ContainerAwareInterface because all controllers should be container aware
 
-App\Controller\YieldController violates rules
+App\Controller\YieldController has 1 violations
   should implement ContainerAwareInterface because all controllers should be container aware
 
-App\Domain\Model violates rules
+App\Domain\Model has 2 violations
   depends on App\Services\UserService, but should not depend on classes outside namespace App\Domain because we want protect our domain (on line 14)
   depends on App\Services\CartService, but should not depend on classes outside namespace App\Domain because we want protect our domain (on line 15)';
 
@@ -91,7 +91,7 @@ App\Domain\Model violates rules
 
         $expectedErrors = 'ERRORS!
 
-App\Controller\Foo violates rules
+App\Controller\Foo has 1 violations
   should have a name that matches *Controller';
 
         $this->assertEquals(self::ERROR_CODE, $process->getExitCode());

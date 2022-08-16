@@ -25,19 +25,19 @@ class CheckClassImplementInterfaceTest extends TestCase
             ->because('i said so');
 
         $expectedExceptionMessage = '
-App\Controller\Foo violates rules
+App\Controller\Foo has 1 violations
   should implement ContainerAwareInterface because i said so
 
-App\Controller\ProductsController violates rules
+App\Controller\ProductsController has 1 violations
   should implement ContainerAwareInterface because i said so
 
-App\Controller\UserController violates rules
+App\Controller\UserController has 1 violations
   should implement ContainerAwareInterface because i said so
 
-App\Controller\YieldController violates rules
+App\Controller\YieldController has 1 violations
   should implement ContainerAwareInterface because i said so
 
-App\Services\UserService violates rules
+App\Services\UserService has 1 violations
   should implement ContainerAwareInterface because i said so';
 
         $this->expectException(ExpectationFailedException::class);
