@@ -67,7 +67,7 @@ class FakeRule implements ArchRule
 {
     public function check(ClassDescription $classDescription, Violations $violations): void
     {
-        $violations->add(Violation::create('fqcn', 'error'));
+        $violations->add(new Violation('fqcn', 'error'));
     }
 }
 
