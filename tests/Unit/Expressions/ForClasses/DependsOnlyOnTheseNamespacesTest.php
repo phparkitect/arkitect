@@ -42,6 +42,10 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
         $dependOnClasses->evaluate($classDescription, $violations, $because);
 
         self::assertNotEquals(0, $violations->count());
+        self::assertEquals(
+            'depends on anotherNamespace\Banana, but should depend only on classes in one of these namespaces: myNamespace because we want to add this rule for our software',
+            $violations->get(0)->getError()
+        );
     }
 
     public function test_it_should_return_true_if_depends_on_class_in_root_namespace(): void

@@ -9,6 +9,7 @@ use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Rules\Violation;
+use Arkitect\Rules\ViolationMessage;
 use Arkitect\Rules\Violations;
 
 class NotDependsOnTheseNamespaces implements Expression
@@ -41,7 +42,10 @@ class NotDependsOnTheseNamespaces implements Expression
             if ($dependency->matchesOneOf(...$this->namespaces)) {
                 $violation = Violation::createWithErrorLine(
                     $theClass->getFQCN(),
-                    $this->describe($theClass, $because)->toString(),
+                    ViolationMessage::withDescription(
+                        $this->describe($theClass, $because),
+                        "depends on {$dependency->getFQCN()->toString()}"
+                    ),
                     $dependency->getLine()
                 );
 

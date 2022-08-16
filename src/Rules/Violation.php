@@ -22,14 +22,14 @@ class Violation
         $this->line = $line;
     }
 
-    public static function create(string $fqcn, string $error): self
+    public static function create(string $fqcn, ViolationMessage $error): self
     {
-        return new self($fqcn, $error);
+        return new self($fqcn, $error->toString());
     }
 
-    public static function createWithErrorLine(string $fqcn, string $error, int $line): self
+    public static function createWithErrorLine(string $fqcn, ViolationMessage $error, int $line): self
     {
-        return new self($fqcn, $error, $line);
+        return new self($fqcn, $error->toString(), $line);
     }
 
     public function getFqcn(): string
