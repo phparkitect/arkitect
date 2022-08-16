@@ -10,6 +10,7 @@ use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Rules\Constraints;
 use Arkitect\Rules\Violation;
+use Arkitect\Rules\ViolationMessage;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
@@ -20,7 +21,7 @@ class ConstraintsTest extends TestCase
         $trueExpression = new class() implements Expression {
             public function describe(ClassDescription $theClass, string $because): Description
             {
-                return new Description('');
+                return new Description('', '');
             }
 
             public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
@@ -54,7 +55,7 @@ class ConstraintsTest extends TestCase
             {
                 $violation = Violation::create(
                     $theClass->getFQCN(),
-                    $this->describe($theClass, $because)->toString()
+                    ViolationMessage::selfExplanatory($this->describe($theClass, $because))
                 );
 
                 $violations->add($violation);

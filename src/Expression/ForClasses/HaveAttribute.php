@@ -7,6 +7,7 @@ use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Rules\Violation;
+use Arkitect\Rules\ViolationMessage;
 use Arkitect\Rules\Violations;
 
 final class HaveAttribute implements Expression
@@ -33,7 +34,7 @@ final class HaveAttribute implements Expression
         $violations->add(
             Violation::create(
                 $theClass->getFQCN(),
-                $this->describe($theClass, $because)->toString()
+                ViolationMessage::selfExplanatory($this->describe($theClass, $because))
             )
         );
     }

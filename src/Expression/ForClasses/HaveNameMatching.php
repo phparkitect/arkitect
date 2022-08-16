@@ -9,6 +9,7 @@ use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Rules\Violation;
+use Arkitect\Rules\ViolationMessage;
 use Arkitect\Rules\Violations;
 
 class HaveNameMatching implements Expression
@@ -32,7 +33,7 @@ class HaveNameMatching implements Expression
         if (!$fqcn->classMatches($this->name)) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
-                $this->describe($theClass, $because)->toString()
+                ViolationMessage::selfExplanatory($this->describe($theClass, $because))
             );
             $violations->add($violation);
         }

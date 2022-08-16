@@ -9,6 +9,7 @@ use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Rules\Violation;
+use Arkitect\Rules\ViolationMessage;
 use Arkitect\Rules\Violations;
 
 class Implement implements Expression
@@ -37,7 +38,7 @@ class Implement implements Expression
         if (0 === \count(array_filter($interfaces, $implements))) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
-                $this->describe($theClass, $because)->toString()
+                ViolationMessage::selfExplanatory($this->describe($theClass, $because))
             );
             $violations->add($violation);
         }

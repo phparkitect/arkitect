@@ -9,6 +9,7 @@ use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Rules\Violation;
+use Arkitect\Rules\ViolationMessage;
 use Arkitect\Rules\Violations;
 
 class NotHaveDependencyOutsideNamespace implements Expression
@@ -47,7 +48,10 @@ class NotHaveDependencyOutsideNamespace implements Expression
 
             $violation = Violation::createWithErrorLine(
                 $theClass->getFQCN(),
-                $this->describe($theClass, $because)->toString(),
+                ViolationMessage::withDescription(
+                    $this->describe($theClass, $because),
+                    "depends on {$externalDep->getFQCN()->toString()}"
+                ),
                 $externalDep->getLine()
             );
             $violations->add($violation);
