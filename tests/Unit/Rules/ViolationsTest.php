@@ -72,4 +72,39 @@ App\Controller\Foo has 1 violations
 
         $this->assertEquals($expected, $this->violationStore->toString());
     }
+
+    public function test_get_iterable(): void
+    {
+        $violation = new Violation(
+            'App\Controller\Shop',
+            'should have name end with Controller'
+        );
+        $this->violationStore->add($violation);
+        $iterable = $this->violationStore->getIterator();
+
+        $this->assertEquals([
+            $this->violation,
+            $violation,
+        ], iterator_to_array($iterable));
+    }
+
+    public function test_get_array(): void
+    {
+        $violation1 = new Violation(
+            'App\Controller\Shop',
+            'should have name end with Controller'
+        );
+        $violation2 = new Violation(
+            'App\Controller\Shop',
+            'should implement AbstractController'
+        );
+        $this->violationStore->add($violation1);
+        $this->violationStore->add($violation2);
+
+        $this->assertEquals([
+            $this->violation,
+            $violation1,
+            $violation2,
+        ], $this->violationStore->toArray());
+    }
 }
