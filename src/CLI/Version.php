@@ -6,13 +6,6 @@ namespace Arkitect\CLI;
 
 class Version
 {
-    private const COMPOSER_PATHS = [
-        'composer.json',
-        '../composer.json',
-        '../../composer.json',
-        '../../../composer.json',
-        './vendor/phparkitect/phparkitect/composer.json',
-    ];
 
     public static function get(): string
     {
@@ -20,22 +13,13 @@ class Version
 
         if ($pharPath) {
             $content = file_get_contents("$pharPath/composer.json");
-            $composerData = json_decode($content, true);
-
-            return $composerData['version'] ?? 'UNKNOWN';
+        } else {
+            $phparkitectRootPath = __DIR__."/../../";
+            $content = file_get_contents($phparkitectRootPath.'composer.json');
         }
 
-        foreach (self::COMPOSER_PATHS as $composerPath) {
-            if (!file_exists($composerPath)) {
-                continue;
-            }
+        $composerData = json_decode($content, true);
 
-            $content = file_get_contents($composerPath);
-            $composerData = json_decode($content, true);
-
-            return $composerData['version'] ?? 'UNKNOWN';
-        }
-
-        return 'UNKNOWN';
+        return $composerData['version'] ?? 'UNKNOWN';
     }
 }
