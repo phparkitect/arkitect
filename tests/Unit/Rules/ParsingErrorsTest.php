@@ -81,4 +81,17 @@ Syntax error, unexpected T_STRING on line 8 in file: App\Controller\Foo
 
         $this->assertEquals($expected, $this->parsingStore->toArray());
     }
+
+    public function test_get_iterable(): void
+    {
+        $parsingError = ParsingError::create(
+            'App\Controller\Foo',
+            'Syntax error, unexpected T_STRING on line 8'
+        );
+
+        $this->parsingStore->add($parsingError);
+        $iterable = $this->parsingStore->getIterator();
+
+        $this->assertEquals([$this->parsingError, $parsingError], iterator_to_array($iterable));
+    }
 }
