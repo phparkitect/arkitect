@@ -6,7 +6,6 @@ namespace Arkitect\CLI;
 
 class Version
 {
-
     public static function get(): string
     {
         $pharPath = \Phar::running();
@@ -14,7 +13,7 @@ class Version
         if ($pharPath) {
             $content = file_get_contents("$pharPath/composer.json");
         } else {
-            $phparkitectRootPath = __DIR__."/../../";
+            $phparkitectRootPath = __DIR__.'/../../';
             $content = file_get_contents($phparkitectRootPath.'composer.json');
         }
 
