@@ -127,17 +127,6 @@ class Check extends Command
         })();
     }
 
-    protected function printSummaryLine(OutputInterface $output, int $assertionCount, int $violationCount): void
-    {
-        $output->writeln(
-            sprintf(
-                "\nAssertions: %d, Violations: %d.\n",
-                $assertionCount,
-                $violationCount
-            )
-        );
-    }
-
     protected function printHeadingLine(OutputInterface $output): void
     {
         $app = $this->getApplication();
