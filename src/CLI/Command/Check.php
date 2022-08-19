@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\CLI;
+namespace Arkitect\CLI\Command;
 
+use Arkitect\CLI\Config;
 use Arkitect\CLI\Progress\DebugProgress;
 use Arkitect\CLI\Progress\ProgressBarProgress;
+use Arkitect\CLI\Runner;
+use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Exceptions\FailOnFirstViolationException;
 use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violations;
