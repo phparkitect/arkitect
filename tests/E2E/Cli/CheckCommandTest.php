@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Tests\E2E\Cli;
 
 use Arkitect\CLI\Application;
-use Arkitect\CLI\Check;
+use Arkitect\CLI\Command\Check;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 

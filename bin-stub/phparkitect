@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Arkitect\CLI\Application;
-use Arkitect\CLI\Check;
+use Arkitect\CLI\Command\Check;
 use Arkitect\CLI\Command\Init;
 use Arkitect\CLI\Version;
 
