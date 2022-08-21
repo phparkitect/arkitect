@@ -8,6 +8,7 @@ Shout out to our top contributors!
 - [pfazzi](https://api.github.com/users/pfazzi)
 - [ricfio](https://api.github.com/users/ricfio)
 - [github-actions[bot]](https://api.github.com/users/github-actions%5Bbot%5D)
+- [annervisser](https://api.github.com/users/annervisser)
 - [stephpy](https://api.github.com/users/stephpy)
 - [frankverhoeven](https://api.github.com/users/frankverhoeven)
 - [mloru](https://api.github.com/users/mloru)
