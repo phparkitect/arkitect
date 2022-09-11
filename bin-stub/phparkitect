@@ -2,10 +2,7 @@
 <?php
 declare(strict_types=1);
 
-use Arkitect\CLI\Application;
-use Arkitect\CLI\Command\Check;
-use Arkitect\CLI\Command\Init;
-use Arkitect\CLI\Version;
+use Arkitect\CLI\PhpArkitectApplication;
 
 foreach (array(__DIR__ . '/../../../autoload.php', __DIR__ . '/../../autoload.php', __DIR__ . '/../vendor/autoload.php', __DIR__ . '/vendor/autoload.php') as $file) {
     if (file_exists($file)) {
@@ -30,9 +27,6 @@ if (!defined('PHPARKITECT_COMPOSER_INSTALL')) {
 
 require PHPARKITECT_COMPOSER_INSTALL;
 
-$application = new Application('PHPArkitect', Version::get());
-
-$application->add(new Check());
-$application->add(new Init());
+$application = new PhpArkitectApplication();
 
 $application->run();

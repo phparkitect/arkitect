@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\E2E\Cli;
 
-use Arkitect\CLI\Application;
-use Arkitect\CLI\Command\Check;
+use Arkitect\CLI\PhpArkitectApplication;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Console\Tester\ApplicationTester;
 
 class CheckCommandTest extends TestCase
 {
@@ -79,47 +78,48 @@ App\Controller\Foo has 1 violations
         $this->assertCheckHasErrors($cmdTester, $expectedErrors);
     }
 
-    protected function runCheck($configFilePath = null, bool $stopOnFailure = null): CommandTester
+    protected function runCheck($configFilePath = null, bool $stopOnFailure = null): ApplicationTester
     {
-        $input = $configFilePath ? ['--config' => $configFilePath] : [];
+        $input = ['check'];
+        if (null != $configFilePath) {
+            $input['--config'] = $configFilePath;
+        }
         if (null !== $stopOnFailure) {
             $input['--stop-on-failure'] = true;
         }
 
-        $app = new Application('PHPArkitect', 'dunno');
-        $app->add(new Check());
+        $app = new PhpArkitectApplication();
+        $app->setAutoExit(false);
 
-        $command = $app->find('check');
-
-        $appTester = new CommandTester($command);
-        $appTester->execute($input);
+        $appTester = new ApplicationTester($app);
+        $appTester->run($input);
 
         return $appTester;
     }
 
-    protected function assertCheckHasErrors(CommandTester $commandTester, string $expectedOutput = null): void
+    protected function assertCheckHasErrors(ApplicationTester $applicationTester, string $expectedOutput = null): void
     {
-        $this->assertEquals(self::ERROR_CODE, $commandTester->getStatusCode());
+        $this->assertEquals(self::ERROR_CODE, $applicationTester->getStatusCode());
         if (null != $expectedOutput) {
-            $actualOutput = str_replace(["\r", "\n"], '', $commandTester->getDisplay());
+            $actualOutput = str_replace(["\r", "\n"], '', $applicationTester->getDisplay());
             $expectedOutput = str_replace(["\r", "\n"], '', $expectedOutput);
             $this->assertStringContainsString($expectedOutput, $actualOutput);
         }
     }
 
-    protected function assertCheckHasNoErrorsLike(CommandTester $commandTester, string $expectedOutput = null): void
+    protected function assertCheckHasNoErrorsLike(ApplicationTester $applicationTester, string $expectedOutput = null): void
     {
-        $this->assertEquals(self::ERROR_CODE, $commandTester->getStatusCode());
+        $this->assertEquals(self::ERROR_CODE, $applicationTester->getStatusCode());
         if (null != $expectedOutput) {
-            $actualOutput = str_replace(["\r", "\n"], '', $commandTester->getDisplay());
+            $actualOutput = str_replace(["\r", "\n"], '', $applicationTester->getDisplay());
             $expectedOutput = str_replace(["\r", "\n"], '', $expectedOutput);
             $this->assertStringNotContainsString($expectedOutput, $actualOutput);
         }
     }
 
-    protected function assertCheckHasSuccess(CommandTester $commandTester): void
+    protected function assertCheckHasSuccess(ApplicationTester $applicationTester): void
     {
-        $this->assertEquals(self::SUCCESS_CODE, $commandTester->getStatusCode());
-        $this->assertStringNotContainsString('ERRORS!', $commandTester->getDisplay());
+        $this->assertEquals(self::SUCCESS_CODE, $applicationTester->getStatusCode());
+        $this->assertStringNotContainsString('ERRORS!', $applicationTester->getDisplay());
     }
 }

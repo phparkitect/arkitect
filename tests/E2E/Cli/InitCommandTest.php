@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\E2E\Cli;
 
-use Arkitect\CLI\Application;
-use Arkitect\CLI\Command\Init;
+use Arkitect\CLI\PhpArkitectApplication;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Console\Tester\ApplicationTester;
 
 class InitCommandTest extends TestCase
 {
@@ -76,15 +75,13 @@ class InitCommandTest extends TestCase
         );
     }
 
-    private function runInit(string $path): CommandTester
+    private function runInit(string $path): ApplicationTester
     {
-        $app = new Application('PHPArkitect', 'dunno');
-        $app->add(new Init());
+        $app = new PhpArkitectApplication();
+        $app->setAutoExit(false);
 
-        $command = $app->find('init');
-
-        $appTester = new CommandTester($command);
-        $appTester->execute(['--dest-dir' => $path]);
+        $appTester = new ApplicationTester($app);
+        $appTester->run(['init', '--dest-dir' => $path]);
 
         return $appTester;
     }
