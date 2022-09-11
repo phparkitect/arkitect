@@ -81,7 +81,7 @@ App\Controller\Foo has 1 violations
     protected function runCheck($configFilePath = null, bool $stopOnFailure = null): ApplicationTester
     {
         $input = ['check'];
-        if (null != $configFilePath) {
+        if (null !== $configFilePath) {
             $input['--config'] = $configFilePath;
         }
         if (null !== $stopOnFailure) {
