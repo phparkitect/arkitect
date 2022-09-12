@@ -30,5 +30,5 @@ return static function (Config $config): void {
         ->because('we want protect our domain');
 
     $config
-        ->add($mvc_class_set, ...[$rule_1, $rule_2, $rule_3]);
+        ->add($mvc_class_set, [$rule_1, $rule_2, $rule_3]);
 };

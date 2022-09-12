@@ -21,11 +21,14 @@ class Runner
 
     /** @var ParsingErrors */
     private $parsingErrors;
+    /** @var string|null */
+    private $ruleFilter;
 
-    public function __construct(bool $stopOnFailure = false)
+    public function __construct(bool $stopOnFailure = false, ?string $ruleFilter = null)
     {
         $this->violations = new Violations($stopOnFailure);
         $this->parsingErrors = new ParsingErrors();
+        $this->ruleFilter = $ruleFilter;
     }
 
     public function run(Config $config, Progress $progress, TargetPhpVersion $targetPhpVersion): void
@@ -34,7 +37,7 @@ class Runner
         $fileParser = FileParserFactory::createFileParser($targetPhpVersion);
 
         /** @var ClassSetRules $classSetRule */
-        foreach ($config->getClassSetRules() as $classSetRule) {
+        foreach ($config->getClassSetRules($this->ruleFilter) as $classSetRule) {
             $progress->startFileSetAnalysis($classSetRule->getClassSet());
 
             $this->check($classSetRule, $progress, $fileParser, $this->violations, $this->parsingErrors);

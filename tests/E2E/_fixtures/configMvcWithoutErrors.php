@@ -18,5 +18,5 @@ return static function (Config $config): void {
         ->because('all services should be end name with Service');
 
     $config
-        ->add($mvc_class_set, ...[$rule_1]);
+        ->add($mvc_class_set, [$rule_1]);
 };

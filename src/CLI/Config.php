@@ -5,7 +5,6 @@ namespace Arkitect\CLI;
 
 use Arkitect\ClassSet;
 use Arkitect\ClassSetRules;
-use Arkitect\Rules\DSL\ArchRule;
 
 class Config
 {
@@ -17,15 +16,37 @@ class Config
         $this->classSetRules = [];
     }
 
-    public function add(ClassSet $classSet, ArchRule ...$rules): self
+    public function add(ClassSet $classSet, array $rules): self
     {
-        $this->classSetRules[] = ClassSetRules::create($classSet, ...$rules);
+        $this->classSetRules[] = ClassSetRules::create($classSet, $rules);
 
         return $this;
     }
 
-    public function getClassSetRules(): array
+    public function getClassSetRules(?string $ruleFilter = null): array
     {
+        if (null !== $ruleFilter) {
+            return $this->filterRuleIntoClassSetRules($ruleFilter);
+        }
+
+        return $this->classSetRules;
+    }
+
+    private function filterRuleIntoClassSetRules(string $ruleFilter): array
+    {
+        /** @var ClassSetRules $classSetRules */
+        foreach ($this->classSetRules as $index => $classSetRules) {
+            $rule = $classSetRules->getRulesByName($ruleFilter);
+            if (null === $rule) {
+                unset($this->classSetRules[$index]);
+                continue;
+            }
+
+            $ruleFiltered = [];
+            $ruleFiltered[$ruleFilter] = $rule;
+            $this->classSetRules[$index] = ClassSetRules::create($classSetRules->getClassSet(), $ruleFiltered);
+        }
+
         return $this->classSetRules;
     }
 }

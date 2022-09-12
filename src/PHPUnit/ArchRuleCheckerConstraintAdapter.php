@@ -50,7 +50,7 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
     protected function matches(/** @var $rule ArchRule */ $other): bool
     {
         $this->runner->check(
-            ClassSetRules::create($this->classSet, $other),
+            ClassSetRules::create($this->classSet, [$other]),
             new VoidProgress(),
             $this->fileparser,
             $this->violations,

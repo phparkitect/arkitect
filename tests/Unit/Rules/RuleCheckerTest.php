@@ -28,7 +28,7 @@ class RuleCheckerTest extends TestCase
         $runner = new Runner();
 
         $runner->check(
-            ClassSetRules::create(new FakeClassSet(), ...[$rule]),
+            ClassSetRules::create(new FakeClassSet(), [$rule]),
             new VoidProgress(),
             $fileParser,
             $violations,

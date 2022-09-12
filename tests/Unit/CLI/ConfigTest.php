@@ -14,21 +14,47 @@ use PHPUnit\Framework\TestCase;
 
 class ConfigTest extends TestCase
 {
-    public function test_it_should_create_config(): void
+    protected function setUp(): void
     {
-        $classSet = ClassSet::fromDir(__DIR__.'/foo');
+        $this->classSet = ClassSet::fromDir(__DIR__.'/foo');
 
-        $rule = Rule::allClasses()
+        $this->rule = Rule::allClasses()
             ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
             ->should(new HaveNameMatching('*Controller'))
             ->because('all controllers should be end name with Controller');
 
-        $config = new Config();
-        $config->add($classSet, ...[$rule]);
+        $this->config = new Config();
+    }
 
-        $this->assertInstanceOf(Config::class, $config);
+    public function test_it_should_create_config(): void
+    {
+        $this->config->add($this->classSet, [$this->rule]);
 
-        $classSetRulesExpected[] = ClassSetRules::create($classSet, ...[$rule]);
-        $this->assertEquals($classSetRulesExpected, $config->getClassSetRules());
+        $this->assertInstanceOf(Config::class, $this->config);
+
+        $classSetRulesExpected[] = ClassSetRules::create($this->classSet, [$this->rule]);
+        $this->assertEquals($classSetRulesExpected, $this->config->getClassSetRules());
+    }
+
+    public function test_it_should_create_config_with_rule_filtered(): void
+    {
+        $this->config->add($this->classSet, [
+            'myRule' => $this->rule,
+        ]);
+
+        $this->assertInstanceOf(Config::class, $this->config);
+
+        $rules = ['myRule' => $this->rule];
+        $classSetRulesExpected[] = ClassSetRules::create($this->classSet, $rules);
+        $this->assertEquals($classSetRulesExpected, $this->config->getClassSetRules('myRule'));
+    }
+
+    public function test_it_should_create_config_with_not_existing_rule_filtered(): void
+    {
+        $rule = ['myRule' => $this->rule];
+        $this->config->add($this->classSet, $rule);
+
+        $this->assertInstanceOf(Config::class, $this->config);
+        $this->assertEquals([], $this->config->getClassSetRules('notExistingRule'));
     }
 }

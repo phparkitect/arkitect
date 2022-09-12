@@ -17,5 +17,5 @@ return static function (Config $config): void {
         ->because('all controllers should be end name with Controller');
 
     $config
-        ->add($mvc_class_set, ...[$rule_1]);
+        ->add($mvc_class_set, [$rule_1]);
 };

@@ -335,7 +335,16 @@ phparkitect check --config=/project/yourConfigFile.php
 ```
 * `--target-php-version`: With this parameter, you can specify which PHP version should use the parser. This can be useful to debug problems and to understand if there are problems with a different PHP version.
 Supported PHP versions are: 7.1, 7.2, 7.3, 7.4, 8.0, 8.1
- * `--stop-on-failure`: With this option the process will end immediately after the first violation.
+* `--stop-on-failure`: With this option the process will end immediately after the first violation.
+* `--filter`: With this option you can run a specific rule with the same name example: `--filter=myRule`.
+To use this filter you can give a name to your rule like this:
+```php
+$rules['myRule'] = Rule::allClasses()
+    ->except('App\Controller\FolderController\*')
+    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
+    ->should(new HaveNameMatching('*Controller'))
+    ->because('we want uniform naming');
+```
 
 # Integrations
 

@@ -32,6 +32,8 @@ class Check extends Command
 
     private const ERROR_CODE = 1;
 
+    private const RULE_FILTER = 'filter';
+
     public function __construct()
     {
         parent::__construct('check');
@@ -59,6 +61,12 @@ class Check extends Command
                 's',
                 InputOption::VALUE_NONE,
                 'Stop on failure'
+            )
+            ->addOption(
+                self::RULE_FILTER,
+                'r',
+                InputOption::VALUE_OPTIONAL,
+                'Filter a specific rule by name'
             );
     }
 
@@ -86,7 +94,9 @@ class Check extends Command
 
             $this->readRules($config, $rulesFilename);
 
-            $runner = new Runner($stopOnFailure);
+            /** @var string|null $ruleFilter */
+            $ruleFilter = $input->getOption(self::RULE_FILTER);
+            $runner = new Runner($stopOnFailure, $ruleFilter);
             try {
                 $runner->run($config, $progress, $targetPhpVersion);
             } catch (FailOnFirstViolationException $e) {
