@@ -3,7 +3,10 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI;
 
-class Application extends \Symfony\Component\Console\Application
+use Arkitect\CLI\Command\Check;
+use Arkitect\CLI\Command\Init;
+
+class PhpArkitectApplication extends \Symfony\Component\Console\Application
 {
     /** @var string */
     private static $logo = <<< 'EOD'
@@ -13,6 +16,13 @@ class Application extends \Symfony\Component\Console\Application
  |  __/|  _  |  __/ ___ \| |  |   <| | ||  __/ (__| |_
  |_|   |_| |_|_| /_/   \_\_|  |_|\_\_|\__\___|\___|\__|
 EOD;
+
+    public function __construct()
+    {
+        parent::__construct('PHPArkitect', Version::get());
+        $this->add(new Check());
+        $this->add(new Init());
+    }
 
     public function getLongVersion()
     {
