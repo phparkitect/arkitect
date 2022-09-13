@@ -19,12 +19,21 @@ class ArchRule implements DSL\ArchRule
     /** @var array */
     private $classesToBeExcluded;
 
-    public function __construct(Specs $specs, Constraints $constraints, string $because, array $classesToBeExcluded)
-    {
+    /** @var bool */
+    private $runOnlyThis;
+
+    public function __construct(
+        Specs $specs,
+        Constraints $constraints,
+        string $because,
+        array $classesToBeExcluded,
+        bool $runOnlyThis
+    ) {
         $this->thats = $specs;
         $this->shoulds = $constraints;
         $this->because = $because;
         $this->classesToBeExcluded = $classesToBeExcluded;
+        $this->runOnlyThis = $runOnlyThis;
     }
 
     public function check(ClassDescription $classDescription, Violations $violations): void
@@ -38,5 +47,17 @@ class ArchRule implements DSL\ArchRule
         }
 
         $this->shoulds->checkAll($classDescription, $violations, $this->because);
+    }
+
+    public function isRunOnlyThis(): bool
+    {
+        return $this->runOnlyThis;
+    }
+
+    public function runOnlyThis(): DSL\ArchRule
+    {
+        $this->runOnlyThis = true;
+
+        return $this;
     }
 }

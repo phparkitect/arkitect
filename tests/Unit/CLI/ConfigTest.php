@@ -31,4 +31,28 @@ class ConfigTest extends TestCase
         $classSetRulesExpected[] = ClassSetRules::create($classSet, ...[$rule]);
         $this->assertEquals($classSetRulesExpected, $config->getClassSetRules());
     }
+
+    public function test_it_should_create_config_with_only_one_rule_to_run(): void
+    {
+        $classSet = ClassSet::fromDir(__DIR__.'/foo');
+
+        $rule1 = Rule::allClasses()
+            ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
+            ->should(new HaveNameMatching('*Controller'))
+            ->because('all controllers should be end name with Controller');
+
+        $rule2 = Rule::allClasses()
+            ->that(new ResideInOneOfTheseNamespaces('App\Service'))
+            ->should(new HaveNameMatching('*Service'))
+            ->because('all services should be end name with Service')
+            ->runOnlyThis();
+
+        $config = new Config();
+        $config->add($classSet, ...[$rule1, $rule2]);
+
+        $this->assertInstanceOf(Config::class, $config);
+
+        $classSetRulesExpected[] = ClassSetRules::create($classSet, ...[$rule2]);
+        $this->assertEquals($classSetRulesExpected, $config->getClassSetRules());
+    }
 }

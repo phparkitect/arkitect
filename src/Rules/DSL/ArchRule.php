@@ -9,4 +9,8 @@ use Arkitect\Rules\Violations;
 interface ArchRule
 {
     public function check(ClassDescription $classDescription, Violations $violations): void;
+
+    public function isRunOnlyThis(): bool;
+
+    public function runOnlyThis(): self;
 }

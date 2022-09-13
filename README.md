@@ -337,6 +337,18 @@ phparkitect check --config=/project/yourConfigFile.php
 Supported PHP versions are: 7.1, 7.2, 7.3, 7.4, 8.0, 8.1
  * `--stop-on-failure`: With this option the process will end immediately after the first violation.
 
+## Run only a specific rule
+For some reasons, you might want to run only a specific rule, you can do it using `runOnlyThis` like this:
+
+```php
+$rules[] = Rule::allClasses()
+    ->except('App\Controller\FolderController\*')
+    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
+    ->should(new HaveNameMatching('*Controller'))
+    ->because('we want uniform naming')
+    ->runOnlyThis();
+```
+
 # Integrations
 
 ## Laravel
