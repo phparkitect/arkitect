@@ -69,6 +69,16 @@ class FakeRule implements ArchRule
     {
         $violations->add(new Violation('fqcn', 'error'));
     }
+
+    public function isRunOnlyThis(): bool
+    {
+        return false;
+    }
+
+    public function runOnlyThis(): ArchRule
+    {
+        return $this;
+    }
 }
 
 class FakeParser implements Parser

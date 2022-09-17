@@ -18,6 +18,8 @@ class RuleBuilder
 
     /** @var array */
     private $classesToBeExcluded;
+    /** @var bool */
+    private $runOnlyThis;
 
     public function __construct()
     {
@@ -25,6 +27,7 @@ class RuleBuilder
         $this->shoulds = new Constraints();
         $this->because = '';
         $this->classesToBeExcluded = [];
+        $this->runOnlyThis = false;
     }
 
     public function addThat(Expression $that): self
@@ -54,13 +57,21 @@ class RuleBuilder
             $this->thats,
             $this->shoulds,
             $this->because,
-            $this->classesToBeExcluded
+            $this->classesToBeExcluded,
+            $this->runOnlyThis
         );
     }
 
     public function classesToBeExcluded(string ...$classesToBeExcluded): self
     {
         $this->classesToBeExcluded = $classesToBeExcluded;
+
+        return $this;
+    }
+
+    public function setRunOnlyThis(): self
+    {
+        $this->runOnlyThis = true;
 
         return $this;
     }
