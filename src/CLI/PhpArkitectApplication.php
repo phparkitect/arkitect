@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Arkitect\CLI;
 
 use Arkitect\CLI\Command\Check;
+use Arkitect\CLI\Command\DebugExpression;
 use Arkitect\CLI\Command\Init;
 
 class PhpArkitectApplication extends \Symfony\Component\Console\Application
@@ -22,6 +23,7 @@ EOD;
         parent::__construct('PHPArkitect', Version::get());
         $this->add(new Check());
         $this->add(new Init());
+        $this->add(new DebugExpression());
     }
 
     public function getLongVersion()
