@@ -20,7 +20,7 @@ You can express the constraint that you want to enforce, in simple and readable 
 Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
     ->should(new HaveNameMatching('*Controller'))
-    ->because("it's a symfony naming convention");
+    ->because('it\'s a symfony naming convention');
 ```
 # Installation
 
@@ -122,7 +122,7 @@ $rules = Rule::allClasses()
 $rules = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
     ->should(new DocBlockNotContains('@psalm-immutable'))
-    ->because('we don't want to enforce immutability');
+    ->because('we don\'t want to enforce immutability');
 ```
 
 ### Extend another class
