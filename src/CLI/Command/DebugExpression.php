@@ -73,7 +73,7 @@ EOT;
             foreach ($fileParser->getClassDescriptions() as $classDescription) {
                 $violations = new Violations();
                 $rule->evaluate($classDescription, $violations, '');
-                if (0 == $violations->count()) {
+                if (0 === $violations->count()) {
                     $output->writeln($classDescription->getFQCN());
                 }
             }
