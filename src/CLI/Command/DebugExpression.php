@@ -40,13 +40,19 @@ EOT;
                 InputOption::VALUE_REQUIRED,
                 'The folder in which to search the classes',
                 '.'
+            )
+            ->addOption(
+                'target-php-version',
+                't',
+                InputOption::VALUE_OPTIONAL,
+                'Target php version to use for parsing'
             );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        // TODO come gestiamo le diverse versioni di PHP? Con una opzione?
-        $targetPhpVersion = TargetPhpVersion::create(null);
+        $phpVersion = $input->getOption('target-php-version');
+        $targetPhpVersion = TargetPhpVersion::create($phpVersion);
         $fileParser = FileParserFactory::createFileParser($targetPhpVersion);
 
         $classSet = ClassSet::fromDir($input->getOption('from-dir'));
