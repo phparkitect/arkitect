@@ -66,6 +66,14 @@ App\Controller\Foo has 1 violations
         $this->assertCheckHasSuccess($cmdTester);
     }
 
+    public function test_parse_error_in_the_codebase(): void
+    {
+        $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configParseError.php');
+
+        $expectedErrors = "ERROR ON PARSING THESE FILES:Syntax error, unexpected T_STRING, expecting '{' on line 8 in file: Services/CartService.php";
+        $this->assertCheckHasErrors($cmdTester, $expectedErrors);
+    }
+
     public function test_bug_yield(): void
     {
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvcForYieldBug.php');
