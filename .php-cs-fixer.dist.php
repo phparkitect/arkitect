@@ -2,7 +2,8 @@
 
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
-    ->exclude(__DIR__.'/vendor/');
+    ->exclude([__DIR__.'/vendor/', __DIR__.'/tests/E2E/_fixtures/parse_error/']);
+
 
 return (new PhpCsFixer\Config())
     ->setFinder($finder)
