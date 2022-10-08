@@ -57,6 +57,14 @@ class DebugExpressionCommandTest extends TestCase
         $this->assertEquals(0, $appTester->getStatusCode());
     }
 
+    public function test_expression_not_found(): void
+    {
+        $appTester = $this->createAppTester();
+        $appTester->run(['debug:expression', 'expression' => 'blabla', 'arguments' => ['NotFound'], '--from-dir' => __DIR__]);
+        $this->assertEquals("Error: Expression 'blabla' not found.\n", $appTester->getDisplay());
+        $this->assertEquals(2, $appTester->getStatusCode());
+    }
+
     private function createAppTester(): ApplicationTester
     {
         $app = new PhpArkitectApplication();

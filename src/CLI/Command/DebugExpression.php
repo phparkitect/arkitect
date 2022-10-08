@@ -65,23 +65,38 @@ EOT;
             }
 
             $ruleName = $input->getArgument('expression');
+            /** @var class-string $ruleFQCN */
             $ruleFQCN = 'Arkitect\Expression\ForClasses\\'.$ruleName;
             $arguments = $input->getArgument('arguments');
 
-            $expressionReflection = new \ReflectionClass('ReflectionClass');
-            $maxNumberOfArguments = $expressionReflection->getConstructor()->getNumberOfParameters();
-            $minNumberOfArguments = $expressionReflection->getConstructor()->getNumberOfRequiredParameters();
+            try {
+                $expressionReflection = new \ReflectionClass($ruleFQCN);
+            } catch (\ReflectionException $exception) {
+                $output->writeln("Error: Expression '$ruleName' not found.");
 
-            if (count($arguments) < $minNumberOfArguments) {
+                return Command::INVALID;
+            }
+
+            $constructorReflection = $expressionReflection->getConstructor();
+            if (null === $constructorReflection) {
+                $maxNumberOfArguments = 0;
+                $minNumberOfArguments = 0;
+            } else {
+                $maxNumberOfArguments = $constructorReflection->getNumberOfParameters();
+                $minNumberOfArguments = $constructorReflection->getNumberOfRequiredParameters();
+            }
+
+            if (\count($arguments) < $minNumberOfArguments) {
                 $output->writeln("Error: Too few arguments for '$ruleName'.");
+
                 return Command::INVALID;
             }
 
-            if (count($arguments) > $maxNumberOfArguments) {
+            if (\count($arguments) > $maxNumberOfArguments) {
                 $output->writeln("Error: Too many arguments for '$ruleName'.");
+
                 return Command::INVALID;
             }
-
 
             $rule = new $ruleFQCN(...$arguments);
             foreach ($fileParser->getClassDescriptions() as $classDescription) {
