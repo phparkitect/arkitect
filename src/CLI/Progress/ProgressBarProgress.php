@@ -7,6 +7,10 @@ use Arkitect\ClassSet;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @psalm-suppress UndefinedDocblockClass
+ * @psalm-suppress UndefinedClass
+ */
 class ProgressBarProgress implements Progress
 {
     /** @var OutputInterface */
