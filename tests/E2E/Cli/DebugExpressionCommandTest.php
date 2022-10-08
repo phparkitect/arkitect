@@ -65,6 +65,21 @@ class DebugExpressionCommandTest extends TestCase
         $this->assertEquals(2, $appTester->getStatusCode());
     }
 
+    public function test_parse_error_dont_stop_execution(): void
+    {
+        $appTester = $this->createAppTester();
+        $appTester->run(['debug:expression', 'expression' => 'NotExtend', 'arguments' => ['NotFound'], '--from-dir' => __DIR__.'/../_fixtures/parse_error']);
+        $errorMessage = <<<END
+            WARNING: Some files could not be parsed for these errors:
+             - Syntax error, unexpected T_STRING, expecting '{' on line 8: Services/CartService.php
+
+            App\Services\UserService
+
+            END;
+        $this->assertEquals($errorMessage, $appTester->getDisplay());
+        $this->assertEquals(0, $appTester->getStatusCode());
+    }
+
     private function createAppTester(): ApplicationTester
     {
         $app = new PhpArkitectApplication();

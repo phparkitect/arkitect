@@ -6,6 +6,7 @@ namespace Arkitect\CLI\Command;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\ClassSet;
 use Arkitect\CLI\TargetPhpVersion;
+use Arkitect\Rules\ParsingError;
 use Arkitect\Rules\Violations;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -60,8 +61,13 @@ EOT;
             $fileParser->parse($file->getContents(), $file->getRelativePathname());
             $parsedErrors = $fileParser->getParsingErrors();
 
-            foreach ($parsedErrors as $parsedError) {
-                // TODO qua ce ne vogliamo fare qualcosa?
+            if (\count($parsedErrors) > 0) {
+                $output->writeln('WARNING: Some files could not be parsed for these errors:');
+                /** @var ParsingError $parsedError */
+                foreach ($parsedErrors as $parsedError) {
+                    $output->writeln(' - '.$parsedError->getError().': '.$parsedError->getRelativeFilePath());
+                }
+                $output->writeln('');
             }
 
             $ruleName = $input->getArgument('expression');
