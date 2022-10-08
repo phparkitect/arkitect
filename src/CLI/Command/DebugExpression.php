@@ -74,7 +74,7 @@ EOT;
             } catch (\ReflectionException $exception) {
                 $output->writeln("Error: Expression '$ruleName' not found.");
 
-                return Command::INVALID;
+                return 2;
             }
 
             $constructorReflection = $expressionReflection->getConstructor();
@@ -89,13 +89,13 @@ EOT;
             if (\count($arguments) < $minNumberOfArguments) {
                 $output->writeln("Error: Too few arguments for '$ruleName'.");
 
-                return Command::INVALID;
+                return 2;
             }
 
             if (\count($arguments) > $maxNumberOfArguments) {
                 $output->writeln("Error: Too many arguments for '$ruleName'.");
 
-                return Command::INVALID;
+                return 2;
             }
 
             $rule = new $ruleFQCN(...$arguments);
@@ -108,6 +108,6 @@ EOT;
             }
         }
 
-        return Command::SUCCESS;
+        return 0;
     }
 }
