@@ -68,8 +68,22 @@ EOT;
             $ruleFQCN = 'Arkitect\Expression\ForClasses\\'.$ruleName;
             $arguments = $input->getArgument('arguments');
 
-            $rule = new $ruleFQCN(...$arguments);
+            $expressionReflection = new \ReflectionClass('ReflectionClass');
+            $maxNumberOfArguments = $expressionReflection->getConstructor()->getNumberOfParameters();
+            $minNumberOfArguments = $expressionReflection->getConstructor()->getNumberOfRequiredParameters();
 
+            if (count($arguments) < $minNumberOfArguments) {
+                $output->writeln("Error: Too few arguments for '$ruleName'.");
+                return Command::INVALID;
+            }
+
+            if (count($arguments) > $maxNumberOfArguments) {
+                $output->writeln("Error: Too many arguments for '$ruleName'.");
+                return Command::INVALID;
+            }
+
+
+            $rule = new $ruleFQCN(...$arguments);
             foreach ($fileParser->getClassDescriptions() as $classDescription) {
                 $violations = new Violations();
                 $rule->evaluate($classDescription, $violations, '');
@@ -79,6 +93,6 @@ EOT;
             }
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 }
