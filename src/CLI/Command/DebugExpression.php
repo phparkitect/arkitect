@@ -52,54 +52,22 @@ EOT;
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $phpVersion = $input->getOption('target-php-version');
-        $targetPhpVersion = TargetPhpVersion::create($phpVersion);
-        $fileParser = FileParserFactory::createFileParser($targetPhpVersion);
+        $fileParser = $this->getParser($input);
 
         $classSet = ClassSet::fromDir($input->getOption('from-dir'));
         foreach ($classSet as $file) {
             $fileParser->parse($file->getContents(), $file->getRelativePathname());
-            $parsedErrors = $fileParser->getParsingErrors();
 
-            if (\count($parsedErrors) > 0) {
-                $output->writeln('WARNING: Some files could not be parsed for these errors:');
-                /** @var ParsingError $parsedError */
-                foreach ($parsedErrors as $parsedError) {
-                    $output->writeln(' - '.$parsedError->getError().': '.$parsedError->getRelativeFilePath());
-                }
-                $output->writeln('');
-            }
+            $this->showParsingErrors($fileParser, $output);
 
             $ruleName = $input->getArgument('expression');
             /** @var class-string $ruleFQCN */
             $ruleFQCN = 'Arkitect\Expression\ForClasses\\'.$ruleName;
             $arguments = $input->getArgument('arguments');
 
-            try {
-                $expressionReflection = new \ReflectionClass($ruleFQCN);
-            } catch (\ReflectionException $exception) {
-                $output->writeln("Error: Expression '$ruleName' not found.");
-
-                return 2;
-            }
-
-            $constructorReflection = $expressionReflection->getConstructor();
-            if (null === $constructorReflection) {
-                $maxNumberOfArguments = 0;
-                $minNumberOfArguments = 0;
-            } else {
-                $maxNumberOfArguments = $constructorReflection->getNumberOfParameters();
-                $minNumberOfArguments = $constructorReflection->getNumberOfRequiredParameters();
-            }
-
-            if (\count($arguments) < $minNumberOfArguments) {
-                $output->writeln("Error: Too few arguments for '$ruleName'.");
-
-                return 2;
-            }
-
-            if (\count($arguments) > $maxNumberOfArguments) {
-                $output->writeln("Error: Too many arguments for '$ruleName'.");
+            $argumentError = $this->getArgumentsError($arguments, $ruleName, $ruleFQCN);
+            if (null !== $argumentError) {
+                $output->writeln($argumentError);
 
                 return 2;
             }
@@ -115,5 +83,60 @@ EOT;
         }
 
         return 0;
+    }
+
+    /**
+     * @throws \Arkitect\Exceptions\PhpVersionNotValidException
+     */
+    private function getParser(InputInterface $input): \Arkitect\Analyzer\FileParser
+    {
+        $phpVersion = $input->getOption('target-php-version');
+        $targetPhpVersion = TargetPhpVersion::create($phpVersion);
+        $fileParser = FileParserFactory::createFileParser($targetPhpVersion);
+
+        return $fileParser;
+    }
+
+    private function showParsingErrors(\Arkitect\Analyzer\FileParser $fileParser, OutputInterface $output): void
+    {
+        $parsedErrors = $fileParser->getParsingErrors();
+
+        if (\count($parsedErrors) > 0) {
+            $output->writeln('WARNING: Some files could not be parsed for these errors:');
+            /** @var ParsingError $parsedError */
+            foreach ($parsedErrors as $parsedError) {
+                $output->writeln(' - '.$parsedError->getError().': '.$parsedError->getRelativeFilePath());
+            }
+            $output->writeln('');
+        }
+    }
+
+    private function getArgumentsError(array $arguments, string $ruleName, string $ruleFQCN): ?string
+    {
+        try {
+            /** @var class-string $ruleFQCN */
+            $expressionReflection = new \ReflectionClass($ruleFQCN);
+        } catch (\ReflectionException $exception) {
+            return "Error: Expression '$ruleName' not found.";
+        }
+
+        $constructorReflection = $expressionReflection->getConstructor();
+        if (null === $constructorReflection) {
+            $maxNumberOfArguments = 0;
+            $minNumberOfArguments = 0;
+        } else {
+            $maxNumberOfArguments = $constructorReflection->getNumberOfParameters();
+            $minNumberOfArguments = $constructorReflection->getNumberOfRequiredParameters();
+        }
+
+        if (\count($arguments) < $minNumberOfArguments) {
+            return "Error: Too few arguments for '$ruleName'.";
+        }
+
+        if (\count($arguments) > $maxNumberOfArguments) {
+            return "Error: Too many arguments for '$ruleName'.";
+        }
+
+        return null;
     }
 }
