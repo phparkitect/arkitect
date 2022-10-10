@@ -96,6 +96,12 @@ return static function (Config $config): void {
 
 # Available rules
 
+**Hint**: If you want to test how a Rule work, you can use the command like `phparkitect debug:expression <RuleName> <arguments>` to check which class satisfy the rule in your current folder.
+
+For example: `phparkitect debug:expression ResideInOneOfTheseNamespaces App`
+
+---
+
 Currently, you can check if a class:
 
 ### Depends on a namespace
