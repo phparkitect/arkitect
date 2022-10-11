@@ -66,6 +66,7 @@ class Check extends Command
     {
         ini_set('memory_limit', '-1');
         ini_set('xdebug.max_nesting_level', '10000');
+        $startTime = microtime(true);
 
         try {
             $verbose = $input->getOption('verbose');
@@ -94,6 +95,7 @@ class Check extends Command
             $violations = $runner->getViolations();
             if ($violations->count() > 0) {
                 $this->printViolations($violations, $output);
+                $this->printExecutionTime($output, $startTime);
 
                 return self::ERROR_CODE;
             }
@@ -101,16 +103,19 @@ class Check extends Command
             $parsedErrors = $runner->getParsingErrors();
             if ($parsedErrors->count() > 0) {
                 $this->printParsedErrors($parsedErrors, $output);
+                $this->printExecutionTime($output, $startTime);
 
                 return self::ERROR_CODE;
             }
         } catch (\Throwable $e) {
             $output->writeln($e->getMessage());
+            $this->printExecutionTime($output, $startTime);
 
             return self::ERROR_CODE;
         }
 
         $this->printNoViolationsDetectedMessage($output);
+        $this->printExecutionTime($output, $startTime);
 
         return self::SUCCESS_CODE;
     }
@@ -134,6 +139,14 @@ class Check extends Command
         $version = $app ? $app->getVersion() : 'unknown';
 
         $output->writeln("<info>PHPArkitect $version</info>\n");
+    }
+
+    protected function printExecutionTime(OutputInterface $output, float $startTime): void
+    {
+        $endTime = microtime(true);
+        $executionTime = number_format($endTime - $startTime, 2);
+
+        $output->writeln('<info>Execution time: '.$executionTime."s</info>\n");
     }
 
     private function getConfigFilename(InputInterface $input): string
