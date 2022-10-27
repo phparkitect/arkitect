@@ -6,15 +6,15 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
-use Arkitect\Expression\ForClasses\DocBlockContains;
+use Arkitect\Expression\ForClasses\NotContainDocBlockLike;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
-class DocBlockContainsTest extends TestCase
+class NotContainDocBlockLikeTest extends TestCase
 {
-    public function test_it_should_return_true_if_contains_doc_block(): void
+    public function test_it_should_return_true_if_not_contains_doc_block(): void
     {
-        $expression = new DocBlockContains('myDocBlock');
+        $expression = new NotContainDocBlockLike('anotherDocBlock');
 
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland\Myclass'),
@@ -31,14 +31,14 @@ class DocBlockContainsTest extends TestCase
 
         self::assertEquals(0, $violations->count());
         self::assertEquals(
-            'should have a doc block that contains myDocBlock because we want to add this rule for our software',
+            'should not have a doc block that contains anotherDocBlock because we want to add this rule for our software',
             $expression->describe($classDescription, $because)->toString()
         );
     }
 
-    public function test_it_should_return_true_if_contains_doc_block_without_because(): void
+    public function test_it_should_return_false_if_contains_doc_block_without_because(): void
     {
-        $expression = new DocBlockContains('myDocBlock');
+        $expression = new NotContainDocBlockLike('anotherDocBlock');
 
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland\Myclass'),
@@ -54,14 +54,14 @@ class DocBlockContainsTest extends TestCase
 
         self::assertEquals(0, $violations->count());
         self::assertEquals(
-            'should have a doc block that contains myDocBlock',
+            'should not have a doc block that contains anotherDocBlock',
             $expression->describe($classDescription, '')->toString()
         );
     }
 
-    public function test_it_should_return_false_if_not_contains_doc_block(): void
+    public function test_it_should_return_false_if_contains_doc_block(): void
     {
-        $expression = new DocBlockContains('anotherDocBlock');
+        $expression = new NotContainDocBlockLike('myDocBlock');
 
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland\Myclass'),

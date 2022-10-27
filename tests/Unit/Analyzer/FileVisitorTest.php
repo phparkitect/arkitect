@@ -10,8 +10,8 @@ use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
-use Arkitect\Expression\ForClasses\DocBlockNotContains;
 use Arkitect\Expression\ForClasses\Implement;
+use Arkitect\Expression\ForClasses\NotContainDocBlockLike;
 use Arkitect\Expression\ForClasses\NotHaveDependencyOutsideNamespace;
 use Arkitect\Rules\ParsingError;
 use Arkitect\Rules\Violations;
@@ -479,12 +479,12 @@ EOF;
 
         $violations = new Violations();
 
-        $notHaveDependencyOutsideNamespace = new DocBlockNotContains('ItemNotFound');
+        $notHaveDependencyOutsideNamespace = new NotContainDocBlockLike('ItemNotFound');
         $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         $this->assertCount(1, $violations);
 
-        $notHaveDependencyOutsideNamespace = new DocBlockNotContains('Exception');
+        $notHaveDependencyOutsideNamespace = new NotContainDocBlockLike('Exception');
         $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         $this->assertCount(2, $violations);
