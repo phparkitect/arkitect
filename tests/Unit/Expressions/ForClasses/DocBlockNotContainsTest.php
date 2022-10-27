@@ -23,7 +23,7 @@ class DocBlockNotContainsTest extends TestCase
             null,
             false,
             false,
-            '/**  */myDocBlock with other information'
+            ['/**  */myDocBlock with other information']
         );
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
@@ -47,7 +47,7 @@ class DocBlockNotContainsTest extends TestCase
             null,
             false,
             false,
-            '/**  */myDocBlock with other information'
+            ['/**  */myDocBlock with other information']
         );
         $violations = new Violations();
         $expression->evaluate($classDescription, $violations, '');
@@ -70,7 +70,7 @@ class DocBlockNotContainsTest extends TestCase
             null,
             false,
             false,
-            '/**  */myDocBlock with other information'
+            ['/**  */myDocBlock with other information']
         );
         $because = 'we want to add this rule for our software';
         $violations = new Violations();

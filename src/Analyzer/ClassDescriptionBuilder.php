@@ -26,7 +26,7 @@ class ClassDescriptionBuilder
     /** @var bool */
     private $abstract;
 
-    /** @var string */
+    /** @var list<string> */
     private $docBlock;
 
     /** @var list<FullyQualifiedClassName> */
@@ -44,7 +44,7 @@ class ClassDescriptionBuilder
         array $interfaces,
         bool $final,
         bool $abstract,
-        string $docBlock = '',
+        array $docBlock = [],
         array $attributes = []
     ) {
         $this->FQCN = $FQCN;
@@ -66,7 +66,7 @@ class ClassDescriptionBuilder
             [],
             false,
             false,
-            '',
+            [],
             []
         );
     }
@@ -132,9 +132,9 @@ class ClassDescriptionBuilder
         return $this;
     }
 
-    public function setDocBlock(string $docBlock): self
+    public function addDocBlock(string $docBlock): self
     {
-        $this->docBlock = $docBlock;
+        $this->docBlock[] = $docBlock;
 
         return $this;
     }

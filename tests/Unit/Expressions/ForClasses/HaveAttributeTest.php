@@ -23,7 +23,7 @@ class HaveAttributeTest extends TestCase
             null,
             false,
             false,
-            '',
+            [],
             [FullyQualifiedClassName::fromString('myAttribute')]
         );
         $because = 'we want to add this rule for our software';
@@ -48,7 +48,7 @@ class HaveAttributeTest extends TestCase
             null,
             false,
             false,
-            '',
+            [],
             [FullyQualifiedClassName::fromString('myAttribute')]
         );
         $violations = new Violations();
@@ -72,7 +72,7 @@ class HaveAttributeTest extends TestCase
             null,
             false,
             false,
-            '',
+            [],
             [FullyQualifiedClassName::fromString('myAttribute')]
         );
         $because = 'we want to add this rule for our software';

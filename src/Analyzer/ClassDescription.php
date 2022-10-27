@@ -26,7 +26,7 @@ class ClassDescription
     /** @var bool */
     private $abstract;
 
-    /** @var string */
+    /** @var list<string> */
     private $docBlock;
 
     /** @var list<FullyQualifiedClassName> */
@@ -45,7 +45,7 @@ class ClassDescription
         ?FullyQualifiedClassName $extends,
         bool $final,
         bool $abstract,
-        string $docBlock = '',
+        array $docBlock = [],
         array $attributes = []
     ) {
         $this->FQCN = $FQCN;
@@ -163,15 +163,17 @@ class ClassDescription
         return $this->abstract;
     }
 
-    public function getDocBlock(): string
+    public function getDocBlock(): array
     {
         return $this->docBlock;
     }
 
     public function containsDocBlock(string $search): bool
     {
-        if (str_contains($this->docBlock, $search)) {
-            return true;
+        foreach ($this->docBlock as $docBlock) {
+            if (str_contains($docBlock, $search)) {
+                return true;
+            }
         }
 
         return false;

@@ -62,7 +62,7 @@ class ClassDescriptionTest extends TestCase
     public function test_should_return_true_if_is_annotated_with(): void
     {
         $cd = $this->builder
-            ->setDocBlock('/**
+            ->addDocBlock('/**
  * @psalm-immutable
  */')
             ->get();
@@ -73,7 +73,7 @@ class ClassDescriptionTest extends TestCase
     public function test_should_return_false_if_not_annotated_with(): void
     {
         $cd = $this->builder
-            ->setDocBlock('/**
+            ->addDocBlock('/**
  * @psalm-immutable
  */')
             ->get();

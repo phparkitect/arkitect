@@ -47,12 +47,6 @@ class FileVisitor extends NodeVisitorAbstract
                 $this->classDescriptionBuilder->setAbstract(true);
             }
 
-            if (null !== $node->getDocComment()) {
-                /** @var Doc $docComment */
-                $docComment = $node->getDocComment();
-                $this->classDescriptionBuilder->setDocBlock($docComment->getText());
-            }
-
             foreach ($node->attrGroups as $attributeGroup) {
                 foreach ($attributeGroup->attrs as $attribute) {
                     $this->classDescriptionBuilder
@@ -131,6 +125,12 @@ class FileVisitor extends NodeVisitorAbstract
             $this->classDescriptionBuilder = ClassDescriptionBuilder::create(
                 $node->namespacedName->toCodeString()
             );
+        }
+
+        if (null !== $this->classDescriptionBuilder && null !== $node->getDocComment()) {
+            /** @var Doc $docComment */
+            $docComment = $node->getDocComment();
+            $this->classDescriptionBuilder->addDocBlock($docComment->getText());
         }
 
         /**

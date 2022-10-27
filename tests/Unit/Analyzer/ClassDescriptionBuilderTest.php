@@ -86,7 +86,7 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'HappyIsland';
         $classDescriptionBuilder = ClassDescriptionBuilder::create($FQCN);
-        $classDescriptionBuilder->setDocBlock('/**
+        $classDescriptionBuilder->addDocBlock('/**
  * @psalm-immutable
  */');
 
@@ -95,9 +95,9 @@ class ClassDescriptionBuilderTest extends TestCase
         $this->assertInstanceOf(ClassDescription::class, $classDescription);
 
         $this->assertEquals(
-            '/**
+            ['/**
  * @psalm-immutable
- */',
+ */'],
             $classDescription->getDocBlock()
         );
     }
