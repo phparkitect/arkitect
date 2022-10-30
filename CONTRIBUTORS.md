@@ -11,6 +11,7 @@ Shout out to our top contributors!
 - [annervisser](https://api.github.com/users/annervisser)
 - [stephpy](https://api.github.com/users/stephpy)
 - [frankverhoeven](https://api.github.com/users/frankverhoeven)
+- [jerowork](https://api.github.com/users/jerowork)
 - [jkrzefski](https://api.github.com/users/jkrzefski)
 - [mloru](https://api.github.com/users/mloru)
 - [smortexa](https://api.github.com/users/smortexa)
