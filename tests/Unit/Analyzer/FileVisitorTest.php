@@ -450,6 +450,40 @@ EOF;
         $this->assertCount(1, $violations);
     }
 
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function test_should_parse_enum_attributes(): void
+    {
+        $code = <<< 'EOF'
+<?php
+namespace Root\Cars;
+use Bar\FooAttr;
+#[FooAttr('bar')]
+#[Baz]
+enum Enum
+{
+    case Hearts;
+    case Diamonds;
+    case Clubs;
+    case Spades;
+}
+EOF;
+
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
+        $fp->parse($code, 'relativePathName');
+
+        $cd = $fp->getClassDescriptions();
+
+        self::assertEquals(
+            [
+                FullyQualifiedClassName::fromString('Bar\\FooAttr'),
+                FullyQualifiedClassName::fromString('Root\\Cars\\Baz'),
+            ],
+            $cd[0]->getAttributes()
+        );
+    }
+
     public function test_it_parse_docblocks(): void
     {
         $code = <<< 'EOF'
