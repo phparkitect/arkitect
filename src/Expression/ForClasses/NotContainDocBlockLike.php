@@ -11,7 +11,7 @@ use Arkitect\Rules\Violation;
 use Arkitect\Rules\ViolationMessage;
 use Arkitect\Rules\Violations;
 
-class DocBlockContains implements Expression
+class NotContainDocBlockLike implements Expression
 {
     /** @var string */
     private $docBlock;
@@ -23,12 +23,12 @@ class DocBlockContains implements Expression
 
     public function describe(ClassDescription $theClass, string $because): Description
     {
-        return new Description("should have a doc block that contains {$this->docBlock}", $because);
+        return new Description("should not have a doc block that contains {$this->docBlock}", $because);
     }
 
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
-        if (!$theClass->containsDocBlock($this->docBlock)) {
+        if ($theClass->containsDocBlock($this->docBlock)) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
                 ViolationMessage::selfExplanatory($this->describe($theClass, $because))

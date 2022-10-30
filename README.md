@@ -118,7 +118,7 @@ $rules = Rule::allClasses()
 ```php
 $rules = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Domain\Events'))
-    ->should(new DocBlockContains('@psalm-immutable'))
+    ->should(new ContainDocBlockLike('@psalm-immutable'))
     ->because('we want to enforce immutability');
 ```
 
@@ -127,7 +127,7 @@ $rules = Rule::allClasses()
 ```php
 $rules = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
-    ->should(new DocBlockNotContains('@psalm-immutable'))
+    ->should(new NotContainDocBlockLike('@psalm-immutable'))
     ->because('we don\'t want to enforce immutability');
 ```
 
