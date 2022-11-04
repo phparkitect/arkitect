@@ -134,6 +134,24 @@ class FileVisitor extends NodeVisitorAbstract
             }
         }
 
+        /**
+         * matches parameters dependency in property definitions like
+         * public NotBlank $foo;.
+         *
+         * @see FileVisitorTest::test_it_parse_typed_property
+         */
+        if ($node instanceof Node\Stmt\Property && null !== $this->classDescriptionBuilder) {
+            if (null === $node->type) {
+                return;
+            }
+
+            if (!method_exists($node->type, 'toString')) {
+                return;
+            }
+
+            $this->classDescriptionBuilder->addDependency(new ClassDependency($node->type->toString(), $node->getLine()));
+        }
+
         if (null !== $this->classDescriptionBuilder && null !== $node->getDocComment()) {
             /** @var Doc $docComment */
             $docComment = $node->getDocComment();
