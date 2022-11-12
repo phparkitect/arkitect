@@ -6,7 +6,6 @@ namespace Arkitect\Analyzer;
 
 use Arkitect\CLI\TargetPhpVersion;
 use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor\NameResolver;
 
 class FileParserFactory
 {
