@@ -8,7 +8,6 @@ use Arkitect\Rules\ParsingError;
 use PhpParser\ErrorHandler\Collecting;
 use PhpParser\Lexer\Emulative;
 use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\ParserFactory;
 
 class FileParser implements Parser

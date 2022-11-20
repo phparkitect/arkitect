@@ -6,9 +6,9 @@ namespace Arkitect\Tests\Unit\Analyzer;
 
 use Arkitect\Analyzer\FileParser;
 use Arkitect\Analyzer\FileVisitor;
+use Arkitect\Analyzer\NameResolver;
 use Arkitect\CLI\TargetPhpVersion;
 use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor\NameResolver;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 

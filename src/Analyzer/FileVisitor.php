@@ -159,6 +159,7 @@ class FileVisitor extends NodeVisitorAbstract
         if (null !== $this->classDescriptionBuilder && null !== $node->getDocComment()) {
             /** @var Doc $docComment */
             $docComment = $node->getDocComment();
+
             $this->classDescriptionBuilder->addDocBlock($docComment->getText());
         }
 

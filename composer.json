@@ -30,7 +30,8 @@
         "symfony/polyfill-php80": "^1.20",
         "nikic/php-parser": "~4",
         "webmozart/assert": "^1.9",
-        "ext-json": "*"
+        "ext-json": "*",
+        "phpstan/phpdoc-parser": "^1.2"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master",
