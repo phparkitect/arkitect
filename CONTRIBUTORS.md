@@ -13,6 +13,7 @@ Shout out to our top contributors!
 - [frankverhoeven](https://api.github.com/users/frankverhoeven)
 - [jerowork](https://api.github.com/users/jerowork)
 - [jkrzefski](https://api.github.com/users/jkrzefski)
+- [LuigiCardamone](https://api.github.com/users/LuigiCardamone)
 - [mloru](https://api.github.com/users/mloru)
 - [smortexa](https://api.github.com/users/smortexa)
 - [DonCallisto](https://api.github.com/users/DonCallisto)
