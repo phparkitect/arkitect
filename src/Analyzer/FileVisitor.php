@@ -153,7 +153,10 @@ class FileVisitor extends NodeVisitorAbstract
                 return;
             }
 
-            $this->classDescriptionBuilder->addDependency(new ClassDependency($node->type->toString(), $node->getLine()));
+            try {
+                $this->classDescriptionBuilder->addDependency(new ClassDependency($node->type->toString(), $node->getLine()));
+            } catch (\Exception $e) {
+            }
         }
 
         if (null !== $this->classDescriptionBuilder && null !== $node->getDocComment()) {
