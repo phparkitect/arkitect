@@ -581,7 +581,7 @@ EOF;
         $this->assertCount(0, $violations);
     }
 
-    public function test_it_parse_dependencies_in_docblocks(): void
+    public function test_it_parse_dependencies_in_docblocks_customs(): void
     {
         $code = <<< 'EOF'
 <?php
@@ -649,17 +649,13 @@ EOF;
     {
         $code = <<< 'EOF'
 <?php
-
 namespace Foo;
-
 interface Order
 {
 }
-
 interface OrderTwo
 {
 }
-
 class test implements Order
 {
 }
@@ -677,5 +673,35 @@ EOF;
         $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         $this->assertCount(0, $violations, $violations->toString());
+    }
+
+    public function test_it_parse_dependencies_in_docblocks_with_alias(): void
+    {
+        $code = <<< 'EOF'
+<?php
+namespace MyProject\AppBundle\Application;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Test;
+class ApplicationLevelDto
+{
+    /**
+     * @Assert\NotBlank
+     */
+    public string|null $foo;
+}
+EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
+        $fp->parse($code, 'relativePathName');
+
+        $cd = $fp->getClassDescriptions();
+
+        $violations = new Violations();
+
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('MyProject\AppBundle\Application');
+        $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+
+        $this->assertCount(1, $violations);
     }
 }
