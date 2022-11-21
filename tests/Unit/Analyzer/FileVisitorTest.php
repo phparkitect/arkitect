@@ -592,6 +592,11 @@ class ApplicationLevelDto
 * @var NotBlank
 */
      public $foo;
+
+/**
+* @var array<int, \stdClass>
+*/
+     public $baz;
 }
 EOF;
 
