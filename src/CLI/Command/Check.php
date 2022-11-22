@@ -114,12 +114,14 @@ class Check extends Command
             $violations = $runner->getViolations();
 
             if ($setBaseline) {
-                file_put_contents($setBaseline, json_encode($violations, \JSON_PRETTY_PRINT));
+                $this->saveBaseline($setBaseline, $violations);
 
-                $output->writeln('Baseline file created');
+                $output->writeln('<info>Baseline file created!</info>');
+                $this->printExecutionTime($output, $startTime);
+
+                return self::SUCCESS_CODE;
             } elseif ($useBaseline) {
-                /** @var Violations $baseline */
-                $baseline = Violations::fromJson(file_get_contents($useBaseline));
+                $baseline = $this->loadBaseline($useBaseline);
 
                 $violations->remove($baseline);
             }
@@ -178,6 +180,16 @@ class Check extends Command
         $executionTime = number_format($endTime - $startTime, 2);
 
         $output->writeln('<info>Execution time: '.$executionTime."s</info>\n");
+    }
+
+    private function loadBaseline(string $filename): Violations
+    {
+        return Violations::fromJson(file_get_contents($filename));
+    }
+
+    private function saveBaseline(string $filename, Violations $violations): void
+    {
+        file_put_contents($filename, json_encode($violations, \JSON_PRETTY_PRINT));
     }
 
     private function getConfigFilename(InputInterface $input): string

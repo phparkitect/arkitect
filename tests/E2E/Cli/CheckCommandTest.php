@@ -14,6 +14,16 @@ class CheckCommandTest extends TestCase
 
     const ERROR_CODE = 1;
 
+    /** @var string */
+    private $baselineFilename = 'my-baseline.json';
+
+    protected function tearDown(): void
+    {
+        if (file_exists($this->baselineFilename)) {
+            unlink($this->baselineFilename);
+        }
+    }
+
     public function test_app_returns_error_with_multiple_violations(): void
     {
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvc.php');
@@ -88,16 +98,11 @@ App\Controller\Foo has 1 violations
 
     public function test_baseline(): void
     {
-        $baselineFilename = 'my-baseline.json';
         $configFilePath = __DIR__.'/../_fixtures/configMvcForYieldBug.php';
 
         // Produce the baseline
 
-        $cmdTester = $this->runCheck($configFilePath, null, null, $baselineFilename);
-
-        $expectedErrors = 'Baseline file created';
-
-        $this->assertCheckHasErrors($cmdTester, $expectedErrors);
+        $this->runCheck($configFilePath, null, null, $this->baselineFilename);
 
         // Check it detects error if baseline is not used
 
@@ -107,11 +112,9 @@ App\Controller\Foo has 1 violations
 
         // Check it ignores error if baseline is used
 
-        $cmdTester = $this->runCheck($configFilePath, null, $baselineFilename);
+        $cmdTester = $this->runCheck($configFilePath, null, $this->baselineFilename);
 
         $this->assertCheckHasSuccess($cmdTester);
-
-        unlink($baselineFilename);
     }
 
     protected function runCheck(
