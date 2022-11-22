@@ -88,19 +88,21 @@ App\Controller\Foo has 1 violations
 
     public function test_baseline(): void
     {
+        // Produce the baseline
+
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvcForYieldBug.php', null, null, 'my-baseline.xml');
 
         $expectedErrors = 'Baseline file created';
 
         $this->assertCheckHasErrors($cmdTester, $expectedErrors);
 
-        // /////////
+        // Check it detects error if baseline is not used
 
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvcForYieldBug.php', null, null, null);
 
         $this->assertCheckHasErrors($cmdTester);
 
-        // //////////
+        // Check it ignores error if baseline is used
 
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvcForYieldBug.php', null, 'my-baseline.xml');
 
