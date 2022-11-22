@@ -58,6 +58,25 @@ phparkitect check --config=/project/yourConfigFile.php
 
 By default, a progress bar will show the status of the ongoing analysis.
 
+### Using a baseline file
+
+If there are a lot of violations in your codebase and you can't at the moment fix them, 
+you can use the baseline feature to instruct the tool to ignore past violations.
+
+To create a baseline file, run the `check` command with the `set-baseline` parameter as follows:
+
+```
+phparkitect check --set-baseline=my-baseline.json
+```
+
+It will produce a json file with the current list of violations.  
+
+To instruct the tool to use the baseline file, run the `check` command with the `use-baseline` parameter as follows:
+
+```
+phparkitect check --use-baseline=my-baseline.json
+```
+
 ## Configuration
 
 Example of configuration file `phparkitect.php`
@@ -92,7 +111,6 @@ return static function (Config $config): void {
         ->add($mvcClassSet, ...$rules);
 };
 ```
-
 
 # Available rules
 
