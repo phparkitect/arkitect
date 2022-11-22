@@ -92,4 +92,15 @@ class Violations implements \IteratorAggregate, \Countable
     {
         return $this->violations;
     }
+
+    public function remove(self $violations): void
+    {
+        $this->violations = array_udiff(
+            $this->violations,
+            $violations->violations,
+            function (Violation $a, Violation $b): int {
+                return $a == $b ? 0 : 1;
+            }
+        );
+    }
 }

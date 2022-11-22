@@ -86,14 +86,47 @@ App\Controller\Foo has 1 violations
         $this->assertCheckHasErrors($cmdTester, $expectedErrors);
     }
 
-    protected function runCheck($configFilePath = null, bool $stopOnFailure = null): ApplicationTester
+    public function test_baseline(): void
     {
+        $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvcForYieldBug.php', null, null, 'my-baseline.xml');
+
+        $expectedErrors = 'Baseline file created';
+
+        $this->assertCheckHasErrors($cmdTester, $expectedErrors);
+
+        // /////////
+
+        $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvcForYieldBug.php', null, null, null);
+
+        $this->assertCheckHasErrors($cmdTester);
+
+        // //////////
+
+        $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvcForYieldBug.php', null, 'my-baseline.xml');
+
+        $this->assertCheckHasSuccess($cmdTester);
+
+        unlink('my-baseline.xml');
+    }
+
+    protected function runCheck(
+        $configFilePath = null,
+        bool $stopOnFailure = null,
+        ?string $useBaseline = null,
+        ?string $setBaseline = null
+    ): ApplicationTester {
         $input = ['check'];
         if (null !== $configFilePath) {
             $input['--config'] = $configFilePath;
         }
         if (null !== $stopOnFailure) {
             $input['--stop-on-failure'] = true;
+        }
+        if (null !== $useBaseline) {
+            $input['--use-baseline'] = $useBaseline;
+        }
+        if (null !== $setBaseline) {
+            $input['--set-baseline'] = $setBaseline;
         }
 
         $app = new PhpArkitectApplication();
@@ -127,7 +160,7 @@ App\Controller\Foo has 1 violations
 
     protected function assertCheckHasSuccess(ApplicationTester $applicationTester): void
     {
-        $this->assertEquals(self::SUCCESS_CODE, $applicationTester->getStatusCode());
-        $this->assertStringNotContainsString('ERRORS!', $applicationTester->getDisplay());
+        $this->assertEquals(self::SUCCESS_CODE, $applicationTester->getStatusCode(), 'Error code not expected in successful execution');
+        $this->assertStringNotContainsString('ERRORS!', $applicationTester->getDisplay(), 'Error message not expected in successful execution');
     }
 }

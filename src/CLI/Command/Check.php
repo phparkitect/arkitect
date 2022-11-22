@@ -21,10 +21,10 @@ use Webmozart\Assert\Assert;
 class Check extends Command
 {
     private const CONFIG_FILENAME_PARAM = 'config';
-
     private const TARGET_PHP_PARAM = 'target-php-version';
-
     private const STOP_ON_FAILURE_PARAM = 'stop-on-failure';
+    private const USE_BASELINE_PARAM = 'use-baseline';
+    private const SET_BASELINE_PARAM = 'set-baseline';
 
     private const DEFAULT_FILENAME = 'phparkitect.php';
 
@@ -59,6 +59,18 @@ class Check extends Command
                 's',
                 InputOption::VALUE_NONE,
                 'Stop on failure'
+            )
+            ->addOption(
+                self::SET_BASELINE_PARAM,
+                null,
+                InputOption::VALUE_NONE,
+                'Generate a file containing the current errors'
+            )
+            ->addOption(
+                self::USE_BASELINE_PARAM,
+                'b',
+                InputOption::VALUE_NONE,
+                'Ignore errors in baseline fine'
             );
     }
 
@@ -71,6 +83,8 @@ class Check extends Command
         try {
             $verbose = $input->getOption('verbose');
             $stopOnFailure = $input->getOption(self::STOP_ON_FAILURE_PARAM);
+            $useBaseline = $input->getOption(self::USE_BASELINE_PARAM);
+            $setBaseline = $input->getOption(self::SET_BASELINE_PARAM);
 
             /** @var string|null $phpVersion */
             $phpVersion = $input->getOption('target-php-version');
@@ -93,6 +107,18 @@ class Check extends Command
             } catch (FailOnFirstViolationException $e) {
             }
             $violations = $runner->getViolations();
+
+            if ($setBaseline) {
+                file_put_contents($setBaseline, serialize($violations));
+
+                $output->writeln('Baseline file created');
+            } elseif ($useBaseline) {
+                /** @var Violations $baseline */
+                $baseline = unserialize(file_get_contents($useBaseline));
+
+                $violations->remove($baseline);
+            }
+
             if ($violations->count() > 0) {
                 $this->printViolations($violations, $output);
                 $this->printExecutionTime($output, $startTime);
