@@ -63,13 +63,13 @@ class Check extends Command
             ->addOption(
                 self::SET_BASELINE_PARAM,
                 null,
-                InputOption::VALUE_NONE,
+                InputOption::VALUE_REQUIRED,
                 'Generate a file containing the current errors'
             )
             ->addOption(
                 self::USE_BASELINE_PARAM,
                 'b',
-                InputOption::VALUE_NONE,
+                InputOption::VALUE_REQUIRED,
                 'Ignore errors in baseline fine'
             );
     }
@@ -84,6 +84,11 @@ class Check extends Command
             $verbose = $input->getOption('verbose');
             $stopOnFailure = $input->getOption(self::STOP_ON_FAILURE_PARAM);
             $useBaseline = $input->getOption(self::USE_BASELINE_PARAM);
+            if ($useBaseline && !file_exists($useBaseline)) {
+                $output->writeln('<error>Baseline file not found.</error>');
+
+                return self::ERROR_CODE;
+            }
             $setBaseline = $input->getOption(self::SET_BASELINE_PARAM);
 
             /** @var string|null $phpVersion */
