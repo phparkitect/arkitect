@@ -43,8 +43,8 @@ class NoClassRulesTest extends TestCase
     public function test_no_class_dsl_works(): void
     {
         $rule = Rule::noClass()
-            ->that(new ResideInOneOfTheseNamespaces('App\Services'))
-            ->should(new HaveNameMatching('*Pippo'))
+            ->that(new ResideInOneOfTheseNamespaces('App\Entity'))
+            ->should(new HaveNameMatching('*Service'))
             ->because('of our naming convention');
 
         $classSet = ClassSet::fromDir(__DIR__.'/../../E2E/_fixtures/mvc');
