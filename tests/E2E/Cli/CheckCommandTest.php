@@ -88,9 +88,12 @@ App\Controller\Foo has 1 violations
 
     public function test_baseline(): void
     {
+        $baselineFilename = 'my-baseline.json';
+        $configFilePath = __DIR__.'/../_fixtures/configMvcForYieldBug.php';
+
         // Produce the baseline
 
-        $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvcForYieldBug.php', null, null, 'my-baseline.xml');
+        $cmdTester = $this->runCheck($configFilePath, null, null, $baselineFilename);
 
         $expectedErrors = 'Baseline file created';
 
@@ -98,17 +101,17 @@ App\Controller\Foo has 1 violations
 
         // Check it detects error if baseline is not used
 
-        $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvcForYieldBug.php', null, null, null);
+        $cmdTester = $this->runCheck($configFilePath, null, null, null);
 
         $this->assertCheckHasErrors($cmdTester);
 
         // Check it ignores error if baseline is used
 
-        $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvcForYieldBug.php', null, 'my-baseline.xml');
+        $cmdTester = $this->runCheck($configFilePath, null, $baselineFilename);
 
         $this->assertCheckHasSuccess($cmdTester);
 
-        unlink('my-baseline.xml');
+        unlink($baselineFilename);
     }
 
     protected function runCheck(

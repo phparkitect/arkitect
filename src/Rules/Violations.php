@@ -7,7 +7,7 @@ namespace Arkitect\Rules;
 use Arkitect\Exceptions\FailOnFirstViolationException;
 use Arkitect\Exceptions\IndexNotFoundException;
 
-class Violations implements \IteratorAggregate, \Countable
+class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
 {
     /**
      * @var Violation[]
@@ -22,6 +22,19 @@ class Violations implements \IteratorAggregate, \Countable
     {
         $this->violations = [];
         $this->stopOnFailure = $stopOnFailure;
+    }
+
+    public static function fromJson(string $json): self
+    {
+        $json = json_decode($json, true);
+
+        $instance = new self($json['stopOnFailure']);
+
+        $instance->violations = array_map(function (array $json): Violation {
+            return Violation::fromJson($json);
+        }, $json['violations']);
+
+        return $instance;
     }
 
     public function add(Violation $violation): void
@@ -102,5 +115,10 @@ class Violations implements \IteratorAggregate, \Countable
                 return $a == $b ? 0 : 1;
             }
         );
+    }
+
+    public function jsonSerialize(): array
+    {
+        return get_object_vars($this);
     }
 }

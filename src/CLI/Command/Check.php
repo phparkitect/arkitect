@@ -109,12 +109,12 @@ class Check extends Command
             $violations = $runner->getViolations();
 
             if ($setBaseline) {
-                file_put_contents($setBaseline, serialize($violations));
+                file_put_contents($setBaseline, json_encode($violations, \JSON_PRETTY_PRINT));
 
                 $output->writeln('Baseline file created');
             } elseif ($useBaseline) {
                 /** @var Violations $baseline */
-                $baseline = unserialize(file_get_contents($useBaseline));
+                $baseline = Violations::fromJson(file_get_contents($useBaseline));
 
                 $violations->remove($baseline);
             }

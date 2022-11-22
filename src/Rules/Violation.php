@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Rules;
 
-class Violation
+class Violation implements \JsonSerializable
 {
     /** @var string */
     private $fqcn;
@@ -45,5 +45,15 @@ class Violation
     public function getLine(): ?int
     {
         return $this->line;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return get_object_vars($this);
+    }
+
+    public static function fromJson(array $json): self
+    {
+        return new self($json['fqcn'], $json['error'], $json['line']);
     }
 }
