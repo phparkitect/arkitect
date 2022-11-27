@@ -115,8 +115,8 @@ class Check extends Command
             }
             $violations = $runner->getViolations();
 
-            if ($generateBaseline !== false) {
-                if ($generateBaseline === null) {
+            if (false !== $generateBaseline) {
+                if (null === $generateBaseline) {
                     $generateBaseline = self::DEFAULT_BASELINE_FILENAME;
                 }
                 $this->saveBaseline($generateBaseline, $violations);
