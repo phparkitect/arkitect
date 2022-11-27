@@ -26,7 +26,8 @@ class Check extends Command
     private const USE_BASELINE_PARAM = 'use-baseline';
     private const GENERATE_BASELINE_PARAM = 'generate-baseline';
 
-    private const DEFAULT_FILENAME = 'phparkitect.php';
+    private const DEFAULT_RULES_FILENAME = 'phparkitect.php';
+    private const DEFAULT_BASELINE_FILENAME = 'phparkitect-baseline.json';
 
     private const SUCCESS_CODE = 0;
 
@@ -62,9 +63,10 @@ class Check extends Command
             )
             ->addOption(
                 self::GENERATE_BASELINE_PARAM,
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Generate a file containing the current errors'
+                'g',
+                InputOption::VALUE_OPTIONAL,
+                'Generate a file containing the current errors',
+                false
             )
             ->addOption(
                 self::USE_BASELINE_PARAM,
@@ -113,10 +115,13 @@ class Check extends Command
             }
             $violations = $runner->getViolations();
 
-            if ($generateBaseline) {
+            if ($generateBaseline !== false) {
+                if ($generateBaseline === null) {
+                    $generateBaseline = self::DEFAULT_BASELINE_FILENAME;
+                }
                 $this->saveBaseline($generateBaseline, $violations);
 
-                $output->writeln('<info>Baseline file created!</info>');
+                $output->writeln('<info>Baseline file \''.$generateBaseline.'\'created!</info>');
                 $this->printExecutionTime($output, $startTime);
 
                 return self::SUCCESS_CODE;
@@ -197,7 +202,7 @@ class Check extends Command
         $filename = $input->getOption(self::CONFIG_FILENAME_PARAM);
 
         if (null === $filename) {
-            $filename = self::DEFAULT_FILENAME;
+            $filename = self::DEFAULT_RULES_FILENAME;
         }
 
         Assert::file($filename, 'Config file not found');
