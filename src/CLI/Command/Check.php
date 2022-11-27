@@ -24,7 +24,7 @@ class Check extends Command
     private const TARGET_PHP_PARAM = 'target-php-version';
     private const STOP_ON_FAILURE_PARAM = 'stop-on-failure';
     private const USE_BASELINE_PARAM = 'use-baseline';
-    private const SET_BASELINE_PARAM = 'set-baseline';
+    private const GENERATE_BASELINE_PARAM = 'generate-baseline';
 
     private const DEFAULT_FILENAME = 'phparkitect.php';
 
@@ -61,7 +61,7 @@ class Check extends Command
                 'Stop on failure'
             )
             ->addOption(
-                self::SET_BASELINE_PARAM,
+                self::GENERATE_BASELINE_PARAM,
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Generate a file containing the current errors'
@@ -89,7 +89,7 @@ class Check extends Command
 
                 return self::ERROR_CODE;
             }
-            $setBaseline = $input->getOption(self::SET_BASELINE_PARAM);
+            $generateBaseline = $input->getOption(self::GENERATE_BASELINE_PARAM);
 
             /** @var string|null $phpVersion */
             $phpVersion = $input->getOption('target-php-version');
@@ -113,8 +113,8 @@ class Check extends Command
             }
             $violations = $runner->getViolations();
 
-            if ($setBaseline) {
-                $this->saveBaseline($setBaseline, $violations);
+            if ($generateBaseline) {
+                $this->saveBaseline($generateBaseline, $violations);
 
                 $output->writeln('<info>Baseline file created!</info>');
                 $this->printExecutionTime($output, $startTime);

@@ -66,7 +66,7 @@ you can use the baseline feature to instruct the tool to ignore past violations.
 To create a baseline file, run the `check` command with the `set-baseline` parameter as follows:
 
 ```
-phparkitect check --set-baseline=my-baseline.json
+phparkitect check --generate-baseline=my-baseline.json
 ```
 
 It will produce a json file with the current list of violations.  

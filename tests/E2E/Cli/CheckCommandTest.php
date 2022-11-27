@@ -15,7 +15,7 @@ class CheckCommandTest extends TestCase
     const ERROR_CODE = 1;
 
     /** @var string */
-    private $baselineFilename = 'my-baseline.json';
+    private $baselineFilename = __DIR__.'/my-baseline.json';
 
     protected function tearDown(): void
     {
@@ -113,7 +113,6 @@ App\Controller\Foo has 1 violations
         // Check it ignores error if baseline is used
 
         $cmdTester = $this->runCheck($configFilePath, null, $this->baselineFilename);
-
         $this->assertCheckHasSuccess($cmdTester);
     }
 
@@ -121,7 +120,7 @@ App\Controller\Foo has 1 violations
         $configFilePath = null,
         bool $stopOnFailure = null,
         ?string $useBaseline = null,
-        ?string $setBaseline = null
+        ?string $generateBaseline = null
     ): ApplicationTester {
         $input = ['check'];
         if (null !== $configFilePath) {
@@ -133,8 +132,8 @@ App\Controller\Foo has 1 violations
         if (null !== $useBaseline) {
             $input['--use-baseline'] = $useBaseline;
         }
-        if (null !== $setBaseline) {
-            $input['--set-baseline'] = $setBaseline;
+        if (null !== $generateBaseline) {
+            $input['--generate-baseline'] = $generateBaseline;
         }
 
         $app = new PhpArkitectApplication();
