@@ -148,11 +148,11 @@ class NameResolver extends NodeVisitorAbstract
                 break;
             }
 
-            if ($node->type === null) {
+            if (null === $node->type) {
                 foreach ($phpDocNode->getTags() as $tagValue) {
-                    if ($tagValue->name[0] === '@' && strpos($tagValue->name, '@var') === false) {
+                    if ('@' === $tagValue->name[0] && false === strpos($tagValue->name, '@var')) {
                         $customTag = str_replace('@', '', $tagValue->name);
-                        $type = $this->resolveName(new Node\Name((string) $customTag), Use_::TYPE_NORMAL);
+                        $type = $this->resolveName(new Node\Name($customTag), Use_::TYPE_NORMAL);
                         $node->type = $type;
 
                         break;
