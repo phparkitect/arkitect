@@ -134,11 +134,24 @@ App\Controller\Foo has 1 violations
         $this->assertCheckHasSuccess($cmdTester);
     }
 
+    public function test_you_can_ignore_the_default_baseline(): void
+    {
+        $configFilePath = __DIR__.'/../_fixtures/configMvcForYieldBug.php';
+
+        // Produce the baseline
+        $this->runCheck($configFilePath, null, null, null);
+
+        // Check it ignores the default baseline
+        $cmdTester = $this->runCheck($configFilePath, null, null, false, true);
+        $this->assertCheckHasErrors($cmdTester);
+    }
+
     protected function runCheck(
         $configFilePath = null,
         bool $stopOnFailure = null,
         ?string $useBaseline = null,
-        $generateBaseline = false
+        $generateBaseline = false,
+        bool $skipBaseline = false
     ): ApplicationTester {
         $input = ['check'];
         if (null !== $configFilePath) {
@@ -149,6 +162,9 @@ App\Controller\Foo has 1 violations
         }
         if (null !== $useBaseline) {
             $input['--use-baseline'] = $useBaseline;
+        }
+        if ($skipBaseline) {
+            $input['--skip-baseline'] = true;
         }
 
         // false = option not set, null = option set but without value, string = option with value

@@ -24,13 +24,14 @@ class Check extends Command
     private const TARGET_PHP_PARAM = 'target-php-version';
     private const STOP_ON_FAILURE_PARAM = 'stop-on-failure';
     private const USE_BASELINE_PARAM = 'use-baseline';
-    private const GENERATE_BASELINE_PARAM = 'generate-baseline';
+    private const SKIP_BASELINE_PARAM = 'skip-baseline';
 
+    private const GENERATE_BASELINE_PARAM = 'generate-baseline';
     private const DEFAULT_RULES_FILENAME = 'phparkitect.php';
+
     private const DEFAULT_BASELINE_FILENAME = 'phparkitect-baseline.json';
 
     private const SUCCESS_CODE = 0;
-
     private const ERROR_CODE = 1;
 
     public function __construct()
@@ -72,7 +73,13 @@ class Check extends Command
                 self::USE_BASELINE_PARAM,
                 'b',
                 InputOption::VALUE_REQUIRED,
-                'Ignore errors in baseline fine'
+                'Ignore errors in baseline file'
+            )
+            ->addOption(
+                self::SKIP_BASELINE_PARAM,
+                'k',
+                InputOption::VALUE_NONE,
+                'Don\'t use the default baseline'
             );
     }
 
@@ -86,7 +93,9 @@ class Check extends Command
             $verbose = $input->getOption('verbose');
             $stopOnFailure = $input->getOption(self::STOP_ON_FAILURE_PARAM);
             $useBaseline = $input->getOption(self::USE_BASELINE_PARAM);
-            if (!$useBaseline && file_exists(self::DEFAULT_BASELINE_FILENAME)) {
+            $skipBaseline = $input->getOption(self::SKIP_BASELINE_PARAM);
+
+            if (true !== $skipBaseline && !$useBaseline && file_exists(self::DEFAULT_BASELINE_FILENAME)) {
                 $useBaseline = self::DEFAULT_BASELINE_FILENAME;
             }
 
