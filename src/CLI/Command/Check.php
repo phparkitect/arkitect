@@ -95,6 +95,8 @@ class Check extends Command
 
                 return self::ERROR_CODE;
             }
+            $output->writeln('<info>Baseline found: '.$useBaseline.'</info>');
+
             $generateBaseline = $input->getOption(self::GENERATE_BASELINE_PARAM);
 
             /** @var string|null $phpVersion */
