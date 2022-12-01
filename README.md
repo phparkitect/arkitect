@@ -60,21 +60,33 @@ By default, a progress bar will show the status of the ongoing analysis.
 
 ### Using a baseline file
 
-If there are a lot of violations in your codebase and you can't at the moment fix them, 
+If there are a lot of violations in your codebase and you can't fix them now, 
 you can use the baseline feature to instruct the tool to ignore past violations.
 
-To create a baseline file, run the `check` command with the `set-baseline` parameter as follows:
+To create a baseline file, run the `check` command with the `generate-baseline` parameter as follows:
 
+```
+phparkitect check --generate-baseline
+```
+This will create a `phparkitect-baseline.json`, if you want a different file name you can do it with:
 ```
 phparkitect check --generate-baseline=my-baseline.json
 ```
 
 It will produce a json file with the current list of violations.  
 
-To instruct the tool to use the baseline file, run the `check` command with the `use-baseline` parameter as follows:
+If is present a baseline file with the default name will be used automatically.
+
+To use a different baseline file, run the `check` command with the `use-baseline` parameter as follows:
 
 ```
 phparkitect check --use-baseline=my-baseline.json
+```
+
+To avoid using the default baseline file, you can use the `skip-baseline` option:
+
+```
+phparkitect check --skip-baseline
 ```
 
 ## Configuration
