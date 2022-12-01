@@ -86,6 +86,10 @@ class Check extends Command
             $verbose = $input->getOption('verbose');
             $stopOnFailure = $input->getOption(self::STOP_ON_FAILURE_PARAM);
             $useBaseline = $input->getOption(self::USE_BASELINE_PARAM);
+            if (!$useBaseline && file_exists(self::DEFAULT_BASELINE_FILENAME)) {
+                $useBaseline = self::DEFAULT_BASELINE_FILENAME;
+            }
+
             if ($useBaseline && !file_exists($useBaseline)) {
                 $output->writeln('<error>Baseline file not found.</error>');
 
@@ -125,7 +129,9 @@ class Check extends Command
                 $this->printExecutionTime($output, $startTime);
 
                 return self::SUCCESS_CODE;
-            } elseif ($useBaseline) {
+            }
+
+            if ($useBaseline) {
                 $baseline = $this->loadBaseline($useBaseline);
 
                 $violations->remove($baseline);

@@ -120,7 +120,7 @@ App\Controller\Foo has 1 violations
         $this->assertCheckHasSuccess($cmdTester);
     }
 
-    public function test_baseline_with_default_filename(): void
+    public function test_baseline_with_default_filename_is_enabled_automatically(): void
     {
         $configFilePath = __DIR__.'/../_fixtures/configMvcForYieldBug.php';
 
@@ -128,15 +128,9 @@ App\Controller\Foo has 1 violations
 
         $this->runCheck($configFilePath, null, null, null);
 
-        // Check it detects error if baseline is not used
-
-        $cmdTester = $this->runCheck($configFilePath, null, null);
-
-        $this->assertCheckHasErrors($cmdTester);
-
         // Check it ignores error if baseline is used
 
-        $cmdTester = $this->runCheck($configFilePath, null, $this->defaultBaselineFilename);
+        $cmdTester = $this->runCheck($configFilePath, null, null);
         $this->assertCheckHasSuccess($cmdTester);
     }
 
