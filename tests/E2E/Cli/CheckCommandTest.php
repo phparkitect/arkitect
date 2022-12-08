@@ -14,6 +14,20 @@ class CheckCommandTest extends TestCase
 
     const ERROR_CODE = 1;
 
+    /** @var string */
+    private $customBaselineFilename = __DIR__.'/my-baseline.json';
+    private $defaultBaselineFilename = 'phparkitect-baseline.json';
+
+    protected function tearDown(): void
+    {
+        if (file_exists($this->customBaselineFilename)) {
+            unlink($this->customBaselineFilename);
+        }
+        if (file_exists($this->defaultBaselineFilename)) {
+            unlink($this->defaultBaselineFilename);
+        }
+    }
+
     public function test_app_returns_error_with_multiple_violations(): void
     {
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvc.php');
@@ -86,14 +100,76 @@ App\Controller\Foo has 1 violations
         $this->assertCheckHasErrors($cmdTester, $expectedErrors);
     }
 
-    protected function runCheck($configFilePath = null, bool $stopOnFailure = null): ApplicationTester
+    public function test_baseline(): void
     {
+        $configFilePath = __DIR__.'/../_fixtures/configMvcForYieldBug.php';
+
+        // Produce the baseline
+
+        $this->runCheck($configFilePath, null, null, $this->customBaselineFilename);
+
+        // Check it detects error if baseline is not used
+
+        $cmdTester = $this->runCheck($configFilePath, null, null);
+
+        $this->assertCheckHasErrors($cmdTester);
+
+        // Check it ignores error if baseline is used
+
+        $cmdTester = $this->runCheck($configFilePath, null, $this->customBaselineFilename);
+        $this->assertCheckHasSuccess($cmdTester);
+    }
+
+    public function test_baseline_with_default_filename_is_enabled_automatically(): void
+    {
+        $configFilePath = __DIR__.'/../_fixtures/configMvcForYieldBug.php';
+
+        // Produce the baseline
+
+        $this->runCheck($configFilePath, null, null, null);
+
+        // Check it ignores error if baseline is used
+
+        $cmdTester = $this->runCheck($configFilePath, null, null);
+        $this->assertCheckHasSuccess($cmdTester);
+    }
+
+    public function test_you_can_ignore_the_default_baseline(): void
+    {
+        $configFilePath = __DIR__.'/../_fixtures/configMvcForYieldBug.php';
+
+        // Produce the baseline
+        $this->runCheck($configFilePath, null, null, null);
+
+        // Check it ignores the default baseline
+        $cmdTester = $this->runCheck($configFilePath, null, null, false, true);
+        $this->assertCheckHasErrors($cmdTester);
+    }
+
+    protected function runCheck(
+        $configFilePath = null,
+        bool $stopOnFailure = null,
+        ?string $useBaseline = null,
+        $generateBaseline = false,
+        bool $skipBaseline = false
+    ): ApplicationTester {
         $input = ['check'];
         if (null !== $configFilePath) {
             $input['--config'] = $configFilePath;
         }
         if (null !== $stopOnFailure) {
             $input['--stop-on-failure'] = true;
+        }
+        if (null !== $useBaseline) {
+            $input['--use-baseline'] = $useBaseline;
+        }
+        if ($skipBaseline) {
+            $input['--skip-baseline'] = true;
+        }
+
+        // false = option not set, null = option set but without value, string = option with value
+        if (false !== $generateBaseline) {
+            $input['--generate-baseline'] = $generateBaseline;
         }
 
         $app = new PhpArkitectApplication();
@@ -127,7 +203,7 @@ App\Controller\Foo has 1 violations
 
     protected function assertCheckHasSuccess(ApplicationTester $applicationTester): void
     {
-        $this->assertEquals(self::SUCCESS_CODE, $applicationTester->getStatusCode());
-        $this->assertStringNotContainsString('ERRORS!', $applicationTester->getDisplay());
+        $this->assertEquals(self::SUCCESS_CODE, $applicationTester->getStatusCode(), 'Command failed: '.$applicationTester->getDisplay());
+        $this->assertStringNotContainsString('ERRORS!', $applicationTester->getDisplay(), 'Error message not expected in successful execution');
     }
 }
