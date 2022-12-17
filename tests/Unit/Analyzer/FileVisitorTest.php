@@ -613,4 +613,40 @@ EOF;
 
         $this->assertCount(1, $violations);
     }
+
+    public function test_should_implement_exact_classname(): void
+    {
+        $code = <<< 'EOF'
+<?php
+
+namespace Root\Namespace1;
+
+use Foo;
+
+interface Order
+{
+}
+
+interface OrderTwo
+{
+}
+
+class test implements Order
+{
+}
+EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
+        $fp->parse($code, 'relativePathName');
+
+        $cd = $fp->getClassDescriptions();
+
+        $violations = new Violations();
+
+        $notHaveDependencyOutsideNamespace = new Implement('Foo\Order');
+        $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+
+        $this->assertCount(0, $violations);
+    }
 }
