@@ -19,8 +19,8 @@ class PatternString
             return false;
         }
 
-        if (!$this->containsWildcard($pattern) && str_starts_with($this->value, $pattern)) {
-            return true;
+        if (!$this->containsWildcard($pattern)) {
+            return $this->value === $pattern;
         }
 
         return $this->startsWithPattern($pattern);
