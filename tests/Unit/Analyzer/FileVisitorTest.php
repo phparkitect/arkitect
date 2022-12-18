@@ -619,9 +619,7 @@ EOF;
         $code = <<< 'EOF'
 <?php
 
-namespace Root\Namespace1;
-
-use Foo;
+namespace Foo;
 
 interface Order
 {
@@ -647,6 +645,6 @@ EOF;
         $notHaveDependencyOutsideNamespace = new Implement('Foo\Order');
         $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(0, $violations);
+        $this->assertCount(0, $violations, $violations->toString());
     }
 }
