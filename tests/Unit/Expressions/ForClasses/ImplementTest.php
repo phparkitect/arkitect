@@ -74,4 +74,23 @@ class ImplementTest extends TestCase
         $implementConstraint->evaluate($classDescription, $violations, $because);
         self::assertEquals(0, $violations->count());
     }
+
+    public function test_it_should_check_the_complete_fqcn(): void
+    {
+        $interfaceName = '\Foo\Order';
+
+        $implementConstraint = new Implement($interfaceName);
+        $classDescription = new ClassDescription(
+            FullyQualifiedClassName::fromString('HappyIsland'),
+            [],
+            [FullyQualifiedClassName::fromString('\Foo\Orderable')],
+            null,
+            false,
+            false
+        );
+        $violations = new Violations();
+        $implementConstraint->evaluate($classDescription, $violations, '');
+        self::assertEquals(1, $violations->count());
+    }
+
 }
