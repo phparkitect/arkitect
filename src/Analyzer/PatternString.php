@@ -20,7 +20,8 @@ class PatternString
         }
 
         if (!$this->containsWildcard($pattern)) {
-            return str_starts_with($this->value, $pattern.'\\') || $this->value == $pattern;
+            $slashedTerminatedPattern = str_ends_with($pattern, '\\')? $pattern : $pattern.'\\';
+            return str_starts_with($this->value, $slashedTerminatedPattern) || $this->value == $pattern;
         }
 
         return $this->startsWithPattern($pattern);
