@@ -28,7 +28,7 @@ class FullyQualifiedClassNameTest extends TestCase
     {
         $fqcn = FullyQualifiedClassName::fromString($fqcn);
 
-        $this->assertEquals($shouldMatch, $fqcn->matches($pattern), "{$fqcn->toString()} should ".($shouldMatch ? '': "not ")."match $pattern");
+        $this->assertEquals($shouldMatch, $fqcn->matches($pattern), "{$fqcn->toString()} should ".($shouldMatch ? '' : 'not ')."match $pattern");
     }
 
     public function test_should_throw_if_invalid_namespace_is_passed(): void

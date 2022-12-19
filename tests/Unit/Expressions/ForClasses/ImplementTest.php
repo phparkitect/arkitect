@@ -92,5 +92,4 @@ class ImplementTest extends TestCase
         $implementConstraint->evaluate($classDescription, $violations, '');
         self::assertEquals(1, $violations->count());
     }
-
 }
