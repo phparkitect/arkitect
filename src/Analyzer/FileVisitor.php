@@ -9,24 +9,22 @@ use PhpParser\NodeVisitorAbstract;
 
 class FileVisitor extends NodeVisitorAbstract
 {
-    /** @var ?ClassDescriptionBuilder */
+    /** @var ClassDescriptionBuilder */
     private $classDescriptionBuilder;
 
     /** @var array */
     private $classDescriptions = [];
 
+    public function __construct(ClassDescriptionBuilder $classDescriptionBuilder)
+    {
+        $this->classDescriptionBuilder = $classDescriptionBuilder;
+    }
+
     public function enterNode(Node $node): void
     {
         if ($node instanceof Node\Stmt\Class_) {
             if (!$node->isAnonymous() && null !== $node->namespacedName) {
-                /** @psalm-suppress UndefinedPropertyFetch */
-                $this->classDescriptionBuilder = ClassDescriptionBuilder::create(
-                    $node->namespacedName->toCodeString()
-                );
-            }
-
-            if (null === $this->classDescriptionBuilder) {
-                return;
+                $this->classDescriptionBuilder->setClassName($node->namespacedName->toCodeString());
             }
 
             foreach ($node->implements as $interface) {
@@ -55,6 +53,17 @@ class FileVisitor extends NodeVisitorAbstract
             }
         }
 
+        if ($node instanceof Node\Stmt\Enum_ && null !== $node->namespacedName) {
+            $this->classDescriptionBuilder->setClassName($node->namespacedName->toCodeString());
+
+            foreach ($node->attrGroups as $attributeGroup) {
+                foreach ($attributeGroup->attrs as $attribute) {
+                    $this->classDescriptionBuilder
+                        ->addAttribute($attribute->name->toString(), $attribute->getLine());
+                }
+            }
+        }
+
         /**
          * adding static classes as dependencies
          * $constantValue = StaticClass::constant;.
@@ -62,8 +71,7 @@ class FileVisitor extends NodeVisitorAbstract
          * @see FileVisitorTest::test_it_should_return_errors_for_const_outside_namespace
          */
         if ($node instanceof Node\Expr\ClassConstFetch &&
-            method_exists($node->class, 'toString') &&
-            null !== $this->classDescriptionBuilder
+            method_exists($node->class, 'toString')
         ) {
             if ($this->isSelfOrStaticOrParent($node->class->toString())) {
                 return;
@@ -80,8 +88,7 @@ class FileVisitor extends NodeVisitorAbstract
          * @see FileVisitorTest::test_should_returns_all_dependencies
          */
         if ($node instanceof Node\Expr\StaticCall &&
-            method_exists($node->class, 'toString') &&
-            null !== $this->classDescriptionBuilder
+            method_exists($node->class, 'toString')
         ) {
             if ($this->isSelfOrStaticOrParent($node->class->toString())) {
                 return;
@@ -92,8 +99,7 @@ class FileVisitor extends NodeVisitorAbstract
         }
 
         if ($node instanceof Node\Expr\Instanceof_ &&
-            method_exists($node->class, 'toString') &&
-            null !== $this->classDescriptionBuilder
+            method_exists($node->class, 'toString')
         ) {
             if ($this->isSelfOrStaticOrParent($node->class->toString())) {
                 return;
@@ -104,8 +110,7 @@ class FileVisitor extends NodeVisitorAbstract
         }
 
         if ($node instanceof Node\Expr\New_ &&
-            !($node->class instanceof Node\Expr\Variable) &&
-             null !== $this->classDescriptionBuilder
+            !($node->class instanceof Node\Expr\Variable)
         ) {
             if ((method_exists($node->class, 'isAnonymous') && $node->class->isAnonymous()) ||
                 !method_exists($node->class, 'toString')) {
@@ -120,27 +125,13 @@ class FileVisitor extends NodeVisitorAbstract
                 ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
         }
 
-        if ($node instanceof Node\Stmt\Enum_ && null !== $node->namespacedName) {
-            /** @psalm-suppress UndefinedPropertyFetch */
-            $this->classDescriptionBuilder = ClassDescriptionBuilder::create(
-                $node->namespacedName->toCodeString()
-            );
-
-            foreach ($node->attrGroups as $attributeGroup) {
-                foreach ($attributeGroup->attrs as $attribute) {
-                    $this->classDescriptionBuilder
-                        ->addAttribute($attribute->name->toString(), $attribute->getLine());
-                }
-            }
-        }
-
         /**
          * matches parameters dependency in property definitions like
          * public NotBlank $foo;.
          *
          * @see FileVisitorTest::test_it_parse_typed_property
          */
-        if ($node instanceof Node\Stmt\Property && null !== $this->classDescriptionBuilder) {
+        if ($node instanceof Node\Stmt\Property) {
             if (null === $node->type) {
                 return;
             }
@@ -159,7 +150,7 @@ class FileVisitor extends NodeVisitorAbstract
             }
         }
 
-        if (null !== $this->classDescriptionBuilder && null !== $node->getDocComment()) {
+        if (null !== $node->getDocComment()) {
             /** @var Doc $docComment */
             $docComment = $node->getDocComment();
 
@@ -172,7 +163,7 @@ class FileVisitor extends NodeVisitorAbstract
          *
          * @see FileVisitorTest::test_should_returns_all_dependencies
          */
-        if ($node instanceof Node\Param && null !== $this->classDescriptionBuilder) {
+        if ($node instanceof Node\Param) {
             $this->addParamDependency($node);
         }
     }
@@ -189,16 +180,14 @@ class FileVisitor extends NodeVisitorAbstract
 
     public function leaveNode(Node $node): void
     {
-        if ($node instanceof Node\Stmt\Class_ && null !== $this->classDescriptionBuilder) {
-            $classDescription = $this->classDescriptionBuilder->get();
-
-            $this->classDescriptions[] = $classDescription;
+        if ($node instanceof Node\Stmt\Class_ && !$node->isAnonymous()) {
+            $this->classDescriptions[] = $this->classDescriptionBuilder->get();
+            $this->classDescriptionBuilder->clear();
         }
 
-        if ($node instanceof Node\Stmt\Enum_ && null !== $this->classDescriptionBuilder) {
-            $classDescription = $this->classDescriptionBuilder->get();
-
-            $this->classDescriptions[] = $classDescription;
+        if ($node instanceof Node\Stmt\Enum_) {
+            $this->classDescriptions[] = $this->classDescriptionBuilder->get();
+            $this->classDescriptionBuilder->clear();
         }
     }
 
@@ -218,10 +207,6 @@ class FileVisitor extends NodeVisitorAbstract
         }
 
         if (!method_exists($node->type, 'toString')) {
-            return;
-        }
-
-        if (null === $this->classDescriptionBuilder) {
             return;
         }
 

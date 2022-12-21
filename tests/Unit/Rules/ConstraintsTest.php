@@ -34,8 +34,11 @@ class ConstraintsTest extends TestCase
         $violations = new Violations();
         $because = 'we want to add this rule for our software';
 
+        $cb = ClassDescriptionBuilder::create();
+        $cb->setClassName('Banana');
+
         $expressionStore->checkAll(
-            ClassDescriptionBuilder::create('Banana')->get(),
+            $cb->get(),
             $violations,
             $because
         );
@@ -67,8 +70,11 @@ class ConstraintsTest extends TestCase
         $violations = new Violations();
         $because = 'we want to add this rule for our software';
 
+        $cb = ClassDescriptionBuilder::create();
+        $cb->setClassName('Banana');
+
         $expressionStore->checkAll(
-            ClassDescriptionBuilder::create('Banana')->get(),
+            $cb->get(),
             $violations,
             $because
         );

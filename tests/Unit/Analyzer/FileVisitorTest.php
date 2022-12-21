@@ -88,7 +88,7 @@ EOF;
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
-        self::assertCount(3, $cd);
+        self::assertCount(2, $cd);
         self::assertInstanceOf(ClassDescription::class, $cd[0]);
         self::assertInstanceOf(ClassDescription::class, $cd[1]);
 
@@ -96,6 +96,7 @@ EOF;
             new ClassDependency('Root\Namespace1\AnInterface', 7),
             new ClassDependency('Root\Namespace1\InterfaceTwo', 7),
             new ClassDependency('Root\Namespace1\Another\ForbiddenInterface', 11),
+            new ClassDependency('Root\Namespace1\Proj', 23),
         ];
 
         $this->assertEquals($expectedInterfaces, $cd[0]->getDependencies());
