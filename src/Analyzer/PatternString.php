@@ -20,9 +20,10 @@ class PatternString
         }
 
         if (!$this->containsWildcard($pattern)) {
-            $slashTerminatedPattern = str_ends_with($pattern, '\\')? $pattern : $pattern.'\\';
+            $slashTerminatedPattern = str_ends_with($pattern, '\\') ? $pattern : $pattern.'\\';
             $isInThisNamespace = str_starts_with($this->value, $slashTerminatedPattern);
             $isThisClass = $this->value == $pattern;
+
             return $isInThisNamespace || $isThisClass;
         }
 
