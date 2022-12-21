@@ -15,7 +15,8 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_create_builder_with_dependency_and_interface(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = ClassDescriptionBuilder::create($FQCN);
+        $classDescriptionBuilder = ClassDescriptionBuilder::create();
+        $classDescriptionBuilder->setClassName($FQCN);
 
         $classDependency = new ClassDependency('DepClass', 10);
 
@@ -33,7 +34,8 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_create_final_class(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = ClassDescriptionBuilder::create($FQCN);
+        $classDescriptionBuilder = ClassDescriptionBuilder::create();
+        $classDescriptionBuilder->setClassName($FQCN);
         $classDescriptionBuilder->setFinal(true);
 
         $classDescription = $classDescriptionBuilder->get();
@@ -46,7 +48,8 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_create_not_final_class(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = ClassDescriptionBuilder::create($FQCN);
+        $classDescriptionBuilder = ClassDescriptionBuilder::create();
+        $classDescriptionBuilder->setClassName($FQCN);
         $classDescriptionBuilder->setFinal(false);
 
         $classDescription = $classDescriptionBuilder->get();
@@ -59,7 +62,8 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_create_abstract_class(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = ClassDescriptionBuilder::create($FQCN);
+        $classDescriptionBuilder = ClassDescriptionBuilder::create();
+        $classDescriptionBuilder->setClassName($FQCN);
         $classDescriptionBuilder->setAbstract(true);
 
         $classDescription = $classDescriptionBuilder->get();
@@ -72,7 +76,8 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_create_not_abstract_class(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = ClassDescriptionBuilder::create($FQCN);
+        $classDescriptionBuilder = ClassDescriptionBuilder::create();
+        $classDescriptionBuilder->setClassName($FQCN);
         $classDescriptionBuilder->setAbstract(false);
 
         $classDescription = $classDescriptionBuilder->get();
@@ -85,7 +90,8 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_create_annotated_class(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = ClassDescriptionBuilder::create($FQCN);
+        $classDescriptionBuilder = ClassDescriptionBuilder::create();
+        $classDescriptionBuilder->setClassName($FQCN);
         $classDescriptionBuilder->addDocBlock('/**
  * @psalm-immutable
  */');
@@ -105,7 +111,8 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_add_attributes(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = ClassDescriptionBuilder::create($FQCN);
+        $classDescriptionBuilder = ClassDescriptionBuilder::create();
+        $classDescriptionBuilder->setClassName($FQCN);
         $classDescriptionBuilder->addAttribute('AttrClass', 27);
 
         $classDescription = $classDescriptionBuilder->get();

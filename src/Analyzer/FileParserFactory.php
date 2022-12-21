@@ -13,7 +13,7 @@ class FileParserFactory
     {
         return new FileParser(
             new NodeTraverser(),
-            new FileVisitor(),
+            new FileVisitor(ClassDescriptionBuilder::create()),
             new NameResolver(),
             $targetPhpVersion
         );

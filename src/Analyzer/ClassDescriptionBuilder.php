@@ -3,12 +3,14 @@ declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
 
+use Webmozart\Assert\Assert;
+
 class ClassDescriptionBuilder
 {
     /** @var list<ClassDependency> */
     private $classDependencies;
 
-    /** @var FullyQualifiedClassName */
+    /** @var ?FullyQualifiedClassName */
     private $FQCN;
 
     /** @var list<FullyQualifiedClassName> */
@@ -36,9 +38,10 @@ class ClassDescriptionBuilder
      * @param list<ClassDependency>         $classDependencies
      * @param list<FullyQualifiedClassName> $interfaces
      * @param list<FullyQualifiedClassName> $attributes
+     * @param ?FullyQualifiedClassName      $FQCN
      */
     private function __construct(
-        FullyQualifiedClassName $FQCN,
+        ?FullyQualifiedClassName $FQCN,
         string $filePath,
         array $classDependencies,
         array $interfaces,
@@ -57,10 +60,10 @@ class ClassDescriptionBuilder
         $this->attributes = $attributes;
     }
 
-    public static function create(string $FQCN): self
+    public static function create(): self
     {
         return new self(
-            FullyQualifiedClassName::fromString($FQCN),
+            null,
             '',
             [],
             [],
@@ -69,6 +72,23 @@ class ClassDescriptionBuilder
             [],
             []
         );
+    }
+
+    public function setClassName(string $FQCN): void
+    {
+        $this->FQCN = FullyQualifiedClassName::fromString($FQCN);
+    }
+
+    public function clear(): void
+    {
+        $this->FQCN = null;
+        $this->filePath = '';
+        $this->classDependencies = [];
+        $this->interfaces = [];
+        $this->final = false;
+        $this->abstract = false;
+        $this->docBlock = [];
+        $this->attributes = [];
     }
 
     public function setFilePath(string $filePath): self
@@ -103,6 +123,8 @@ class ClassDescriptionBuilder
 
     public function get(): ClassDescription
     {
+        Assert::notNull($this->FQCN);
+
         $cd = new ClassDescription(
             $this->FQCN,
             $this->classDependencies,
