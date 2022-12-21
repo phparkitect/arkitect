@@ -33,8 +33,9 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
      *
      * @param mixed $expectedNamespace
      * @param mixed $actualFQCN
+     * @param mixed $explanation
      */
-    public function test_it_should_match_namespace_and_descendants($expectedNamespace, $actualFQCN): void
+    public function test_it_should_match_namespace_and_descendants($expectedNamespace, $actualFQCN, $explanation): void
     {
         $haveNameMatching = new ResideInOneOfTheseNamespaces($expectedNamespace);
 
@@ -43,7 +44,7 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
         $violations = new Violations();
         $haveNameMatching->evaluate($classDesc, $violations, $because);
 
-        self::assertEquals(0, $violations->count());
+        self::assertEquals(0, $violations->count(), $explanation);
     }
 
     public function test_it_should_return_false_if_not_reside_in_namespace(): void

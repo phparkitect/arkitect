@@ -35,12 +35,12 @@ class ClassDependencyTest extends TestCase
 
     public function test_it_should_not_match(): void
     {
-        $this->assertTrue($this->classDependency->matches('Happy'));
+        $this->assertFalse($this->classDependency->matches('Happy'));
     }
 
     public function test_it_should_match_one_of(): void
     {
-        $this->assertTrue($this->classDependency->matchesOneOf('Happy', 'Foo', 'Bar'));
+        $this->assertTrue($this->classDependency->matchesOneOf('HappyIsland', 'Foo', 'Bar'));
     }
 
     public function test_it_should_not_match_one_of(): void

@@ -14,8 +14,12 @@ class FullyQualifiedClassNameTest extends TestCase
           ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables\Fruits\Banana', true],
           ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables\*\Banana', true],
           ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables', true],
-          ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables\*', true],
+            ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables\\', true],
+
+            ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables\*', true],
           ['Food\Vegetables\Fruits\Mango', '', false],
+          ['Food\Veg', 'Food\Vegetables', false],
+          ['Food\Vegetables', 'Food\Veg', false],
         ];
     }
 
@@ -26,7 +30,7 @@ class FullyQualifiedClassNameTest extends TestCase
     {
         $fqcn = FullyQualifiedClassName::fromString($fqcn);
 
-        $this->assertEquals($shouldMatch, $fqcn->matches($pattern));
+        $this->assertEquals($shouldMatch, $fqcn->matches($pattern), "{$fqcn->toString()} should ".($shouldMatch ? '' : 'not ')."match $pattern");
     }
 
     public function test_should_throw_if_invalid_namespace_is_passed(): void
