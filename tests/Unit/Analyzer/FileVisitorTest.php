@@ -614,6 +614,36 @@ EOF;
         $this->assertCount(1, $violations);
     }
 
+    public function test_it_parse_custom_tags_in_docblocks(): void
+    {
+        $code = <<< 'EOF'
+<?php
+namespace MyProject\AppBundle\Application;
+use Symfony\Component\Validator\Constraints as Assert;
+class ApplicationLevelDto
+{
+/**
+* @Assert\NotBlank
+*/
+     public $foo;
+
+}
+EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
+        $fp->parse($code, 'relativePathName');
+
+        $cd = $fp->getClassDescriptions();
+
+        $violations = new Violations();
+
+        $notHaveDependencyOutsideNamespace = new DependsOnlyOnTheseNamespaces('MyProject\AppBundle\Application');
+        $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+
+        $this->assertCount(1, $violations);
+    }
+
     public function test_should_implement_exact_classname(): void
     {
         $code = <<< 'EOF'
