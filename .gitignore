@@ -8,3 +8,5 @@
 !/bin/box.phar
 phparkitect.phar
 composer.lock
+.php-version
+composer.phar
