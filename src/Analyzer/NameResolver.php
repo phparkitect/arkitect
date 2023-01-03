@@ -148,7 +148,7 @@ class NameResolver extends NodeVisitorAbstract
                 break;
             }
 
-            if (null === $node->type) {
+            if (!($node->type instanceof FullyQualified)) {
                 foreach ($phpDocNode->getTags() as $tagValue) {
                     if ('@' === $tagValue->name[0] && false === strpos($tagValue->name, '@var')) {
                         $customTag = str_replace('@', '', $tagValue->name);
