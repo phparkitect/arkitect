@@ -122,4 +122,15 @@ class ClassDescriptionBuilderTest extends TestCase
             $classDescription->getAttributes()
         );
     }
+
+    public function test_it_should_set_file_path(): void
+    {
+        $filePath = 'filePath/filePath2';
+        $classDescriptionBuilder = ClassDescriptionBuilder::create();
+        $classDescriptionBuilder->setClassName('FQCN');
+        $classDescriptionBuilder->setFilePath($filePath);
+
+        $classDescription = $classDescriptionBuilder->get();
+        $this->assertEquals($filePath, $classDescription->fullPath());
+    }
 }
