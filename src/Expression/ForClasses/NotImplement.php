@@ -29,6 +29,10 @@ class NotImplement implements Expression
 
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
+        if ($theClass->isInterface()) {
+            return;
+        }
+
         $interface = $this->interface;
         $interfaces = $theClass->getInterfaces();
         $implements = function (FullyQualifiedClassName $FQCN) use ($interface): bool {

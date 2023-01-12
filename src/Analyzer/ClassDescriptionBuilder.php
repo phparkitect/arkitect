@@ -34,6 +34,9 @@ class ClassDescriptionBuilder
     /** @var list<FullyQualifiedClassName> */
     private $attributes;
 
+    /** @var bool */
+    private $interface;
+
     /**
      * @param list<ClassDependency>         $classDependencies
      * @param list<FullyQualifiedClassName> $interfaces
@@ -47,6 +50,7 @@ class ClassDescriptionBuilder
         array $interfaces,
         bool $final,
         bool $abstract,
+        bool $interface,
         array $docBlock = [],
         array $attributes = []
     ) {
@@ -58,6 +62,7 @@ class ClassDescriptionBuilder
         $this->abstract = $abstract;
         $this->docBlock = $docBlock;
         $this->attributes = $attributes;
+        $this->interface = $interface;
     }
 
     public static function create(): self
@@ -67,6 +72,7 @@ class ClassDescriptionBuilder
             '',
             [],
             [],
+            false,
             false,
             false,
             [],
@@ -89,6 +95,7 @@ class ClassDescriptionBuilder
         $this->abstract = false;
         $this->docBlock = [];
         $this->attributes = [];
+        $this->interface = false;
     }
 
     public function setFilePath(string $filePath): self
@@ -132,6 +139,7 @@ class ClassDescriptionBuilder
             $this->extend,
             $this->final,
             $this->abstract,
+            $this->interface,
             $this->docBlock,
             $this->attributes
         );
@@ -150,6 +158,13 @@ class ClassDescriptionBuilder
     public function setAbstract(bool $abstract): self
     {
         $this->abstract = $abstract;
+
+        return $this;
+    }
+
+    public function setInterface(bool $interface): self
+    {
+        $this->interface = $interface;
 
         return $this;
     }

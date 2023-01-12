@@ -23,6 +23,7 @@ class NotContainDocBlockLikeTest extends TestCase
             null,
             false,
             false,
+            false,
             ['/**  */myDocBlock with other information']
         );
         $because = 'we want to add this rule for our software';
@@ -47,6 +48,7 @@ class NotContainDocBlockLikeTest extends TestCase
             null,
             false,
             false,
+            false,
             ['/**  */myDocBlock with other information']
         );
         $violations = new Violations();
@@ -68,6 +70,7 @@ class NotContainDocBlockLikeTest extends TestCase
             [],
             [],
             null,
+            false,
             false,
             false,
             ['/**  */myDocBlock with other information']

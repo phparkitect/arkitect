@@ -23,6 +23,7 @@ class NotImplementTest extends TestCase
             [],
             null,
             false,
+            false,
             false
         );
 
@@ -45,6 +46,7 @@ class NotImplementTest extends TestCase
             [FullyQualifiedClassName::fromString('foo')],
             null,
             false,
+            false,
             false
         );
         $because = 'we want to add this rule for our software';
@@ -64,6 +66,7 @@ class NotImplementTest extends TestCase
             [FullyQualifiedClassName::fromString('interface')],
             null,
             false,
+            false,
             false
         );
 
@@ -78,5 +81,26 @@ class NotImplementTest extends TestCase
             'should not implement '.$interface.' because we want to add this rule for our software',
             $violationError
         );
+    }
+
+    public function test_it_should_return_if_is_an_interface(): void
+    {
+        $interface = 'interface';
+
+        $implementConstraint = new NotImplement($interface);
+        $classDescription = new ClassDescription(
+            FullyQualifiedClassName::fromString('HappyIsland'),
+            [],
+            [],
+            null,
+            false,
+            false,
+            true
+        );
+        $because = 'we want to add this rule for our software';
+
+        $violations = new Violations();
+        $implementConstraint->evaluate($classDescription, $violations, $because);
+        self::assertEquals(0, $violations->count());
     }
 }

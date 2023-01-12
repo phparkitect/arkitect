@@ -21,7 +21,8 @@ class IsNotAbstractTest extends TestCase
             [],
             null,
             true,
-            true
+            true,
+            false
         );
         $because = 'we want to add this rule for our software';
         $violationError = $isAbstract->describe($classDescription, $because)->toString();
@@ -41,6 +42,7 @@ class IsNotAbstractTest extends TestCase
             [],
             [],
             null,
+            false,
             false,
             false
         );
