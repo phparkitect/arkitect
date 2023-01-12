@@ -108,13 +108,13 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
 
     public function remove(self $violations): void
     {
-        $this->violations = array_udiff(
+        $this->violations = array_values(array_udiff(
             $this->violations,
             $violations->violations,
-            function (Violation $a, Violation $b): int {
-                return $a == $b ? 0 : 1;
+            static function (Violation $a, Violation $b): int {
+                return $a->isEqualsTo($b) ? 0 : -1;
             }
-        );
+        ));
     }
 
     public function jsonSerialize(): array

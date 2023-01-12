@@ -56,4 +56,11 @@ class Violation implements \JsonSerializable
     {
         return new self($json['fqcn'], $json['error'], $json['line']);
     }
+
+    public function isEqualsTo(Violation $violation): bool
+    {
+        return $this === $violation || ($this->fqcn === $violation->getFqcn()
+            && $this->error === $violation->getError()
+            && $this->line === $violation->getLine());
+    }
 }
