@@ -767,4 +767,34 @@ EOF;
 
         $this->assertCount(0, $violations);
     }
+
+    public function test_it_skip_custom_annotations_in_docblocks_if_the_option_parse_custom_annotation_is_false(): void
+    {
+        $code = <<< 'EOF'
+<?php
+namespace MyProject\AppBundle\Application;
+use Symfony\Component\Validator\Constraints as Assert;
+class ApplicationLevelDto
+{
+/**
+* @Assert\NotBlank
+*/
+     public $foo;
+
+}
+EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'), false);
+        $fp->parse($code, 'relativePathName');
+
+        $cd = $fp->getClassDescriptions();
+
+        $violations = new Violations();
+
+        $dependsOnlyOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('MyProject\AppBundle\Application');
+        $dependsOnlyOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+
+        $this->assertCount(0, $violations);
+    }
 }

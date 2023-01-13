@@ -13,11 +13,14 @@ class Config
     private $classSetRules;
     /** @var bool */
     private $runOnlyARule;
+    /** @var bool */
+    private $parseCustomAnnotations;
 
     public function __construct()
     {
         $this->classSetRules = [];
         $this->runOnlyARule = false;
+        $this->parseCustomAnnotations = true;
     }
 
     public function add(ClassSet $classSet, ArchRule ...$rules): self
@@ -45,5 +48,17 @@ class Config
     public function getClassSetRules(): array
     {
         return $this->classSetRules;
+    }
+
+    public function skipParsingCustomAnnotations(): self
+    {
+        $this->parseCustomAnnotations = false;
+
+        return $this;
+    }
+
+    public function isParseCustomAnnotationsEnabled(): bool
+    {
+        return $this->parseCustomAnnotations;
     }
 }
