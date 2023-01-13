@@ -124,7 +124,7 @@ App\Controller\Foo has 1 violations
 
         $this->assertCount(3, $this->violationStore->toArray());
 
-        $violationsBaseline= new Violations();
+        $violationsBaseline = new Violations();
         $violationsBaseline->add($this->violation);
 
         $this->violationStore->remove($violationsBaseline);
