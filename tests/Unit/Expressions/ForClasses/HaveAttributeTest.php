@@ -23,6 +23,7 @@ class HaveAttributeTest extends TestCase
             null,
             false,
             false,
+            false,
             [],
             [FullyQualifiedClassName::fromString('myAttribute')]
         );
@@ -48,6 +49,7 @@ class HaveAttributeTest extends TestCase
             null,
             false,
             false,
+            false,
             [],
             [FullyQualifiedClassName::fromString('myAttribute')]
         );
@@ -70,6 +72,7 @@ class HaveAttributeTest extends TestCase
             [],
             [],
             null,
+            false,
             false,
             false,
             [],

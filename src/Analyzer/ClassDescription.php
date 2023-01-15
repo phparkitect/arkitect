@@ -26,6 +26,9 @@ class ClassDescription
     /** @var bool */
     private $abstract;
 
+    /** @var bool */
+    private $interface;
+
     /** @var list<string> */
     private $docBlock;
 
@@ -45,6 +48,7 @@ class ClassDescription
         ?FullyQualifiedClassName $extends,
         bool $final,
         bool $abstract,
+        bool $interface,
         array $docBlock = [],
         array $attributes = []
     ) {
@@ -57,6 +61,7 @@ class ClassDescription
         $this->fullPath = '';
         $this->docBlock = $docBlock;
         $this->attributes = $attributes;
+        $this->interface = $interface;
     }
 
     public function setFullPath(string $fullPath): void
@@ -164,6 +169,11 @@ class ClassDescription
     public function isAbstract(): bool
     {
         return $this->abstract;
+    }
+
+    public function isInterface(): bool
+    {
+        return $this->interface;
     }
 
     public function getDocBlock(): array

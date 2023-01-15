@@ -23,6 +23,7 @@ class ImplementTest extends TestCase
             [],
             null,
             false,
+            false,
             false
         );
 
@@ -47,6 +48,7 @@ class ImplementTest extends TestCase
             [FullyQualifiedClassName::fromString('foo')],
             null,
             false,
+            false,
             false
         );
         $because = 'we want to add this rule for our software';
@@ -65,6 +67,7 @@ class ImplementTest extends TestCase
             [],
             [FullyQualifiedClassName::fromString('interface')],
             null,
+            false,
             false,
             false
         );
@@ -86,10 +89,32 @@ class ImplementTest extends TestCase
             [FullyQualifiedClassName::fromString('\Foo\Orderable')],
             null,
             false,
+            false,
             false
         );
         $violations = new Violations();
         $implementConstraint->evaluate($classDescription, $violations, '');
         self::assertEquals(1, $violations->count());
+    }
+
+    public function test_it_should_return_if_is_an_interface(): void
+    {
+        $interface = 'interface';
+
+        $implementConstraint = new Implement($interface);
+        $classDescription = new ClassDescription(
+            FullyQualifiedClassName::fromString('HappyIsland'),
+            [],
+            [],
+            null,
+            false,
+            false,
+            true
+        );
+        $because = 'we want to add this rule for our software';
+
+        $violations = new Violations();
+        $implementConstraint->evaluate($classDescription, $violations, $because);
+        self::assertEquals(0, $violations->count());
     }
 }

@@ -133,4 +133,32 @@ class ClassDescriptionBuilderTest extends TestCase
         $classDescription = $classDescriptionBuilder->get();
         $this->assertEquals($filePath, $classDescription->fullPath());
     }
+
+    public function test_it_should_create_interface(): void
+    {
+        $FQCN = 'HappyIsland';
+        $classDescriptionBuilder = ClassDescriptionBuilder::create();
+        $classDescriptionBuilder->setClassName($FQCN);
+        $classDescriptionBuilder->setInterface(true);
+
+        $classDescription = $classDescriptionBuilder->get();
+
+        $this->assertInstanceOf(ClassDescription::class, $classDescription);
+
+        $this->assertTrue($classDescription->isInterface());
+    }
+
+    public function test_it_should_create_not_interface(): void
+    {
+        $FQCN = 'HappyIsland';
+        $classDescriptionBuilder = ClassDescriptionBuilder::create();
+        $classDescriptionBuilder->setClassName($FQCN);
+        $classDescriptionBuilder->setInterface(false);
+
+        $classDescription = $classDescriptionBuilder->get();
+
+        $this->assertInstanceOf(ClassDescription::class, $classDescription);
+
+        $this->assertFalse($classDescription->isInterface());
+    }
 }

@@ -22,6 +22,7 @@ class NotExtendTest extends TestCase
             [],
             FullyQualifiedClassName::fromString('My\BaseClass'),
             false,
+            false,
             false
         );
         $because = 'we want to add this rule for our software';
