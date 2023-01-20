@@ -57,9 +57,10 @@ class FullyQualifiedClassNameTest extends TestCase
 
     public function test_should_have_ns_normalized(): void
     {
-        $fqcn = FullyQualifiedClassName::fromString('\Food\Vegetables\Fruits\Banana');
+        $fqcn = FullyQualifiedClassName::fromString('Food\Vegetables\Fruits\Banana');
 
         $this->assertEquals('Banana', $fqcn->className());
         $this->assertEquals('Food\Vegetables\Fruits', $fqcn->namespace());
+        $this->assertEquals('Food\Vegetables\Fruits\Banana', $fqcn->toString());
     }
 }

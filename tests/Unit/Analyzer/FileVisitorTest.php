@@ -730,4 +730,41 @@ EOF;
 
         $this->assertCount(1, $violations);
     }
+
+    public function test_it_handles_return_types(): void
+    {
+        $code = <<< 'EOF'
+<?php
+namespace Foo\Bar;
+
+use Doctrine\MongoDB\Collection;
+use Foo\Baz\Baz;
+use Symfony\Component\HttpFoundation\Request;
+
+class MyClass implements Baz
+{
+    public function __construct(Request $request)
+    {
+        $collection = new Collection($request);
+    }
+
+    public function getRequest(): Request //the violations is reported here
+    {
+        return new Request();
+    }
+}
+EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
+        $fp->parse($code, 'relativePathName');
+        $cd = $fp->getClassDescriptions();
+
+        $violations = new Violations();
+
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Foo', 'Symfony', 'Doctrine');
+        $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+
+        $this->assertCount(0, $violations);
+    }
 }

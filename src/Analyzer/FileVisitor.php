@@ -187,7 +187,7 @@ class FileVisitor extends NodeVisitorAbstract
             $returnType = $node->returnType;
             if ($returnType instanceof Node\Name\FullyQualified) {
                 $this->classDescriptionBuilder
-                  ->addDependency(new ClassDependency($returnType->toCodeString(), $returnType->getLine()));
+                  ->addDependency(new ClassDependency($returnType->toString(), $returnType->getLine()));
             }
         }
     }
