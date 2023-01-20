@@ -780,7 +780,6 @@ class ApplicationLevelDto
 * @Assert\NotBlank
 */
      public $foo;
-
 }
 EOF;
 
@@ -794,6 +793,35 @@ EOF;
 
         $dependsOnlyOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('MyProject\AppBundle\Application');
         $dependsOnlyOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+
+        $this->assertCount(0, $violations);
+    }
+
+    public function test_it_parse_arrays_as_scalar_types(): void
+    {
+        $code = <<< 'EOF'
+<?php
+namespace App\Domain;
+Class MyClass
+{
+    private array $field1;
+    public function __construct(array $field1)
+    {
+        $this->field1 = $field1;
+    }
+}
+EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
+        $fp->parse($code, 'relativePathName');
+
+        $cd = $fp->getClassDescriptions();
+
+        $violations = new Violations();
+
+        $notHaveDependenciesOutside = new NotHaveDependencyOutsideNamespace('App\Domain');
+        $notHaveDependenciesOutside->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         $this->assertCount(0, $violations);
     }

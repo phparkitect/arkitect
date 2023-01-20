@@ -140,7 +140,7 @@ class FileVisitor extends NodeVisitorAbstract
                 return;
             }
 
-            if ($this->isScalarType($node->type->toString())) {
+            if ($this->isBuiltInType($node->type->toString())) {
                 return;
             }
 
@@ -243,8 +243,8 @@ class FileVisitor extends NodeVisitorAbstract
             ->addDependency(new ClassDependency($node->type->toString(), $node->getLine()));
     }
 
-    private function isScalarType(string $typeName): bool
+    private function isBuiltInType(string $typeName): bool
     {
-        return \in_array($typeName, ['bool', 'int', 'float', 'string']);
+        return \in_array($typeName, ['bool', 'int', 'float', 'string', 'array', 'resource', 'object', 'null']);
     }
 }
