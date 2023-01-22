@@ -31,7 +31,7 @@ class Runner
     public function run(Config $config, Progress $progress, TargetPhpVersion $targetPhpVersion): void
     {
         /** @var FileParser $fileParser */
-        $fileParser = FileParserFactory::createFileParser($targetPhpVersion);
+        $fileParser = FileParserFactory::createFileParser($targetPhpVersion, $config->isParseCustomAnnotationsEnabled());
 
         /** @var ClassSetRules $classSetRule */
         foreach ($config->getClassSetRules() as $classSetRule) {

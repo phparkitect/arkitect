@@ -55,4 +55,13 @@ class ConfigTest extends TestCase
         $classSetRulesExpected[] = ClassSetRules::create($classSet, ...[$rule2]);
         $this->assertEquals($classSetRulesExpected, $config->getClassSetRules());
     }
+
+    public function test_it_should_allow_to_change_the_default_value_for_parsing_custom_annotations(): void
+    {
+        $config = new Config();
+        $this->assertTrue($config->isParseCustomAnnotationsEnabled());
+
+        $config->skipParsingCustomAnnotations();
+        $this->assertFalse($config->isParseCustomAnnotationsEnabled());
+    }
 }

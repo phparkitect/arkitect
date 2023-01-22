@@ -9,12 +9,12 @@ use PhpParser\NodeTraverser;
 
 class FileParserFactory
 {
-    public static function createFileParser(TargetPhpVersion $targetPhpVersion): FileParser
+    public static function createFileParser(TargetPhpVersion $targetPhpVersion, bool $parseCustomAnnotations = true): FileParser
     {
         return new FileParser(
             new NodeTraverser(),
             new FileVisitor(ClassDescriptionBuilder::create()),
-            new NameResolver(),
+            new NameResolver(null, ['parseCustomAnnotations' => $parseCustomAnnotations]),
             $targetPhpVersion
         );
     }

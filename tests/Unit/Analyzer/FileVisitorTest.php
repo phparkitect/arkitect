@@ -669,8 +669,8 @@ EOF;
 
         $violations = new Violations();
 
-        $notHaveDependencyOutsideNamespace = new Implement('Foo\Order');
-        $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+        $implement = new Implement('Foo\Order');
+        $implement->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         $this->assertCount(0, $violations, $violations->toString());
     }
@@ -703,5 +703,126 @@ EOF;
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         $this->assertCount(1, $violations);
+    }
+
+    public function test_it_parse_interfaces(): void
+    {
+        $code = <<< 'EOF'
+<?php
+namespace MyProject\AppBundle\Application;
+use Doctrine\ORM\QueryBuilder;
+interface BookRepositoryInterface
+{
+    public function getBookList(): QueryBuilder;
+}
+EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
+        $fp->parse($code, 'relativePathName');
+
+        $cd = $fp->getClassDescriptions();
+
+        $violations = new Violations();
+
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('MyProject\AppBundle\Application');
+        $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+
+        $this->assertCount(1, $violations);
+    }
+
+    public function test_it_handles_return_types(): void
+    {
+        $code = <<< 'EOF'
+<?php
+namespace Foo\Bar;
+
+use Doctrine\MongoDB\Collection;
+use Foo\Baz\Baz;
+use Symfony\Component\HttpFoundation\Request;
+
+class MyClass implements Baz
+{
+    public function __construct(Request $request)
+    {
+        $collection = new Collection($request);
+    }
+
+    public function getRequest(): Request //the violations is reported here
+    {
+        return new Request();
+    }
+}
+EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
+        $fp->parse($code, 'relativePathName');
+        $cd = $fp->getClassDescriptions();
+
+        $violations = new Violations();
+
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Foo', 'Symfony', 'Doctrine');
+        $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+
+        $this->assertCount(0, $violations);
+    }
+
+    public function test_it_skip_custom_annotations_in_docblocks_if_the_option_parse_custom_annotation_is_false(): void
+    {
+        $code = <<< 'EOF'
+<?php
+namespace MyProject\AppBundle\Application;
+use Symfony\Component\Validator\Constraints as Assert;
+class ApplicationLevelDto
+{
+/**
+* @Assert\NotBlank
+*/
+     public $foo;
+}
+EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'), false);
+        $fp->parse($code, 'relativePathName');
+
+        $cd = $fp->getClassDescriptions();
+
+        $violations = new Violations();
+
+        $dependsOnlyOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('MyProject\AppBundle\Application');
+        $dependsOnlyOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+
+        $this->assertCount(0, $violations);
+    }
+
+    public function test_it_parse_arrays_as_scalar_types(): void
+    {
+        $code = <<< 'EOF'
+<?php
+namespace App\Domain;
+Class MyClass
+{
+    private array $field1;
+    public function __construct(array $field1)
+    {
+        $this->field1 = $field1;
+    }
+}
+EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
+        $fp->parse($code, 'relativePathName');
+
+        $cd = $fp->getClassDescriptions();
+
+        $violations = new Violations();
+
+        $notHaveDependenciesOutside = new NotHaveDependencyOutsideNamespace('App\Domain');
+        $notHaveDependenciesOutside->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+
+        $this->assertCount(0, $violations);
     }
 }

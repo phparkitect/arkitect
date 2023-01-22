@@ -31,6 +31,9 @@ class NameResolver extends NodeVisitorAbstract
     /** @var bool Whether to replace resolved nodes in place, or to add resolvedNode attributes */
     protected $replaceNodes;
 
+    /** @var bool Whether to parse DocBlock Custom Annotations */
+    protected $parseCustomAnnotations;
+
     /**
      * Constructs a name resolution visitor.
      *
@@ -40,6 +43,7 @@ class NameResolver extends NodeVisitorAbstract
      *  * replaceNodes (default true): Resolved names are replaced in-place. Otherwise, a
      *    resolvedName attribute is added. (Names that cannot be statically resolved receive a
      *    namespacedName attribute, as usual.)
+     *  * parseCustomAnnotations (default true): Whether to parse DocBlock Custom Annotations.
      *
      * @param ErrorHandler|null $errorHandler Error handler
      * @param array             $options      Options
@@ -49,6 +53,7 @@ class NameResolver extends NodeVisitorAbstract
         $this->nameContext = new NameContext($errorHandler ?? new ErrorHandler\Throwing());
         $this->preserveOriginalNames = $options['preserveOriginalNames'] ?? false;
         $this->replaceNodes = $options['replaceNodes'] ?? true;
+        $this->parseCustomAnnotations = $options['parseCustomAnnotations'] ?? true;
     }
 
     /**
@@ -148,7 +153,7 @@ class NameResolver extends NodeVisitorAbstract
                 break;
             }
 
-            if (!($node->type instanceof FullyQualified)) {
+            if ($this->parseCustomAnnotations && !($node->type instanceof FullyQualified)) {
                 foreach ($phpDocNode->getTags() as $tagValue) {
                     if ('@' === $tagValue->name[0] && false === strpos($tagValue->name, '@var')) {
                         $customTag = str_replace('@', '', $tagValue->name);

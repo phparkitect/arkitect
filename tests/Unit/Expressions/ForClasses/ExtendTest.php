@@ -22,6 +22,7 @@ class ExtendTest extends TestCase
             [],
             FullyQualifiedClassName::fromString('My\AnotherClass'),
             false,
+            false,
             false
         );
 
@@ -44,6 +45,7 @@ class ExtendTest extends TestCase
             [],
             [],
             null,
+            false,
             false,
             false
         );

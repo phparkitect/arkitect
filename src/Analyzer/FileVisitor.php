@@ -140,7 +140,7 @@ class FileVisitor extends NodeVisitorAbstract
                 return;
             }
 
-            if ($this->isScalarType($node->type->toString())) {
+            if ($this->isBuiltInType($node->type->toString())) {
                 return;
             }
 
@@ -166,6 +166,30 @@ class FileVisitor extends NodeVisitorAbstract
         if ($node instanceof Node\Param) {
             $this->addParamDependency($node);
         }
+
+        if ($node instanceof Node\Stmt\Interface_) {
+            if (null === $node->namespacedName) {
+                return;
+            }
+
+            $this->classDescriptionBuilder->setClassName($node->namespacedName->toCodeString());
+            $this->classDescriptionBuilder->setInterface(true);
+
+            foreach ($node->attrGroups as $attributeGroup) {
+                foreach ($attributeGroup->attrs as $attribute) {
+                    $this->classDescriptionBuilder
+                        ->addAttribute($attribute->name->toString(), $attribute->getLine());
+                }
+            }
+        }
+
+        if ($node instanceof Node\Stmt\ClassMethod) {
+            $returnType = $node->returnType;
+            if ($returnType instanceof Node\Name\FullyQualified) {
+                $this->classDescriptionBuilder
+                  ->addDependency(new ClassDependency($returnType->toString(), $returnType->getLine()));
+            }
+        }
     }
 
     public function getClassDescriptions(): array
@@ -186,6 +210,11 @@ class FileVisitor extends NodeVisitorAbstract
         }
 
         if ($node instanceof Node\Stmt\Enum_) {
+            $this->classDescriptions[] = $this->classDescriptionBuilder->get();
+            $this->classDescriptionBuilder->clear();
+        }
+
+        if ($node instanceof Node\Stmt\Interface_) {
             $this->classDescriptions[] = $this->classDescriptionBuilder->get();
             $this->classDescriptionBuilder->clear();
         }
@@ -214,8 +243,8 @@ class FileVisitor extends NodeVisitorAbstract
             ->addDependency(new ClassDependency($node->type->toString(), $node->getLine()));
     }
 
-    private function isScalarType(string $typeName): bool
+    private function isBuiltInType(string $typeName): bool
     {
-        return \in_array($typeName, ['bool', 'int', 'float', 'string']);
+        return \in_array($typeName, ['bool', 'int', 'float', 'string', 'array', 'resource', 'object', 'null']);
     }
 }

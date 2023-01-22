@@ -123,6 +123,11 @@ return static function (Config $config): void {
         ->add($mvcClassSet, ...$rules);
 };
 ```
+PHPArkitect can detect violations also on DocBlocks custom annotations (like `@Assert\NotBlank` or `@Serializer\Expose`).
+If you want to disable this feature you can add this simple configuration:
+```php
+$config->skipParsingCustomAnnotations();
+```
 
 # Available rules
 
