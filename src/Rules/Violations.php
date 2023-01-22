@@ -112,7 +112,7 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
             $this->violations,
             $violations->violations,
             static function (Violation $a, Violation $b): int {
-                return $a->isEqualsTo($b) ? 0 : -1;
+                return $a <=> $b;
             }
         ));
     }
