@@ -107,4 +107,32 @@ App\Controller\Foo has 1 violations
             $violation2,
         ], $this->violationStore->toArray());
     }
+
+    public function test_remove_violations_from_violations(): void
+    {
+        $violation1 = new Violation(
+            'App\Controller\Shop',
+            'should have name end with Controller'
+        );
+        $this->violationStore->add($violation1);
+
+        $violation2 = new Violation(
+            'App\Controller\Shop',
+            'should implement AbstractController'
+        );
+        $this->violationStore->add($violation2);
+
+        $this->assertCount(3, $this->violationStore->toArray());
+
+        $violationsBaseline = new Violations();
+        $violationsBaseline->add($this->violation);
+
+        $this->violationStore->remove($violationsBaseline);
+
+        $this->assertCount(2, $this->violationStore->toArray());
+        $this->assertEquals([
+            $violation1,
+            $violation2,
+        ], $this->violationStore->toArray());
+    }
 }
