@@ -15,6 +15,8 @@ use PhpParser\Node\Stmt;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\NodeVisitorAbstract;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
+use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\ConstExprParser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
@@ -136,6 +138,30 @@ class NameResolver extends NodeVisitorAbstract
 
             if (null === $phpDocNode) {
                 return;
+            }
+
+            if (null !== $node->type && isset($node->type->name) && 'array' === $node->type->name) {
+                $arrayItemType = null;
+
+                foreach ($phpDocNode->getVarTagValues() as $tagValue) {
+                    if ($tagValue->type instanceof GenericTypeNode) {
+                        if (1 === \count($tagValue->type->genericTypes)) {
+                            $arrayItemType = (string) $tagValue->type->genericTypes[0];
+                        } elseif (2 === \count($tagValue->type->genericTypes)) {
+                            $arrayItemType = (string) $tagValue->type->genericTypes[1];
+                        }
+                    }
+
+                    if ($tagValue->type instanceof ArrayTypeNode) {
+                        $arrayItemType = (string) $tagValue->type->type;
+                    }
+                }
+
+                if (null !== $arrayItemType) {
+                    $node->type = $this->resolveName(new Node\Name($arrayItemType), Use_::TYPE_NORMAL);
+
+                    return;
+                }
             }
 
             foreach ($phpDocNode->getVarTagValues() as $tagValue) {
