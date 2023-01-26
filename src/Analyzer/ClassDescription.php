@@ -14,9 +14,6 @@ class ClassDescription
     /** @var list<FullyQualifiedClassName> */
     private $interfaces;
 
-    /** @var string */
-    private $fullPath;
-
     /** @var ?FullyQualifiedClassName */
     private $extends;
 
@@ -58,20 +55,14 @@ class ClassDescription
         $this->extends = $extends;
         $this->final = $final;
         $this->abstract = $abstract;
-        $this->fullPath = '';
         $this->docBlock = $docBlock;
         $this->attributes = $attributes;
         $this->interface = $interface;
     }
 
-    public function setFullPath(string $fullPath): void
-    {
-        $this->fullPath = $fullPath;
-    }
-
     public static function build(string $FQCN): ClassDescriptionBuilder
     {
-        $cb = ClassDescriptionBuilder::create();
+        $cb = new ClassDescriptionBuilder();
         $cb->setClassName($FQCN);
 
         return $cb;
@@ -85,38 +76,6 @@ class ClassDescription
     public function getFQCN(): string
     {
         return $this->FQCN->toString();
-    }
-
-    public function dependsOnClass(string $pattern): bool
-    {
-        $depends = function (ClassDependency $dependency) use ($pattern): bool {
-            return $dependency->getFQCN()->matches($pattern);
-        };
-
-        return (bool) \count(array_filter($this->dependencies, $depends));
-    }
-
-    public function dependsOnNamespace(string $pattern): bool
-    {
-        $depends = function (ClassDependency $dependency) use ($pattern): bool {
-            return $dependency->getFQCN()->namespaceMatches($pattern);
-        };
-
-        return (bool) \count(array_filter($this->dependencies, $depends));
-    }
-
-    public function dependsOn(string $pattern): bool
-    {
-        $depends = function (ClassDependency $dependency) use ($pattern): bool {
-            return $dependency->matches($pattern);
-        };
-
-        return (bool) \count(array_filter($this->dependencies, $depends));
-    }
-
-    public function nameMatches(string $pattern): bool
-    {
-        return $this->FQCN->classMatches($pattern);
     }
 
     public function namespaceMatches(string $pattern): bool
@@ -133,11 +92,6 @@ class ClassDescription
         }
 
         return false;
-    }
-
-    public function fullPath(): string
-    {
-        return $this->fullPath;
     }
 
     /**

@@ -21,10 +21,4 @@ class PatternStringTest extends TestCase
         $this->assertTrue($pattern->matches('*This*'));
         $this->assertFalse($pattern->matches('This*'));
     }
-
-    public function test_explode(): void
-    {
-        $pattern = new PatternString('So This Is An Example');
-        $this->assertEquals(['So', 'This', 'Is', 'An', 'Example'], $pattern->explode(' '));
-    }
 }

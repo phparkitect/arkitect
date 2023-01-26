@@ -31,11 +31,6 @@ class FullyQualifiedClassName
         return $this->class->matches($pattern);
     }
 
-    public function namespaceMatches(string $pattern): bool
-    {
-        return $this->namespace->matches($pattern);
-    }
-
     public function matches(string $pattern): bool
     {
         return $this->fqcnString->matches($pattern);

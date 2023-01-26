@@ -15,7 +15,7 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_create_builder_with_dependency_and_interface(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = ClassDescriptionBuilder::create();
+        $classDescriptionBuilder = new ClassDescriptionBuilder();
         $classDescriptionBuilder->setClassName($FQCN);
 
         $classDependency = new ClassDependency('DepClass', 10);
@@ -34,7 +34,7 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_create_final_class(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = ClassDescriptionBuilder::create();
+        $classDescriptionBuilder = new ClassDescriptionBuilder();
         $classDescriptionBuilder->setClassName($FQCN);
         $classDescriptionBuilder->setFinal(true);
 
@@ -48,7 +48,7 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_create_not_final_class(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = ClassDescriptionBuilder::create();
+        $classDescriptionBuilder = new ClassDescriptionBuilder();
         $classDescriptionBuilder->setClassName($FQCN);
         $classDescriptionBuilder->setFinal(false);
 
@@ -62,7 +62,7 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_create_abstract_class(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = ClassDescriptionBuilder::create();
+        $classDescriptionBuilder = new ClassDescriptionBuilder();
         $classDescriptionBuilder->setClassName($FQCN);
         $classDescriptionBuilder->setAbstract(true);
 
@@ -76,7 +76,7 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_create_not_abstract_class(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = ClassDescriptionBuilder::create();
+        $classDescriptionBuilder = new ClassDescriptionBuilder();
         $classDescriptionBuilder->setClassName($FQCN);
         $classDescriptionBuilder->setAbstract(false);
 
@@ -90,7 +90,7 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_create_annotated_class(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = ClassDescriptionBuilder::create();
+        $classDescriptionBuilder = new ClassDescriptionBuilder();
         $classDescriptionBuilder->setClassName($FQCN);
         $classDescriptionBuilder->addDocBlock('/**
  * @psalm-immutable
@@ -111,7 +111,7 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_add_attributes(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = ClassDescriptionBuilder::create();
+        $classDescriptionBuilder = new ClassDescriptionBuilder();
         $classDescriptionBuilder->setClassName($FQCN);
         $classDescriptionBuilder->addAttribute('AttrClass', 27);
 
@@ -123,21 +123,10 @@ class ClassDescriptionBuilderTest extends TestCase
         );
     }
 
-    public function test_it_should_set_file_path(): void
-    {
-        $filePath = 'filePath/filePath2';
-        $classDescriptionBuilder = ClassDescriptionBuilder::create();
-        $classDescriptionBuilder->setClassName('FQCN');
-        $classDescriptionBuilder->setFilePath($filePath);
-
-        $classDescription = $classDescriptionBuilder->get();
-        $this->assertEquals($filePath, $classDescription->fullPath());
-    }
-
     public function test_it_should_create_interface(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = ClassDescriptionBuilder::create();
+        $classDescriptionBuilder = new ClassDescriptionBuilder();
         $classDescriptionBuilder->setClassName($FQCN);
         $classDescriptionBuilder->setInterface(true);
 
@@ -151,7 +140,7 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_create_not_interface(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = ClassDescriptionBuilder::create();
+        $classDescriptionBuilder = new ClassDescriptionBuilder();
         $classDescriptionBuilder->setClassName($FQCN);
         $classDescriptionBuilder->setInterface(false);
 

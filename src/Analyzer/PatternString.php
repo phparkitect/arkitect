@@ -30,11 +30,6 @@ class PatternString
         return $this->startsWithPattern($pattern);
     }
 
-    public function explode(string $delimiter): array
-    {
-        return explode($delimiter, $this->value);
-    }
-
     public function toString(): string
     {
         return $this->value;
