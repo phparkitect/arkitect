@@ -61,5 +61,4 @@ class FullyQualifiedClassName
 
         return new self(new PatternString($fqcn), new PatternString($namespace), new PatternString($className));
     }
-
 }
