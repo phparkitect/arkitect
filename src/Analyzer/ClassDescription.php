@@ -14,9 +14,6 @@ class ClassDescription
     /** @var list<FullyQualifiedClassName> */
     private $interfaces;
 
-    /** @var string */
-    private $fullPath;
-
     /** @var ?FullyQualifiedClassName */
     private $extends;
 
@@ -58,15 +55,9 @@ class ClassDescription
         $this->extends = $extends;
         $this->final = $final;
         $this->abstract = $abstract;
-        $this->fullPath = '';
         $this->docBlock = $docBlock;
         $this->attributes = $attributes;
         $this->interface = $interface;
-    }
-
-    public function setFullPath(string $fullPath): void
-    {
-        $this->fullPath = $fullPath;
     }
 
     public static function build(string $FQCN): ClassDescriptionBuilder

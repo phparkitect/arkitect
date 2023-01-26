@@ -123,17 +123,6 @@ class ClassDescriptionBuilderTest extends TestCase
         );
     }
 
-    public function test_it_should_set_file_path(): void
-    {
-        $filePath = 'filePath/filePath2';
-        $classDescriptionBuilder = ClassDescriptionBuilder::create();
-        $classDescriptionBuilder->setClassName('FQCN');
-        $classDescriptionBuilder->setFilePath($filePath);
-
-        $classDescription = $classDescriptionBuilder->get();
-        $this->assertEquals($filePath, $classDescription->fullPath());
-    }
-
     public function test_it_should_create_interface(): void
     {
         $FQCN = 'HappyIsland';

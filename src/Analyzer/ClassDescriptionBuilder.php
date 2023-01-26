@@ -143,7 +143,6 @@ class ClassDescriptionBuilder
             $this->docBlock,
             $this->attributes
         );
-        $cd->setFullPath($this->filePath);
 
         return $cd;
     }
