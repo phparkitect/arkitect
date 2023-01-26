@@ -87,38 +87,6 @@ class ClassDescription
         return $this->FQCN->toString();
     }
 
-    public function dependsOnClass(string $pattern): bool
-    {
-        $depends = function (ClassDependency $dependency) use ($pattern): bool {
-            return $dependency->getFQCN()->matches($pattern);
-        };
-
-        return (bool) \count(array_filter($this->dependencies, $depends));
-    }
-
-    public function dependsOnNamespace(string $pattern): bool
-    {
-        $depends = function (ClassDependency $dependency) use ($pattern): bool {
-            return $dependency->getFQCN()->namespaceMatches($pattern);
-        };
-
-        return (bool) \count(array_filter($this->dependencies, $depends));
-    }
-
-    public function dependsOn(string $pattern): bool
-    {
-        $depends = function (ClassDependency $dependency) use ($pattern): bool {
-            return $dependency->matches($pattern);
-        };
-
-        return (bool) \count(array_filter($this->dependencies, $depends));
-    }
-
-    public function nameMatches(string $pattern): bool
-    {
-        return $this->FQCN->classMatches($pattern);
-    }
-
     public function namespaceMatches(string $pattern): bool
     {
         return $this->FQCN->matches($pattern);
@@ -133,11 +101,6 @@ class ClassDescription
         }
 
         return false;
-    }
-
-    public function fullPath(): string
-    {
-        return $this->fullPath;
     }
 
     /**
