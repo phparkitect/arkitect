@@ -62,7 +62,7 @@ class ClassDescription
 
     public static function build(string $FQCN): ClassDescriptionBuilder
     {
-        $cb = ClassDescriptionBuilder::create();
+        $cb = new ClassDescriptionBuilder();
         $cb->setClassName($FQCN);
 
         return $cb;

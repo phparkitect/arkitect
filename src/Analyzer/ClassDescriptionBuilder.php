@@ -8,77 +8,31 @@ use Webmozart\Assert\Assert;
 class ClassDescriptionBuilder
 {
     /** @var list<ClassDependency> */
-    private $classDependencies;
+    private $classDependencies = [];
 
     /** @var ?FullyQualifiedClassName */
-    private $FQCN;
+    private $FQCN = null;
 
     /** @var list<FullyQualifiedClassName> */
-    private $interfaces;
+    private $interfaces = [];
 
     /** @var ?FullyQualifiedClassName */
-    private $extend;
-
-    /** @var string */
-    private $filePath;
+    private $extend = null;
 
     /** @var bool */
-    private $final;
+    private $final = false;
 
     /** @var bool */
-    private $abstract;
+    private $abstract = false;
 
     /** @var list<string> */
-    private $docBlock;
+    private $docBlock = [];
 
     /** @var list<FullyQualifiedClassName> */
-    private $attributes;
+    private $attributes = [];
 
     /** @var bool */
-    private $interface;
-
-    /**
-     * @param list<ClassDependency>         $classDependencies
-     * @param list<FullyQualifiedClassName> $interfaces
-     * @param list<FullyQualifiedClassName> $attributes
-     * @param ?FullyQualifiedClassName      $FQCN
-     */
-    private function __construct(
-        ?FullyQualifiedClassName $FQCN,
-        string $filePath,
-        array $classDependencies,
-        array $interfaces,
-        bool $final,
-        bool $abstract,
-        bool $interface,
-        array $docBlock = [],
-        array $attributes = []
-    ) {
-        $this->FQCN = $FQCN;
-        $this->filePath = $filePath;
-        $this->classDependencies = $classDependencies;
-        $this->interfaces = $interfaces;
-        $this->final = $final;
-        $this->abstract = $abstract;
-        $this->docBlock = $docBlock;
-        $this->attributes = $attributes;
-        $this->interface = $interface;
-    }
-
-    public static function create(): self
-    {
-        return new self(
-            null,
-            '',
-            [],
-            [],
-            false,
-            false,
-            false,
-            [],
-            []
-        );
-    }
+    private $interface = false;
 
     public function setClassName(string $FQCN): void
     {
@@ -88,7 +42,6 @@ class ClassDescriptionBuilder
     public function clear(): void
     {
         $this->FQCN = null;
-        $this->filePath = '';
         $this->classDependencies = [];
         $this->interfaces = [];
         $this->final = false;
@@ -96,13 +49,6 @@ class ClassDescriptionBuilder
         $this->docBlock = [];
         $this->attributes = [];
         $this->interface = false;
-    }
-
-    public function setFilePath(string $filePath): self
-    {
-        $this->filePath = $filePath;
-
-        return $this;
     }
 
     public function addInterface(string $FQCN, int $line): self
@@ -132,7 +78,7 @@ class ClassDescriptionBuilder
     {
         Assert::notNull($this->FQCN);
 
-        $cd = new ClassDescription(
+        return new ClassDescription(
             $this->FQCN,
             $this->classDependencies,
             $this->interfaces,
@@ -143,8 +89,6 @@ class ClassDescriptionBuilder
             $this->docBlock,
             $this->attributes
         );
-
-        return $cd;
     }
 
     public function setFinal(bool $final): self

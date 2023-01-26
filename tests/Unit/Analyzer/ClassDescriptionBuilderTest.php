@@ -111,7 +111,7 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_add_attributes(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = ClassDescriptionBuilder::create();
+        $classDescriptionBuilder = new ClassDescriptionBuilder();
         $classDescriptionBuilder->setClassName($FQCN);
         $classDescriptionBuilder->addAttribute('AttrClass', 27);
 
@@ -126,7 +126,7 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_create_interface(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = ClassDescriptionBuilder::create();
+        $classDescriptionBuilder = new ClassDescriptionBuilder();
         $classDescriptionBuilder->setClassName($FQCN);
         $classDescriptionBuilder->setInterface(true);
 
@@ -140,7 +140,7 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_create_not_interface(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = ClassDescriptionBuilder::create();
+        $classDescriptionBuilder = new ClassDescriptionBuilder();
         $classDescriptionBuilder->setClassName($FQCN);
         $classDescriptionBuilder->setInterface(false);
 
