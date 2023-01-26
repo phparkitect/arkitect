@@ -42,14 +42,11 @@ class PatternString
 
     private function containsWildcard(string $pattern): bool
     {
-        $wildcards = ['*', '?', '.', '[', '('];
-        foreach ($wildcards as $wildcard) {
-            if (str_contains($pattern, $wildcard)) {
-                return true;
-            }
-        }
-
-        return false;
+        return
+            str_contains($pattern, '*') ||
+            str_contains($pattern, '?') ||
+            str_contains($pattern, '.') ||
+            str_contains($pattern, '[');
     }
 
     private function startsWithPattern(string $pattern): bool
