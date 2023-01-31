@@ -44,6 +44,7 @@ class ClassDescriptionBuilder
         $this->FQCN = null;
         $this->classDependencies = [];
         $this->interfaces = [];
+        $this->extend = null;
         $this->final = false;
         $this->abstract = false;
         $this->docBlock = [];
