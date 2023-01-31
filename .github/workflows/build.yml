@@ -9,10 +9,10 @@ on:
 
 jobs:
   build:
-    runs-on: "ubuntu-20.04"
+    runs-on: "ubuntu-22.04"
     strategy:
       matrix:
-        php-versions: [ '7.1', '7.2', '7.3', '7.4', '8.0', '8.1']
+        php-versions: [ '7.1', '7.2', '7.3', '7.4', '8.0', '8.1', '8.2']
         coverage-driver: [ 'pcov' ]
 
     steps:
@@ -165,3 +165,4 @@ jobs:
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+
