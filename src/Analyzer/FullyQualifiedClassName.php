@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
 
+use Arkitect\Exceptions\InvalidPatternException;
+
 class FullyQualifiedClassName
 {
     /** @var PatternString */
@@ -28,11 +30,19 @@ class FullyQualifiedClassName
 
     public function classMatches(string $pattern): bool
     {
+        if ($this->isNotAValidPattern($pattern)) {
+            throw new InvalidPatternException("'$pattern' is not a valid class or namespace pattern. Regex are not allowed, only * and ? wildcard.");
+        }
+
         return $this->class->matches($pattern);
     }
 
     public function matches(string $pattern): bool
     {
+        if ($this->isNotAValidPattern($pattern)) {
+            throw new InvalidPatternException("'$pattern' is not a valid class or namespace pattern. Regex are not allowed, only * and ? wildcard.");
+        }
+
         return $this->fqcnString->matches($pattern);
     }
 
@@ -60,5 +70,10 @@ class FullyQualifiedClassName
         $namespace = implode('\\', $piecesWithoutEmpty);
 
         return new self(new PatternString($fqcn), new PatternString($namespace), new PatternString($className));
+    }
+
+    public function isNotAValidPattern(string $pattern): bool
+    {
+        return 0 === preg_match('/^([A-Za-z]|\\\\|\*|\?)*$/', $pattern);
     }
 }
