@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\ForClasses\Extend;
 use Arkitect\Rules\Violations;
@@ -12,6 +13,22 @@ use PHPUnit\Framework\TestCase;
 
 class ExtendTest extends TestCase
 {
+    public function test_it_should_return_no_violation_on_success(): void
+    {
+        $extend = new Extend('My\BaseClass');
+
+        $builder = new ClassDescriptionBuilder();
+        $builder->setClassName('My\Class');
+        $builder->setExtends('My\BaseClass', 10);
+
+        $classDescription = $builder->get();
+
+        $violations = new Violations();
+        $extend->evaluate($classDescription, $violations, 'because');
+
+        self::assertEquals(0, $violations->count());
+    }
+
     public function test_it_should_return_violation_error(): void
     {
         $extend = new Extend('My\BaseClass');
