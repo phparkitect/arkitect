@@ -16,7 +16,7 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
     {
         $dependOnClasses = new DependsOnlyOnTheseNamespaces('myNamespace');
 
-        $classDescription = ClassDescription::build('HappyIsland\Myclass')->build();
+        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass')->build();
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
         $dependOnClasses->evaluate($classDescription, $violations, $because);
@@ -32,7 +32,7 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
     {
         $dependOnClasses = new DependsOnlyOnTheseNamespaces('myNamespace');
 
-        $classDescription = ClassDescription::build('HappyIsland\Myclass')
+        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass')
             ->addDependency(new ClassDependency('myNamespace\Banana', 0))
             ->addDependency(new ClassDependency('anotherNamespace\Banana', 1))
             ->build();
@@ -52,7 +52,7 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
     {
         $dependOnClasses = new DependsOnlyOnTheseNamespaces('myNamespace');
 
-        $classDescription = ClassDescription::build('HappyIsland\Myclass')
+        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass')
             ->addDependency(new ClassDependency('myNamespace\Banana', 0))
             ->addDependency(new ClassDependency('\anotherNamespace\Banana', 1))
             ->addDependency(new ClassDependency('\DateTime', 10))
@@ -70,7 +70,7 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
     {
         $dependOnClasses = new DependsOnlyOnTheseNamespaces('myNamespace');
 
-        $classDescription = ClassDescription::build('HappyIsland\Myclass')
+        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass')
             ->addDependency(new ClassDependency('myNamespace\Banana', 0))
             ->addDependency(new ClassDependency('myNamespace\Mango', 10))
             ->build();
@@ -86,7 +86,7 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
     {
         $dependOnClasses = new DependsOnlyOnTheseNamespaces();
 
-        $classDescription = ClassDescription::build('HappyIsland\Myclass')
+        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass')
             ->addDependency(new ClassDependency('HappyIsland\Banana', 0))
             ->addDependency(new ClassDependency('myNamespace\Mango', 10))
             ->build();

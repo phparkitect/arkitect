@@ -15,7 +15,7 @@ class ClassDescriptionTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->builder = ClassDescription::build('Fruit\Banana');
+        $this->builder = ClassDescription::getBuilder('Fruit\Banana');
     }
 
     public function test_should_return_true_if_there_class_is_in_namespace(): void

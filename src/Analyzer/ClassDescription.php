@@ -60,7 +60,7 @@ class ClassDescription
         $this->interface = $interface;
     }
 
-    public static function build(string $FQCN): ClassDescriptionBuilder
+    public static function getBuilder(string $FQCN): ClassDescriptionBuilder
     {
         $cb = new ClassDescriptionBuilder();
         $cb->setClassName($FQCN);
