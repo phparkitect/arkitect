@@ -21,7 +21,7 @@ class ExtendTest extends TestCase
         $builder->setClassName('My\Class');
         $builder->setExtends('My\BaseClass', 10);
 
-        $classDescription = $builder->get();
+        $classDescription = $builder->build();
 
         $violations = new Violations();
         $extend->evaluate($classDescription, $violations, 'because');

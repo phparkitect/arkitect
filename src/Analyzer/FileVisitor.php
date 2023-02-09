@@ -205,17 +205,17 @@ class FileVisitor extends NodeVisitorAbstract
     public function leaveNode(Node $node): void
     {
         if ($node instanceof Node\Stmt\Class_ && !$node->isAnonymous()) {
-            $this->classDescriptions[] = $this->classDescriptionBuilder->get();
+            $this->classDescriptions[] = $this->classDescriptionBuilder->build();
             $this->classDescriptionBuilder->clear();
         }
 
         if ($node instanceof Node\Stmt\Enum_) {
-            $this->classDescriptions[] = $this->classDescriptionBuilder->get();
+            $this->classDescriptions[] = $this->classDescriptionBuilder->build();
             $this->classDescriptionBuilder->clear();
         }
 
         if ($node instanceof Node\Stmt\Interface_) {
-            $this->classDescriptions[] = $this->classDescriptionBuilder->get();
+            $this->classDescriptions[] = $this->classDescriptionBuilder->build();
             $this->classDescriptionBuilder->clear();
         }
     }

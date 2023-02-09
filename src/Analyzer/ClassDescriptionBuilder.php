@@ -74,7 +74,7 @@ class ClassDescriptionBuilder
         return $this;
     }
 
-    public function get(): ClassDescription
+    public function build(): ClassDescription
     {
         Assert::notNull($this->FQCN, 'You must set an FQCN');
 

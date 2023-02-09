@@ -20,21 +20,21 @@ class ClassDescriptionTest extends TestCase
 
     public function test_should_return_true_if_there_class_is_in_namespace(): void
     {
-        $cd = $this->builder->get();
+        $cd = $this->builder->build();
 
         $this->assertTrue($cd->namespaceMatches('Fruit'));
     }
 
     public function test_should_return_name(): void
     {
-        $cd = $this->builder->get();
+        $cd = $this->builder->build();
 
         $this->assertEquals('Banana', $cd->getName());
     }
 
     public function test_should_return_true_if_there_class_is_in_namespace_array(): void
     {
-        $cd = $this->builder->get();
+        $cd = $this->builder->build();
 
         $this->assertTrue($cd->namespaceMatchesOneOfTheseNamespaces(['Fruit']));
     }
@@ -45,7 +45,7 @@ class ClassDescriptionTest extends TestCase
             ->addDocBlock('/**
  * @psalm-immutable
  */')
-            ->get();
+            ->build();
 
         $this->assertTrue($cd->containsDocBlock('@psalm-immutable'));
     }
@@ -56,7 +56,7 @@ class ClassDescriptionTest extends TestCase
             ->addDocBlock('/**
  * @psalm-immutable
  */')
-            ->get();
+            ->build();
 
         $this->assertFalse($cd->containsDocBlock('@another-annotation'));
     }
@@ -65,7 +65,7 @@ class ClassDescriptionTest extends TestCase
     {
         $cd = $this->builder
             ->addAttribute('FooAttr', 27)
-            ->get();
+            ->build();
 
         self::assertTrue($cd->hasAttribute('FooAttr'));
         self::assertTrue($cd->hasAttribute('Foo*'));
@@ -75,7 +75,7 @@ class ClassDescriptionTest extends TestCase
     {
         $cd = $this->builder
             ->addAttribute('FooAttr', 27)
-            ->get();
+            ->build();
 
         self::assertFalse($cd->hasAttribute('Bar'));
     }

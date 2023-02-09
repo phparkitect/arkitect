@@ -16,7 +16,7 @@ class NotDependsOnTheseNamespacesTest extends TestCase
     {
         $notDependOnClasses = new NotDependsOnTheseNamespaces('myNamespace');
 
-        $classDescription = ClassDescription::build('HappyIsland\Myclass')->get();
+        $classDescription = ClassDescription::build('HappyIsland\Myclass')->build();
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
         $notDependOnClasses->evaluate($classDescription, $violations, $because);
@@ -31,7 +31,7 @@ class NotDependsOnTheseNamespacesTest extends TestCase
         $classDescription = ClassDescription::build('HappyIsland\Myclass')
             ->addDependency(new ClassDependency('myNamespace\Banana', 0))
             ->addDependency(new ClassDependency('anotherNamespace\Banana', 1))
-            ->get();
+            ->build();
 
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
@@ -52,7 +52,7 @@ class NotDependsOnTheseNamespacesTest extends TestCase
             ->addDependency(new ClassDependency('myNamespace\Banana', 0))
             ->addDependency(new ClassDependency('\anotherNamespace\Banana', 1))
             ->addDependency(new ClassDependency('\DateTime', 10))
-            ->get();
+            ->build();
 
         $violations = new Violations();
         $because = 'we want to add this rule for our software';
@@ -72,7 +72,7 @@ class NotDependsOnTheseNamespacesTest extends TestCase
         $classDescription = ClassDescription::build('HappyIsland\Myclass')
             ->addDependency(new ClassDependency('myNamespace\Banana', 0))
             ->addDependency(new ClassDependency('myNamespace\Mango', 10))
-            ->get();
+            ->build();
 
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
