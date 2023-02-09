@@ -17,11 +17,10 @@ class ExtendTest extends TestCase
     {
         $extend = new Extend('My\BaseClass');
 
-        $builder = new ClassDescriptionBuilder();
-        $builder->setClassName('My\Class');
-        $builder->setExtends('My\BaseClass', 10);
-
-        $classDescription = $builder->build();
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('My\Class')
+            ->setExtends('My\BaseClass', 10)
+            ->build();
 
         $violations = new Violations();
         $extend->evaluate($classDescription, $violations, 'because');
@@ -29,7 +28,7 @@ class ExtendTest extends TestCase
         self::assertEquals(0, $violations->count());
     }
 
-    public function test_it_should_return_violation_error(): void
+    public function test_it_should_return_violation_error_when_class_not_extend(): void
     {
         $extend = new Extend('My\BaseClass');
 
