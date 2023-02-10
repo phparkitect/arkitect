@@ -14,7 +14,7 @@ class NotHaveNameMatchingTest extends TestCase
     {
         $expression = new NotHaveNameMatching('*Class');
 
-        $myClass = ClassDescription::build('\App\MyClass')->get();
+        $myClass = ClassDescription::getBuilder('\App\MyClass')->build();
 
         $violations = new Violations();
         $because = 'we want to add this rule for our software';
@@ -30,7 +30,7 @@ class NotHaveNameMatchingTest extends TestCase
     {
         $expression = new NotHaveNameMatching('*GoodName*');
 
-        $badClass = ClassDescription::build('\App\BadNameClass')->get();
+        $badClass = ClassDescription::getBuilder('\App\BadNameClass')->build();
 
         $because = 'we want to add this rule for our software';
         $violations = new Violations();

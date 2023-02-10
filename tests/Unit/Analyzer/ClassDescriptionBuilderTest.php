@@ -23,7 +23,7 @@ class ClassDescriptionBuilderTest extends TestCase
         $classDescriptionBuilder->addDependency($classDependency);
         $classDescriptionBuilder->addInterface('InterfaceClass', 10);
 
-        $classDescription = $classDescriptionBuilder->get();
+        $classDescription = $classDescriptionBuilder->build();
 
         $this->assertInstanceOf(ClassDescription::class, $classDescription);
 
@@ -38,7 +38,7 @@ class ClassDescriptionBuilderTest extends TestCase
         $classDescriptionBuilder->setClassName($FQCN);
         $classDescriptionBuilder->setFinal(true);
 
-        $classDescription = $classDescriptionBuilder->get();
+        $classDescription = $classDescriptionBuilder->build();
 
         $this->assertInstanceOf(ClassDescription::class, $classDescription);
 
@@ -52,7 +52,7 @@ class ClassDescriptionBuilderTest extends TestCase
         $classDescriptionBuilder->setClassName($FQCN);
         $classDescriptionBuilder->setFinal(false);
 
-        $classDescription = $classDescriptionBuilder->get();
+        $classDescription = $classDescriptionBuilder->build();
 
         $this->assertInstanceOf(ClassDescription::class, $classDescription);
 
@@ -66,7 +66,7 @@ class ClassDescriptionBuilderTest extends TestCase
         $classDescriptionBuilder->setClassName($FQCN);
         $classDescriptionBuilder->setAbstract(true);
 
-        $classDescription = $classDescriptionBuilder->get();
+        $classDescription = $classDescriptionBuilder->build();
 
         $this->assertInstanceOf(ClassDescription::class, $classDescription);
 
@@ -80,7 +80,7 @@ class ClassDescriptionBuilderTest extends TestCase
         $classDescriptionBuilder->setClassName($FQCN);
         $classDescriptionBuilder->setAbstract(false);
 
-        $classDescription = $classDescriptionBuilder->get();
+        $classDescription = $classDescriptionBuilder->build();
 
         $this->assertInstanceOf(ClassDescription::class, $classDescription);
 
@@ -96,7 +96,7 @@ class ClassDescriptionBuilderTest extends TestCase
  * @psalm-immutable
  */');
 
-        $classDescription = $classDescriptionBuilder->get();
+        $classDescription = $classDescriptionBuilder->build();
 
         $this->assertInstanceOf(ClassDescription::class, $classDescription);
 
@@ -115,7 +115,7 @@ class ClassDescriptionBuilderTest extends TestCase
         $classDescriptionBuilder->setClassName($FQCN);
         $classDescriptionBuilder->addAttribute('AttrClass', 27);
 
-        $classDescription = $classDescriptionBuilder->get();
+        $classDescription = $classDescriptionBuilder->build();
 
         self::assertEquals(
             [FullyQualifiedClassName::fromString('AttrClass')],
@@ -130,7 +130,7 @@ class ClassDescriptionBuilderTest extends TestCase
         $classDescriptionBuilder->setClassName($FQCN);
         $classDescriptionBuilder->setInterface(true);
 
-        $classDescription = $classDescriptionBuilder->get();
+        $classDescription = $classDescriptionBuilder->build();
 
         $this->assertInstanceOf(ClassDescription::class, $classDescription);
 
@@ -144,7 +144,7 @@ class ClassDescriptionBuilderTest extends TestCase
         $classDescriptionBuilder->setClassName($FQCN);
         $classDescriptionBuilder->setInterface(false);
 
-        $classDescription = $classDescriptionBuilder->get();
+        $classDescription = $classDescriptionBuilder->build();
 
         $this->assertInstanceOf(ClassDescription::class, $classDescription);
 

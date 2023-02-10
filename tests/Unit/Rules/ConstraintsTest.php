@@ -38,7 +38,7 @@ class ConstraintsTest extends TestCase
         $cb->setClassName('Banana');
 
         $expressionStore->checkAll(
-            $cb->get(),
+            $cb->build(),
             $violations,
             $because
         );
@@ -74,7 +74,7 @@ class ConstraintsTest extends TestCase
         $cb->setClassName('Banana');
 
         $expressionStore->checkAll(
-            $cb->get(),
+            $cb->build(),
             $violations,
             $because
         );

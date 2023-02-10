@@ -89,7 +89,7 @@ class FakeParser implements Parser
 
     public function getClassDescriptions(): array
     {
-        return [ClassDescription::build('uno')->get()];
+        return [ClassDescription::getBuilder('uno')->build()];
     }
 
     public function getParsingErrors(): array

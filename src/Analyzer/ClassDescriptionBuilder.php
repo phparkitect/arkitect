@@ -34,11 +34,6 @@ class ClassDescriptionBuilder
     /** @var bool */
     private $interface = false;
 
-    public function setClassName(string $FQCN): void
-    {
-        $this->FQCN = FullyQualifiedClassName::fromString($FQCN);
-    }
-
     public function clear(): void
     {
         $this->FQCN = null;
@@ -50,6 +45,13 @@ class ClassDescriptionBuilder
         $this->docBlock = [];
         $this->attributes = [];
         $this->interface = false;
+    }
+
+    public function setClassName(string $FQCN): self
+    {
+        $this->FQCN = FullyQualifiedClassName::fromString($FQCN);
+
+        return $this;
     }
 
     public function addInterface(string $FQCN, int $line): self
@@ -73,23 +75,6 @@ class ClassDescriptionBuilder
         $this->extend = FullyQualifiedClassName::fromString($FQCN);
 
         return $this;
-    }
-
-    public function get(): ClassDescription
-    {
-        Assert::notNull($this->FQCN);
-
-        return new ClassDescription(
-            $this->FQCN,
-            $this->classDependencies,
-            $this->interfaces,
-            $this->extend,
-            $this->final,
-            $this->abstract,
-            $this->interface,
-            $this->docBlock,
-            $this->attributes
-        );
     }
 
     public function setFinal(bool $final): self
@@ -126,5 +111,22 @@ class ClassDescriptionBuilder
         $this->attributes[] = FullyQualifiedClassName::fromString($FQCN);
 
         return $this;
+    }
+
+    public function build(): ClassDescription
+    {
+        Assert::notNull($this->FQCN, 'You must set an FQCN');
+
+        return new ClassDescription(
+            $this->FQCN,
+            $this->classDependencies,
+            $this->interfaces,
+            $this->extend,
+            $this->final,
+            $this->abstract,
+            $this->interface,
+            $this->docBlock,
+            $this->attributes
+        );
     }
 }
