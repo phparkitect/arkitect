@@ -14,6 +14,7 @@ use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\Stmt;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\NodeVisitorAbstract;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\ConstExprParser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
@@ -131,21 +132,11 @@ class NameResolver extends NodeVisitorAbstract
             }
             $this->resolveAttrGroups($node);
 
-            $lexer = new Lexer();
-            $typeParser = new TypeParser();
-            $constExprParser = new ConstExprParser();
-            $phpDocParser = new PhpDocParser($typeParser, $constExprParser);
+            $phpDocNode = $this->getPhpDocNode($node);
 
-            if (null === $node->getDocComment()) {
+            if (null === $phpDocNode) {
                 return;
             }
-
-            /** @var Doc $docComment */
-            $docComment = $node->getDocComment();
-
-            $tokens = $lexer->tokenize($docComment->getText());
-            $tokenIterator = new TokenIterator($tokens);
-            $phpDocNode = $phpDocParser->parse($tokenIterator);
 
             foreach ($phpDocNode->getVarTagValues() as $tagValue) {
                 $type = $this->resolveName(new Node\Name((string) $tagValue->type), Use_::TYPE_NORMAL);
@@ -340,5 +331,25 @@ class NameResolver extends NodeVisitorAbstract
         }
 
         return $node;
+    }
+
+    private function getPhpDocNode(Stmt\Property $node): ?PhpDocNode
+    {
+        if (null === $node->getDocComment()) {
+            return null;
+        }
+
+        $lexer = new Lexer();
+        $typeParser = new TypeParser();
+        $constExprParser = new ConstExprParser();
+        $phpDocParser = new PhpDocParser($typeParser, $constExprParser);
+
+        /** @var Doc $docComment */
+        $docComment = $node->getDocComment();
+
+        $tokens = $lexer->tokenize($docComment->getText());
+        $tokenIterator = new TokenIterator($tokens);
+
+        return $phpDocParser->parse($tokenIterator);
     }
 }
