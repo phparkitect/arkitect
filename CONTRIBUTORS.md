@@ -3,8 +3,8 @@
 Shout out to our top contributors!
 
 - [AlessandroMinoccheri](https://api.github.com/users/AlessandroMinoccheri)
-- [micheleorselli](https://api.github.com/users/micheleorselli)
 - [fain182](https://api.github.com/users/fain182)
+- [micheleorselli](https://api.github.com/users/micheleorselli)
 - [pfazzi](https://api.github.com/users/pfazzi)
 - [github-actions[bot]](https://api.github.com/users/github-actions%5Bbot%5D)
 - [ricfio](https://api.github.com/users/ricfio)
