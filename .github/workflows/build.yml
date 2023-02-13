@@ -23,6 +23,8 @@ jobs:
       with:
         php-version: ${{ matrix.php-versions }}
         tools: composer:v2.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
 
     - name: Validate composer.json and composer.lock
       run: composer validate
