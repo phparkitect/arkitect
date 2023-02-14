@@ -135,4 +135,49 @@ App\Controller\Foo has 1 violations
             $violation2,
         ], $this->violationStore->toArray());
     }
+
+    public function test_sort(): void
+    {
+        $violationStore = new Violations();
+        $violation1 = new Violation(
+            'App\Controller\Shop',
+            'AAA',
+            20
+        );
+        $violation2 = new Violation(
+            'App\Controller\Shop',
+            'BBB',
+            10
+        );
+        $violation3 = new Violation(
+            'App\Controller\Shop',
+            'AAA',
+            10
+        );
+        $violation4 = new Violation(
+            'App\Controller\Abc',
+            'CCC',
+            30
+        );
+        $violationStore->add($violation1);
+        $violationStore->add($violation2);
+        $violationStore->add($violation3);
+        $violationStore->add($violation4);
+
+        $this->assertEquals([
+            $violation1,
+            $violation2,
+            $violation3,
+            $violation4,
+        ], $violationStore->toArray());
+
+        $violationStore->sort();
+
+        $this->assertSame([
+            $violation4, // fqcn is most important
+            $violation3, // then line number
+            $violation2, // then error message
+            $violation1,
+        ], $violationStore->toArray());
+    }
 }

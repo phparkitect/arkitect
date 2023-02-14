@@ -117,6 +117,13 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
         ));
     }
 
+    public function sort(): void
+    {
+        usort($this->violations, static function (Violation $v1, Violation $v2): int {
+            return $v1 <=> $v2;
+        });
+    }
+
     public function jsonSerialize(): array
     {
         return get_object_vars($this);
