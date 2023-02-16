@@ -28,6 +28,21 @@ class ExtendTest extends TestCase
         self::assertEquals(0, $violations->count());
     }
 
+    public function test_it_should_work_with_wildcards(): void
+    {
+        $extend = new Extend('My\*');
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('My\Class')
+            ->setExtends('My\BaseClass', 10)
+            ->build();
+
+        $violations = new Violations();
+        $extend->evaluate($classDescription, $violations, 'because');
+
+        self::assertEquals(0, $violations->count());
+    }
+
     public function test_it_should_return_violation_error_when_argument_is_a_regex(): void
     {
         $extend = new Extend('App\Providers\(Auth|Event|Route|Horizon)ServiceProvider');
