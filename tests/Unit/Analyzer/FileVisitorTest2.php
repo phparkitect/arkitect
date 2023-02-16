@@ -23,9 +23,11 @@ use Application\MyDto;
 class MyClass
 {
     /**
-     * @var array<int, MyDto>
+     * @param array<int, MyDto> $dtoList
      */
-    private array $dtoList;
+    public function __construct(array $dtoList)
+    {
+    }
 }
 EOF;
 

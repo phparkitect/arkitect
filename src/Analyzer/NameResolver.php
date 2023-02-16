@@ -13,10 +13,12 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\Stmt;
 use PhpParser\Node\Stmt\Use_;
+use PhpParser\NodeAbstract;
 use PhpParser\NodeVisitorAbstract;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\ConstExprParser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
@@ -140,21 +142,11 @@ class NameResolver extends NodeVisitorAbstract
                 return;
             }
 
-            if (null !== $node->type && isset($node->type->name) && 'array' === $node->type->name) {
+            if ($this->isNodeOfTypeArray($node)) {
                 $arrayItemType = null;
 
                 foreach ($phpDocNode->getVarTagValues() as $tagValue) {
-                    if ($tagValue->type instanceof GenericTypeNode) {
-                        if (1 === \count($tagValue->type->genericTypes)) {
-                            $arrayItemType = (string) $tagValue->type->genericTypes[0];
-                        } elseif (2 === \count($tagValue->type->genericTypes)) {
-                            $arrayItemType = (string) $tagValue->type->genericTypes[1];
-                        }
-                    }
-
-                    if ($tagValue->type instanceof ArrayTypeNode) {
-                        $arrayItemType = (string) $tagValue->type->type;
-                    }
+                    $arrayItemType = $this->getArrayItemType($tagValue->type);
                 }
 
                 if (null !== $arrayItemType) {
@@ -324,10 +316,25 @@ class NameResolver extends NodeVisitorAbstract
     /** @param Stmt\Function_|Stmt\ClassMethod|Expr\Closure|Expr\ArrowFunction $node */
     private function resolveSignature($node): void
     {
+        $phpDocNode = $this->getPhpDocNode($node);
+
         foreach ($node->params as $param) {
             $param->type = $this->resolveType($param->type);
             $this->resolveAttrGroups($param);
+
+            if ($this->isNodeOfTypeArray($param) && null !== $phpDocNode) {
+                foreach ($phpDocNode->getParamTagValues() as $phpDocParam) {
+                    if ($param->var instanceof Expr\Variable && \is_string($param->var->name) && $phpDocParam->parameterName === ('$'.$param->var->name)) {
+                        $arrayItemType = $this->getArrayItemType($phpDocParam->type);
+
+                        if (null !== $arrayItemType) {
+                            $param->type = $this->resolveName(new Node\Name($arrayItemType), Use_::TYPE_NORMAL);
+                        }
+                    }
+                }
+            }
         }
+
         $node->returnType = $this->resolveType($node->returnType);
     }
 
@@ -359,7 +366,7 @@ class NameResolver extends NodeVisitorAbstract
         return $node;
     }
 
-    private function getPhpDocNode(Stmt\Property $node): ?PhpDocNode
+    private function getPhpDocNode(NodeAbstract $node): ?PhpDocNode
     {
         if (null === $node->getDocComment()) {
             return null;
@@ -377,5 +384,30 @@ class NameResolver extends NodeVisitorAbstract
         $tokenIterator = new TokenIterator($tokens);
 
         return $phpDocParser->parse($tokenIterator);
+    }
+
+    /**
+     * @param Node\Param|Stmt\Property $node
+     */
+    private function isNodeOfTypeArray($node): bool
+    {
+        return null !== $node->type && isset($node->type->name) && 'array' === $node->type->name;
+    }
+
+    private function getArrayItemType(TypeNode $typeNode): ?string
+    {
+        if ($typeNode instanceof GenericTypeNode) {
+            if (1 === \count($typeNode->genericTypes)) {
+                return (string) $typeNode->genericTypes[0];
+            } elseif (2 === \count($typeNode->genericTypes)) {
+                return (string) $typeNode->genericTypes[1];
+            }
+        }
+
+        if ($typeNode instanceof ArrayTypeNode) {
+            return (string) $typeNode->type;
+        }
+
+        return null;
     }
 }
