@@ -30,11 +30,11 @@ class ExtendTest extends TestCase
 
     public function test_it_should_work_with_wildcards(): void
     {
-        $extend = new Extend('My\*');
+        $extend = new Extend('My\B14*');
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setClassName('My\Class')
-            ->setExtends('My\BaseClass', 10)
+            ->setExtends('My\B14Class', 10)
             ->build();
 
         $violations = new Violations();

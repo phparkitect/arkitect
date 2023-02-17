@@ -74,6 +74,6 @@ class FullyQualifiedClassName
 
     public function isNotAValidPattern(string $pattern): bool
     {
-        return 0 === preg_match('/^([A-Za-z]|\\\\|\*|\?)*$/', $pattern);
+        return 0 === preg_match('/^([A-Za-z0-9]|\\\\|\*|\?)*$/', $pattern);
     }
 }
