@@ -336,6 +336,18 @@ class NameResolver extends NodeVisitorAbstract
         }
 
         $node->returnType = $this->resolveType($node->returnType);
+
+        if ($node->returnType instanceof Node\Identifier && 'array' === $node->returnType->name && null !== $phpDocNode) {
+            $arrayItemType = null;
+
+            foreach ($phpDocNode->getReturnTagValues() as $tagValue) {
+                $arrayItemType = $this->getArrayItemType($tagValue->type);
+            }
+
+            if (null !== $arrayItemType) {
+                $node->returnType = $this->resolveName(new Node\Name($arrayItemType), Use_::TYPE_NORMAL);
+            }
+        }
     }
 
     /**

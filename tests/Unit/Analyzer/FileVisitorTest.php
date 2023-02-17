@@ -1011,4 +1011,103 @@ EOF;
 
         $this->assertCount(1, $violations);
     }
+
+    public function test_it_handles_typed_arrays_in_return_type_with_generics_syntax(): void
+    {
+        $code = <<< 'EOF'
+<?php
+namespace Domain\Foo;
+
+use Application\MyDto;
+
+class MyClass
+{
+    /**
+     * @return array<int, MyDto>
+     */
+    public function getList(): array
+    {
+        return [];
+    }
+}
+EOF;
+
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
+        $fp->parse($code, 'relativePathName');
+        $cd = $fp->getClassDescriptions();
+
+        $violations = new Violations();
+
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Domain');
+        $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+
+        $this->assertCount(1, $violations);
+    }
+
+    public function test_it_handles_typed_arrays_in_return_type_with_list_syntax(): void
+    {
+        $code = <<< 'EOF'
+<?php
+namespace Domain\Foo;
+
+use Application\MyDto;
+
+class MyClass
+{
+    /**
+     * @return list<MyDto>
+     */
+    public function getList(): array
+    {
+        return [];
+    }
+}
+EOF;
+
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
+        $fp->parse($code, 'relativePathName');
+        $cd = $fp->getClassDescriptions();
+
+        $violations = new Violations();
+
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Domain');
+        $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+
+        $this->assertCount(1, $violations);
+    }
+
+    public function test_it_handles_typed_arrays_in_return_type_with_legacy_syntax(): void
+    {
+        $code = <<< 'EOF'
+<?php
+namespace Domain\Foo;
+
+use Application\MyDto;
+
+class MyClass
+{
+    /**
+     * @return MyDto[]
+     */
+    public function getList(): array
+    {
+        return [];
+    }
+}
+EOF;
+
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
+        $fp->parse($code, 'relativePathName');
+        $cd = $fp->getClassDescriptions();
+
+        $violations = new Violations();
+
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Domain');
+        $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+
+        $this->assertCount(1, $violations);
+    }
 }
