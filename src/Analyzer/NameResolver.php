@@ -39,6 +39,12 @@ class NameResolver extends NodeVisitorAbstract
     /** @var bool Whether to parse DocBlock Custom Annotations */
     protected $parseCustomAnnotations;
 
+    /** @var PhpDocParser */
+    protected $phpDocParser;
+
+    /** @var Lexer */
+    protected $phpDocLexer;
+
     /**
      * Constructs a name resolution visitor.
      *
@@ -59,6 +65,11 @@ class NameResolver extends NodeVisitorAbstract
         $this->preserveOriginalNames = $options['preserveOriginalNames'] ?? false;
         $this->replaceNodes = $options['replaceNodes'] ?? true;
         $this->parseCustomAnnotations = $options['parseCustomAnnotations'] ?? true;
+
+        $typeParser = new TypeParser();
+        $constExprParser = new ConstExprParser();
+        $this->phpDocParser = new PhpDocParser($typeParser, $constExprParser);
+        $this->phpDocLexer = new Lexer();
     }
 
     /**
@@ -384,18 +395,13 @@ class NameResolver extends NodeVisitorAbstract
             return null;
         }
 
-        $lexer = new Lexer();
-        $typeParser = new TypeParser();
-        $constExprParser = new ConstExprParser();
-        $phpDocParser = new PhpDocParser($typeParser, $constExprParser);
-
         /** @var Doc $docComment */
         $docComment = $node->getDocComment();
 
-        $tokens = $lexer->tokenize($docComment->getText());
+        $tokens = $this->phpDocLexer->tokenize($docComment->getText());
         $tokenIterator = new TokenIterator($tokens);
 
-        return $phpDocParser->parse($tokenIterator);
+        return $this->phpDocParser->parse($tokenIterator);
     }
 
     /**
