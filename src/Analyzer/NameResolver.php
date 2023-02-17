@@ -414,18 +414,26 @@ class NameResolver extends NodeVisitorAbstract
 
     private function getArrayItemType(TypeNode $typeNode): ?string
     {
+        $arrayItemType = null;
+
         if ($typeNode instanceof GenericTypeNode) {
             if (1 === \count($typeNode->genericTypes)) {
-                return (string) $typeNode->genericTypes[0];
+                $arrayItemType = (string) $typeNode->genericTypes[0];
             } elseif (2 === \count($typeNode->genericTypes)) {
-                return (string) $typeNode->genericTypes[1];
+                $arrayItemType = (string) $typeNode->genericTypes[1];
             }
         }
 
         if ($typeNode instanceof ArrayTypeNode) {
-            return (string) $typeNode->type;
+            $arrayItemType = (string) $typeNode->type;
         }
 
-        return null;
+        $validFqcn = '/^[a-zA-Z_\x7f-\xff\\\\][a-zA-Z0-9_\x7f-\xff\\\\]*[a-zA-Z0-9_\x7f-\xff]$/';
+
+        if (null !== $arrayItemType && !(bool) preg_match($validFqcn, $arrayItemType)) {
+            return null;
+        }
+
+        return $arrayItemType;
     }
 }
