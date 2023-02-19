@@ -18,3 +18,4 @@ Shout out to our top contributors!
 - [mloru](https://api.github.com/users/mloru)
 - [smortexa](https://api.github.com/users/smortexa)
 - [DonCallisto](https://api.github.com/users/DonCallisto)
+- [sebastianstucke87](https://api.github.com/users/sebastianstucke87)
