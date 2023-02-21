@@ -418,13 +418,16 @@ class NameResolver extends NodeVisitorAbstract
 
         if ($typeNode instanceof GenericTypeNode) {
             if (1 === \count($typeNode->genericTypes)) {
+                // this handles list<ClassName>
                 $arrayItemType = (string) $typeNode->genericTypes[0];
             } elseif (2 === \count($typeNode->genericTypes)) {
+                // this handles array<int, ClassName>
                 $arrayItemType = (string) $typeNode->genericTypes[1];
             }
         }
 
         if ($typeNode instanceof ArrayTypeNode) {
+            // this handles ClassName[]
             $arrayItemType = (string) $typeNode->type;
         }
 
