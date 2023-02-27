@@ -13,7 +13,12 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\Stmt;
 use PhpParser\Node\Stmt\Use_;
+use PhpParser\NodeAbstract;
 use PhpParser\NodeVisitorAbstract;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
+use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\ConstExprParser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
@@ -33,6 +38,12 @@ class NameResolver extends NodeVisitorAbstract
 
     /** @var bool Whether to parse DocBlock Custom Annotations */
     protected $parseCustomAnnotations;
+
+    /** @var PhpDocParser */
+    protected $phpDocParser;
+
+    /** @var Lexer */
+    protected $phpDocLexer;
 
     /**
      * Constructs a name resolution visitor.
@@ -54,6 +65,11 @@ class NameResolver extends NodeVisitorAbstract
         $this->preserveOriginalNames = $options['preserveOriginalNames'] ?? false;
         $this->replaceNodes = $options['replaceNodes'] ?? true;
         $this->parseCustomAnnotations = $options['parseCustomAnnotations'] ?? true;
+
+        $typeParser = new TypeParser();
+        $constExprParser = new ConstExprParser();
+        $this->phpDocParser = new PhpDocParser($typeParser, $constExprParser);
+        $this->phpDocLexer = new Lexer();
     }
 
     /**
@@ -131,21 +147,25 @@ class NameResolver extends NodeVisitorAbstract
             }
             $this->resolveAttrGroups($node);
 
-            $lexer = new Lexer();
-            $typeParser = new TypeParser();
-            $constExprParser = new ConstExprParser();
-            $phpDocParser = new PhpDocParser($typeParser, $constExprParser);
+            $phpDocNode = $this->getPhpDocNode($node);
 
-            if (null === $node->getDocComment()) {
+            if (null === $phpDocNode) {
                 return;
             }
 
-            /** @var Doc $docComment */
-            $docComment = $node->getDocComment();
+            if ($this->isNodeOfTypeArray($node)) {
+                $arrayItemType = null;
 
-            $tokens = $lexer->tokenize($docComment->getText());
-            $tokenIterator = new TokenIterator($tokens);
-            $phpDocNode = $phpDocParser->parse($tokenIterator);
+                foreach ($phpDocNode->getVarTagValues() as $tagValue) {
+                    $arrayItemType = $this->getArrayItemType($tagValue->type);
+                }
+
+                if (null !== $arrayItemType) {
+                    $node->type = $this->resolveName(new Node\Name($arrayItemType), Use_::TYPE_NORMAL);
+
+                    return;
+                }
+            }
 
             foreach ($phpDocNode->getVarTagValues() as $tagValue) {
                 $type = $this->resolveName(new Node\Name((string) $tagValue->type), Use_::TYPE_NORMAL);
@@ -307,11 +327,38 @@ class NameResolver extends NodeVisitorAbstract
     /** @param Stmt\Function_|Stmt\ClassMethod|Expr\Closure|Expr\ArrowFunction $node */
     private function resolveSignature($node): void
     {
+        $phpDocNode = $this->getPhpDocNode($node);
+
         foreach ($node->params as $param) {
             $param->type = $this->resolveType($param->type);
             $this->resolveAttrGroups($param);
+
+            if ($this->isNodeOfTypeArray($param) && null !== $phpDocNode) {
+                foreach ($phpDocNode->getParamTagValues() as $phpDocParam) {
+                    if ($param->var instanceof Expr\Variable && \is_string($param->var->name) && $phpDocParam->parameterName === ('$'.$param->var->name)) {
+                        $arrayItemType = $this->getArrayItemType($phpDocParam->type);
+
+                        if (null !== $arrayItemType) {
+                            $param->type = $this->resolveName(new Node\Name($arrayItemType), Use_::TYPE_NORMAL);
+                        }
+                    }
+                }
+            }
         }
+
         $node->returnType = $this->resolveType($node->returnType);
+
+        if ($node->returnType instanceof Node\Identifier && 'array' === $node->returnType->name && null !== $phpDocNode) {
+            $arrayItemType = null;
+
+            foreach ($phpDocNode->getReturnTagValues() as $tagValue) {
+                $arrayItemType = $this->getArrayItemType($tagValue->type);
+            }
+
+            if (null !== $arrayItemType) {
+                $node->returnType = $this->resolveName(new Node\Name($arrayItemType), Use_::TYPE_NORMAL);
+            }
+        }
     }
 
     /**
@@ -340,5 +387,56 @@ class NameResolver extends NodeVisitorAbstract
         }
 
         return $node;
+    }
+
+    private function getPhpDocNode(NodeAbstract $node): ?PhpDocNode
+    {
+        if (null === $node->getDocComment()) {
+            return null;
+        }
+
+        /** @var Doc $docComment */
+        $docComment = $node->getDocComment();
+
+        $tokens = $this->phpDocLexer->tokenize($docComment->getText());
+        $tokenIterator = new TokenIterator($tokens);
+
+        return $this->phpDocParser->parse($tokenIterator);
+    }
+
+    /**
+     * @param Node\Param|Stmt\Property $node
+     */
+    private function isNodeOfTypeArray($node): bool
+    {
+        return null !== $node->type && isset($node->type->name) && 'array' === $node->type->name;
+    }
+
+    private function getArrayItemType(TypeNode $typeNode): ?string
+    {
+        $arrayItemType = null;
+
+        if ($typeNode instanceof GenericTypeNode) {
+            if (1 === \count($typeNode->genericTypes)) {
+                // this handles list<ClassName>
+                $arrayItemType = (string) $typeNode->genericTypes[0];
+            } elseif (2 === \count($typeNode->genericTypes)) {
+                // this handles array<int, ClassName>
+                $arrayItemType = (string) $typeNode->genericTypes[1];
+            }
+        }
+
+        if ($typeNode instanceof ArrayTypeNode) {
+            // this handles ClassName[]
+            $arrayItemType = (string) $typeNode->type;
+        }
+
+        $validFqcn = '/^[a-zA-Z_\x7f-\xff\\\\][a-zA-Z0-9_\x7f-\xff\\\\]*[a-zA-Z0-9_\x7f-\xff]$/';
+
+        if (null !== $arrayItemType && !(bool) preg_match($validFqcn, $arrayItemType)) {
+            return null;
+        }
+
+        return $arrayItemType;
     }
 }
