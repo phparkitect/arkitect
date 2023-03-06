@@ -11,9 +11,6 @@ use PHPUnit\Framework\TestCase;
 
 class ViolationsTest extends TestCase
 {
-    /** @var string */
-    private $violationData;
-
     /** @var Violations */
     private $violationStore;
 
@@ -22,8 +19,6 @@ class ViolationsTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->violationData = 'violation';
-
         $this->violationStore = new Violations();
         $this->violation = new Violation(
             'App\Controller\ProductController',
@@ -179,5 +174,38 @@ App\Controller\Foo has 1 violations
             $violation2, // then error message
             $violation1,
         ], $violationStore->toArray());
+    }
+
+    public function test_remove_violations_from_violations_ignore_linenumber(): void
+    {
+        $violation1 = new Violation(
+            'App\Controller\Shop',
+            'should have name end with Controller',
+            42
+        );
+        $this->violationStore->add($violation1);
+
+        $violation2 = new Violation(
+            'App\Controller\Shop',
+            'should implement AbstractController'
+        );
+        $this->violationStore->add($violation2);
+
+        $this->assertCount(3, $this->violationStore->toArray());
+
+        $violationsBaseline = new Violations();
+        $violationsBaseline->add(new Violation(
+            'App\Controller\Shop',
+            'should have name end with Controller',
+            21
+        ));
+
+        $this->violationStore->remove($violationsBaseline, true);
+
+        $this->assertCount(2, $this->violationStore->toArray());
+        $this->assertEquals([
+            $this->violation,
+            $violation2,
+        ], $this->violationStore->toArray());
     }
 }
