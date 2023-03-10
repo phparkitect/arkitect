@@ -29,7 +29,7 @@ class NotImplement implements Expression
 
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
-        if ($theClass->isInterface()) {
+        if ($theClass->isInterface() || $theClass->isTrait()) {
             return;
         }
 

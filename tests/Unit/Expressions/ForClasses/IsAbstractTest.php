@@ -22,6 +22,7 @@ class IsAbstractTest extends TestCase
             null,
             false,
             false,
+            false,
             false
         );
         $because = 'we want to add this rule for our software';
@@ -44,6 +45,7 @@ class IsAbstractTest extends TestCase
             null,
             true,
             true,
+            false,
             false
         );
         $because = 'we want to add this rule for our software';

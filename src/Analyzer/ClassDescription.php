@@ -26,6 +26,9 @@ class ClassDescription
     /** @var bool */
     private $interface;
 
+    /** @var bool */
+    private $trait;
+
     /** @var list<string> */
     private $docBlock;
 
@@ -46,6 +49,7 @@ class ClassDescription
         bool $final,
         bool $abstract,
         bool $interface,
+        bool $trait,
         array $docBlock = [],
         array $attributes = []
     ) {
@@ -58,6 +62,7 @@ class ClassDescription
         $this->docBlock = $docBlock;
         $this->attributes = $attributes;
         $this->interface = $interface;
+        $this->trait = $trait;
     }
 
     public static function getBuilder(string $FQCN): ClassDescriptionBuilder
@@ -128,6 +133,11 @@ class ClassDescription
     public function isInterface(): bool
     {
         return $this->interface;
+    }
+
+    public function isTrait(): bool
+    {
+        return $this->trait;
     }
 
     public function getDocBlock(): array
