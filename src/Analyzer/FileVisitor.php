@@ -183,6 +183,22 @@ class FileVisitor extends NodeVisitorAbstract
             }
         }
 
+        if ($node instanceof Node\Stmt\Trait_) {
+            if (null === $node->namespacedName) {
+                return;
+            }
+
+            $this->classDescriptionBuilder->setClassName($node->namespacedName->toCodeString());
+            $this->classDescriptionBuilder->setTrait(true);
+
+            foreach ($node->attrGroups as $attributeGroup) {
+                foreach ($attributeGroup->attrs as $attribute) {
+                    $this->classDescriptionBuilder
+                        ->addAttribute($attribute->name->toString(), $attribute->getLine());
+                }
+            }
+        }
+
         if ($node instanceof Node\Stmt\ClassMethod) {
             $returnType = $node->returnType;
             if ($returnType instanceof Node\Name\FullyQualified) {
@@ -215,6 +231,11 @@ class FileVisitor extends NodeVisitorAbstract
         }
 
         if ($node instanceof Node\Stmt\Interface_) {
+            $this->classDescriptions[] = $this->classDescriptionBuilder->build();
+            $this->classDescriptionBuilder->clear();
+        }
+
+        if ($node instanceof Node\Stmt\Trait_) {
             $this->classDescriptions[] = $this->classDescriptionBuilder->build();
             $this->classDescriptionBuilder->clear();
         }

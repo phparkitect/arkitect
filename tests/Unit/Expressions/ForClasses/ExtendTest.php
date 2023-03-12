@@ -84,6 +84,7 @@ class ExtendTest extends TestCase
             null,
             false,
             false,
+            false,
             false
         );
 

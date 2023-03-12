@@ -24,6 +24,7 @@ class NotImplementTest extends TestCase
             null,
             false,
             false,
+            false,
             false
         );
 
@@ -47,6 +48,7 @@ class NotImplementTest extends TestCase
             null,
             false,
             false,
+            false,
             false
         );
         $because = 'we want to add this rule for our software';
@@ -65,6 +67,7 @@ class NotImplementTest extends TestCase
             [],
             [FullyQualifiedClassName::fromString('interface')],
             null,
+            false,
             false,
             false,
             false
@@ -95,7 +98,8 @@ class NotImplementTest extends TestCase
             null,
             false,
             false,
-            true
+            true,
+            false
         );
         $because = 'we want to add this rule for our software';
 

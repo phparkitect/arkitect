@@ -150,4 +150,32 @@ class ClassDescriptionBuilderTest extends TestCase
 
         $this->assertFalse($classDescription->isInterface());
     }
+
+    public function test_it_should_create_trait(): void
+    {
+        $FQCN = 'HappyIsland';
+        $classDescriptionBuilder = new ClassDescriptionBuilder();
+        $classDescriptionBuilder->setClassName($FQCN);
+        $classDescriptionBuilder->setTrait(true);
+
+        $classDescription = $classDescriptionBuilder->build();
+
+        $this->assertInstanceOf(ClassDescription::class, $classDescription);
+
+        $this->assertTrue($classDescription->isTrait());
+    }
+
+    public function test_it_should_create_not_trait(): void
+    {
+        $FQCN = 'HappyIsland';
+        $classDescriptionBuilder = new ClassDescriptionBuilder();
+        $classDescriptionBuilder->setClassName($FQCN);
+        $classDescriptionBuilder->setTrait(false);
+
+        $classDescription = $classDescriptionBuilder->build();
+
+        $this->assertInstanceOf(ClassDescription::class, $classDescription);
+
+        $this->assertFalse($classDescription->isTrait());
+    }
 }

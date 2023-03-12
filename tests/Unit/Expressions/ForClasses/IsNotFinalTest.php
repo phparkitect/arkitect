@@ -22,6 +22,7 @@ class IsNotFinalTest extends TestCase
             null,
             true,
             false,
+            false,
             false
         );
 
@@ -43,6 +44,7 @@ class IsNotFinalTest extends TestCase
             [],
             [],
             null,
+            false,
             false,
             false,
             false

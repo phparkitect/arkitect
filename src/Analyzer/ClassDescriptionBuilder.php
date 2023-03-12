@@ -34,6 +34,9 @@ class ClassDescriptionBuilder
     /** @var bool */
     private $interface = false;
 
+    /** @var bool */
+    private $trait = false;
+
     public function clear(): void
     {
         $this->FQCN = null;
@@ -45,6 +48,7 @@ class ClassDescriptionBuilder
         $this->docBlock = [];
         $this->attributes = [];
         $this->interface = false;
+        $this->trait = false;
     }
 
     public function setClassName(string $FQCN): self
@@ -98,6 +102,13 @@ class ClassDescriptionBuilder
         return $this;
     }
 
+    public function setTrait(bool $trait): self
+    {
+        $this->trait = $trait;
+
+        return $this;
+    }
+
     public function addDocBlock(string $docBlock): self
     {
         $this->docBlock[] = $docBlock;
@@ -125,6 +136,7 @@ class ClassDescriptionBuilder
             $this->final,
             $this->abstract,
             $this->interface,
+            $this->trait,
             $this->docBlock,
             $this->attributes
         );
