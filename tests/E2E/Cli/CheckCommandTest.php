@@ -35,8 +35,8 @@ class CheckCommandTest extends TestCase
         $expectedErrors = 'ERRORS!
 
 App\Controller\Foo has 2 violations
-  should implement ContainerAwareInterface because all controllers should be container aware
   should have a name that matches *Controller because we want uniform naming
+  should implement ContainerAwareInterface because all controllers should be container aware
 
 App\Controller\ProductsController has 1 violations
   should implement ContainerAwareInterface because all controllers should be container aware

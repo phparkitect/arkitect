@@ -129,6 +129,7 @@ class Check extends Command
             } catch (FailOnFirstViolationException $e) {
             }
             $violations = $runner->getViolations();
+            $violations->sort();
 
             if (false !== $generateBaseline) {
                 if (null === $generateBaseline) {

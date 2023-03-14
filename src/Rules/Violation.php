@@ -9,11 +9,11 @@ class Violation implements \JsonSerializable
     /** @var string */
     private $fqcn;
 
-    /** @var string */
-    private $error;
-
     /** @var int|null */
     private $line;
+
+    /** @var string */
+    private $error;
 
     public function __construct(string $fqcn, string $error, ?int $line = null)
     {
