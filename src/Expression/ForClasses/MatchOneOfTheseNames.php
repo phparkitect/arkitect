@@ -24,7 +24,7 @@ class MatchOneOfTheseNames implements Expression
 
     public function describe(ClassDescription $theClass, string $because): Description
     {
-        $name = implode(', ', $this->names);
+        $names = implode(', ', $this->names);
 
         return new Description("should have a name that matches {$names}", $because);
     }
