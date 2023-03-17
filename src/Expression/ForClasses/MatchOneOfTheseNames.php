@@ -14,7 +14,7 @@ use Arkitect\Rules\Violations;
 
 class MatchOneOfTheseNames implements Expression
 {
-    /** @var array */
+    /** @var array<string> */
     private $names;
 
     public function __construct(array $names)
