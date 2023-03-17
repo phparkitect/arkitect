@@ -14,23 +14,30 @@ use Arkitect\Rules\Violations;
 
 class MatchOneOfTheseNames implements Expression
 {
-    /** @var string */
-    private $name;
+    /** @var array */
+    private $names;
 
-    public function __construct(string $name)
+    public function __construct(array $names)
     {
-        $this->name = $name;
+        $this->names = $names;
     }
 
     public function describe(ClassDescription $theClass, string $because): Description
     {
-        return new Description("should have a name that matches {$this->name}", $because);
+        $name = implode(', ', $this->names);
+
+        return new Description("should have a name that matches {$names}", $because);
     }
 
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
         $fqcn = FullyQualifiedClassName::fromString($theClass->getFQCN());
-        if (!$fqcn->classMatches($this->name)) {
+        $matches = false;
+        foreach ($this->names as $name) {
+            $matches = $matches || $fqcn->classMatches($this->name);
+        }
+
+        if (!$matches) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
                 ViolationMessage::selfExplanatory($this->describe($theClass, $because))
