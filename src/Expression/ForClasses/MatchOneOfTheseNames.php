@@ -34,7 +34,7 @@ class MatchOneOfTheseNames implements Expression
         $fqcn = FullyQualifiedClassName::fromString($theClass->getFQCN());
         $matches = false;
         foreach ($this->names as $name) {
-            $matches = $matches || $fqcn->classMatches($this->name);
+            $matches = $matches || $fqcn->classMatches($name);
         }
 
         if (!$matches) {
