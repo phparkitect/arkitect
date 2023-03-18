@@ -25,6 +25,7 @@ class Check extends Command
     private const STOP_ON_FAILURE_PARAM = 'stop-on-failure';
     private const USE_BASELINE_PARAM = 'use-baseline';
     private const SKIP_BASELINE_PARAM = 'skip-baseline';
+    private const IGNORE_BASELINE_LINENUMBERS_PARAM = 'ignore-baseline-linenumbers';
 
     private const GENERATE_BASELINE_PARAM = 'generate-baseline';
     private const DEFAULT_RULES_FILENAME = 'phparkitect.php';
@@ -80,6 +81,12 @@ class Check extends Command
                 'k',
                 InputOption::VALUE_NONE,
                 'Don\'t use the default baseline'
+            )
+            ->addOption(
+                self::IGNORE_BASELINE_LINENUMBERS_PARAM,
+                'i',
+                InputOption::VALUE_NONE,
+                'Ignore line numbers when checking the baseline'
             );
     }
 
@@ -94,6 +101,7 @@ class Check extends Command
             $stopOnFailure = $input->getOption(self::STOP_ON_FAILURE_PARAM);
             $useBaseline = $input->getOption(self::USE_BASELINE_PARAM);
             $skipBaseline = $input->getOption(self::SKIP_BASELINE_PARAM);
+            $ignoreBaselineLinenumbers = $input->getOption(self::IGNORE_BASELINE_LINENUMBERS_PARAM);
 
             if (true !== $skipBaseline && !$useBaseline && file_exists(self::DEFAULT_BASELINE_FILENAME)) {
                 $useBaseline = self::DEFAULT_BASELINE_FILENAME;
@@ -146,7 +154,7 @@ class Check extends Command
             if ($useBaseline) {
                 $baseline = $this->loadBaseline($useBaseline);
 
-                $violations->remove($baseline);
+                $violations->remove($baseline, $ignoreBaselineLinenumbers);
             }
 
             if ($violations->count() > 0) {
