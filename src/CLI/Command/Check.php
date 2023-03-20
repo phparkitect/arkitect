@@ -7,11 +7,13 @@ namespace Arkitect\CLI\Command;
 use Arkitect\CLI\Config;
 use Arkitect\CLI\Progress\DebugProgress;
 use Arkitect\CLI\Progress\ProgressBarProgress;
+use Arkitect\CLI\Progress\VoidProgress;
 use Arkitect\CLI\Runner;
 use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Exceptions\FailOnFirstViolationException;
 use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violations;
+use OndraM\CiDetector\CiDetector;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -120,7 +122,8 @@ class Check extends Command
             $phpVersion = $input->getOption('target-php-version');
             $targetPhpVersion = TargetPhpVersion::create($phpVersion);
 
-            $progress = $verbose ? new DebugProgress($output) : new ProgressBarProgress($output);
+            $defaultProgressBar = (new CiDetector())->isCiDetected() ? new VoidProgress() : new ProgressBarProgress($output);
+            $progress = $verbose ? new DebugProgress($output) : $defaultProgressBar;
 
             $this->printHeadingLine($output);
 
