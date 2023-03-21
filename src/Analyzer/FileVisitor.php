@@ -5,6 +5,7 @@ namespace Arkitect\Analyzer;
 
 use PhpParser\Comment\Doc;
 use PhpParser\Node;
+use PhpParser\Node\NullableType;
 use PhpParser\NodeVisitorAbstract;
 
 class FileVisitor extends NodeVisitorAbstract
@@ -127,7 +128,7 @@ class FileVisitor extends NodeVisitorAbstract
 
         /**
          * matches parameters dependency in property definitions like
-         * public NotBlank $foo;.
+         * public ?NotBlank $foo;.
          *
          * @see FileVisitorTest::test_it_parse_typed_property
          */
@@ -136,16 +137,23 @@ class FileVisitor extends NodeVisitorAbstract
                 return;
             }
 
-            if (!method_exists($node->type, 'toString')) {
+            $type = $node->type;
+            if ($type instanceof NullableType) {
+                /** @var NullableType * */
+                $nullableType = $type;
+                $type = $nullableType->type;
+            }
+
+            if (!method_exists($type, 'toString')) {
                 return;
             }
 
-            if ($this->isBuiltInType($node->type->toString())) {
+            if ($this->isBuiltInType($type->toString())) {
                 return;
             }
 
             try {
-                $this->classDescriptionBuilder->addDependency(new ClassDependency($node->type->toString(), $node->getLine()));
+                $this->classDescriptionBuilder->addDependency(new ClassDependency($type->toString(), $node->getLine()));
             } catch (\Exception $e) {
             }
         }
