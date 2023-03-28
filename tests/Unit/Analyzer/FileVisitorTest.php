@@ -170,10 +170,11 @@ use Doctrine\MongoDB\Collection;
 use Foo\Baz\Baz;
 use Symfony\Component\HttpFoundation\Request;
 use Foo\Baz\StaticClass;
+use Foo\Baz\Nullable;
 
 class MyClass implements Baz
 {
-    public function __construct(Request $request)
+public function __construct(Request $request, ?Nullable $nullable)
     {
         $collection = new Collection($request);
         $static = StaticClass::foo();
@@ -187,10 +188,11 @@ EOF;
         $cd = $fp->getClassDescriptions();
 
         $expectedDependencies = [
-            new ClassDependency('Foo\Baz\Baz', 9),
-            new ClassDependency('Symfony\Component\HttpFoundation\Request', 11),
-            new ClassDependency('Doctrine\MongoDB\Collection', 13),
-            new ClassDependency('Foo\Baz\StaticClass', 14),
+            new ClassDependency('Foo\Baz\Baz', 10),
+            new ClassDependency('Symfony\Component\HttpFoundation\Request', 12),
+            new ClassDependency('Foo\Baz\Nullable', 12),
+            new ClassDependency('Doctrine\MongoDB\Collection', 14),
+            new ClassDependency('Foo\Baz\StaticClass', 15),
         ];
 
         $this->assertEquals($expectedDependencies, $cd[0]->getDependencies());
