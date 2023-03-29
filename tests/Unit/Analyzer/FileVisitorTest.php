@@ -174,7 +174,7 @@ use Foo\Baz\Nullable;
 
 class MyClass implements Baz
 {
-public function __construct(Request $request, ?Nullable $nullable)
+    public function __construct(Request $request, ?Nullable $nullable)
     {
         $collection = new Collection($request);
         $static = StaticClass::foo();
