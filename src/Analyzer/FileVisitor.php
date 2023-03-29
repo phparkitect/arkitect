@@ -105,7 +105,6 @@ class FileVisitor extends NodeVisitorAbstract
             if ($this->isSelfOrStaticOrParent($node->class->toString())) {
                 return;
             }
-
             $this->classDescriptionBuilder
                 ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
         }
@@ -256,20 +255,26 @@ class FileVisitor extends NodeVisitorAbstract
 
     private function addParamDependency(Node\Param $node): void
     {
-        if (null === $node->type || $node->type instanceof Node\NullableType || $node->type instanceof Node\Identifier) {
+        if (null === $node->type || $node->type instanceof Node\Identifier) {
             return;
         }
 
-        if (method_exists($node->type, 'isSpecialClassName') && $node->type->isSpecialClassName()) {
+        $type = $node->type;
+        if ($type instanceof NullableType) {
+            /** @var NullableType * */
+            $nullableType = $type;
+            $type = $nullableType->type;
+        }
+
+        if (method_exists($type, 'isSpecialClassName') && $type->isSpecialClassName()) {
             return;
         }
 
-        if (!method_exists($node->type, 'toString')) {
+        if (!method_exists($type, 'toString')) {
             return;
         }
-
         $this->classDescriptionBuilder
-            ->addDependency(new ClassDependency($node->type->toString(), $node->getLine()));
+            ->addDependency(new ClassDependency($type->toString(), $node->getLine()));
     }
 
     private function isBuiltInType(string $typeName): bool
