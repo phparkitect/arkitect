@@ -611,6 +611,38 @@ EOF;
         $this->assertCount(0, $violations);
     }
 
+    public function test_it_parse_nullable_scalar_typed_property(): void
+    {
+        $code = <<< 'EOF'
+<?php
+namespace MyProject\AppBundle\Application;
+class ApplicationLevelDto
+{
+    public function __construct(
+        ?bool $fooBool,
+        ?int $fooInt,
+        ?float $fooFloat,
+        ?string $fooString
+    ) {
+
+    }
+}
+EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
+        $fp->parse($code, 'relativePathName');
+
+        $cd = $fp->getClassDescriptions();
+
+        $violations = new Violations();
+
+        $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('MyProject\AppBundle\Application');
+        $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+
+        $this->assertCount(0, $violations);
+    }
+
     public function test_it_parse_dependencies_in_docblocks_customs(): void
     {
         $code = <<< 'EOF'
