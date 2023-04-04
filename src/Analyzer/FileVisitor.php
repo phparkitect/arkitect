@@ -273,6 +273,11 @@ class FileVisitor extends NodeVisitorAbstract
         if (!method_exists($type, 'toString')) {
             return;
         }
+
+        if ($this->isBuiltInType($type->toString())) {
+            return;
+        }
+
         $this->classDescriptionBuilder
             ->addDependency(new ClassDependency($type->toString(), $node->getLine()));
     }
