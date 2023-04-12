@@ -46,13 +46,13 @@ class PatternString
 
     private function startsWithPattern(string $pattern): bool
     {
-        return 1 === preg_match('#^'.$this->convertShellToRegExPattern($pattern).'#', $this->value);
+        return 1 === preg_match('#^'.$this->convertShellToRegExPattern($pattern).'$#', $this->value);
     }
 
     private function convertShellToRegExPattern(string $pattern): string
     {
         return strtr($pattern, [
-            '*' => '.*',
+            '*' => '.+',
             '?' => '.',
             '.' => '\.',
             '[!' => '[^',
