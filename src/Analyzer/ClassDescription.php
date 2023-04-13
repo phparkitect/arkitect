@@ -53,6 +53,7 @@ class ClassDescription
         bool $abstract,
         bool $interface,
         bool $trait,
+        bool $enum,
         array $docBlock = [],
         array $attributes = []
     ) {
@@ -66,6 +67,7 @@ class ClassDescription
         $this->attributes = $attributes;
         $this->interface = $interface;
         $this->trait = $trait;
+        $this->enum = $enum;
     }
 
     public static function getBuilder(string $FQCN): ClassDescriptionBuilder

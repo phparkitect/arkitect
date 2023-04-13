@@ -23,6 +23,7 @@ class IsNotAbstractTest extends TestCase
             true,
             true,
             false,
+            false,
             false
         );
         $because = 'we want to add this rule for our software';
@@ -43,6 +44,7 @@ class IsNotAbstractTest extends TestCase
             [],
             [],
             null,
+            false,
             false,
             false,
             false,
