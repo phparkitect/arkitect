@@ -20,7 +20,7 @@ class IsFinal implements Expression
 
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
-        if ($theClass->isAbstract() || $theClass->isInterface() || $theClass->isFinal()) {
+        if ($theClass->isAbstract() || $theClass->isInterface() || $theClass->isFinal() || $theClass->isTrait()) {
             return;
         }
 
