@@ -29,6 +29,9 @@ class ClassDescription
     /** @var bool */
     private $trait;
 
+    /** @var bool */
+    private $enum;
+
     /** @var list<string> */
     private $docBlock;
 
@@ -138,6 +141,11 @@ class ClassDescription
     public function isTrait(): bool
     {
         return $this->trait;
+    }
+
+    public function isEnum(): bool
+    {
+        return $this->enum;
     }
 
     public function getDocBlock(): array

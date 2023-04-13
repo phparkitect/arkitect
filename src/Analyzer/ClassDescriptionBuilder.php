@@ -37,6 +37,9 @@ class ClassDescriptionBuilder
     /** @var bool */
     private $trait = false;
 
+    /** @var bool */
+    private $enum = false;
+
     public function clear(): void
     {
         $this->FQCN = null;
@@ -49,6 +52,7 @@ class ClassDescriptionBuilder
         $this->attributes = [];
         $this->interface = false;
         $this->trait = false;
+        $this->enum = false;
     }
 
     public function setClassName(string $FQCN): self
@@ -109,6 +113,13 @@ class ClassDescriptionBuilder
         return $this;
     }
 
+    public function setEnum(bool $enum): self
+    {
+        $this->enum = $enum;
+
+        return $this;
+    }
+
     public function addDocBlock(string $docBlock): self
     {
         $this->docBlock[] = $docBlock;
@@ -137,6 +148,7 @@ class ClassDescriptionBuilder
             $this->abstract,
             $this->interface,
             $this->trait,
+            $this->enum,
             $this->docBlock,
             $this->attributes
         );
