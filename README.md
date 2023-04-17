@@ -233,6 +233,15 @@ $rules = Rule::allClasses()
     ->because('we want to be sure that classes are abstract in a specific namespace');
 ```
 
+### Is trait
+
+```php
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Customer\Service\Traits'))
+    ->should(new IsTrait())
+    ->because('we want to be sure that there are only traits in a specific namespace');
+```
+
 ### Is final
 
 ```php
@@ -249,6 +258,15 @@ $rules = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
     ->should(new IsNotAbstract())
     ->because('we want to avoid abstract classes into our domain');
+```
+
+### Is not trait
+
+```php
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
+    ->should(new IsNotTrait())
+    ->because('we want to avoid traits in our codebase');
 ```
 
 ### Is not final
