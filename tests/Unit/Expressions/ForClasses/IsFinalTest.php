@@ -102,6 +102,28 @@ class IsFinalTest extends TestCase
         self::assertEquals(0, $violations->count());
     }
 
+    public function test_traits_can_not_be_final_and_should_be_ignored(): void
+    {
+        $class = 'myClass';
+
+        $isFinal = new IsFinal();
+        $classDescription = new ClassDescription(
+            FullyQualifiedClassName::fromString('HappyIsland'),
+            [],
+            [],
+            null,
+            false,
+            false,
+            false,
+            true,
+            false
+        );
+        $because = 'we want to add this rule for our software';
+        $violations = new Violations();
+        $isFinal->evaluate($classDescription, $violations, $because);
+        self::assertEquals(0, $violations->count());
+    }
+
     public function test_enums_can_not_be_final_and_should_be_ignored(): void
     {
         $class = 'myClass';
