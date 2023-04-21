@@ -56,6 +56,7 @@ class FileVisitor extends NodeVisitorAbstract
 
         if ($node instanceof Node\Stmt\Enum_ && null !== $node->namespacedName) {
             $this->classDescriptionBuilder->setClassName($node->namespacedName->toCodeString());
+            $this->classDescriptionBuilder->setEnum(true);
 
             foreach ($node->attrGroups as $attributeGroup) {
                 foreach ($attributeGroup->attrs as $attribute) {

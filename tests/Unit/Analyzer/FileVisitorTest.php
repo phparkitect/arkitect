@@ -1236,4 +1236,81 @@ EOF;
 
         $this->assertCount(1, $violations);
     }
+
+    /**
+     * @requires PHP >= 8.1
+     *
+     * @dataProvider provide_enums
+     */
+    public function test_it_parse_enums(string $code): void
+    {
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
+        $fp->parse($code, 'relativePathName');
+
+        foreach ($fp->getClassDescriptions() as $classDescription) {
+            $this->assertTrue($classDescription->isEnum());
+        }
+    }
+
+    public function provide_enums(): \Generator
+    {
+        yield 'default enum' => [
+            <<< 'EOF'
+<?php
+namespace App\Foo;
+
+enum DefaultEnum
+{
+    case FOO;
+}
+EOF
+        ];
+
+        yield 'string enum' => [
+            <<< 'EOF'
+<?php
+namespace App\Foo;
+
+enum StringEnum: string
+{
+    case BAR: 'bar';
+}
+EOF
+        ];
+
+        yield 'integer enum' => [
+            <<< 'EOF'
+<?php
+namespace App\Foo;
+
+enum IntEnum: int
+{
+    case BAZ: 42;
+}
+EOF
+        ];
+
+        yield 'multiple enums' => [
+            <<< 'EOF'
+<?php
+namespace App\Foo;
+
+enum DefaultEnum
+{
+    case FOO;
+}
+
+enum IntEnum: int
+{
+    case BAZ: 42;
+}
+
+enum IntEnum: int
+{
+    case BAZ: 42;
+}
+EOF
+        ];
+    }
 }
