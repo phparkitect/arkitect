@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace Arkitect\CLI\Progress;
 
 use Arkitect\ClassSet;
+use OndraM\CiDetector\CiDetector;
 use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -21,7 +23,11 @@ class ProgressBarProgress implements Progress
 
     public function __construct(OutputInterface $output)
     {
-        $this->output = $output;
+        if ((new CiDetector())->isCiDetected()) {
+            $this->output = new NullOutput();
+        } else {
+            $this->output = $output;
+        }
         $this->progress = new ProgressBar($output);
     }
 
