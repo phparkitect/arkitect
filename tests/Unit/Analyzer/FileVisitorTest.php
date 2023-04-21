@@ -15,7 +15,6 @@ use Arkitect\Expression\ForClasses\NotContainDocBlockLike;
 use Arkitect\Expression\ForClasses\NotHaveDependencyOutsideNamespace;
 use Arkitect\Rules\ParsingError;
 use Arkitect\Rules\Violations;
-use Generator;
 use PHPUnit\Framework\TestCase;
 
 class FileVisitorTest extends TestCase
@@ -1252,7 +1251,7 @@ EOF;
         }
     }
 
-    private function provide_enums(): Generator
+    private function provide_enums(): \Generator
     {
         yield 'default enum' => [
             <<< 'EOF'
