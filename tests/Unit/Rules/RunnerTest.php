@@ -16,7 +16,7 @@ use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\SplFileInfo;
 
-class RuleCheckerTest extends TestCase
+class RunnerTest extends TestCase
 {
     public function test_should_run_parse_on_all_files_in_class_set(): void
     {
