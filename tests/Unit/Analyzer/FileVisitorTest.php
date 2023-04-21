@@ -1238,6 +1238,8 @@ EOF;
     }
 
     /**
+     * @requires PHP >= 8.1
+     *
      * @dataProvider provide_enums
      */
     public function test_it_parse_enums(string $code): void
@@ -1251,7 +1253,7 @@ EOF;
         }
     }
 
-    private function provide_enums(): \Generator
+    public function provide_enums(): \Generator
     {
         yield 'default enum' => [
             <<< 'EOF'
