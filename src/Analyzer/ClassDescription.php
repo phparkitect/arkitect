@@ -29,6 +29,9 @@ class ClassDescription
     /** @var bool */
     private $trait;
 
+    /** @var bool */
+    private $enum;
+
     /** @var list<string> */
     private $docBlock;
 
@@ -50,6 +53,7 @@ class ClassDescription
         bool $abstract,
         bool $interface,
         bool $trait,
+        bool $enum,
         array $docBlock = [],
         array $attributes = []
     ) {
@@ -63,6 +67,7 @@ class ClassDescription
         $this->attributes = $attributes;
         $this->interface = $interface;
         $this->trait = $trait;
+        $this->enum = $enum;
     }
 
     public static function getBuilder(string $FQCN): ClassDescriptionBuilder
@@ -138,6 +143,11 @@ class ClassDescription
     public function isTrait(): bool
     {
         return $this->trait;
+    }
+
+    public function isEnum(): bool
+    {
+        return $this->enum;
     }
 
     public function getDocBlock(): array
