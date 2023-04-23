@@ -23,7 +23,8 @@ class IsNotTraitTest extends TestCase
             false,
             false,
             false,
-            true
+            true,
+            false
         );
         $because = 'we want to add this rule for our software';
         $violationError = $isFinal->describe($classDescription, $because)->toString();
@@ -43,6 +44,7 @@ class IsNotTraitTest extends TestCase
             [],
             [],
             null,
+            false,
             false,
             false,
             false,
