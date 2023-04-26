@@ -251,6 +251,15 @@ $rules = Rule::allClasses()
     ->because('we want to be sure that aggregates are final classes');
 ```
 
+### Is interface
+
+```php
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Interfaces'))
+    ->should(new IsInterface())
+    ->because('we want to be sure that all interfaces are in one directory');
+```
+
 ### Is not abstract
 
 ```php
@@ -276,6 +285,15 @@ $rules = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Infrastructure\Doctrine'))
     ->should(new IsNotFinal())
     ->because('we want to be sure that our adapters are not final classes');
+```
+
+### Is not interface
+
+```php
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('Tests\Integration'))
+    ->should(new IsNotInterface())
+    ->because('we want to be sure that we do not have interfaces in tests');
 ```
 
 ### Not depends on a namespace
