@@ -23,6 +23,7 @@ class IsNotInterfaceTest extends TestCase
             false,
             false,
             true,
+            false,
             false
         );
         $because = 'we want to add this rule for our software';
@@ -43,6 +44,7 @@ class IsNotInterfaceTest extends TestCase
             [],
             [],
             null,
+            false,
             false,
             false,
             false,
