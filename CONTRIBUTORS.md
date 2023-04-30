@@ -12,6 +12,7 @@ Shout out to our top contributors!
 - [szepeviktor](https://api.github.com/users/szepeviktor)
 - [annervisser](https://api.github.com/users/annervisser)
 - [LuigiCardamone](https://api.github.com/users/LuigiCardamone)
+- [simivar](https://api.github.com/users/simivar)
 - [stephpy](https://api.github.com/users/stephpy)
 - [dbu](https://api.github.com/users/dbu)
 - [frankverhoeven](https://api.github.com/users/frankverhoeven)
