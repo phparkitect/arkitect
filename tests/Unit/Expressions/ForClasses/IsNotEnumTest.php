@@ -5,7 +5,7 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
-use Arkitect\Expression\ForClasses\IsEnum;
+use Arkitect\Expression\ForClasses\IsNotEnum;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
@@ -13,7 +13,7 @@ class IsNotEnumTest extends TestCase
 {
     public function test_it_should_return_violation_error(): void
     {
-        $isEnum = new IsEnum();
+        $isEnum = new IsNotEnum();
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
@@ -37,7 +37,7 @@ class IsNotEnumTest extends TestCase
 
     public function test_it_should_return_true_if_is_not_enum(): void
     {
-        $isEnum = new IsEnum();
+        $isEnum = new IsNotEnum();
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
