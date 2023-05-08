@@ -9,7 +9,7 @@ use Arkitect\Expression\ForClasses\IsFinal;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
-class IsEnumTest extends TestCase
+class IsNotEnumTest extends TestCase
 {
     public function test_it_should_return_violation_error(): void
     {
@@ -23,7 +23,7 @@ class IsEnumTest extends TestCase
             false,
             false,
             false,
-            false
+            true
         );
         $because = 'we want to add this rule for our software';
         $violationError = $isEnum->describe($classDescription, $because)->toString();
@@ -32,7 +32,7 @@ class IsEnumTest extends TestCase
         $isEnum->evaluate($classDescription, $violations, $because);
         self::assertNotEquals(0, $violations->count());
 
-        $this->assertEquals('HappyIsland should be an enum because we want to add this rule for our software', $violationError);
+        $this->assertEquals('HappyIsland should not be an enum because we want to add this rule for our software', $violationError);
     }
 
     public function test_it_should_return_true_if_is_enum(): void
@@ -47,7 +47,7 @@ class IsEnumTest extends TestCase
             false,
             false,
             false,
-            true
+            false
         );
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
