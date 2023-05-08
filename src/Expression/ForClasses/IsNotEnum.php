@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
@@ -18,7 +20,7 @@ class IsNotEnum implements Expression
 
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
-        if ($theClass->isEnum() === false) {
+        if (false === $theClass->isEnum()) {
             return;
         }
 

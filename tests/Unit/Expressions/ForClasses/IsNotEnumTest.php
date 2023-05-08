@@ -1,11 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\ForClasses\IsEnum;
-use Arkitect\Expression\ForClasses\IsFinal;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
