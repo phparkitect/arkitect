@@ -260,6 +260,15 @@ $rules = Rule::allClasses()
     ->because('we want to be sure that all interfaces are in one directory');
 ```
 
+### Is enum
+
+```php
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Enum'))
+    ->should(new IsEnum())
+    ->because('we want to be sure that all classes are enum');
+```
+
 ### Is not abstract
 
 ```php
@@ -294,6 +303,15 @@ $rules = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('Tests\Integration'))
     ->should(new IsNotInterface())
     ->because('we want to be sure that we do not have interfaces in tests');
+```
+
+### Is not enum
+
+```php
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
+    ->should(new IsNotEnum())
+    ->because('we want to be sure that all classes are not enum');
 ```
 
 ### Not depends on a namespace
