@@ -35,7 +35,7 @@ class IsNotEnumTest extends TestCase
         $this->assertEquals('HappyIsland should not be an enum because we want to add this rule for our software', $violationError);
     }
 
-    public function test_it_should_return_true_if_is_enum(): void
+    public function test_it_should_return_true_if_is_not_enum(): void
     {
         $isEnum = new IsEnum();
         $classDescription = new ClassDescription(
