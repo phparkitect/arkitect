@@ -10,6 +10,7 @@ Shout out to our top contributors!
 - [ricfio](https://api.github.com/users/ricfio)
 - [sebastianstucke87](https://api.github.com/users/sebastianstucke87)
 - [szepeviktor](https://api.github.com/users/szepeviktor)
+- [JulienRAVIA](https://api.github.com/users/JulienRAVIA)
 - [annervisser](https://api.github.com/users/annervisser)
 - [LuigiCardamone](https://api.github.com/users/LuigiCardamone)
 - [simivar](https://api.github.com/users/simivar)
