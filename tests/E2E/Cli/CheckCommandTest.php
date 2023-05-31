@@ -149,7 +149,7 @@ App\Controller\Foo has 1 violations
     protected function runCheck(
         $configFilePath = null,
         bool $stopOnFailure = null,
-        ?string $useBaseline = null,
+        string $useBaseline = null,
         $generateBaseline = false,
         bool $skipBaseline = false
     ): ApplicationTester {

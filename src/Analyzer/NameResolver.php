@@ -175,7 +175,7 @@ class NameResolver extends NodeVisitorAbstract
 
             if ($this->parseCustomAnnotations && !($node->type instanceof FullyQualified)) {
                 foreach ($phpDocNode->getTags() as $tagValue) {
-                    if ('@' === $tagValue->name[0] && false === strpos($tagValue->name, '@var')) {
+                    if ('@' === $tagValue->name[0] && !str_contains($tagValue->name, '@var')) {
                         $customTag = str_replace('@', '', $tagValue->name);
                         $type = $this->resolveName(new Node\Name($customTag), Use_::TYPE_NORMAL);
                         $node->type = $type;
@@ -365,8 +365,6 @@ class NameResolver extends NodeVisitorAbstract
      * @psalm-suppress MissingParamType
      * @psalm-suppress PossiblyNullArgument
      * @psalm-suppress MissingReturnType
-     *
-     * @param mixed $node
      */
     private function resolveType($node)
     {
