@@ -128,6 +128,35 @@ EOF;
         $this->assertEquals('Root\Animals\Animal', $cd->getExtends()->toString());
     }
 
+    public function test_it_should_not_parse_extends_from_insider_anonymousclass(): void
+    {
+        $code = <<< 'EOF'
+<?php
+
+namespace Root\Animals;
+
+class Animal
+{
+}
+
+class Cat extends Animal
+{
+    public function methodWithAnonymous(): void
+    {
+        $obj = new class extends \stdClass {};
+    }
+}
+EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
+        $fp->parse($code, 'relativePathName');
+
+        $cd = $fp->getClassDescriptions()[1];
+
+        $this->assertEquals('Root\Animals\Animal', $cd->getExtends()->toString());
+    }
+
     public function test_should_depends_on_these_namespaces(): void
     {
         $code = <<< 'EOF'
