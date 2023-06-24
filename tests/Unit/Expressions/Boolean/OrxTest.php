@@ -11,6 +11,20 @@ use PHPUnit\Framework\TestCase;
 
 final class OrxTest extends TestCase
 {
+    public function test_it_should_throw_exception_if_no_expressions_provided(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        new Orx([]);
+    }
+
+    public function test_it_should_throw_exception_if_only_one_expression_provided(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        new Orx([new Extend('My\BaseClass')]);
+    }
+
     public function test_it_should_return_no_violation_on_success(): void
     {
         $or = new Orx([new Extend('My\BaseClass'), new Extend('Your\OtherClass')]);

@@ -17,6 +17,9 @@ final class Orx implements Expression
 
     public function __construct(array $expressions)
     {
+        if (\count($expressions) <= 1) {
+            throw new \InvalidArgumentException('at least two expression are required');
+        }
         $this->expressions = $expressions;
     }
 
