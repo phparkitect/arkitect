@@ -11,13 +11,13 @@ class ClassDescriptionBuilder
     private $classDependencies = [];
 
     /** @var ?FullyQualifiedClassName */
-    private $FQCN = null;
+    private $FQCN;
 
     /** @var list<FullyQualifiedClassName> */
     private $interfaces = [];
 
     /** @var ?FullyQualifiedClassName */
-    private $extend = null;
+    private $extend;
 
     /** @var bool */
     private $final = false;
