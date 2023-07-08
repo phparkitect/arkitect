@@ -30,6 +30,10 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
 
     /**
      * @dataProvider shouldMatchNamespacesProvider
+     *
+     * @param mixed $expectedNamespace
+     * @param mixed $actualFQCN
+     * @param mixed $explanation
      */
     public function test_it_should_match_namespace_and_descendants($expectedNamespace, $actualFQCN, $explanation): void
     {

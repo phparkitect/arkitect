@@ -365,6 +365,8 @@ class NameResolver extends NodeVisitorAbstract
      * @psalm-suppress MissingParamType
      * @psalm-suppress PossiblyNullArgument
      * @psalm-suppress MissingReturnType
+     *
+     * @param mixed $node
      */
     private function resolveType($node)
     {
