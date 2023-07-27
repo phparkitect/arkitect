@@ -9,5 +9,7 @@ interface ThatParser
 {
     public function except(string ...$classesToBeExcluded): self;
 
+    public function exceptExpression(Expression ...$classesToBeExcluded): self;
+
     public function that(Expression $expression): AndThatShouldParser;
 }
