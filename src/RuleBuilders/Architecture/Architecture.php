@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace Arkitect\RuleBuilders\Architecture;
 
+use Arkitect\Expression\Boolean\Andx;
+use Arkitect\Expression\Boolean\Not;
+use Arkitect\Expression\Expression;
 use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
 use Arkitect\Expression\ForClasses\NotDependsOnTheseNamespaces;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
@@ -40,6 +43,13 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
     }
 
     public function definedBy(string $selector)
+    {
+        $this->componentSelectors[$this->componentName] = $selector;
+
+        return $this;
+    }
+
+    public function definedByExpression(Expression $selector)
     {
         $this->componentSelectors[$this->componentName] = $selector;
 
@@ -90,13 +100,9 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
                 $forbiddenComponents = array_diff($layerNames, [$name], $this->allowedDependencies[$name]);
 
                 if (!empty($forbiddenComponents)) {
-                    $forbiddenSelectors = array_map(function (string $componentName): string {
-                        return $this->componentSelectors[$componentName];
-                    }, $forbiddenComponents);
-
                     yield Rule::allClasses()
-                        ->that(new ResideInOneOfTheseNamespaces($selector))
-                        ->should(new NotDependsOnTheseNamespaces(...$forbiddenSelectors))
+                        ->that(\is_string($selector) ? new ResideInOneOfTheseNamespaces($selector) : $selector)
+                        ->should($this->createForbiddenExpression($forbiddenComponents))
                         ->because('of component architecture');
                 }
             }
@@ -114,5 +120,36 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
                 ->should(new DependsOnlyOnTheseNamespaces(...$allowedDependencies))
                 ->because('of component architecture');
         }
+    }
+
+    public function createForbiddenExpression(array $forbiddenComponents): Expression
+    {
+        $forbiddenNamespaceSelectors = array_filter(
+            array_map(function (string $componentName): ?string {
+                $selector = $this->componentSelectors[$componentName];
+
+                return \is_string($selector) ? $selector : null;
+            }, $forbiddenComponents)
+        );
+
+        $forbiddenExpressionSelectors = array_filter(
+            array_map(function (string $componentName): ?Expression {
+                $selector = $this->componentSelectors[$componentName];
+
+                return \is_string($selector) ? null : $selector;
+            }, $forbiddenComponents)
+        );
+
+        $forbiddenExpressionList = [];
+        if ([] !== $forbiddenNamespaceSelectors) {
+            $forbiddenExpressionList[] = new NotDependsOnTheseNamespaces(...$forbiddenNamespaceSelectors);
+        }
+        if ([] !== $forbiddenExpressionSelectors) {
+            $forbiddenExpressionList[] = new Not(new Andx(...$forbiddenExpressionSelectors));
+        }
+
+        return 1 === \count($forbiddenExpressionList)
+            ? array_pop($forbiddenExpressionList)
+            : new Andx(...$forbiddenExpressionList);
     }
 }
