@@ -32,7 +32,7 @@ class ResideInOneOfTheseNamespaces implements Expression
     {
         $resideInNamespace = false;
         foreach ($this->namespaces as $namespace) {
-            if ($theClass->namespaceMatches($namespace)) {
+            if ($theClass->namespaceMatches($namespace.'*')) {
                 $resideInNamespace = true;
             }
         }
