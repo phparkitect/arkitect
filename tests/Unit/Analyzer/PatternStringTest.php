@@ -19,6 +19,10 @@ class PatternStringTest extends TestCase
     {
         $pattern = new PatternString('SoThisIsAnExample');
         $this->assertTrue($pattern->matches('*This*'));
+        $this->assertTrue($pattern->matches('*SoThisIsAnExample'));
+        $this->assertTrue($pattern->matches('*ThisIsAnExample'));
+        $this->assertFalse($pattern->matches('*This'));
+        $this->assertFalse($pattern->matches('*This'));
         $this->assertFalse($pattern->matches('This*'));
     }
 }
