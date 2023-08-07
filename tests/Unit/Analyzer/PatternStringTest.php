@@ -15,10 +15,32 @@ class PatternStringTest extends TestCase
         $this->assertFalse($pattern->matches('Something else'));
     }
 
-    public function test_wildcard_is_for_alphanumeric(): void
+    /**
+     * @dataProvider providePatterns
+     */
+    public function test_wildcard_is_for_alphanumeric(string $string, string $pattern, bool $expectedResult): void
     {
-        $pattern = new PatternString('SoThisIsAnExample');
-        $this->assertTrue($pattern->matches('*This*'));
-        $this->assertFalse($pattern->matches('This*'));
+        $this->assertEquals($expectedResult, (new PatternString($string))->matches($pattern));
+    }
+
+    public function providePatterns(): array
+    {
+        return [
+            ['SoThisIsAnExample', '*This*', true],
+            ['SoThisIsAnExample', 'This*', false],
+            ['SoThisIsAnExample', '*This', false],
+            ['SoThisIsAnExample', 'SoThisIsAnExample', true],
+            ['SoThisIsAnExample', 'So????????Example', true],
+            ['SoThisIsAnExample', '*SoThisIsAnExample', true],
+            ['SoThisIsAnExample', 'SoThisIsAnExample*', true],
+            ['SoThisIsAnExample', 'So*Example', true],
+            ['SoThisIsAnExample', '*ThisIsAnExample', true],
+            ['SoThisIsAnExample', 'SoThisIsAn*', true],
+            ['Food\Vegetables\Roots\Carrot', 'Food\*\Roots', false],
+            ['Food\Vegetables\Roots\Orange\Carrot', 'Food\*\Roots', false],
+            ['Food\Vegetables\Carrot', '*\Vegetables', false],
+            ['Food\Vegetables\Roots\Carrot', '*\Vegetables', false],
+            ['Food\Vegetables\Roots\Orange\Carrot', '*\Vegetables', false],
+        ];
     }
 }
