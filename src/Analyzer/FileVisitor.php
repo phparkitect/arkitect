@@ -33,7 +33,7 @@ class FileVisitor extends NodeVisitorAbstract
                      ->addInterface($interface->toString(), $interface->getLine());
             }
 
-            if (null !== $node->extends) {
+            if (!$node->isAnonymous() && null !== $node->extends) {
                 $this->classDescriptionBuilder
                     ->setExtends($node->extends->toString(), $node->getLine());
             }
