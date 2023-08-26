@@ -18,9 +18,14 @@ class PatternStringTest extends TestCase
     public function test_wildcard_is_for_alphanumeric(): void
     {
         $pattern = new PatternString('SoThisIsAnExample');
-        $this->assertTrue($pattern->matches('*This*'));
+        $this->assertTrue($pattern->matches('SoThisIsAnExample'));
+        $this->assertTrue($pattern->matches('So????????Example'));
         $this->assertTrue($pattern->matches('*SoThisIsAnExample'));
+        $this->assertTrue($pattern->matches('SoThisIsAnExample*'));
+        $this->assertTrue($pattern->matches('So*Example'));
         $this->assertTrue($pattern->matches('*ThisIsAnExample'));
+        $this->assertTrue($pattern->matches('SoThisIsAn*'));
+        $this->assertTrue($pattern->matches('*This*'));
         $this->assertFalse($pattern->matches('*This'));
         $this->assertFalse($pattern->matches('This*'));
     }
