@@ -16,6 +16,7 @@ Shout out to our top contributors!
 - [simivar](https://api.github.com/users/simivar)
 - [stephpy](https://api.github.com/users/stephpy)
 - [dbu](https://api.github.com/users/dbu)
+- [jdomenechbLendable](https://api.github.com/users/jdomenechbLendable)
 - [frankverhoeven](https://api.github.com/users/frankverhoeven)
 - [hectorespert](https://api.github.com/users/hectorespert)
 - [jerowork](https://api.github.com/users/jerowork)
