@@ -1,0 +1,3 @@
+include:
+  - local: '/.gitlab/global.yml'
+  - local: '/.gitlab/stages/_include.yml'

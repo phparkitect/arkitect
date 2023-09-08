@@ -1,0 +1,3 @@
+.is_merged:
+  rules:
+    - if: '$MANUAL_PIPELINE == "false" && $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH'

@@ -1,0 +1,6 @@
+include:
+  - local: '/.gitlab/stages/rules/is_merged.yml'
+  - local: '/.gitlab/stages/rules/is_merged_and_has_changes.yml'
+  - local: '/.gitlab/stages/rules/is_mr.yml'
+  - local: '/.gitlab/stages/rules/is_mr_and_has_changes.yml'
+

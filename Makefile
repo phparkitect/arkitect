@@ -52,4 +52,3 @@ sfbuild: ## it launches all the build
 
 dt: ##it launches tests using container
 	docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect make test
-
