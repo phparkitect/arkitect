@@ -3,6 +3,23 @@
 [![Packagist](https://img.shields.io/packagist/dt/phparkitect/phparkitect.svg)](https://packagist.org/packages/phparkitect/phparkitect)
 [![codecov](https://codecov.io/gh/phparkitect/arkitect/branch/main/graph/badge.svg)](https://codecov.io/gh/phparkitect/arkitect)
 
+# NOTE
+
+
+> This project is a clone of [phparkitect/arkitect](https://github.com/phparkitect/arkitect), with some extra features
+on top of it.
+> 
+> As much as possible, this project will comply to upstream, this is just a way to get the features
+I need, quickly incorporated.
+>
+> I will periodically rebase on the original project (upstream), and also periodically open PRs onto upstream,
+to incorporate the features I build.
+>
+> This means the **history on master will change**. The tags will be stable, though.
+>
+> This project uses semantic versioning, but completely independent of the upstream versioning.
+
+# Index
 
 1. [Introduction](#introduction)
 1. [Installation](#installation)
@@ -22,6 +39,7 @@ Rule::allClasses()
     ->should(new HaveNameMatching('*Controller'))
     ->because('it\'s a symfony naming convention');
 ```
+
 # Installation
 
 ## Using Composer
