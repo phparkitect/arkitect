@@ -170,6 +170,23 @@ For example: `phparkitect debug:expression ResideInOneOfTheseNamespaces App`
 
 Currently, you can check if a class:
 
+### Is referenced in a given map
+
+This is useful, for example, to ensure that DTOs like commands and
+events are always set in a map, so that we are sure a serializer knows how
+to serialize/deserialize them.
+
+```php
+$map = [
+    'a' => 'App\Core\Component\MyComponent\Command\MyCommand',
+    'b' => 'App\Core\Component\MyComponent\Event\MyEvent',
+];
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Core\Component\**\Command', 'App\Core\Component\**\Event'))
+    ->should(new IsMapped($map))
+    ->because('we want to ensure our serializer can serialize/deserialize all commands and events');
+```
+
 ### Depends on a namespace
 
 ```php
