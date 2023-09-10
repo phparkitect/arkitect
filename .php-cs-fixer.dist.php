@@ -40,5 +40,16 @@ return (new PhpCsFixer\Config())
         'list_syntax' => ['syntax' => 'short'],
         'phpdoc_to_comment' => false,
         'php_unit_method_casing' => ['case' => 'snake_case'],
-        'function_to_constant' => false
+        'function_to_constant' => false,
+        'native_constant_invocation' =>[
+            'fix_built_in' => false,
+            'include' => [
+                'DIRECTORY_SEPARATOR',
+                'PHP_INT_SIZE',
+                'PHP_SAPI',
+                'PHP_VERSION_ID'
+            ],
+            'scope' => 'namespaced',
+            'strict' => false
+        ]
     ]);
