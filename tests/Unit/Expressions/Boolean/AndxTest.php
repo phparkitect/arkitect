@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Unit\Expressions\Boolean;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\Boolean\Andx;
 use Arkitect\Expression\ForClasses\Extend;
@@ -14,6 +15,21 @@ use PHPUnit\Framework\TestCase;
 
 class AndxTest extends TestCase
 {
+    public function test_it_should_return_no_violation_when_empty(): void
+    {
+        $and = new Andx();
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('My\Class')
+            ->setExtends('My\BaseClass', 10)
+            ->build();
+
+        $violations = new Violations();
+        $and->evaluate($classDescription, $violations, 'because');
+
+        self::assertEquals(0, $violations->count());
+    }
+
     public function test_it_should_pass_the_rule(): void
     {
         $interface = 'interface';
@@ -93,12 +109,18 @@ class AndxTest extends TestCase
         self::assertNotEquals(0, $violations->count());
 
         $this->assertEquals(
-            'all expressions must be true (should implement SomeInterface, should extend SomeClass) because reasons',
+            "(\nshould implement SomeInterface because reasons\nAND\nshould extend SomeClass because reasons\n) because reasons",
             $violationError
         );
         $this->assertEquals(
-            "The class 'HappyIsland' violated the expression should extend SomeClass, but "
-            .'all expressions must be true (should implement SomeInterface, should extend SomeClass) because reasons',
+            "The class 'HappyIsland' violated the expression\n"
+            ."should extend SomeClass\n"
+            ."from the rule\n"
+            ."(\n"
+            ."should implement SomeInterface because reasons\n"
+            ."AND\n"
+            ."should extend SomeClass because reasons\n"
+            .') because reasons',
             $violations->get(0)->getError()
         );
     }

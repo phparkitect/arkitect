@@ -25,13 +25,13 @@ final class Andx implements Expression
     {
         $expressionsDescriptions = [];
         foreach ($this->expressions as $expression) {
-            $expressionsDescriptions[] = $expression->describe($theClass, '')->toString();
+            $expressionsDescriptions[] = $expression->describe($theClass, $because)->toString();
         }
+        $expressionsDescriptionsString = "(\n"
+            .implode("\nAND\n", array_unique(array_map('trim', $expressionsDescriptions)))
+            ."\n)";
 
-        return new Description(
-            'all expressions must be true ('.implode(', ', $expressionsDescriptions).')',
-            $because
-        );
+        return new Description($expressionsDescriptionsString, $because);
     }
 
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
@@ -44,7 +44,7 @@ final class Andx implements Expression
                     $theClass->getFQCN(),
                     ViolationMessage::withDescription(
                         $this->describe($theClass, $because),
-                        "The class '".$theClass->getFQCN()."' violated the expression "
+                        "The class '".$theClass->getFQCN()."' violated the expression\n"
                         .$expression->describe($theClass, '')->toString()
                     )
                 ));
