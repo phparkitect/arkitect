@@ -18,7 +18,7 @@ class ResideInOneOfTheseNamespaces implements Expression
 
     public function __construct(string ...$namespaces)
     {
-        $this->namespaces = $namespaces;
+        $this->namespaces = array_unique($namespaces);
     }
 
     public function describe(ClassDescription $theClass, string $because): Description
