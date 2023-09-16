@@ -13,10 +13,10 @@ class ViolationMessage
     /** @var string|null */
     private $violation;
 
-    private function __construct(string $rule, ?string $violation)
+    private function __construct(string $rule, string $violation = '')
     {
-        $this->rule = $rule;
-        $this->violation = $violation;
+        $this->rule = trim($rule);
+        $this->violation = trim($violation);
     }
 
     public static function withDescription(Description $brokenRule, string $description): self
@@ -26,15 +26,15 @@ class ViolationMessage
 
     public static function selfExplanatory(Description $brokenRule): self
     {
-        return new self($brokenRule->toString(), null);
+        return new self($brokenRule->toString());
     }
 
     public function toString(): string
     {
-        if (null === $this->violation) {
+        if ('' === $this->violation) {
             return $this->rule;
         }
 
-        return "$this->violation, but $this->rule";
+        return "$this->violation\nfrom the rule\n$this->rule";
     }
 }

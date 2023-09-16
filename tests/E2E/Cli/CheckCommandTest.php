@@ -48,8 +48,12 @@ App\Controller\YieldController has 1 violations
   should implement ContainerAwareInterface because all controllers should be container aware
 
 App\Domain\Model has 2 violations
-  depends on App\Services\UserService, but should not depend on classes outside namespace App\Domain because we want protect our domain (on line 14)
-  depends on App\Services\CartService, but should not depend on classes outside namespace App\Domain because we want protect our domain (on line 15)';
+  depends on App\Services\UserService
+from the rule
+should not depend on classes outside namespace App\Domain because we want protect our domain (on line 14)
+  depends on App\Services\CartService
+from the rule
+should not depend on classes outside namespace App\Domain because we want protect our domain (on line 15)';
 
         $this->assertCheckHasErrors($cmdTester, $expectedErrors);
     }
@@ -58,7 +62,7 @@ App\Domain\Model has 2 violations
     {
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvc.php', true);
 
-        $expectedErrors = 'ERRORS!
+        $expectedErrors = '
 App\Controller\Foo has 1 violations
   should implement ContainerAwareInterface because all controllers should be container aware';
 
@@ -84,7 +88,7 @@ App\Controller\Foo has 1 violations
     {
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configParseError.php');
 
-        $expectedErrors = "ERROR ON PARSING THESE FILES:Syntax error, unexpected T_STRING, expecting '{' on line 8 in file: Services/CartService.php";
+        $expectedErrors = "ERROR ON PARSING THESE FILES:\n\nSyntax error, unexpected T_STRING, expecting '{' on line 8 in file: Services/CartService.php";
         $this->assertCheckHasErrors($cmdTester, $expectedErrors);
     }
 
@@ -185,8 +189,7 @@ App\Controller\Foo has 1 violations
     {
         $this->assertEquals(self::ERROR_CODE, $applicationTester->getStatusCode());
         if (null != $expectedOutput) {
-            $actualOutput = str_replace(["\r", "\n"], '', $applicationTester->getDisplay());
-            $expectedOutput = str_replace(["\r", "\n"], '', $expectedOutput);
+            $actualOutput = $applicationTester->getDisplay();
             $this->assertStringContainsString($expectedOutput, $actualOutput);
         }
     }
@@ -195,8 +198,7 @@ App\Controller\Foo has 1 violations
     {
         $this->assertEquals(self::ERROR_CODE, $applicationTester->getStatusCode());
         if (null != $expectedOutput) {
-            $actualOutput = str_replace(["\r", "\n"], '', $applicationTester->getDisplay());
-            $expectedOutput = str_replace(["\r", "\n"], '', $expectedOutput);
+            $actualOutput = $applicationTester->getDisplay();
             $this->assertStringNotContainsString($expectedOutput, $actualOutput);
         }
     }

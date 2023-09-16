@@ -36,8 +36,13 @@ App\Controller\YieldController has 1 violations
   should implement ContainerAwareInterface because all controllers should be container aware
 
 App\Domain\Model has 2 violations
-  depends on App\Services\UserService, but should not depend on classes outside namespace App\Domain because we want protect our domain (on line 14)
-  depends on App\Services\CartService, but should not depend on classes outside namespace App\Domain because we want protect our domain (on line 15)';
+  depends on App\Services\UserService
+from the rule
+should not depend on classes outside namespace App\Domain because we want protect our domain (on line 14)
+  depends on App\Services\CartService
+from the rule
+should not depend on classes outside namespace App\Domain because we want protect our domain (on line 15)
+';
 
         $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
         $this->assertStringContainsString($expectedErrors, $process->getOutput());
@@ -63,8 +68,13 @@ App\Controller\YieldController has 1 violations
   should implement ContainerAwareInterface because all controllers should be container aware
 
 App\Domain\Model has 2 violations
-  depends on App\Services\UserService, but should not depend on classes outside namespace App\Domain because we want protect our domain (on line 14)
-  depends on App\Services\CartService, but should not depend on classes outside namespace App\Domain because we want protect our domain (on line 15)';
+  depends on App\Services\UserService
+from the rule
+should not depend on classes outside namespace App\Domain because we want protect our domain (on line 14)
+  depends on App\Services\CartService
+from the rule
+should not depend on classes outside namespace App\Domain because we want protect our domain (on line 15)
+';
 
         $this->assertStringContainsString($expectedErrors, $process->getOutput());
         $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
