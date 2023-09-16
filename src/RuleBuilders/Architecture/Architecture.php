@@ -89,7 +89,7 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
         return $this;
     }
 
-    public function rules(): iterable
+    public function rules(string $because = 'of component architecture'): iterable
     {
         foreach ($this->componentSelectors as $name => $selector) {
             if (isset($this->allowedDependencies[$name])) {
@@ -98,14 +98,14 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
                     ->should($this->createAllowedExpression(
                         array_merge([$name], $this->allowedDependencies[$name])
                     ))
-                    ->because('of component architecture');
+                    ->because($because);
             }
 
             if (isset($this->componentDependsOnlyOnTheseComponents[$name])) {
                 yield Rule::allClasses()
                     ->that(\is_string($selector) ? new ResideInOneOfTheseNamespaces($selector) : $selector)
                     ->should($this->createAllowedExpression($this->componentDependsOnlyOnTheseComponents[$name]))
-                    ->because('of component architecture');
+                    ->because($because);
             }
         }
     }
