@@ -8,5 +8,5 @@ use Arkitect\Rules\DSL\ArchRule;
 interface Rules
 {
     /** @return iterable<array-key, ArchRule> */
-    public function rules(): iterable;
+    public function rules(string $because = 'of component architecture'): iterable;
 }
