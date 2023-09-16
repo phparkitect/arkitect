@@ -3,10 +3,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Architecture;
 
-use Arkitect\Expression\Boolean\Andx;
-use Arkitect\Expression\Boolean\Not;
-use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
-use Arkitect\Expression\ForClasses\NotDependsOnTheseNamespaces;
+use Arkitect\Expression\ForClasses\DependsOnlyOnTheseExpressions;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\RuleBuilders\Architecture\Architecture;
 use Arkitect\Rules\Rule;
@@ -30,15 +27,26 @@ class ArchitectureTest extends TestCase
         $expectedRules = [
             Rule::allClasses()
                 ->that(new ResideInOneOfTheseNamespaces('App\*\Domain\*'))
-                ->should(new NotDependsOnTheseNamespaces('App\*\Application\*', 'App\*\Infrastructure\*'))
+                ->should(new DependsOnlyOnTheseExpressions(
+                    new ResideInOneOfTheseNamespaces('App\*\Domain\*')
+                ))
                 ->because('of component architecture'),
             Rule::allClasses()
                 ->that(new ResideInOneOfTheseNamespaces('App\*\Application\*'))
-                ->should(new NotDependsOnTheseNamespaces('App\*\Infrastructure\*'))
+                ->should(new DependsOnlyOnTheseExpressions(
+                    new ResideInOneOfTheseNamespaces('App\*\Application\*', 'App\*\Domain\*')
+                ))
+                ->because('of component architecture'),
+            Rule::allClasses()
+                ->that(new ResideInOneOfTheseNamespaces('App\*\Infrastructure\*'))
+                ->should(new DependsOnlyOnTheseExpressions(
+                    new ResideInOneOfTheseNamespaces('App\*\Infrastructure\*', 'App\*\Domain\*', 'App\*\Application\*')
+                ))
                 ->because('of component architecture'),
         ];
 
-        self::assertEquals($expectedRules, iterator_to_array($rules));
+        $actualRules = iterator_to_array($rules);
+        self::assertEquals($expectedRules, $actualRules);
     }
 
     public function test_layered_architecture_with_expression(): void
@@ -58,20 +66,26 @@ class ArchitectureTest extends TestCase
         $expectedRules = [
             Rule::allClasses()
                 ->that(new ResideInOneOfTheseNamespaces('App\*\Domain\*'))
-                ->should(new Not(new Andx(
-                    new ResideInOneOfTheseNamespaces('App\*\Application\*'),
-                    new ResideInOneOfTheseNamespaces('App\*\Infrastructure\*')
-                )))
+                ->should(new DependsOnlyOnTheseExpressions(
+                    new ResideInOneOfTheseNamespaces('App\*\Domain\*')
+                ))
                 ->because('of component architecture'),
             Rule::allClasses()
                 ->that(new ResideInOneOfTheseNamespaces('App\*\Application\*'))
-                ->should(new Not(new Andx(
-                    new ResideInOneOfTheseNamespaces('App\*\Infrastructure\*')
-                )))
+                ->should(new DependsOnlyOnTheseExpressions(
+                    new ResideInOneOfTheseNamespaces('App\*\Application\*', 'App\*\Domain\*')
+                ))
+                ->because('of component architecture'),
+            Rule::allClasses()
+                ->that(new ResideInOneOfTheseNamespaces('App\*\Infrastructure\*'))
+                ->should(new DependsOnlyOnTheseExpressions(
+                    new ResideInOneOfTheseNamespaces('App\*\Infrastructure\*', 'App\*\Domain\*', 'App\*\Application\*')
+                ))
                 ->because('of component architecture'),
         ];
 
-        self::assertEquals($expectedRules, iterator_to_array($rules));
+        $actualRules = iterator_to_array($rules);
+        self::assertEquals($expectedRules, $actualRules);
     }
 
     public function test_layered_architecture_with_mix_of_namespace_and_expression(): void
@@ -90,20 +104,26 @@ class ArchitectureTest extends TestCase
         $expectedRules = [
             Rule::allClasses()
                 ->that(new ResideInOneOfTheseNamespaces('App\*\Domain\*'))
-                ->should(new Andx(
-                    new NotDependsOnTheseNamespaces('App\*\Infrastructure\*'),
-                    new Not(new Andx(
-                        new ResideInOneOfTheseNamespaces('App\*\Application\*')
-                    ))
+                ->should(new DependsOnlyOnTheseExpressions(
+                    new ResideInOneOfTheseNamespaces('App\*\Domain\*')
                 ))
                 ->because('of component architecture'),
             Rule::allClasses()
                 ->that(new ResideInOneOfTheseNamespaces('App\*\Application\*'))
-                ->should(new NotDependsOnTheseNamespaces('App\*\Infrastructure\*'))
+                ->should(new DependsOnlyOnTheseExpressions(
+                    new ResideInOneOfTheseNamespaces('App\*\Application\*', 'App\*\Domain\*')
+                ))
+                ->because('of component architecture'),
+            Rule::allClasses()
+                ->that(new ResideInOneOfTheseNamespaces('App\*\Infrastructure\*'))
+                ->should(new DependsOnlyOnTheseExpressions(
+                    new ResideInOneOfTheseNamespaces('App\*\Domain\*', 'App\*\Application\*', 'App\*\Infrastructure\*')
+                ))
                 ->because('of component architecture'),
         ];
 
-        self::assertEquals($expectedRules, iterator_to_array($rules));
+        $actualRules = iterator_to_array($rules);
+        self::assertEquals($expectedRules, $actualRules);
     }
 
     public function test_layered_architecture_with_depends_only_on_components(): void
@@ -117,7 +137,7 @@ class ArchitectureTest extends TestCase
         $expectedRules = [
             Rule::allClasses()
                 ->that(new ResideInOneOfTheseNamespaces('App\*\Domain\*'))
-                ->should(new DependsOnlyOnTheseNamespaces('App\*\Domain\*'))
+                ->should(new DependsOnlyOnTheseExpressions(new ResideInOneOfTheseNamespaces('App\*\Domain\*')))
                 ->because('of component architecture'),
         ];
 
