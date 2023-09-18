@@ -22,14 +22,14 @@ class MatchOneOfTheseNames implements Expression
         $this->names = $names;
     }
 
-    public function describe(ClassDescription $theClass, string $because): Description
+    public function describe(ClassDescription $theClass, string $because = ''): Description
     {
         $names = implode(', ', $this->names);
 
         return new Description("should have a name that matches {$names}", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because = ''): void
     {
         $fqcn = FullyQualifiedClassName::fromString($theClass->getFQCN());
         $matches = false;

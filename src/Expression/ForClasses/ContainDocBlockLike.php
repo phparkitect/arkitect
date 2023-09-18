@@ -21,12 +21,12 @@ class ContainDocBlockLike implements Expression
         $this->docBlock = $docBlock;
     }
 
-    public function describe(ClassDescription $theClass, string $because): Description
+    public function describe(ClassDescription $theClass, string $because = ''): Description
     {
         return new Description("should have a doc block that contains {$this->docBlock}", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because = ''): void
     {
         if (!$theClass->containsDocBlock($this->docBlock)) {
             $violation = Violation::create(

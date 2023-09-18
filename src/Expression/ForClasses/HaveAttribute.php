@@ -20,12 +20,12 @@ final class HaveAttribute implements Expression
         $this->attribute = $attribute;
     }
 
-    public function describe(ClassDescription $theClass, string $because): Description
+    public function describe(ClassDescription $theClass, string $because = ''): Description
     {
         return new Description("should have the attribute {$this->attribute}", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because = ''): void
     {
         if ($theClass->hasAttribute($this->attribute)) {
             return;

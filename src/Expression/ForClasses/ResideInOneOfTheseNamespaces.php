@@ -22,14 +22,14 @@ class ResideInOneOfTheseNamespaces implements Expression, MergeableExpression
         $this->namespaces = array_unique($namespaces);
     }
 
-    public function describe(ClassDescription $theClass, string $because): Description
+    public function describe(ClassDescription $theClass, string $because = ''): Description
     {
         $descr = implode(', ', $this->namespaces);
 
         return new Description("should reside in one of these namespaces: $descr", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because = ''): void
     {
         $resideInNamespace = false;
         foreach ($this->namespaces as $namespace) {

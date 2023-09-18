@@ -20,14 +20,14 @@ final class HaveCorrespondingUnit implements Expression
         $this->inferFqnFunction = $inferFqnFunction;
     }
 
-    public function describe(ClassDescription $theClass, string $because): Description
+    public function describe(ClassDescription $theClass, string $because = ''): Description
     {
         $correspondingFqn = $this->inferCorrespondingFqn($theClass);
 
         return new Description("should have a matching unit named: '$correspondingFqn'", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because = ''): void
     {
         $correspondingFqn = $this->inferCorrespondingFqn($theClass);
 

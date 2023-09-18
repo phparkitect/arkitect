@@ -22,12 +22,12 @@ class HaveNameMatching implements Expression
         $this->name = $name;
     }
 
-    public function describe(ClassDescription $theClass, string $because): Description
+    public function describe(ClassDescription $theClass, string $because = ''): Description
     {
         return new Description("should have a name that matches {$this->name}", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because = ''): void
     {
         $fqcn = FullyQualifiedClassName::fromString($theClass->getFQCN());
         if (!$fqcn->classMatches($this->name)) {

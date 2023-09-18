@@ -25,12 +25,12 @@ class NotHaveDependencyOutsideNamespace implements Expression
         $this->externalDependenciesToExclude = $externalDependenciesToExclude;
     }
 
-    public function describe(ClassDescription $theClass, string $because): Description
+    public function describe(ClassDescription $theClass, string $because = ''): Description
     {
         return new Description("should not depend on classes outside namespace {$this->namespace}", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because = ''): void
     {
         $namespace = $this->namespace;
         $depends = function (ClassDependency $dependency) use ($namespace): bool {

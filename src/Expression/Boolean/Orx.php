@@ -20,7 +20,7 @@ final class Orx implements Expression
         $this->expressions = $expressions;
     }
 
-    public function describe(ClassDescription $theClass, string $because): Description
+    public function describe(ClassDescription $theClass, string $because = ''): Description
     {
         $expressionsDescriptions = [];
         foreach ($this->expressions as $expression) {
@@ -31,7 +31,7 @@ final class Orx implements Expression
         return new Description($expressionsDescriptionsString, $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because = ''): void
     {
         if (0 === \count($this->expressions)) {
             return;

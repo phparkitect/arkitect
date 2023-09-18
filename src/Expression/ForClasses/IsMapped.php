@@ -23,12 +23,12 @@ final class IsMapped implements Expression
         $this->list = array_flip($list);
     }
 
-    public function describe(ClassDescription $theClass, string $because): Description
+    public function describe(ClassDescription $theClass, string $because = ''): Description
     {
         return new Description(self::POSITIVE_DESCRIPTION, $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because = ''): void
     {
         if (isset($this->list[$theClass->getFQCN()])) {
             return;

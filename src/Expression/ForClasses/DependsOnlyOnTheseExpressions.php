@@ -31,7 +31,7 @@ class DependsOnlyOnTheseExpressions implements Expression
         }
     }
 
-    public function describe(ClassDescription $theClass, string $because): Description
+    public function describe(ClassDescription $theClass, string $because = ''): Description
     {
         $expressionsDescriptions = '';
         foreach ($this->expressions as $expression) {
@@ -45,7 +45,7 @@ class DependsOnlyOnTheseExpressions implements Expression
         );
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because = ''): void
     {
         $dependencies = $this->removeDuplicateDependencies($theClass->getDependencies());
 

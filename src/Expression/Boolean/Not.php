@@ -21,12 +21,12 @@ final class Not implements Expression
         $this->expression = $expression;
     }
 
-    public function describe(ClassDescription $theClass, string $because): Description
+    public function describe(ClassDescription $theClass, string $because = ''): Description
     {
         return new Description('must NOT ('.$this->expression->describe($theClass, '')->toString().')', $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because = ''): void
     {
         $newViolations = new Violations();
         $this->expression->evaluate($theClass, $newViolations, $because);
