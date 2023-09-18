@@ -23,7 +23,7 @@ final class Not implements Expression
 
     public function describe(ClassDescription $theClass, string $because = ''): Description
     {
-        return new Description('must NOT ('.$this->expression->describe($theClass, '')->toString().')', $because);
+        return new Description('must NOT ('.$this->expression->describe($theClass)->toString().')', $because);
     }
 
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because = ''): void
