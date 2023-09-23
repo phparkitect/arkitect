@@ -36,7 +36,14 @@ class ClassDescriptionTest extends TestCase
     {
         $cd = $this->builder->build();
 
-        $this->assertTrue($cd->namespaceMatchesOneOfTheseNamespaces('Fruit', 'Banana'));
+        $this->assertTrue($cd->namespaceMatchesOneOfTheseNamespaces(['Fruit']));
+    }
+
+    public function test_should_return_true_if_there_class_is_in_namespace_list(): void
+    {
+        $cd = $this->builder->build();
+
+        $this->assertTrue($cd->namespaceMatchesOneOfTheseNamespacesSplat('Fruit', 'Banana'));
     }
 
     public function test_should_return_true_if_is_annotated_with(): void
