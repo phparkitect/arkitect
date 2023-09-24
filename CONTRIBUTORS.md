@@ -22,5 +22,6 @@ Shout out to our top contributors!
 - [jerowork](https://api.github.com/users/jerowork)
 - [jkrzefski](https://api.github.com/users/jkrzefski)
 - [mloru](https://api.github.com/users/mloru)
+- [OskarStark](https://api.github.com/users/OskarStark)
 - [smortexa](https://api.github.com/users/smortexa)
 - [DonCallisto](https://api.github.com/users/DonCallisto)
