@@ -8,6 +8,7 @@ use Arkitect\Analyzer\ClassDependencyCollection;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Exceptions\ClassFileNotFoundException;
 use Arkitect\Exceptions\FailOnFirstViolationException;
+use Arkitect\Expression\Boolean\Not;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Expression\ExpressionCollection;
@@ -15,14 +16,17 @@ use Arkitect\Rules\Violation;
 use Arkitect\Rules\ViolationMessage;
 use Arkitect\Rules\Violations;
 
-class DependsOnlyOnTheseExpressions implements Expression
+class NotDependsOnTheseExpressions implements Expression
 {
     /** @var ExpressionCollection */
     private $expressions;
 
     public function __construct(Expression ...$expressions)
     {
-        $this->expressions = new ExpressionCollection(...$expressions);
+        $this->expressions = new ExpressionCollection();
+        foreach ($expressions as $expression) {
+            $this->expressions->addExpression(new Not($expression));
+        }
     }
 
     public function describe(ClassDescription $theClass, string $because = ''): Description
@@ -33,15 +37,15 @@ class DependsOnlyOnTheseExpressions implements Expression
         }
 
         return new Description(
-            "should depend only on classes in one of the given expressions: \n"
-            .$expressionsDescriptions,
+            "should not depend on classes in any of these expressions: \n"
+            .trim($expressionsDescriptions),
             $because
         );
     }
 
     /**
-     * @throws \ReflectionException
      * @throws FailOnFirstViolationException
+     * @throws \ReflectionException
      * @throws ClassFileNotFoundException
      */
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because = ''): void
@@ -58,7 +62,7 @@ class DependsOnlyOnTheseExpressions implements Expression
 
             $dependencyClassDescription = $dependency->getClassDescription();
 
-            if (!$this->expressions->hasComplianceWith($dependencyClassDescription)) {
+            if ($this->expressions->hasViolationBy($dependencyClassDescription)) {
                 $violations->add(
                     Violation::create(
                         $theClass->getFQCN(),

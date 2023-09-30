@@ -26,7 +26,7 @@ class ResideInOneOfTheseNamespaces implements Expression, MergeableExpression
     {
         $descr = implode(', ', $this->namespaces);
 
-        return new Description("should reside in one of these namespaces: $descr", $because);
+        return new Description("resides in one of these namespaces: $descr", $because);
     }
 
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because = ''): void
