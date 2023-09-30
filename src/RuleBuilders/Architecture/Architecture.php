@@ -6,10 +6,20 @@ namespace Arkitect\RuleBuilders\Architecture;
 use Arkitect\Expression\Boolean\Orx;
 use Arkitect\Expression\Expression;
 use Arkitect\Expression\ForClasses\DependsOnlyOnTheseExpressions;
+use Arkitect\Expression\ForClasses\NotDependsOnTheseExpressions;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\Rules\Rule;
 
-class Architecture implements Component, DefinedBy, Where, MayDependOnComponents, MayDependOnAnyComponent, ShouldNotDependOnAnyComponent, ShouldOnlyDependOnComponents, Rules
+class Architecture implements
+    Component,
+    DefinedBy,
+    Where,
+    MayDependOnComponents,
+    MayDependOnAnyComponent,
+    ShouldNotDependOnAnyComponent,
+    ShouldOnlyDependOnComponents,
+    MustNotDependOnComponents,
+    Rules
 {
     /** @var string */
     private $componentName;
@@ -19,6 +29,8 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
     private $allowedDependencies;
     /** @var array<string, string[]> */
     private $componentDependsOnlyOnTheseComponents;
+    /** @var array<string, string[]> */
+    private $forbiddenDependencies;
 
     private function __construct()
     {
@@ -26,6 +38,7 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
         $this->componentSelectors = [];
         $this->allowedDependencies = [];
         $this->componentDependsOnlyOnTheseComponents = [];
+        $this->forbiddenDependencies = [];
     }
 
     public static function withComponents(): Component
@@ -89,6 +102,13 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
         return $this;
     }
 
+    public function mustNotDependOnComponents(string ...$componentNames)
+    {
+        $this->forbiddenDependencies[$this->componentName] = $componentNames;
+
+        return $this;
+    }
+
     public function rules(string $because = 'of component architecture'): iterable
     {
         foreach ($this->componentSelectors as $name => $selector) {
@@ -107,9 +127,36 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
                     ->should($this->createAllowedExpression($this->componentDependsOnlyOnTheseComponents[$name]))
                     ->because($because);
             }
+
+            if (isset($this->forbiddenDependencies[$name])) {
+                yield Rule::allClasses()
+                    ->that(\is_string($selector) ? new ResideInOneOfTheseNamespaces($selector) : $selector)
+                    ->should($this->createForbiddenExpression($this->forbiddenDependencies[$name]))
+                    ->because($because);
+            }
         }
     }
 
+    private function createForbiddenExpression(array $components): Expression
+    {
+        $namespaceSelectors = $this->extractComponentsNamespaceSelectors($components);
+
+        $expressionSelectors = $this->extractComponentExpressionSelectors($components);
+
+        if ([] === $namespaceSelectors && [] === $expressionSelectors) {
+            return new Orx(); // always true
+        }
+
+        if ([] !== $namespaceSelectors) {
+            $expressionSelectors[] = new ResideInOneOfTheseNamespaces(...$namespaceSelectors);
+        }
+
+        return new NotDependsOnTheseExpressions(...$expressionSelectors);
+    }
+
+    /**
+     * @param array<string> $components
+     */
     private function createAllowedExpression(array $components): Expression
     {
         $namespaceSelectors = $this->extractComponentsNamespaceSelectors($components);
