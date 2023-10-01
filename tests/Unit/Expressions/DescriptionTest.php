@@ -11,7 +11,7 @@ class DescriptionTest extends TestCase
 {
     public function test_it_should_return_description(): void
     {
-        $description = new Description('an example', '');
+        $description = new Description('an example');
         self::assertEquals('an example', $description->toString());
     }
 

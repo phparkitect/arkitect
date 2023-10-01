@@ -21,7 +21,7 @@ class ConstraintsTest extends TestCase
         $trueExpression = new class() implements Expression {
             public function describe(ClassDescription $theClass, string $because = ''): Description
             {
-                return new Description('', '');
+                return new Description('');
             }
 
             public function evaluate(ClassDescription $theClass, Violations $violations, string $because = ''): void
