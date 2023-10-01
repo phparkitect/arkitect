@@ -10,6 +10,7 @@ use Arkitect\Expression\Expression;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\ViolationMessage;
 use Arkitect\Rules\Violations;
+use Arkitect\Shared\String\IndentationHelper;
 
 final class Andx implements Expression
 {
@@ -28,7 +29,7 @@ final class Andx implements Expression
             $expressionsDescriptions[] = $expression->describe($theClass, $because)->toString();
         }
         $expressionsDescriptionsString = "(\n"
-            .implode("\nAND\n", array_unique(array_map('trim', $expressionsDescriptions)))
+            .IndentationHelper::indent(implode("\nAND\n", array_unique(array_map('trim', $expressionsDescriptions))))
             ."\n)";
 
         return new Description($expressionsDescriptionsString, $because);

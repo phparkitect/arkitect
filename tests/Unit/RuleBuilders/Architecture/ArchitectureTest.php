@@ -50,7 +50,7 @@ class ArchitectureTest extends AbstractUnitTest
             $violationsText
         );
         self::assertStringContainsString(
-            'NOT (resides in one of these namespaces: Arkitect\Tests\Fixtures\ComponentA\)',
+            'NOT resides in one of these namespaces: Arkitect\Tests\Fixtures\ComponentA\\',
             $violationsText
         );
     }

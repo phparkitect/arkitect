@@ -9,6 +9,7 @@ use Arkitect\Expression\Expression;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\ViolationMessage;
 use Arkitect\Rules\Violations;
+use Arkitect\Shared\String\IndentationHelper;
 
 final class Orx implements Expression
 {
@@ -26,7 +27,9 @@ final class Orx implements Expression
         foreach ($this->expressions as $expression) {
             $expressionsDescriptions[] = $expression->describe($theClass, $because)->toString();
         }
-        $expressionsDescriptionsString = implode("\nOR\n", array_unique($expressionsDescriptions))."\n";
+        $expressionsDescriptionsString = "(\n"
+            .IndentationHelper::indent(implode("\nOR\n", array_unique($expressionsDescriptions)))
+            ."\n)";
 
         return new Description($expressionsDescriptionsString, $because);
     }
