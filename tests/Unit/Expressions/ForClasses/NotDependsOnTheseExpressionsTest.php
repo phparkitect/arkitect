@@ -85,13 +85,13 @@ class NotDependsOnTheseExpressionsTest extends AbstractUnitTest
         );
         self::assertStringContainsString(
             <<<TXT
-NOT resides in one of these namespaces: Arkitect\Tests\Fixtures\ComponentA\
-OR
-NOT (
-  resides in one of these namespaces: Arkitect\Tests\Fixtures\ComponentC\
-  AND
-  not resides in one of these namespaces: Arkitect\Tests\Fixtures\ComponentC\ComponentCA\
-)
+  NOT resides in one of these namespaces: Arkitect\Tests\Fixtures\ComponentA\
+  OR
+  NOT (
+    resides in one of these namespaces: Arkitect\Tests\Fixtures\ComponentC\
+    AND
+    not resides in one of these namespaces: Arkitect\Tests\Fixtures\ComponentC\ComponentCA\
+  )
 TXT
             ,
             $violationsText

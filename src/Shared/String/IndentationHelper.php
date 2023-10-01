@@ -10,4 +10,9 @@ final class IndentationHelper
     {
         return preg_replace('/^/m', str_repeat(' ', $spaces), $text);
     }
+
+    public static function clearEmptyLines(string $text): string
+    {
+        return preg_replace('/^\s+$/m', '', $text);
+    }
 }

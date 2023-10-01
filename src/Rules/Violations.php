@@ -6,6 +6,7 @@ namespace Arkitect\Rules;
 
 use Arkitect\Exceptions\FailOnFirstViolationException;
 use Arkitect\Exceptions\IndexNotFoundException;
+use Arkitect\Shared\String\IndentationHelper;
 
 class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
 {
@@ -86,20 +87,22 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
          */
         foreach ($violationsCollection as $key => $violationsByFqcn) {
             $violationForThisFqcn = \count($violationsByFqcn);
-            $errors .= "\n$key has {$violationForThisFqcn} violations";
+            $errors .= "\n$key has {$violationForThisFqcn} violations\n";
 
+            $violationDescription = '';
             foreach ($violationsByFqcn as $violation) {
-                $errors .= "\n";
-                $errors .= $violation->getError();
+                $violationDescription .= "\n";
+                $violationDescription .= $violation->getError();
 
                 if (null !== $violation->getLine()) {
-                    $errors .= ' (on line '.$violation->getLine().')';
+                    $violationDescription .= ' (on line '.$violation->getLine().')';
                 }
-                $errors .= "\n";
+                $violationDescription .= "\n";
             }
+            $errors .= IndentationHelper::indent(trim($violationDescription))."\n";
         }
 
-        return $errors;
+        return IndentationHelper::clearEmptyLines($errors);
     }
 
     public function toArray(): array
