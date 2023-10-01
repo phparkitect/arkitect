@@ -60,3 +60,4 @@ fix:
 	PHP_CS_FIXER_IGNORE_ENV=1 ./bin/php-cs-fixer fix -v
 	./bin/psalm
 	./bin/phpunit -d memory_limit=-1 --coverage-clover var/coverage.clover.xml
+	@ echo "" && echo "FINISHED SUCCESSFULLY!"
