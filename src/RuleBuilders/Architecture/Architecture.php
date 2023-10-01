@@ -109,7 +109,7 @@ class Architecture implements
         return $this;
     }
 
-    public function rules(string $because = 'of component architecture'): iterable
+    public function rules(string $because = null): iterable
     {
         foreach ($this->componentSelectors as $name => $selector) {
             if (isset($this->allowedDependencies[$name])) {
@@ -118,21 +118,36 @@ class Architecture implements
                     ->should($this->createAllowedExpression(
                         array_merge([$name], $this->allowedDependencies[$name])
                     ))
-                    ->because($because);
+                    ->because(
+                        $because
+                            ?? "$name can only depend on itself"
+                                .(
+                                    \count($this->allowedDependencies[$name])
+                                    ? ' and on '.implode(', ', $this->allowedDependencies[$name])
+                                    : ''
+                                )
+                    );
             }
 
             if (isset($this->componentDependsOnlyOnTheseComponents[$name])) {
                 yield Rule::allClasses()
                     ->that(\is_string($selector) ? new ResideInOneOfTheseNamespaces($selector) : $selector)
                     ->should($this->createAllowedExpression($this->componentDependsOnlyOnTheseComponents[$name]))
-                    ->because($because);
+                    ->because(
+                        $because
+                            ?? "$name can only depend on "
+                                .implode(', ', $this->componentDependsOnlyOnTheseComponents[$name])
+                    );
             }
 
             if (isset($this->forbiddenDependencies[$name])) {
                 yield Rule::allClasses()
                     ->that(\is_string($selector) ? new ResideInOneOfTheseNamespaces($selector) : $selector)
                     ->should($this->createForbiddenExpression($this->forbiddenDependencies[$name]))
-                    ->because($because);
+                    ->because(
+                        $because
+                            ?? "$name must not depend on ".implode(', ', $this->forbiddenDependencies[$name])
+                    );
             }
         }
     }

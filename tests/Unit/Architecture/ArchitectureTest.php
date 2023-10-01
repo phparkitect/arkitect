@@ -30,19 +30,19 @@ class ArchitectureTest extends TestCase
                 ->should(new DependsOnlyOnTheseExpressions(
                     new ResideInOneOfTheseNamespaces('App\*\Domain\*')
                 ))
-                ->because('of component architecture'),
+                ->because('Domain can only depend on itself'),
             Rule::allClasses()
                 ->that(new ResideInOneOfTheseNamespaces('App\*\Application\*'))
                 ->should(new DependsOnlyOnTheseExpressions(
                     new ResideInOneOfTheseNamespaces('App\*\Application\*', 'App\*\Domain\*')
                 ))
-                ->because('of component architecture'),
+                ->because('Application can only depend on itself and on Domain'),
             Rule::allClasses()
                 ->that(new ResideInOneOfTheseNamespaces('App\*\Infrastructure\*'))
                 ->should(new DependsOnlyOnTheseExpressions(
                     new ResideInOneOfTheseNamespaces('App\*\Infrastructure\*', 'App\*\Domain\*', 'App\*\Application\*')
                 ))
-                ->because('of component architecture'),
+                ->because('Infrastructure can only depend on itself and on Domain, Application, Infrastructure'),
         ];
 
         $actualRules = iterator_to_array($rules);
@@ -69,19 +69,19 @@ class ArchitectureTest extends TestCase
                 ->should(new DependsOnlyOnTheseExpressions(
                     new ResideInOneOfTheseNamespaces('App\*\Domain\*')
                 ))
-                ->because('of component architecture'),
+                ->because('Domain can only depend on itself'),
             Rule::allClasses()
                 ->that(new ResideInOneOfTheseNamespaces('App\*\Application\*'))
                 ->should(new DependsOnlyOnTheseExpressions(
                     new ResideInOneOfTheseNamespaces('App\*\Application\*', 'App\*\Domain\*')
                 ))
-                ->because('of component architecture'),
+                ->because('Application can only depend on itself and on Domain'),
             Rule::allClasses()
                 ->that(new ResideInOneOfTheseNamespaces('App\*\Infrastructure\*'))
                 ->should(new DependsOnlyOnTheseExpressions(
                     new ResideInOneOfTheseNamespaces('App\*\Infrastructure\*', 'App\*\Domain\*', 'App\*\Application\*')
                 ))
-                ->because('of component architecture'),
+                ->because('Infrastructure can only depend on itself and on Domain, Application, Infrastructure'),
         ];
 
         $actualRules = iterator_to_array($rules);
@@ -107,19 +107,19 @@ class ArchitectureTest extends TestCase
                 ->should(new DependsOnlyOnTheseExpressions(
                     new ResideInOneOfTheseNamespaces('App\*\Domain\*')
                 ))
-                ->because('of component architecture'),
+                ->because('Domain can only depend on itself'),
             Rule::allClasses()
                 ->that(new ResideInOneOfTheseNamespaces('App\*\Application\*'))
                 ->should(new DependsOnlyOnTheseExpressions(
                     new ResideInOneOfTheseNamespaces('App\*\Application\*', 'App\*\Domain\*')
                 ))
-                ->because('of component architecture'),
+                ->because('Application can only depend on itself and on Domain'),
             Rule::allClasses()
                 ->that(new ResideInOneOfTheseNamespaces('App\*\Infrastructure\*'))
                 ->should(new DependsOnlyOnTheseExpressions(
                     new ResideInOneOfTheseNamespaces('App\*\Domain\*', 'App\*\Application\*', 'App\*\Infrastructure\*')
                 ))
-                ->because('of component architecture'),
+                ->because('Infrastructure can only depend on itself and on Domain, Application, Infrastructure'),
         ];
 
         $actualRules = iterator_to_array($rules);
@@ -138,7 +138,7 @@ class ArchitectureTest extends TestCase
             Rule::allClasses()
                 ->that(new ResideInOneOfTheseNamespaces('App\*\Domain\*'))
                 ->should(new DependsOnlyOnTheseExpressions(new ResideInOneOfTheseNamespaces('App\*\Domain\*')))
-                ->because('of component architecture'),
+                ->because('Domain can only depend on Domain'),
         ];
 
         self::assertEquals($expectedRules, iterator_to_array($rules));
