@@ -23,7 +23,8 @@ class ViolationDescriptionTest extends TestCase
         self::assertEquals(
             "it does something\n"
             ."from the rule\n"
-            .'should not because reasons',
+            ."should not\n"
+            .'because reasons',
             $description->toString()
         );
     }

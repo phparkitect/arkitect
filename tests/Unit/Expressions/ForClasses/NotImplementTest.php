@@ -84,7 +84,7 @@ class NotImplementTest extends TestCase
         self::assertNotEquals(0, $violations->count());
 
         $this->assertEquals(
-            'should not implement '.$interface.' because we want to add this rule for our software',
+            'should not implement '.$interface."\nbecause we want to add this rule for our software",
             $violationError
         );
     }

@@ -109,7 +109,7 @@ class AndxTest extends TestCase
         self::assertNotEquals(0, $violations->count());
 
         $this->assertEquals(
-            "(\nshould implement SomeInterface because reasons\nAND\nshould extend SomeClass because reasons\n) because reasons",
+            "(\nshould implement SomeInterface\nbecause reasons\nAND\nshould extend SomeClass\nbecause reasons\n)\nbecause reasons",
             $violationError
         );
         $this->assertEquals(
@@ -117,10 +117,10 @@ class AndxTest extends TestCase
             ."should extend SomeClass\n"
             ."from the rule\n"
             ."(\n"
-            ."should implement SomeInterface because reasons\n"
+            ."should implement SomeInterface\nbecause reasons\n"
             ."AND\n"
-            ."should extend SomeClass because reasons\n"
-            .') because reasons',
+            ."should extend SomeClass\nbecause reasons\n"
+            .")\nbecause reasons",
             $violations->get(0)->getError()
         );
     }

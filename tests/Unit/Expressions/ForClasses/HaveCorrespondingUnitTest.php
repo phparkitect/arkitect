@@ -70,7 +70,7 @@ class HaveCorrespondingUnitTest extends TestCase
         $violationError = $constraint->describe($classDescription, $because)->toString();
         $this->assertEquals(
             'should have a matching unit named: '
-            ."'Arkitect\Tests\Unit\Expressions\ForClasses\DummyClasses\DogTestCase' because $because",
+            ."'Arkitect\Tests\Unit\Expressions\ForClasses\DummyClasses\DogTestCase'\nbecause $because",
             $violationError
         );
     }

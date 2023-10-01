@@ -32,7 +32,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
         $violationError = $notHaveDependencyOutsideNamespace->describe($classDescription, $because)->toString();
 
         $this->assertEquals(
-            'should not depend on classes outside namespace '.$namespace.' because we want to add this rule for our software',
+            "should not depend on classes outside namespace $namespace\nbecause we want to add this rule for our software",
             $violationError
         );
     }

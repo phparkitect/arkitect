@@ -34,7 +34,7 @@ class NotExtendTest extends TestCase
         $notExtend->evaluate($classDescription, $violations, $because);
 
         self::assertEquals(1, $violations->count());
-        self::assertEquals('should not extend My\BaseClass because we want to add this rule for our software', $violationError);
+        self::assertEquals("should not extend My\BaseClass\nbecause we want to add this rule for our software", $violationError);
     }
 
     public function test_it_should_not_return_violation_error_if_extends_another_class(): void

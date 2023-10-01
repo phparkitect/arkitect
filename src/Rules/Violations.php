@@ -89,13 +89,14 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
             $errors .= "\n$key has {$violationForThisFqcn} violations";
 
             foreach ($violationsByFqcn as $violation) {
-                $errors .= "\n  ".$violation->getError();
+                $errors .= "\n";
+                $errors .= $violation->getError();
 
                 if (null !== $violation->getLine()) {
                     $errors .= ' (on line '.$violation->getLine().')';
                 }
+                $errors .= "\n";
             }
-            $errors .= "\n";
         }
 
         return $errors;

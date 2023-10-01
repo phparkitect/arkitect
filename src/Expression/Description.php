@@ -14,7 +14,7 @@ class Description
         $this->description = $description;
 
         if ('' !== $because) {
-            $this->description .= ' because '.$because;
+            $this->description .= "\nbecause $because";
         }
     }
 

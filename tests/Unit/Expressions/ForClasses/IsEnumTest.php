@@ -32,7 +32,7 @@ class IsEnumTest extends TestCase
         $isEnum->evaluate($classDescription, $violations, $because);
         self::assertNotEquals(0, $violations->count());
 
-        $this->assertEquals('HappyIsland should be an enum because we want to add this rule for our software', $violationError);
+        $this->assertEquals("HappyIsland should be an enum\nbecause we want to add this rule for our software", $violationError);
     }
 
     public function test_it_should_return_true_if_is_enum(): void

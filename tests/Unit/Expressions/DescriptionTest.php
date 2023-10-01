@@ -18,6 +18,6 @@ class DescriptionTest extends TestCase
     public function test_it_should_append_because_when_is_present(): void
     {
         $description = new Description('an example', 'reasons');
-        self::assertEquals('an example because reasons', $description->toString());
+        self::assertEquals("an example\nbecause reasons", $description->toString());
     }
 }

@@ -23,25 +23,34 @@ class RunArkitectBinTest extends TestCase
         $expectedErrors = 'ERRORS!
 
 App\Controller\Foo has 2 violations
-  should have a name that matches *Controller because we want uniform naming
-  should implement ContainerAwareInterface because all controllers should be container aware
+should have a name that matches *Controller
+because we want uniform naming
+
+should implement ContainerAwareInterface
+because all controllers should be container aware
 
 App\Controller\ProductsController has 1 violations
-  should implement ContainerAwareInterface because all controllers should be container aware
+should implement ContainerAwareInterface
+because all controllers should be container aware
 
 App\Controller\UserController has 1 violations
-  should implement ContainerAwareInterface because all controllers should be container aware
+should implement ContainerAwareInterface
+because all controllers should be container aware
 
 App\Controller\YieldController has 1 violations
-  should implement ContainerAwareInterface because all controllers should be container aware
+should implement ContainerAwareInterface
+because all controllers should be container aware
 
 App\Domain\Model has 2 violations
-  depends on App\Services\UserService
+depends on App\Services\UserService
 from the rule
-should not depend on classes outside namespace App\Domain because we want protect our domain (on line 14)
-  depends on App\Services\CartService
+should not depend on classes outside namespace App\Domain
+because we want protect our domain (on line 14)
+
+depends on App\Services\CartService
 from the rule
-should not depend on classes outside namespace App\Domain because we want protect our domain (on line 15)
+should not depend on classes outside namespace App\Domain
+because we want protect our domain (on line 15)
 ';
 
         $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
@@ -55,25 +64,34 @@ should not depend on classes outside namespace App\Domain because we want protec
         $expectedErrors = 'ERRORS!
 
 App\Controller\Foo has 2 violations
-  should have a name that matches *Controller because we want uniform naming
-  should implement ContainerAwareInterface because all controllers should be container aware
+should have a name that matches *Controller
+because we want uniform naming
+
+should implement ContainerAwareInterface
+because all controllers should be container aware
 
 App\Controller\ProductsController has 1 violations
-  should implement ContainerAwareInterface because all controllers should be container aware
+should implement ContainerAwareInterface
+because all controllers should be container aware
 
 App\Controller\UserController has 1 violations
-  should implement ContainerAwareInterface because all controllers should be container aware
+should implement ContainerAwareInterface
+because all controllers should be container aware
 
 App\Controller\YieldController has 1 violations
-  should implement ContainerAwareInterface because all controllers should be container aware
+should implement ContainerAwareInterface
+because all controllers should be container aware
 
 App\Domain\Model has 2 violations
-  depends on App\Services\UserService
+depends on App\Services\UserService
 from the rule
-should not depend on classes outside namespace App\Domain because we want protect our domain (on line 14)
-  depends on App\Services\CartService
+should not depend on classes outside namespace App\Domain
+because we want protect our domain (on line 14)
+
+depends on App\Services\CartService
 from the rule
-should not depend on classes outside namespace App\Domain because we want protect our domain (on line 15)
+should not depend on classes outside namespace App\Domain
+because we want protect our domain (on line 15)
 ';
 
         $this->assertStringContainsString($expectedErrors, $process->getOutput());
@@ -102,7 +120,7 @@ should not depend on classes outside namespace App\Domain because we want protec
         $expectedErrors = 'ERRORS!
 
 App\Controller\Foo has 1 violations
-  should have a name that matches *Controller';
+should have a name that matches *Controller';
 
         $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
         $this->assertStringContainsString($expectedErrors, $process->getOutput());

@@ -23,7 +23,7 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
 
         self::assertEquals(0, $violations->count());
         self::assertEquals(
-            'should depend only on classes in one of these namespaces: myNamespace because we want to add this rule for our software',
+            "should depend only on classes in one of these namespaces: myNamespace\nbecause we want to add this rule for our software",
             $dependOnClasses->describe($classDescription, $because)->toString()
         );
     }
@@ -45,7 +45,7 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
         self::assertEquals(
             "depends on anotherNamespace\Banana\n"
             ."from the rule\n"
-            .'should depend only on classes in one of these namespaces: myNamespace because we want to add this rule for our software',
+            ."should depend only on classes in one of these namespaces: myNamespace\nbecause we want to add this rule for our software",
             $violations->get(0)->getError()
         );
     }

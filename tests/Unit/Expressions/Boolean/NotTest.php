@@ -35,7 +35,7 @@ class NotTest extends TestCase
         self::assertNotEquals(0, $violations->count());
 
         $this->assertEquals(
-            'NOT (HappyIsland should be an interface) because we want to add this rule for our software',
+            "NOT (HappyIsland should be an interface)\nbecause we want to add this rule for our software",
             $violationError
         );
     }

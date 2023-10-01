@@ -31,7 +31,7 @@ class MatchOneOfTheseNamesTest extends TestCase
         $expression->evaluate($badClass, $violations, $because);
         self::assertNotEquals(0, $violations->count());
         $this->assertEquals(
-            'should have a name that matches *BetterName*, *GoodName* because we want to add this rule for our software',
+            "should have a name that matches *BetterName*, *GoodName*\nbecause we want to add this rule for our software",
             $expression->describe($badClass, $because)->toString()
         );
     }

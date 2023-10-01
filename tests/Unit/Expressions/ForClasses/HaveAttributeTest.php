@@ -35,7 +35,7 @@ class HaveAttributeTest extends TestCase
 
         self::assertEquals(0, $violations->count());
         self::assertEquals(
-            'should have the attribute myAttribute because we want to add this rule for our software',
+            "should have the attribute myAttribute\nbecause we want to add this rule for our software",
             $expression->describe($classDescription, $because)->toString()
         );
     }
