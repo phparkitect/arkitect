@@ -54,6 +54,7 @@ dt: ##it launches tests using container
 	docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect make test
 
 fix:
+	rm -f composer.lock
 	composer validate
 	composer install --prefer-dist
 	PHP_CS_FIXER_IGNORE_ENV=1 ./bin/php-cs-fixer fix -v
