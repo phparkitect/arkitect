@@ -365,7 +365,7 @@ $rules[] = Rule::allClasses()
 ```php
 $rules[] = Rule::allClasses()
     ->that(new Extend('App\Domain\Event'))
-    ->should(new NotResideInOneOfTheseNamespaces('App\Application', 'App\Infrastructure'))
+    ->should(new NotResideInTheseNamespaces('App\Application', 'App\Infrastructure'))
     ->because('we want to be sure that all events not reside in wrong layers');
 ```
 
