@@ -53,3 +53,11 @@ sfbuild: ## it launches all the build
 dt: ##it launches tests using container
 	docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect make test
 
+fix:
+	rm -f composer.lock
+	composer validate
+	composer install --prefer-dist
+	PHP_CS_FIXER_IGNORE_ENV=1 ./bin/php-cs-fixer fix -v
+	./bin/psalm
+	./bin/phpunit -d memory_limit=-1 --coverage-clover var/coverage.clover.xml
+	@ echo "" && echo "FINISHED SUCCESSFULLY!"

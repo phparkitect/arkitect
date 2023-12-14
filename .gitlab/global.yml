@@ -1,0 +1,11 @@
+stages:
+  - test
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_BUILDKIT: 1
+
+  TIMEZONE: "Europe/Amsterdam"            # For the system in general
+  TZ: ${TIMEZONE}                         # For mysql
+  DATE_TIMEZONE: ${TIMEZONE}              # For PHP
+  ARTIFACT_OUT_PATH: 'var/ci-out'

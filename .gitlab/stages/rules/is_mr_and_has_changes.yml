@@ -1,0 +1,6 @@
+.is_mr_and_has_changes:
+  rules:
+    - if: '$MANUAL_PIPELINE == "false" && ($CI_PIPELINE_SOURCE == "merge_request_event" || $CI_PIPELINE_SOURCE == "web")'
+      changes:
+        - .gitlab/stages/jobs/build.yml
+        - images/${IMAGE_CANONICAL_NAME}/**/*

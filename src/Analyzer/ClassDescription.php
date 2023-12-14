@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
 
+use Arkitect\Expression\Expression;
+use Arkitect\Rules\Violations;
+
 class ClassDescription
 {
     /** @var FullyQualifiedClassName */
@@ -95,8 +98,26 @@ class ClassDescription
 
     public function namespaceMatchesOneOfTheseNamespaces(array $classesToBeExcluded): bool
     {
+        return $this->namespaceMatchesOneOfTheseNamespacesSplat(...$classesToBeExcluded);
+    }
+
+    public function namespaceMatchesOneOfTheseNamespacesSplat(string ...$classesToBeExcluded): bool
+    {
         foreach ($classesToBeExcluded as $classToBeExcluded) {
             if ($this->namespaceMatches($classToBeExcluded)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function matchesOneOfTheseExpressions(Expression ...$expressionList): bool
+    {
+        foreach ($expressionList as $expression) {
+            $violations = new Violations();
+            $expression->evaluate($this, $violations, '');
+            if (0 === $violations->count()) {
                 return true;
             }
         }

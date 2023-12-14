@@ -30,4 +30,11 @@ class AllClasses implements ThatParser
 
         return $this;
     }
+
+    public function exceptExpression(Expression ...$classesToBeExcluded): ThatParser
+    {
+        $this->ruleBuilder->classesToBeExcludedByExpression(...$classesToBeExcluded);
+
+        return $this;
+    }
 }

@@ -34,7 +34,7 @@ class NotContainDocBlockLikeTest extends TestCase
 
         self::assertEquals(0, $violations->count());
         self::assertEquals(
-            'should not have a doc block that contains anotherDocBlock because we want to add this rule for our software',
+            "should not have a doc block that contains anotherDocBlock\nbecause we want to add this rule for our software",
             $expression->describe($classDescription, $because)->toString()
         );
     }

@@ -13,12 +13,12 @@ use Arkitect\Rules\Violations;
 
 class IsFinal implements Expression
 {
-    public function describe(ClassDescription $theClass, string $because): Description
+    public function describe(ClassDescription $theClass, string $because = ''): Description
     {
         return new Description("{$theClass->getName()} should be final", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because = ''): void
     {
         if ($theClass->isAbstract() || $theClass->isInterface() || $theClass->isFinal() || $theClass->isTrait()
             || $theClass->isEnum()) {

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
 
+use Arkitect\Exceptions\ClassFileNotFoundException;
+
 class ClassDependency
 {
     /** @var int */
@@ -41,5 +43,26 @@ class ClassDependency
     public function getFQCN(): FullyQualifiedClassName
     {
         return $this->FQCN;
+    }
+
+    /**
+     * @throws ClassFileNotFoundException
+     * @throws \ReflectionException
+     */
+    public function getClassDescription(): ClassDescription
+    {
+        /** @var class-string $dependencyFqcn */
+        $dependencyFqcn = $this->getFQCN()->toString();
+        $reflector = new \ReflectionClass($dependencyFqcn);
+        $filename = $reflector->getFileName();
+        if (false === $filename) {
+            throw new ClassFileNotFoundException($dependencyFqcn);
+        }
+
+        $fileParser = FileParserFactory::createFileParser();
+        $fileParser->parse(file_get_contents($filename), $filename);
+        $classDescriptionList = $fileParser->getClassDescriptions();
+
+        return array_pop($classDescriptionList);
     }
 }

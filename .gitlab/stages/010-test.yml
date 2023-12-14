@@ -1,0 +1,34 @@
+test-php-7.1:
+  extends: .test
+  variables:
+    IMAGE: hgraca/full-php-7.1-fpm-alpine:ci-latest
+
+test-php-7.2:
+  extends: .test
+  variables:
+    IMAGE: hgraca/full-php-7.2-fpm-alpine:ci-latest
+
+test-php-7.3:
+  extends: .test
+  variables:
+    IMAGE: hgraca/full-php-7.3-fpm-alpine:ci-latest
+
+test-php-7.4:
+  extends: .test
+  variables:
+    IMAGE: hgraca/full-php-7.4-fpm-alpine:ci-latest
+
+test-php-8.0:
+  extends: .test
+  variables:
+    IMAGE: hgraca/full-php-8.0-fpm-alpine:ci-latest
+
+test-php-8.1:
+  extends: .test
+  variables:
+    IMAGE: hgraca/full-php-8.1-fpm-alpine:ci-latest
+
+test-php-8.2:
+  extends: .test
+  variables:
+    IMAGE: hgraca/full-php-8.2-fpm-alpine:ci-latest

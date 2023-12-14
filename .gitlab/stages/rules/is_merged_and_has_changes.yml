@@ -1,0 +1,6 @@
+.is_merged_and_has_changes:
+  rules:
+    - if: '$MANUAL_PIPELINE == "false" && $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH'
+      changes:
+        - .gitlab/stages/jobs/build.yml
+        - images/${IMAGE_CANONICAL_NAME}/**/*

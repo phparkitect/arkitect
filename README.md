@@ -3,6 +3,19 @@
 [![Packagist](https://img.shields.io/packagist/dt/phparkitect/phparkitect.svg)](https://packagist.org/packages/phparkitect/phparkitect)
 [![codecov](https://codecov.io/gh/phparkitect/arkitect/branch/main/graph/badge.svg)](https://codecov.io/gh/phparkitect/arkitect)
 
+# NOTE
+
+
+> This project is a clone of [phparkitect/arkitect](https://github.com/phparkitect/arkitect), with some extra features
+on top of it.
+> 
+> As much as possible, this project will comply to upstream, this is just a way to get some extra features.
+>
+> We will periodically merge from the original project (upstream/main).
+>
+> This project uses semantic versioning, but completely independent of the upstream versioning, we started at 0.666.1.
+
+# Index
 
 1. [Introduction](#introduction)
 1. [Installation](#installation)
@@ -22,6 +35,7 @@ Rule::allClasses()
     ->should(new HaveNameMatching('*Controller'))
     ->because('it\'s a symfony naming convention');
 ```
+
 # Installation
 
 ## Using Composer
@@ -152,10 +166,46 @@ For example: `phparkitect debug:expression ResideInOneOfTheseNamespaces App`
 
 Currently, you can check if a class:
 
-### Depends on a namespace
+### Is referenced in a given map
+
+This is useful, for example, to ensure that DTOs like commands and
+events are always set in a map, so that we are sure a serializer knows how
+to serialize/deserialize them.
+
+```php
+$map = [
+    'a' => 'App\Core\Component\MyComponent\Command\MyCommand',
+    'b' => 'App\Core\Component\MyComponent\Event\MyEvent',
+];
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Core\Component\**\Command', 'App\Core\Component\**\Event'))
+    ->should(new IsMapped($map))
+    ->because('we want to ensure our serializer can serialize/deserialize all commands and events');
+```
+
+### Has a corresponding code unit in another namespace
+
+This will allow us to ensure that certain classes always have a test,
+or that every test has a matching class and their namespaces are correct.
 
 ```php
 $rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Core\Component\**\Command\*'))
+    ->should(new HaveCorrespondingUnit(
+            // This will assert that class `App\Core\Component\MyComponent\Command\MyCommand`
+            // has a test class in `Tests\App\Core\Component\MyComponent\Command\MyCommandTest`
+            function ($fqcn) {
+                return 'Tests\\'.$fqcn.'Test';
+            }
+        )
+    )
+    ->because('we want all our command handlers to have a test');
+```
+
+### Depends on a namespace
+
+```php
+$rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
     ->should(new DependsOnlyOnTheseNamespaces('App\Domain', 'Ramsey\Uuid'))
     ->because('we want to protect our domain from external dependencies except for Ramsey\Uuid');
@@ -164,7 +214,7 @@ $rules = Rule::allClasses()
 ### Doc block contains a string
 
 ```php
-$rules = Rule::allClasses()
+$rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Domain\Events'))
     ->should(new ContainDocBlockLike('@psalm-immutable'))
     ->because('we want to enforce immutability');
@@ -173,7 +223,7 @@ $rules = Rule::allClasses()
 ### Doc block not contains a string
 
 ```php
-$rules = Rule::allClasses()
+$rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
     ->should(new NotContainDocBlockLike('@psalm-immutable'))
     ->because('we don\'t want to enforce immutability');
@@ -182,7 +232,7 @@ $rules = Rule::allClasses()
 ### Extend another class
 
 ```php
-$rules = Rule::allClasses()
+$rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
     ->should(new Extend('App\Controller\AbstractController'))
     ->because('we want to be sure that all controllers extend AbstractController');
@@ -191,7 +241,7 @@ $rules = Rule::allClasses()
 ### Has an attribute (requires PHP >= 8.0)
 
 ```php
-$rules = Rule::allClasses()
+$rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
     ->should(new HaveAttribute('AsController'))
     ->because('it configures the service container');
@@ -200,7 +250,7 @@ $rules = Rule::allClasses()
 ### Have a name matching a pattern
 
 ```php
-$rules = Rule::allClasses()
+$rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Service'))
     ->should(new HaveNameMatching('*Service'))
     ->because('we want uniform naming for services');
@@ -209,7 +259,7 @@ $rules = Rule::allClasses()
 ### Implements an interface
 
 ```php
-$rules = Rule::allClasses()
+$rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
     ->should(new Implement('ContainerAwareInterface'))
     ->because('all controllers should be container aware');
@@ -218,7 +268,7 @@ $rules = Rule::allClasses()
 ### Not implements an interface
 
 ```php
-$rules = Rule::allClasses()
+$rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Infrastructure\RestApi\Public'))
     ->should(new NotImplement('ContainerAwareInterface'))
     ->because('all public controllers should not be container aware');
@@ -227,7 +277,7 @@ $rules = Rule::allClasses()
 ### Is abstract
 
 ```php
-$rules = Rule::allClasses()
+$rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Customer\Service'))
     ->should(new IsAbstract())
     ->because('we want to be sure that classes are abstract in a specific namespace');
@@ -236,7 +286,7 @@ $rules = Rule::allClasses()
 ### Is trait
 
 ```php
-$rules = Rule::allClasses()
+$rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Customer\Service\Traits'))
     ->should(new IsTrait())
     ->because('we want to be sure that there are only traits in a specific namespace');
@@ -245,7 +295,7 @@ $rules = Rule::allClasses()
 ### Is final
 
 ```php
-$rules = Rule::allClasses()
+$rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Domain\Aggregates'))
     ->should(new IsFinal())
     ->because('we want to be sure that aggregates are final classes');
@@ -254,7 +304,7 @@ $rules = Rule::allClasses()
 ### Is interface
 
 ```php
-$rules = Rule::allClasses()
+$rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Interfaces'))
     ->should(new IsInterface())
     ->because('we want to be sure that all interfaces are in one directory');
@@ -263,7 +313,7 @@ $rules = Rule::allClasses()
 ### Is enum
 
 ```php
-$rules = Rule::allClasses()
+$rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Enum'))
     ->should(new IsEnum())
     ->because('we want to be sure that all classes are enum');
@@ -272,7 +322,7 @@ $rules = Rule::allClasses()
 ### Is not abstract
 
 ```php
-$rules = Rule::allClasses()
+$rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
     ->should(new IsNotAbstract())
     ->because('we want to avoid abstract classes into our domain');
@@ -281,7 +331,7 @@ $rules = Rule::allClasses()
 ### Is not trait
 
 ```php
-$rules = Rule::allClasses()
+$rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
     ->should(new IsNotTrait())
     ->because('we want to avoid traits in our codebase');
@@ -290,7 +340,7 @@ $rules = Rule::allClasses()
 ### Is not final
 
 ```php
-$rules = Rule::allClasses()
+$rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Infrastructure\Doctrine'))
     ->should(new IsNotFinal())
     ->because('we want to be sure that our adapters are not final classes');
@@ -299,7 +349,7 @@ $rules = Rule::allClasses()
 ### Is not interface
 
 ```php
-$rules = Rule::allClasses()
+$rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('Tests\Integration'))
     ->should(new IsNotInterface())
     ->because('we want to be sure that we do not have interfaces in tests');
@@ -308,7 +358,7 @@ $rules = Rule::allClasses()
 ### Is not enum
 
 ```php
-$rules = Rule::allClasses()
+$rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
     ->should(new IsNotEnum())
     ->because('we want to be sure that all classes are not enum');
@@ -317,7 +367,7 @@ $rules = Rule::allClasses()
 ### Not depends on a namespace
 
 ```php
-$rules = Rule::allClasses()
+$rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Application'))
     ->should(new NotDependsOnTheseNamespaces('App\Infrastructure'))
     ->because('we want to avoid coupling between application layer and infrastructure layer');
@@ -326,7 +376,7 @@ $rules = Rule::allClasses()
 ### Not extend another class
 
 ```php
-$rules = Rule::allClasses()
+$rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller\Admin'))
     ->should(new NotExtend('App\Controller\AbstractController'))
     ->because('we want to be sure that all admin controllers not extend AbstractController for security reasons');
@@ -335,7 +385,7 @@ $rules = Rule::allClasses()
 ### Don't have dependency outside a namespace
 
 ```php
-$rules = Rule::allClasses()
+$rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
     ->should(new NotHaveDependencyOutsideNamespace('App\Domain', ['Ramsey\Uuid']))
     ->because('we want protect our domain except for Ramsey\Uuid');
@@ -344,7 +394,7 @@ $rules = Rule::allClasses()
 ### Not have a name matching a pattern
 
 ```php
-$rules = Rule::allClasses()
+$rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App'))
     ->should(new NotHaveNameMatching('*Manager'))
     ->because('*Manager is too vague in naming classes');
@@ -353,7 +403,7 @@ $rules = Rule::allClasses()
 ### Reside in a namespace
 
 ```php
-$rules = Rule::allClasses()
+$rules[] = Rule::allClasses()
     ->that(new HaveNameMatching('*Handler'))
     ->should(new ResideInOneOfTheseNamespaces('App\Application'))
     ->because('we want to be sure that all CommandHandlers are in a specific namespace');
@@ -363,9 +413,9 @@ $rules = Rule::allClasses()
 ### Not reside in a namespace
 
 ```php
-$rules = Rule::allClasses()
+$rules[] = Rule::allClasses()
     ->that(new Extend('App\Domain\Event'))
-    ->should(new NotResideInOneOfTheseNamespaces('App\Application', 'App\Infrastructure'))
+    ->should(new NotResideInTheseNamespaces('App\Application', 'App\Infrastructure'))
     ->because('we want to be sure that all events not reside in wrong layers');
 ```
 

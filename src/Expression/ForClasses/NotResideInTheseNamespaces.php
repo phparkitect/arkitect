@@ -21,14 +21,14 @@ class NotResideInTheseNamespaces implements Expression
         $this->namespaces = $namespaces;
     }
 
-    public function describe(ClassDescription $theClass, string $because): Description
+    public function describe(ClassDescription $theClass, string $because = ''): Description
     {
         $descr = implode(', ', $this->namespaces);
 
-        return new Description("should not reside in one of these namespaces: $descr", $because);
+        return new Description("not resides in one of these namespaces: $descr", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because = ''): void
     {
         $resideInNamespace = false;
         foreach ($this->namespaces as $namespace) {

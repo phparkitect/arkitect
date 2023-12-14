@@ -1,0 +1,27 @@
+.test:
+  image: ${IMAGE}
+  stage: test                  # Must be overwritten in a child job
+#  rules:                      # The rules are set on the 'concrete' job, as the concrete jobs can have different rules
+  interruptible: true          # allows to stop the job if a newer pipeline starts, saving resources and allowing new jobs to start because job concurrency is limited
+  rules:
+      - !reference [ .is_mr, rules ]
+  dependencies: [] # don't pull any artifacts
+  cache: [] # Don't pull any cache
+  artifacts:
+    name: "artifact-coverage-pipeline-${CI_PIPELINE_ID}"
+    expire_in: 24 hours # So we can use and download these during the next day, and because they don't take much space in the server
+    paths:
+      - var/coverage.clover.xml
+#      - var/tests.junit.xml
+#    reports: # enable this when we have >=PHP7.3 & >=PHPUnit9.4
+#      coverage_report:
+#        coverage_format: cobertura
+#        path: var/coverage.cobertura.xml
+#      junit: var/tests.junit.xml
+  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
+  script:
+    - composer validate
+    - composer install --prefer-dist
+    - PHP_CS_FIXER_IGNORE_ENV=1 ./bin/php-cs-fixer fix --dry-run -v
+    - ./bin/psalm
+    - ./bin/phpunit -d memory_limit=-1 --coverage-clover var/coverage.clover.xml

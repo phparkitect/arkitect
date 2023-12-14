@@ -21,7 +21,7 @@ class NotHaveNameMatchingTest extends TestCase
         $expression->evaluate($myClass, $violations, $because);
         self::assertEquals(1, $violations->count());
         $this->assertEquals(
-            'should not have a name that matches *Class because we want to add this rule for our software',
+            "should not have a name that matches *Class\nbecause we want to add this rule for our software",
             $expression->describe($myClass, $because)->toString()
         );
     }

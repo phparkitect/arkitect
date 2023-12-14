@@ -69,6 +69,13 @@ class RuleBuilder
         return $this;
     }
 
+    public function classesToBeExcludedByExpression(Expression ...$classesToBeExcluded): self
+    {
+        $this->classesToBeExcluded = $classesToBeExcluded;
+
+        return $this;
+    }
+
     public function setRunOnlyThis(): self
     {
         $this->runOnlyThis = true;

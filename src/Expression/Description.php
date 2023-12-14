@@ -9,12 +9,12 @@ class Description
     /** @var string */
     private $description;
 
-    public function __construct(string $description, string $because)
+    public function __construct(string $description, string $because = '')
     {
         $this->description = $description;
 
         if ('' !== $because) {
-            $this->description .= ' because '.$because;
+            $this->description .= "\nbecause $because";
         }
     }
 

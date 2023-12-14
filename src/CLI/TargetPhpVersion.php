@@ -26,7 +26,7 @@ class TargetPhpVersion
         $this->version = $version;
     }
 
-    public static function create(?string $version): self
+    public static function create(string $version = null): self
     {
         if (null === $version) {
             return new self(phpversion());

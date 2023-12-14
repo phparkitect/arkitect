@@ -26,19 +26,24 @@ class CheckClassImplementInterfaceTest extends TestCase
 
         $expectedExceptionMessage = '
 App\Controller\Foo has 1 violations
-  should implement ContainerAwareInterface because i said so
+  should implement ContainerAwareInterface
+  because i said so
 
 App\Controller\ProductsController has 1 violations
-  should implement ContainerAwareInterface because i said so
+  should implement ContainerAwareInterface
+  because i said so
 
 App\Controller\UserController has 1 violations
-  should implement ContainerAwareInterface because i said so
+  should implement ContainerAwareInterface
+  because i said so
 
 App\Controller\YieldController has 1 violations
-  should implement ContainerAwareInterface because i said so
+  should implement ContainerAwareInterface
+  because i said so
 
 App\Services\UserService has 1 violations
-  should implement ContainerAwareInterface because i said so';
+  should implement ContainerAwareInterface
+  because i said so';
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);

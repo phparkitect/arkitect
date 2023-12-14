@@ -20,6 +20,12 @@ class ViolationDescriptionTest extends TestCase
     {
         $expressionDescription = new Description('should not', 'reasons');
         $description = ViolationMessage::withDescription($expressionDescription, 'it does something');
-        self::assertEquals('it does something, but should not because reasons', $description->toString());
+        self::assertEquals(
+            "it does something\n"
+            ."from the rule\n"
+            ."should not\n"
+            .'because reasons',
+            $description->toString()
+        );
     }
 }
