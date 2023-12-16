@@ -123,7 +123,7 @@ jobs:
         run: php ./phparkitect-${{ github.sha }}.phar
 
   publish_phar:
-    needs: [build, phar]
+    needs: [build, smoke-test-phar]
     runs-on: "ubuntu-20.04"
     if: github.event_name == 'release'
     steps:
@@ -142,7 +142,7 @@ jobs:
           tag: ${{ github.ref }}
 
   publish_docker_images:
-    needs: [build, phar]
+    needs: [build, smoke-test-phar]
     runs-on: "ubuntu-20.04"
 
     if: github.ref == 'refs/heads/main' || github.event_name == 'release'
