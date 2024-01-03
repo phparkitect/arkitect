@@ -15,7 +15,7 @@ class FileParser implements Parser
     /** @var \PhpParser\Parser */
     private $parser;
 
-    /** @var \PhpParser\NodeTraverser */
+    /** @var NodeTraverser */
     private $traverser;
 
     /** @var FileVisitor */
