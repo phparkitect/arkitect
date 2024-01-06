@@ -2,23 +2,18 @@ name: Test
 
 on:
     push:
-    pull_request:
-    release:
-        types:
-            - published
 
 jobs:
-    build:
-        runs-on: "ubuntu-22.04"
-        strategy:
-            fail-fast: false
-            matrix:
-                php-versions: [ '8.0']
+    phparkitect:
+        name: PHPArkitect
+
+        runs-on: ubuntu-latest
 
         steps:
-        - name: Architectural Rules
-          uses: docker://phparkitect/arkitect-github-actions:latest
-          env:
-              PHP_VERSION: ${{ matrix.php-versions }}
-          with:
-              args: check
+            - name: "Checkout"
+              uses: actions/checkout@v2
+
+            - name: PHPArkitect
+              uses: docker://phparkitect/arkitect-github-actions:latest
+              with:
+                  args: check
