@@ -17,6 +17,13 @@ class TargetPhpVersionTest extends TestCase
         $this->assertEquals('8.3', $targetPhpVersion->get());
     }
 
+    public function test_it_should_ignore_the_patch_number(): void
+    {
+        $targetPhpVersion = TargetPhpVersion::create('8.3.2');
+
+        $this->assertEquals('8.3', $targetPhpVersion->get());
+    }
+
     public function test_it_should_throw_exception_if_not_valid_php_version(): void
     {
         $this->expectException(PhpVersionNotValidException::class);

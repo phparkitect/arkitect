@@ -22,22 +22,23 @@ class TargetPhpVersion
     /** @var string|null */
     private $version;
 
-    private function __construct(?string $version)
+    private function __construct(string $version)
     {
+        $versionNumbers = explode('.', $version);
+        if (count($versionNumbers) == 3) {
+            $version = $versionNumbers[0].'.'.$versionNumbers[1];
+        }
+
+        if (!\in_array($version, self::VALID_PHP_VERSIONS)) {
+            throw new PhpVersionNotValidException($version);
+        }
+
         $this->version = $version;
     }
 
     public static function create(?string $version): self
     {
-        if (null === $version) {
-            return new self(phpversion());
-        }
-
-        if (!\in_array($version, (new self(null))::VALID_PHP_VERSIONS)) {
-            throw new PhpVersionNotValidException($version);
-        }
-
-        return new self($version);
+        return new self($version ?? phpversion());
     }
 
     public function get(): ?string
