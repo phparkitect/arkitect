@@ -17,9 +17,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 class DebugExpression extends Command
 {
     /** @var string|null */
-    public static $defaultName = 'debug:expression';
-
-    /** @var string|null */
     public static $defaultDescription = <<< 'EOT'
 Check which classes respect an expression
 EOT;
@@ -28,6 +25,11 @@ EOT;
     public static $help = <<< 'EOT'
 Check which classes respect an expression
 EOT;
+
+    public function __construct()
+    {
+        parent::__construct('debug:expression');
+    }
 
     protected function configure(): void
     {
