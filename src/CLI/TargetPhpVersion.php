@@ -25,7 +25,7 @@ class TargetPhpVersion
     private function __construct(string $version)
     {
         $versionNumbers = explode('.', $version);
-        if (3 == \count($versionNumbers)) {
+        if (3 <= \count($versionNumbers)) {
             $version = $versionNumbers[0].'.'.$versionNumbers[1];
         }
 
