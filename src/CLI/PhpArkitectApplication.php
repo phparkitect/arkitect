@@ -26,7 +26,7 @@ EOD;
         $this->add(new DebugExpression());
     }
 
-    public function getLongVersion()
+    public function getLongVersion(): string
     {
         return sprintf("%s\n\n<info>%s</info> version <comment>%s</comment>", self::$logo, $this->getName(), $this->getVersion());
     }
