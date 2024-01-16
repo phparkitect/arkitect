@@ -12,7 +12,6 @@ use PhpParser\Node\Expr;
 use PhpParser\Node\Name;
 use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\Stmt;
-use PhpParser\Node\Stmt\Use_;
 use PhpParser\NodeAbstract;
 use PhpParser\NodeVisitorAbstract;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
@@ -161,14 +160,14 @@ class NameResolver extends NodeVisitorAbstract
                 }
 
                 if (null !== $arrayItemType) {
-                    $node->type = $this->resolveName(new Node\Name($arrayItemType), Use_::TYPE_NORMAL);
+                    $node->type = $this->resolveName(new Name($arrayItemType), Stmt\Use_::TYPE_NORMAL);
 
                     return;
                 }
             }
 
             foreach ($phpDocNode->getVarTagValues() as $tagValue) {
-                $type = $this->resolveName(new Node\Name((string) $tagValue->type), Use_::TYPE_NORMAL);
+                $type = $this->resolveName(new Name((string) $tagValue->type), Stmt\Use_::TYPE_NORMAL);
                 $node->type = $type;
                 break;
             }
@@ -177,7 +176,7 @@ class NameResolver extends NodeVisitorAbstract
                 foreach ($phpDocNode->getTags() as $tagValue) {
                     if ('@' === $tagValue->name[0] && !str_contains($tagValue->name, '@var')) {
                         $customTag = str_replace('@', '', $tagValue->name);
-                        $type = $this->resolveName(new Node\Name($customTag), Use_::TYPE_NORMAL);
+                        $type = $this->resolveName(new Name($customTag), Stmt\Use_::TYPE_NORMAL);
                         $node->type = $type;
 
                         break;
@@ -339,7 +338,7 @@ class NameResolver extends NodeVisitorAbstract
                         $arrayItemType = $this->getArrayItemType($phpDocParam->type);
 
                         if (null !== $arrayItemType) {
-                            $param->type = $this->resolveName(new Node\Name($arrayItemType), Use_::TYPE_NORMAL);
+                            $param->type = $this->resolveName(new Name($arrayItemType), Stmt\Use_::TYPE_NORMAL);
                         }
                     }
                 }
@@ -356,7 +355,7 @@ class NameResolver extends NodeVisitorAbstract
             }
 
             if (null !== $arrayItemType) {
-                $node->returnType = $this->resolveName(new Node\Name($arrayItemType), Use_::TYPE_NORMAL);
+                $node->returnType = $this->resolveName(new Name($arrayItemType), Stmt\Use_::TYPE_NORMAL);
             }
         }
     }
