@@ -24,6 +24,7 @@ class IsTraitTest extends TestCase
             false,
             false,
             false,
+            false,
             false
         );
         $because = 'we want to add this rule for our software';
@@ -44,6 +45,7 @@ class IsTraitTest extends TestCase
             [],
             [],
             null,
+            false,
             false,
             false,
             false,

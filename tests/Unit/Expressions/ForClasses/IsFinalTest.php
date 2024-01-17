@@ -24,6 +24,7 @@ class IsFinalTest extends TestCase
             false,
             false,
             false,
+            false,
             false
         );
         $because = 'we want to add this rule for our software';
@@ -50,6 +51,7 @@ class IsFinalTest extends TestCase
             false,
             false,
             false,
+            false,
             false
         );
         $because = 'we want to add this rule for our software';
@@ -68,6 +70,7 @@ class IsFinalTest extends TestCase
             [],
             [],
             null,
+            false,
             false,
             true,
             false,
@@ -90,6 +93,7 @@ class IsFinalTest extends TestCase
             [],
             [],
             null,
+            false,
             false,
             false,
             true,
@@ -115,6 +119,7 @@ class IsFinalTest extends TestCase
             false,
             false,
             false,
+            false,
             true,
             false
         );
@@ -134,6 +139,7 @@ class IsFinalTest extends TestCase
             [],
             [],
             null,
+            false,
             false,
             false,
             false,
