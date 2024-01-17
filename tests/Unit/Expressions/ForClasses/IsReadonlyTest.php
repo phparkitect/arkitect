@@ -60,7 +60,6 @@ class IsReadonlyTest extends TestCase
         self::assertEquals(0, $violations->count());
     }
 
-
     public function test_interfaces_can_not_be_readonly_and_should_be_ignored(): void
     {
         $isReadonly = new IsReadonly();

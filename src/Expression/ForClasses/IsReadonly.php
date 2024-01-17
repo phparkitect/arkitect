@@ -21,7 +21,7 @@ class IsReadonly implements Expression
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
         if ($theClass->isReadonly()) {
-            return ;
+            return;
         }
 
         $violation = Violation::create(
