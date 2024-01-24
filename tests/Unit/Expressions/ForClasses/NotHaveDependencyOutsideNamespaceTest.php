@@ -26,6 +26,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
             false,
             false,
             false,
+            false,
             false
         );
         $because = 'we want to add this rule for our software';
@@ -45,6 +46,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
             [new ClassDependency('myNamespace', 100)],
             [],
             null,
+            false,
             false,
             false,
             false,
@@ -69,6 +71,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
             false,
             false,
             false,
+            false,
             false
         );
         $because = 'we want to add this rule for our software';
@@ -85,6 +88,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
             [new ClassDependency('foo', 100)],
             [],
             null,
+            false,
             false,
             false,
             false,

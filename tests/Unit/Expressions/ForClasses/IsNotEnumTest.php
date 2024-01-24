@@ -23,6 +23,7 @@ class IsNotEnumTest extends TestCase
             false,
             false,
             false,
+            false,
             true
         );
         $because = 'we want to add this rule for our software';
@@ -43,6 +44,7 @@ class IsNotEnumTest extends TestCase
             [],
             [],
             null,
+            false,
             false,
             false,
             false,

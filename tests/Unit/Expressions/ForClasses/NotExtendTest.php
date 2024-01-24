@@ -25,6 +25,7 @@ class NotExtendTest extends TestCase
             false,
             false,
             false,
+            false,
             false
         );
         $because = 'we want to add this rule for our software';
@@ -46,6 +47,7 @@ class NotExtendTest extends TestCase
             [],
             [],
             FullyQualifiedClassName::fromString('My\AnotherClass'),
+            false,
             false,
             false,
             false,

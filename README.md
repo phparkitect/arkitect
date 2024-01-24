@@ -251,6 +251,15 @@ $rules[] = Rule::allClasses()
     ->because('we want to be sure that aggregates are final classes');
 ```
 
+### Is readonly
+
+```php
+$rules[] = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Domain\ValueObjects'))
+    ->should(new IsReadonly())
+    ->because('we want to be sure that value objects are readonly classes');
+```
+
 ### Is interface
 
 ```php
@@ -294,6 +303,15 @@ $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Infrastructure\Doctrine'))
     ->should(new IsNotFinal())
     ->because('we want to be sure that our adapters are not final classes');
+```
+
+### Is not readonly
+
+```php
+$rules[] = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Domain\Entity'))
+    ->should(new IsNotReadonly())
+    ->because('we want to be sure that there are no readonly entities');
 ```
 
 ### Is not interface

@@ -22,6 +22,7 @@ class IsNotInterfaceTest extends TestCase
             null,
             false,
             false,
+            false,
             true,
             false,
             false
@@ -44,6 +45,7 @@ class IsNotInterfaceTest extends TestCase
             [],
             [],
             null,
+            false,
             false,
             false,
             false,
