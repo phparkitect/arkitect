@@ -11,6 +11,7 @@ Shout out to our top contributors!
 - [sebastianstucke87](https://api.github.com/users/sebastianstucke87)
 - [szepeviktor](https://api.github.com/users/szepeviktor)
 - [JulienRAVIA](https://api.github.com/users/JulienRAVIA)
+- [helyakin](https://api.github.com/users/helyakin)
 - [ben-challis](https://api.github.com/users/ben-challis)
 - [LuigiCardamone](https://api.github.com/users/LuigiCardamone)
 - [annervisser](https://api.github.com/users/annervisser)
