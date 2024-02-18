@@ -4,9 +4,9 @@ Shout out to our top contributors!
 
 - [AlessandroMinoccheri](https://api.github.com/users/AlessandroMinoccheri)
 - [fain182](https://api.github.com/users/fain182)
-- [micheleorselli](https://api.github.com/users/micheleorselli)
 - [pfazzi](https://api.github.com/users/pfazzi)
 - [github-actions[bot]](https://api.github.com/users/github-actions%5Bbot%5D)
+- [micheleorselli](https://api.github.com/users/micheleorselli)
 - [ricfio](https://api.github.com/users/ricfio)
 - [sebastianstucke87](https://api.github.com/users/sebastianstucke87)
 - [szepeviktor](https://api.github.com/users/szepeviktor)
