@@ -118,7 +118,7 @@ use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\Rules\Rule;
 
 return static function (Config $config): void {
-    $mvcClassSet = ClassSet::fromDir(__DIR__.'/mvc');
+    $mvcClassSet = ClassSet::fromDir(__DIR__.'/mvc', __DIR__.'/lib/my-lib/src');
 
     $rules = [];
 
