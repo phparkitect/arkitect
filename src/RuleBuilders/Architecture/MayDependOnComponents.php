@@ -5,6 +5,12 @@ namespace Arkitect\RuleBuilders\Architecture;
 
 interface MayDependOnComponents
 {
-    /** @return Where&Rules */
+    /**
+     * May depend on the specified components, plus itself.
+     *
+     * @param string[] $componentNames
+     *
+     * @return Where&Rules
+     */
     public function mayDependOnComponents(string ...$componentNames);
 }

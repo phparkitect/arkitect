@@ -3,8 +3,9 @@ declare(strict_types=1);
 
 namespace Arkitect\RuleBuilders\Architecture;
 
-use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
-use Arkitect\Expression\ForClasses\NotDependsOnTheseNamespaces;
+use Arkitect\Expression\Boolean\Orx;
+use Arkitect\Expression\Expression;
+use Arkitect\Expression\ForClasses\DependsOnlyOnTheseExpressions;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\Rules\Rule;
 
@@ -12,19 +13,19 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
 {
     /** @var string */
     private $componentName;
-    /** @var array<string, string> */
+    /** @var array<string, Expression|string> */
     private $componentSelectors;
     /** @var array<string, string[]> */
     private $allowedDependencies;
     /** @var array<string, string[]> */
-    private $componentDependsOnlyOnTheseNamespaces;
+    private $componentDependsOnlyOnTheseComponents;
 
     private function __construct()
     {
         $this->componentName = '';
         $this->componentSelectors = [];
         $this->allowedDependencies = [];
-        $this->componentDependsOnlyOnTheseNamespaces = [];
+        $this->componentDependsOnlyOnTheseComponents = [];
     }
 
     public static function withComponents(): Component
@@ -40,6 +41,13 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
     }
 
     public function definedBy(string $selector)
+    {
+        $this->componentSelectors[$this->componentName] = $selector;
+
+        return $this;
+    }
+
+    public function definedByExpression(Expression $selector)
     {
         $this->componentSelectors[$this->componentName] = $selector;
 
@@ -62,7 +70,7 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
 
     public function shouldOnlyDependOnComponents(string ...$componentNames)
     {
-        $this->componentDependsOnlyOnTheseNamespaces[$this->componentName] = $componentNames;
+        $this->componentDependsOnlyOnTheseComponents[$this->componentName] = $componentNames;
 
         return $this;
     }
@@ -83,36 +91,61 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
 
     public function rules(): iterable
     {
-        $layerNames = array_keys($this->componentSelectors);
-
         foreach ($this->componentSelectors as $name => $selector) {
             if (isset($this->allowedDependencies[$name])) {
-                $forbiddenComponents = array_diff($layerNames, [$name], $this->allowedDependencies[$name]);
-
-                if (!empty($forbiddenComponents)) {
-                    $forbiddenSelectors = array_map(function (string $componentName): string {
-                        return $this->componentSelectors[$componentName];
-                    }, $forbiddenComponents);
-
-                    yield Rule::allClasses()
-                        ->that(new ResideInOneOfTheseNamespaces($selector))
-                        ->should(new NotDependsOnTheseNamespaces(...$forbiddenSelectors))
-                        ->because('of component architecture');
-                }
+                yield Rule::allClasses()
+                    ->that(\is_string($selector) ? new ResideInOneOfTheseNamespaces($selector) : $selector)
+                    ->should($this->createAllowedExpression(
+                        array_merge([$name], $this->allowedDependencies[$name])
+                    ))
+                    ->because('of component architecture');
             }
 
-            if (!isset($this->componentDependsOnlyOnTheseNamespaces[$name])) {
-                continue;
+            if (isset($this->componentDependsOnlyOnTheseComponents[$name])) {
+                yield Rule::allClasses()
+                    ->that(\is_string($selector) ? new ResideInOneOfTheseNamespaces($selector) : $selector)
+                    ->should($this->createAllowedExpression($this->componentDependsOnlyOnTheseComponents[$name]))
+                    ->because('of component architecture');
             }
-
-            $allowedDependencies = array_map(function (string $componentName): string {
-                return $this->componentSelectors[$componentName];
-            }, $this->componentDependsOnlyOnTheseNamespaces[$name]);
-
-            yield Rule::allClasses()
-                ->that(new ResideInOneOfTheseNamespaces($selector))
-                ->should(new DependsOnlyOnTheseNamespaces(...$allowedDependencies))
-                ->because('of component architecture');
         }
+    }
+
+    private function createAllowedExpression(array $components): Expression
+    {
+        $namespaceSelectors = $this->extractComponentsNamespaceSelectors($components);
+
+        $expressionSelectors = $this->extractComponentExpressionSelectors($components);
+
+        if ([] === $namespaceSelectors && [] === $expressionSelectors) {
+            return new Orx(); // always true
+        }
+
+        if ([] !== $namespaceSelectors) {
+            $expressionSelectors[] = new ResideInOneOfTheseNamespaces(...$namespaceSelectors);
+        }
+
+        return new DependsOnlyOnTheseExpressions(...$expressionSelectors);
+    }
+
+    private function extractComponentsNamespaceSelectors(array $components): array
+    {
+        return array_filter(
+            array_map(function (string $componentName): ?string {
+                $selector = $this->componentSelectors[$componentName];
+
+                return \is_string($selector) ? $selector : null;
+            }, $components)
+        );
+    }
+
+    private function extractComponentExpressionSelectors(array $components): array
+    {
+        return array_filter(
+            array_map(function (string $componentName): ?Expression {
+                $selector = $this->componentSelectors[$componentName];
+
+                return \is_string($selector) ? null : $selector;
+            }, $components)
+        );
     }
 }
