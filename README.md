@@ -355,7 +355,7 @@ $rules[] = Rule::allClasses()
 ```php
 $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
-    ->should(new NotHaveDependencyOutsideNamespace('App\Domain', ['Ramsey\Uuid']))
+    ->should(new NotHaveDependencyOutsideNamespace('App\Domain', ['Ramsey\Uuid'], true))
     ->because('we want protect our domain except for Ramsey\Uuid');
 ```
 

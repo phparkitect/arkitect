@@ -58,7 +58,7 @@ class NameResolver extends NodeVisitorAbstract
      * @param ErrorHandler|null $errorHandler Error handler
      * @param array             $options      Options
      */
-    public function __construct(ErrorHandler $errorHandler = null, array $options = [])
+    public function __construct(?ErrorHandler $errorHandler = null, array $options = [])
     {
         $this->nameContext = new NameContext($errorHandler ?? new ErrorHandler\Throwing());
         $this->preserveOriginalNames = $options['preserveOriginalNames'] ?? false;
@@ -307,7 +307,7 @@ class NameResolver extends NodeVisitorAbstract
         }
     }
 
-    private function addAlias(Stmt\UseUse $use, int $type, Name $prefix = null): void
+    private function addAlias(Stmt\UseUse $use, int $type, ?Name $prefix = null): void
     {
         // Add prefix for group uses
         /** @var Name $name */
