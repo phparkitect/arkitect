@@ -29,7 +29,7 @@ class CheckClassWithMultipleExpressionsTest extends TestCase
             ->andShould(new IsNotEnum())
             ->andShould(new IsNotInterface())
             ->andShould(new IsNotTrait())
-            ->because("some reason");
+            ->because('some reason');
 
         ArchRuleTestCase::assertArchRule($rule, $set);
     }
