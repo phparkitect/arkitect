@@ -57,4 +57,88 @@ class IsAbstractTest extends TestCase
         $isAbstract->evaluate($classDescription, $violations, $because);
         self::assertEquals(0, $violations->count());
     }
+
+    public function test_interfaces_can_not_be_abstract_and_should_be_ignored(): void
+    {
+        $isAbstract = new IsAbstract();
+        $classDescription = new ClassDescription(
+            FullyQualifiedClassName::fromString('HappyIsland'),
+            [],
+            [],
+            null,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+        );
+        $because = 'we want to add this rule for our software';
+        $violations = new Violations();
+        $isAbstract->evaluate($classDescription, $violations, $because);
+        self::assertEquals(0, $violations->count());
+    }
+
+    public function test_traits_can_not_be_abstract_and_should_be_ignored(): void
+    {
+        $isAbstract = new IsAbstract();
+        $classDescription = new ClassDescription(
+            FullyQualifiedClassName::fromString('HappyIsland'),
+            [],
+            [],
+            null,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+        );
+        $because = 'we want to add this rule for our software';
+        $violations = new Violations();
+        $isAbstract->evaluate($classDescription, $violations, $because);
+        self::assertEquals(0, $violations->count());
+    }
+
+    public function test_enums_can_not_be_abstract_and_should_be_ignored(): void
+    {
+        $isAbstract = new IsAbstract();
+        $classDescription = new ClassDescription(
+            FullyQualifiedClassName::fromString('HappyIsland'),
+            [],
+            [],
+            null,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true
+        );
+        $because = 'we want to add this rule for our software';
+        $violations = new Violations();
+        $isAbstract->evaluate($classDescription, $violations, $because);
+        self::assertEquals(0, $violations->count());
+    }
+
+    public function test_final_classes_can_not_be_abstract_and_should_be_ignored(): void
+    {
+        $isAbstract = new IsAbstract();
+        $classDescription = new ClassDescription(
+            FullyQualifiedClassName::fromString('HappyIsland'),
+            [],
+            [],
+            null,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false
+        );
+        $because = 'we want to add this rule for our software';
+        $violations = new Violations();
+        $isAbstract->evaluate($classDescription, $violations, $because);
+        self::assertEquals(0, $violations->count());
+    }
 }
