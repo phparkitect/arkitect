@@ -9,5 +9,5 @@ interface BecauseParser
 {
     public function because(string $reason): ArchRule;
 
-    public function andShould(Expression $expression): BecauseParser;
+    public function andShould(Expression $expression): self;
 }
