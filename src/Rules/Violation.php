@@ -15,7 +15,7 @@ class Violation implements \JsonSerializable
     /** @var string */
     private $error;
 
-    public function __construct(string $fqcn, string $error, int $line = null)
+    public function __construct(string $fqcn, string $error, ?int $line = null)
     {
         $this->fqcn = $fqcn;
         $this->error = $error;
