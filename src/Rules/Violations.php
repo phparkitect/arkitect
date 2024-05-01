@@ -112,13 +112,30 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
      */
     public function remove(self $violations, bool $ignoreBaselineLinenumbers = false): void
     {
-        $comparisonFunction = [__CLASS__, $ignoreBaselineLinenumbers ? 'compareViolationsIgnoreLineNumber' : 'compareViolations'];
+        if (!$ignoreBaselineLinenumbers) {
+            $this->violations = array_values(array_udiff(
+                $this->violations,
+                $violations->violations,
+                [__CLASS__, 'compareViolations'],
+            ));
 
-        $this->violations = array_values(array_udiff(
-            $this->violations,
-            $violations->violations,
-            $comparisonFunction
-        ));
+            return;
+        }
+
+        $baselineViolations = $violations->violations;
+        foreach ($this->violations as $idx => $violation) {
+            foreach ($baselineViolations as $baseIdx => $baselineViolation) {
+                if (
+                    $baselineViolation->getFqcn() === $violation->getFqcn()
+                    && $baselineViolation->getError() === $violation->getError()
+                ) {
+                    unset($this->violations[$idx], $baselineViolations[$baseIdx]);
+                    continue 2;
+                }
+            }
+        }
+
+        $this->violations = array_values($this->violations);
     }
 
     public function sort(): void
