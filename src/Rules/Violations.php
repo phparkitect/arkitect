@@ -116,7 +116,7 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
             $this->violations = array_values(array_udiff(
                 $this->violations,
                 $violations->violations,
-                [__CLASS__, 'compareViolations'],
+                [__CLASS__, 'compareViolations']
             ));
 
             return;

@@ -165,7 +165,7 @@ App\Controller\Foo has 1 violations
         ?string $useBaseline = null,
         $generateBaseline = false,
         bool $skipBaseline = false,
-        bool $ignoreBaselineNumbers = false,
+        bool $ignoreBaselineNumbers = false
     ): ApplicationTester {
         $input = ['check'];
         if (null !== $configFilePath) {

@@ -188,7 +188,7 @@ App\Controller\Foo has 1 violations
         $violation2 = new Violation(
             'App\Controller\Shop',
             'should implement AbstractController',
-            21,
+            21
         );
         $this->violationStore->add($violation2);
 
