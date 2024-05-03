@@ -146,12 +146,26 @@ App\Controller\Foo has 1 violations
         $this->assertCheckHasErrors($cmdTester);
     }
 
+    public function test_baseline_line_numbers_can_be_ignored(): void
+    {
+        $configFilePath = __DIR__.'/../_fixtures/configIgnoreBaselineLineNumbers.php';
+
+        // No errors when ignoring baseline line numbers
+        $cmdTester = $this->runCheck($configFilePath, null, __DIR__.'/../_fixtures/line_numbers/baseline.json', false, false, true);
+        $this->assertCheckHasSuccess($cmdTester);
+
+        // Errors when not ignoring baseline line numbers
+        $cmdTester = $this->runCheck($configFilePath, null, __DIR__.'/../_fixtures/line_numbers/baseline.json');
+        $this->assertCheckHasErrors($cmdTester);
+    }
+
     protected function runCheck(
         $configFilePath = null,
         ?bool $stopOnFailure = null,
         ?string $useBaseline = null,
         $generateBaseline = false,
-        bool $skipBaseline = false
+        bool $skipBaseline = false,
+        bool $ignoreBaselineNumbers = false
     ): ApplicationTester {
         $input = ['check'];
         if (null !== $configFilePath) {
@@ -165,6 +179,10 @@ App\Controller\Foo has 1 violations
         }
         if ($skipBaseline) {
             $input['--skip-baseline'] = true;
+        }
+
+        if ($ignoreBaselineNumbers) {
+            $input['--ignore-baseline-linenumbers'] = true;
         }
 
         // false = option not set, null = option set but without value, string = option with value
