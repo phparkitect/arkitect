@@ -187,11 +187,19 @@ App\Controller\Foo has 1 violations
 
         $violation2 = new Violation(
             'App\Controller\Shop',
-            'should implement AbstractController'
+            'should implement AbstractController',
+            21
         );
         $this->violationStore->add($violation2);
 
-        $this->assertCount(3, $this->violationStore->toArray());
+        $violation3 = new Violation(
+            'App\Controller\Shop',
+            'should have name end with Controller',
+            5
+        );
+        $this->violationStore->add($violation3);
+
+        $this->assertCount(4, $this->violationStore->toArray());
 
         $violationsBaseline = new Violations();
         $violationsBaseline->add(new Violation(
@@ -202,10 +210,11 @@ App\Controller\Foo has 1 violations
 
         $this->violationStore->remove($violationsBaseline, true);
 
-        $this->assertCount(2, $this->violationStore->toArray());
+        $this->assertCount(3, $this->violationStore->toArray());
         $this->assertEquals([
             $this->violation,
             $violation2,
+            $violation3,
         ], $this->violationStore->toArray());
     }
 }
