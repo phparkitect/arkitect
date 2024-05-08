@@ -20,7 +20,8 @@ class IsAbstract implements Expression
 
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
-        if ($theClass->isAbstract()) {
+        if ($theClass->isAbstract() || $theClass->isInterface() || $theClass->isTrait() || $theClass->isEnum()
+            || $theClass->isFinal()) {
             return;
         }
 
