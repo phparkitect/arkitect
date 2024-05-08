@@ -5,6 +5,12 @@ namespace Arkitect\RuleBuilders\Architecture;
 
 interface ShouldOnlyDependOnComponents
 {
-    /** @return Where&Rules */
+    /**
+     * May depend ONLY on the specified components, thus it can only depend on itself if itself is specified.
+     *
+     * @param string[] $componentNames
+     *
+     * @return Where&Rules
+     */
     public function shouldOnlyDependOnComponents(string ...$componentNames);
 }
