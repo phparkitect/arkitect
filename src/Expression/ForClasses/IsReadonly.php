@@ -20,7 +20,7 @@ class IsReadonly implements Expression
 
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
-        if ($theClass->isReadonly()) {
+        if ($theClass->isReadonly() || $theClass->isInterface() || $theClass->isTrait() || $theClass->isEnum()) {
             return;
         }
 
