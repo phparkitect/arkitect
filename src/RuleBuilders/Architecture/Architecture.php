@@ -81,7 +81,7 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
         return $this;
     }
 
-    public function rules(): iterable
+    public function rules(string $because = 'of component architecture'): iterable
     {
         $layerNames = array_keys($this->componentSelectors);
 
@@ -97,7 +97,7 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
                     yield Rule::allClasses()
                         ->that(new ResideInOneOfTheseNamespaces($selector))
                         ->should(new NotDependsOnTheseNamespaces(...$forbiddenSelectors))
-                        ->because('of component architecture');
+                        ->because($because);
                 }
             }
 
@@ -112,7 +112,7 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
             yield Rule::allClasses()
                 ->that(new ResideInOneOfTheseNamespaces($selector))
                 ->should(new DependsOnlyOnTheseNamespaces(...$allowedDependencies))
-                ->because('of component architecture');
+                ->because($because);
         }
     }
 }
