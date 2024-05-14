@@ -13,25 +13,30 @@ use Arkitect\Rules\Violations;
 
 class Extend implements Expression
 {
-    /** @var string */
-    private $className;
+    /** @var string[] */
+    private $classNames;
 
-    public function __construct(string $className)
+    public function __construct(string ...$classNames)
     {
-        $this->className = $className;
+        $this->classNames = $classNames;
     }
 
     public function describe(ClassDescription $theClass, string $because): Description
     {
-        return new Description("should extend {$this->className}", $because);
+        $desc = implode(', ', $this->classNames);
+
+        return new Description("should extend one of these classes: {$desc}", $because);
     }
 
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
         $extends = $theClass->getExtends();
 
-        if (null !== $extends && $extends->matches($this->className)) {
-            return;
+        /** @var string $className */
+        foreach ($this->classNames as $className) {
+            if (null !== $extends && $extends->matches($className)) {
+                return;
+            }
         }
 
         $violation = Violation::create(
