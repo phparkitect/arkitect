@@ -350,6 +350,8 @@ $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller\Admin'))
     ->should(new NotExtend('App\Controller\AbstractController'))
     ->because('we want to be sure that all admin controllers not extend AbstractController for security reasons');
+
+You can add multiple parameters, the violation will happen when one of them match
 ```
 
 ### Don't have dependency outside a namespace

@@ -36,16 +36,16 @@ class DebugExpressionCommandTest extends TestCase
     public function test_meaningful_errors_for_too_few_arguments_for_the_expression(): void
     {
         $appTester = $this->createAppTester();
-        $appTester->run(['debug:expression', 'expression' => 'NotExtend', 'arguments' => [], '--from-dir' => __DIR__.'/../_fixtures/mvc/Domain']);
-        $this->assertEquals("Error: Too few arguments for 'NotExtend'.\n", $appTester->getDisplay());
+        $appTester->run(['debug:expression', 'expression' => 'NotImplement', 'arguments' => [], '--from-dir' => __DIR__.'/../_fixtures/mvc/Domain']);
+        $this->assertEquals("Error: Too few arguments for 'NotImplement'.\n", $appTester->getDisplay());
         $this->assertEquals(2, $appTester->getStatusCode());
     }
 
     public function test_meaningful_errors_for_too_many_arguments_for_the_expression(): void
     {
         $appTester = $this->createAppTester();
-        $appTester->run(['debug:expression', 'expression' => 'NotExtend', 'arguments' => ['First', 'Second'], '--from-dir' => __DIR__.'/../_fixtures/mvc/Domain']);
-        $this->assertEquals("Error: Too many arguments for 'NotExtend'.\n", $appTester->getDisplay());
+        $appTester->run(['debug:expression', 'expression' => 'NotImplement', 'arguments' => ['First', 'Second'], '--from-dir' => __DIR__.'/../_fixtures/mvc/Domain']);
+        $this->assertEquals("Error: Too many arguments for 'NotImplement'.\n", $appTester->getDisplay());
         $this->assertEquals(2, $appTester->getStatusCode());
     }
 
