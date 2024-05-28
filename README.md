@@ -186,6 +186,8 @@ $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
     ->should(new Extend('App\Controller\AbstractController'))
     ->because('we want to be sure that all controllers extend AbstractController');
+
+You can add multiple parameters, the violation will happen when none of them match
 ```
 
 ### Has an attribute (requires PHP >= 8.0)
@@ -348,6 +350,8 @@ $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller\Admin'))
     ->should(new NotExtend('App\Controller\AbstractController'))
     ->because('we want to be sure that all admin controllers not extend AbstractController for security reasons');
+
+You can add multiple parameters, the violation will happen when one of them match
 ```
 
 ### Don't have dependency outside a namespace

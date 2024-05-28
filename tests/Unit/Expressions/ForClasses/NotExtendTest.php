@@ -35,7 +35,7 @@ class NotExtendTest extends TestCase
         $notExtend->evaluate($classDescription, $violations, $because);
 
         self::assertEquals(1, $violations->count());
-        self::assertEquals('should not extend My\BaseClass because we want to add this rule for our software', $violationError);
+        self::assertEquals('should not extend one of these classes: My\BaseClass because we want to add this rule for our software', $violationError);
     }
 
     public function test_it_should_not_return_violation_error_if_extends_another_class(): void
@@ -61,5 +61,31 @@ class NotExtendTest extends TestCase
         $notExtend->evaluate($classDescription, $violations, $because);
 
         self::assertEquals(0, $violations->count());
+    }
+
+    public function test_it_should_return_violation_error_for_multiple_extends(): void
+    {
+        $notExtend = new NotExtend('My\FirstExtend', 'My\SecondExtend');
+
+        $classDescription = new ClassDescription(
+            FullyQualifiedClassName::fromString('HappyIsland'),
+            [],
+            [],
+            FullyQualifiedClassName::fromString('My\SecondExtend'),
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+        );
+        $because = 'we want to add this rule for our software';
+        $violationError = $notExtend->describe($classDescription, $because)->toString();
+
+        $violations = new Violations();
+        $notExtend->evaluate($classDescription, $violations, $because);
+
+        self::assertEquals(1, $violations->count());
+        self::assertEquals('should not extend one of these classes: My\FirstExtend, My\SecondExtend because we want to add this rule for our software', $violationError);
     }
 }

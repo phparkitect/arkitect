@@ -70,7 +70,7 @@ class ExtendTest extends TestCase
         $extend->evaluate($classDescription, $violations, 'we want to add this rule for our software');
 
         self::assertEquals(1, $violations->count());
-        self::assertEquals('should extend My\BaseClass because we want to add this rule for our software', $violations->get(0)->getError());
+        self::assertEquals('should extend one of these classes: My\BaseClass because we want to add this rule for our software', $violations->get(0)->getError());
     }
 
     public function test_it_should_return_violation_error_if_extend_is_null(): void
@@ -97,6 +97,21 @@ class ExtendTest extends TestCase
         $extend->evaluate($classDescription, $violations, $because);
 
         self::assertEquals(1, $violations->count());
-        self::assertEquals('should extend My\BaseClass because we want to add this rule for our software', $violationError);
+        self::assertEquals('should extend one of these classes: My\BaseClass because we want to add this rule for our software', $violationError);
+    }
+
+    public function test_it_should_accept_multiple_extends(): void
+    {
+        $extend = new Extend('My\FirstExtend', 'My\SecondExtend');
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('My\Class')
+            ->setExtends('My\SecondExtend', 10)
+            ->build();
+
+        $violations = new Violations();
+        $extend->evaluate($classDescription, $violations, 'because');
+
+        self::assertEquals(0, $violations->count());
     }
 }
