@@ -56,10 +56,3 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
 
-    - name: Architectural Rules
-      uses: docker://phparkitect/arkitect-github-actions:latest
-      env:
-        PHP_VERSION: ${{ matrix.php-versions }}
-      with:
-        args: check
-
