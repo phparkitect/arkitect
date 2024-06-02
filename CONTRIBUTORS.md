@@ -23,6 +23,7 @@ Shout out to our top contributors!
 - [hgraca](https://api.github.com/users/hgraca)
 - [frankverhoeven](https://api.github.com/users/frankverhoeven)
 - [hectorespert](https://api.github.com/users/hectorespert)
+- [kapersoft](https://api.github.com/users/kapersoft)
 - [jerowork](https://api.github.com/users/jerowork)
 - [jkrzefski](https://api.github.com/users/jkrzefski)
 - [mloru](https://api.github.com/users/mloru)
