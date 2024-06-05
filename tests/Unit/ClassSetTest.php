@@ -10,6 +10,30 @@ use PHPUnit\Framework\TestCase;
 
 class ClassSetTest extends TestCase
 {
+    public function test_can_exclude_files_or_directories_from_multiple_dir_class_set(): void
+    {
+        $path = $this->createMvcProjectStructure();
+
+        $set = ClassSet::fromDir($path.'/Controller', $path.'/Model')
+            ->excludePath('Repository');
+
+        $expected = [
+            $path.'/Controller/CatalogController.php',
+            $path.'/Controller/Foo.php',
+            $path.'/Controller/ProductsController.php',
+            $path.'/Controller/UserController.php',
+            $path.'/Controller/YieldController.php',
+            $path.'/Model/Catalog.php',
+            $path.'/Model/Products.php',
+            $path.'/Model/User.php',
+        ];
+        $actual = array_values(array_map(function ($item) {
+            /** @var \SplFileInfo $item */
+            return $item->getPathname();
+        }, iterator_to_array($set)));
+        self::assertEquals($expected, $actual);
+    }
+
     public function test_can_exclude_files_or_directories(): void
     {
         $path = $this->createMvcProjectStructure();
