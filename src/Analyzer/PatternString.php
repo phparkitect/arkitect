@@ -27,7 +27,7 @@ class PatternString
             return $isInThisNamespace || $isThisClass;
         }
 
-        return $this->startsWithPattern($pattern);
+        return fnmatch($pattern, $this->value, \FNM_NOESCAPE);
     }
 
     public function toString(): string
@@ -42,21 +42,5 @@ class PatternString
             || str_contains($pattern, '?')
             || str_contains($pattern, '.')
             || str_contains($pattern, '[');
-    }
-
-    private function startsWithPattern(string $pattern): bool
-    {
-        return 1 === preg_match('#^'.$this->convertShellToRegExPattern($pattern).'#', $this->value);
-    }
-
-    private function convertShellToRegExPattern(string $pattern): string
-    {
-        return strtr($pattern, [
-            '*' => '.*',
-            '?' => '.',
-            '.' => '\.',
-            '[!' => '[^',
-            '\\' => '\\\\',
-        ]);
     }
 }
