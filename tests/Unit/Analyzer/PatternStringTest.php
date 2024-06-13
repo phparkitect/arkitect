@@ -21,4 +21,11 @@ class PatternStringTest extends TestCase
         $this->assertTrue($pattern->matches('*This*'));
         $this->assertFalse($pattern->matches('This*'));
     }
+
+    public function test_ends_with(): void
+    {
+        $pattern = new PatternString('SoThisIsAnExample');
+        $this->assertTrue($pattern->matches('*Example'));
+        $this->assertFalse($pattern->matches('*This'));
+    }
 }
