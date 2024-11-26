@@ -46,6 +46,8 @@ jobs:
       run: PHP_CS_FIXER_IGNORE_ENV=1 ./bin/php-cs-fixer fix --dry-run -v
 
     - name: Static Analysis
+      # temporarily remove Psalm until ready for PHP 8.4
+      if: matrix.php-versions != '8.4'
       run: ./bin/psalm
 
     - name: Test
