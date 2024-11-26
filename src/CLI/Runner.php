@@ -48,7 +48,7 @@ class Runner
         Progress $progress,
         Parser $fileParser,
         Violations $violations,
-        ParsingErrors $parsingErrors
+        ParsingErrors $parsingErrors,
     ): void {
         /** @var SplFileInfo $file */
         foreach ($classSetRule->getClassSet() as $file) {

@@ -44,7 +44,6 @@ class ClassDescription
     /**
      * @param list<ClassDependency>         $dependencies
      * @param list<FullyQualifiedClassName> $interfaces
-     * @param ?FullyQualifiedClassName      $extends
      * @param list<FullyQualifiedClassName> $attributes
      */
     public function __construct(
@@ -59,7 +58,7 @@ class ClassDescription
         bool $trait,
         bool $enum,
         array $docBlock = [],
-        array $attributes = []
+        array $attributes = [],
     ) {
         $this->FQCN = $FQCN;
         $this->dependencies = $dependencies;
