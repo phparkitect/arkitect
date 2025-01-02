@@ -23,6 +23,7 @@ use PHPStan\PhpDocParser\Parser\ConstExprParser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPStan\PhpDocParser\Parser\TokenIterator;
 use PHPStan\PhpDocParser\Parser\TypeParser;
+use PHPStan\PhpDocParser\ParserConfig;
 
 class NameResolver extends NodeVisitorAbstract
 {
@@ -65,10 +66,18 @@ class NameResolver extends NodeVisitorAbstract
         $this->replaceNodes = $options['replaceNodes'] ?? true;
         $this->parseCustomAnnotations = $options['parseCustomAnnotations'] ?? true;
 
-        $typeParser = new TypeParser();
-        $constExprParser = new ConstExprParser();
-        $this->phpDocParser = new PhpDocParser($typeParser, $constExprParser);
-        $this->phpDocLexer = new Lexer();
+        if (class_exists(ParserConfig::class)) {
+            $parserConfig = new ParserConfig([]);
+            $constExprParser = new ConstExprParser($parserConfig);
+            $typeParser = new TypeParser($parserConfig, $constExprParser);
+            $this->phpDocParser = new PhpDocParser($parserConfig, $typeParser, $constExprParser);
+            $this->phpDocLexer = new Lexer($parserConfig);
+        } else {
+            $typeParser = new TypeParser();
+            $constExprParser = new ConstExprParser();
+            $this->phpDocParser = new PhpDocParser($typeParser, $constExprParser);
+            $this->phpDocLexer = new Lexer();
+        }
     }
 
     /**
