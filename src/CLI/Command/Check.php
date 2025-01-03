@@ -125,7 +125,7 @@ class Check extends Command
             $this->printHeadingLine($output);
 
             $rulesFilename = $this->getConfigFilename($input);
-            $output->writeln(sprintf("Config file: %s\n", $rulesFilename));
+            $output->writeln(\sprintf("Config file: %s\n", $rulesFilename));
 
             $config = new Config();
 
@@ -239,14 +239,14 @@ class Check extends Command
     private function printViolations(Violations $violations, OutputInterface $output): void
     {
         $output->writeln('<error>ERRORS!</error>');
-        $output->writeln(sprintf('%s', $violations->toString()));
-        $output->writeln(sprintf('<error>%s VIOLATIONS DETECTED!</error>', \count($violations)));
+        $output->writeln(\sprintf('%s', $violations->toString()));
+        $output->writeln(\sprintf('<error>%s VIOLATIONS DETECTED!</error>', \count($violations)));
     }
 
     private function printParsedErrors(ParsingErrors $parsingErrors, OutputInterface $output): void
     {
         $output->writeln('<error>ERROR ON PARSING THESE FILES:</error>');
-        $output->writeln(sprintf('%s', $parsingErrors->toString()));
+        $output->writeln(\sprintf('%s', $parsingErrors->toString()));
     }
 
     private function printNoViolationsDetectedMessage(OutputInterface $output): void

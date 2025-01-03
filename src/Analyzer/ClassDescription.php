@@ -44,7 +44,6 @@ class ClassDescription
     /**
      * @param list<ClassDependency>         $dependencies
      * @param list<FullyQualifiedClassName> $interfaces
-     * @param ?FullyQualifiedClassName      $extends
      * @param list<FullyQualifiedClassName> $attributes
      */
     public function __construct(
