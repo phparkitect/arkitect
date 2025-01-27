@@ -1,8 +1,8 @@
-ARG PHP_VERSION=7.1
+ARG PHP_VERSION=8.4
 
 FROM php:${PHP_VERSION}-cli-alpine AS php_build
 
-COPY --from=composer:2.0 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /arkitect
 
