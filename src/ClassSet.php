@@ -7,11 +7,9 @@ use Symfony\Component\Finder\Finder;
 
 class ClassSet implements \IteratorAggregate
 {
-    /** @var string */
-    private $directory;
+    private string $directory;
 
-    /** @var array */
-    private $exclude;
+    private array $exclude;
 
     private function __construct(string $directory)
     {

@@ -16,11 +16,9 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class Runner
 {
-    /** @var Violations */
-    private $violations;
+    private Violations $violations;
 
-    /** @var ParsingErrors */
-    private $parsingErrors;
+    private ParsingErrors $parsingErrors;
 
     public function __construct(bool $stopOnFailure = false)
     {

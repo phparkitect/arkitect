@@ -13,10 +13,7 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
      * @var Violation[]
      */
     private $violations;
-    /**
-     * @var bool
-     */
-    private $stopOnFailure;
+    private bool $stopOnFailure;
 
     public function __construct(bool $stopOnFailure = false)
     {

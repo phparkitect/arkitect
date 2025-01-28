@@ -5,41 +5,33 @@ namespace Arkitect\Analyzer;
 
 class ClassDescription
 {
-    /** @var FullyQualifiedClassName */
-    private $FQCN;
+    private FullyQualifiedClassName $FQCN;
 
     /** @var list<ClassDependency> */
-    private $dependencies;
+    private array $dependencies;
 
     /** @var list<FullyQualifiedClassName> */
-    private $interfaces;
+    private array $interfaces;
 
-    /** @var ?FullyQualifiedClassName */
-    private $extends;
+    private ?FullyQualifiedClassName $extends;
 
-    /** @var bool */
-    private $final;
+    private bool $final;
 
-    /** @var bool */
-    private $readonly;
+    private bool $readonly;
 
-    /** @var bool */
-    private $abstract;
+    private bool $abstract;
 
-    /** @var bool */
-    private $interface;
+    private bool $interface;
 
-    /** @var bool */
-    private $trait;
+    private bool $trait;
 
-    /** @var bool */
-    private $enum;
+    private bool $enum;
 
     /** @var list<string> */
-    private $docBlock;
+    private array $docBlock;
 
     /** @var list<FullyQualifiedClassName> */
-    private $attributes;
+    private array $attributes;
 
     /**
      * @param list<ClassDependency>         $dependencies

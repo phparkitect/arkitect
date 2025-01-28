@@ -10,14 +10,13 @@ use Arkitect\Rules\Rule;
 
 class Architecture implements Component, DefinedBy, Where, MayDependOnComponents, MayDependOnAnyComponent, ShouldNotDependOnAnyComponent, ShouldOnlyDependOnComponents, Rules
 {
-    /** @var string */
-    private $componentName;
+    private string $componentName;
     /** @var array<string, string> */
-    private $componentSelectors;
+    private array $componentSelectors;
     /** @var array<string, string[]> */
-    private $allowedDependencies;
+    private array $allowedDependencies;
     /** @var array<string, string[]> */
-    private $componentDependsOnlyOnTheseNamespaces;
+    private array $componentDependsOnlyOnTheseNamespaces;
 
     private function __construct()
     {
@@ -39,42 +38,42 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
         return $this;
     }
 
-    public function definedBy(string $selector)
+    public function definedBy(string $selector): static
     {
         $this->componentSelectors[$this->componentName] = $selector;
 
         return $this;
     }
 
-    public function where(string $componentName)
+    public function where(string $componentName): static
     {
         $this->componentName = $componentName;
 
         return $this;
     }
 
-    public function shouldNotDependOnAnyComponent()
+    public function shouldNotDependOnAnyComponent(): static
     {
         $this->allowedDependencies[$this->componentName] = [];
 
         return $this;
     }
 
-    public function shouldOnlyDependOnComponents(string ...$componentNames)
+    public function shouldOnlyDependOnComponents(string ...$componentNames): static
     {
         $this->componentDependsOnlyOnTheseNamespaces[$this->componentName] = $componentNames;
 
         return $this;
     }
 
-    public function mayDependOnComponents(string ...$componentNames)
+    public function mayDependOnComponents(string ...$componentNames): static
     {
         $this->allowedDependencies[$this->componentName] = $componentNames;
 
         return $this;
     }
 
-    public function mayDependOnAnyComponent()
+    public function mayDependOnAnyComponent(): static
     {
         $this->allowedDependencies[$this->componentName] = array_keys($this->componentSelectors);
 

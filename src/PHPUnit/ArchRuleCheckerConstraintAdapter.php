@@ -17,20 +17,15 @@ use PHPUnit\Framework\Constraint\Constraint;
 
 class ArchRuleCheckerConstraintAdapter extends Constraint
 {
-    /** @var ClassSet */
-    private $classSet;
+    private ClassSet $classSet;
 
-    /** @var Violations */
-    private $violations;
+    private Violations $violations;
 
-    /** @var Runner */
-    private $runner;
+    private Runner $runner;
 
-    /** @var FileParser */
-    private $fileparser;
+    private FileParser $fileparser;
 
-    /** @var ParsingErrors */
-    private $parsingErrors;
+    private ParsingErrors $parsingErrors;
 
     public function __construct(ClassSet $classSet)
     {

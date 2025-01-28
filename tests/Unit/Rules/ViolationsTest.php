@@ -11,11 +11,9 @@ use PHPUnit\Framework\TestCase;
 
 class ViolationsTest extends TestCase
 {
-    /** @var Violations */
-    private $violationStore;
+    private Violations $violationStore;
 
-    /** @var Violation */
-    private $violation;
+    private Violation $violation;
 
     protected function setUp(): void
     {

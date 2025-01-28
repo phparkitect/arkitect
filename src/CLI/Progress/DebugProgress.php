@@ -8,7 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DebugProgress implements Progress
 {
-    private $output;
+    private OutputInterface $output;
 
     public function __construct(OutputInterface $output)
     {

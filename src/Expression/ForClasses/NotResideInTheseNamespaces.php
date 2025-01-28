@@ -14,7 +14,7 @@ use Arkitect\Rules\Violations;
 class NotResideInTheseNamespaces implements Expression
 {
     /** @var string[] */
-    private $namespaces;
+    private array $namespaces;
 
     public function __construct(string ...$namespaces)
     {

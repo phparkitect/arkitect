@@ -20,8 +20,7 @@ class TargetPhpVersion
         '8.4',
     ];
 
-    /** @var string|null */
-    private $version;
+    private string $version;
 
     private function __construct(string $version)
     {

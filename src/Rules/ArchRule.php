@@ -7,20 +7,15 @@ use Arkitect\Analyzer\ClassDescription;
 
 class ArchRule implements DSL\ArchRule
 {
-    /** @var Specs */
-    private $thats;
+    private Specs $thats;
 
-    /** @var Constraints */
-    private $shoulds;
+    private Constraints $shoulds;
 
-    /** @var string */
-    private $because;
+    private string $because;
 
-    /** @var array */
-    private $classesToBeExcluded;
+    private array $classesToBeExcluded;
 
-    /** @var bool */
-    private $runOnlyThis;
+    private bool $runOnlyThis;
 
     public function __construct(
         Specs $specs,

@@ -14,8 +14,7 @@ use Arkitect\Rules\Violations;
 
 class NotHaveNameMatching implements Expression
 {
-    /** @var string */
-    private $name;
+    private string $name;
 
     public function __construct(string $name)
     {

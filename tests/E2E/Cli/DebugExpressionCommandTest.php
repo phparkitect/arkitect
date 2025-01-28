@@ -70,13 +70,13 @@ class DebugExpressionCommandTest extends TestCase
         $appTester = $this->createAppTester();
         $appTester->run(['debug:expression', 'expression' => 'NotExtend', 'arguments' => ['NotFound'], '--from-dir' => __DIR__.'/../_fixtures/parse_error']);
         $errorMessage = <<<END
-ContainerAwareInterface
-WARNING: Some files could not be parsed for these errors:
- - Syntax error, unexpected T_STRING, expecting '{' on line 8: Services/CartService.php
+            ContainerAwareInterface
+            WARNING: Some files could not be parsed for these errors:
+             - Syntax error, unexpected T_STRING, expecting '{' on line 8: Services/CartService.php
 
-App\Services\UserService
+            App\Services\UserService
 
-END;
+            END;
         $this->assertEquals($errorMessage, $appTester->getDisplay());
         $this->assertEquals(0, $appTester->getStatusCode());
     }

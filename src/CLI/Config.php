@@ -9,12 +9,9 @@ use Arkitect\Rules\DSL\ArchRule;
 
 class Config
 {
-    /** @var array */
-    private $classSetRules;
-    /** @var bool */
-    private $runOnlyARule;
-    /** @var bool */
-    private $parseCustomAnnotations;
+    private array $classSetRules;
+    private bool $runOnlyARule;
+    private bool $parseCustomAnnotations;
 
     public function __construct()
     {

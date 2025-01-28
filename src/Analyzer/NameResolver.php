@@ -23,11 +23,12 @@ use PHPStan\PhpDocParser\Parser\ConstExprParser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPStan\PhpDocParser\Parser\TokenIterator;
 use PHPStan\PhpDocParser\Parser\TypeParser;
+use PHPStan\PhpDocParser\ParserConfig;
 
 class NameResolver extends NodeVisitorAbstract
 {
     /** @var NameContext Naming context */
-    protected $nameContext;
+    protected NameContext $nameContext;
 
     /** @var bool Whether to preserve original names */
     protected $preserveOriginalNames;
@@ -38,11 +39,9 @@ class NameResolver extends NodeVisitorAbstract
     /** @var bool Whether to parse DocBlock Custom Annotations */
     protected $parseCustomAnnotations;
 
-    /** @var PhpDocParser */
-    protected $phpDocParser;
+    protected PhpDocParser $phpDocParser;
 
-    /** @var Lexer */
-    protected $phpDocLexer;
+    protected Lexer $phpDocLexer;
 
     /**
      * Constructs a name resolution visitor.
@@ -65,10 +64,11 @@ class NameResolver extends NodeVisitorAbstract
         $this->replaceNodes = $options['replaceNodes'] ?? true;
         $this->parseCustomAnnotations = $options['parseCustomAnnotations'] ?? true;
 
-        $typeParser = new TypeParser();
-        $constExprParser = new ConstExprParser();
-        $this->phpDocParser = new PhpDocParser($typeParser, $constExprParser);
-        $this->phpDocLexer = new Lexer();
+        $config = new ParserConfig(usedAttributes: ['lines' => true, 'indexes' => true]);
+        $constExprParser = new ConstExprParser($config);
+        $typeParser = new TypeParser($config, $constExprParser);
+        $this->phpDocParser = new PhpDocParser($config, $typeParser, $constExprParser);
+        $this->phpDocLexer = new Lexer($config);
     }
 
     /**
@@ -323,8 +323,7 @@ class NameResolver extends NodeVisitorAbstract
         );
     }
 
-    /** @param Stmt\Function_|Stmt\ClassMethod|Expr\Closure|Expr\ArrowFunction $node */
-    private function resolveSignature($node): void
+    private function resolveSignature(Stmt\Function_|Expr\ArrowFunction|Expr\Closure|Stmt\ClassMethod $node): void
     {
         $phpDocNode = $this->getPhpDocNode($node);
 

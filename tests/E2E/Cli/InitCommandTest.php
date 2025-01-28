@@ -65,7 +65,7 @@ class InitCommandTest extends TestCase
 
     public function test_returns_error_if_directory_is_not_writable(): void
     {
-        $fs = vfsStream::setup('root', 0000)->url();
+        $fs = vfsStream::setup('root', 0o000)->url();
 
         $appTester = $this->runInit($fs);
 

@@ -10,11 +10,9 @@ use PhpParser\NodeVisitorAbstract;
 
 class FileVisitor extends NodeVisitorAbstract
 {
-    /** @var ClassDescriptionBuilder */
-    private $classDescriptionBuilder;
+    private ClassDescriptionBuilder $classDescriptionBuilder;
 
-    /** @var array */
-    private $classDescriptions = [];
+    private array $classDescriptions = [];
 
     public function __construct(ClassDescriptionBuilder $classDescriptionBuilder)
     {

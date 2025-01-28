@@ -18,13 +18,13 @@ class DebugExpression extends Command
 {
     /** @var string|null */
     public static $defaultDescription = <<< 'EOT'
-Check which classes respect an expression
-EOT;
+        Check which classes respect an expression
+        EOT;
 
     /** @var string */
     public static $help = <<< 'EOT'
-Check which classes respect an expression
-EOT;
+        Check which classes respect an expression
+        EOT;
 
     public function __construct()
     {

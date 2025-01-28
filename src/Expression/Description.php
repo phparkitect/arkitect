@@ -6,8 +6,7 @@ namespace Arkitect\Expression;
 
 class Description
 {
-    /** @var string */
-    private $description;
+    private string $description;
 
     public function __construct(string $description, string $because)
     {

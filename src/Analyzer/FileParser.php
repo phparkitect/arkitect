@@ -6,23 +6,20 @@ namespace Arkitect\Analyzer;
 use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Rules\ParsingError;
 use PhpParser\ErrorHandler\Collecting;
-use PhpParser\Lexer\Emulative;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
+use PhpParser\PhpVersion;
 
 class FileParser implements Parser
 {
     /** @var \PhpParser\Parser */
     private $parser;
 
-    /** @var NodeTraverser */
-    private $traverser;
+    private NodeTraverser $traverser;
 
-    /** @var FileVisitor */
-    private $fileVisitor;
+    private FileVisitor $fileVisitor;
 
-    /** @var array */
-    private $parsingErrors;
+    private array $parsingErrors;
 
     public function __construct(
         NodeTraverser $traverser,
@@ -33,12 +30,7 @@ class FileParser implements Parser
         $this->fileVisitor = $fileVisitor;
         $this->parsingErrors = [];
 
-        $lexer = new Emulative([
-            'usedAttributes' => ['comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos'],
-            'phpVersion' => $targetPhpVersion->get() ?? phpversion(),
-        ]);
-
-        $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
+        $this->parser = (new ParserFactory())->createForVersion(PhpVersion::fromString($targetPhpVersion->get() ?? phpversion()));
         $this->traverser = $traverser;
         $this->traverser->addVisitor($nameResolver);
         $this->traverser->addVisitor($this->fileVisitor);

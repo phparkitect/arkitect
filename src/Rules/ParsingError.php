@@ -6,11 +6,9 @@ namespace Arkitect\Rules;
 
 class ParsingError
 {
-    /** @var string */
-    private $relativeFilePath;
+    private string $relativeFilePath;
 
-    /** @var string */
-    private $error;
+    private string $error;
 
     public function __construct(string $relativeFilePath, string $error)
     {

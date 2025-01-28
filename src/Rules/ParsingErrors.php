@@ -10,7 +10,7 @@ class ParsingErrors implements \IteratorAggregate, \Countable
     /**
      * @var ParsingError[]
      */
-    private $parsingErrors;
+    private array $parsingErrors;
 
     public function __construct(array $parsingErrors = [])
     {

@@ -15,11 +15,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ProgressBarProgress implements Progress
 {
-    /** @var OutputInterface */
-    private $output;
+    private \Symfony\Component\Console\Output\NullOutput|OutputInterface $output;
 
-    /** @var ProgressBar */
-    private $progress;
+    private ProgressBar $progress;
 
     public function __construct(OutputInterface $output)
     {

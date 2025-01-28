@@ -8,40 +8,32 @@ use Webmozart\Assert\Assert;
 class ClassDescriptionBuilder
 {
     /** @var list<ClassDependency> */
-    private $classDependencies = [];
+    private array $classDependencies = [];
 
-    /** @var ?FullyQualifiedClassName */
-    private $FQCN;
+    private ?FullyQualifiedClassName $FQCN = null;
 
     /** @var list<FullyQualifiedClassName> */
-    private $interfaces = [];
+    private array $interfaces = [];
 
-    /** @var ?FullyQualifiedClassName */
-    private $extend;
+    private ?FullyQualifiedClassName $extend = null;
 
-    /** @var bool */
-    private $final = false;
+    private bool $final = false;
 
-    /** @var bool */
-    private $readonly = false;
+    private bool $readonly = false;
 
-    /** @var bool */
-    private $abstract = false;
+    private bool $abstract = false;
 
     /** @var list<string> */
-    private $docBlock = [];
+    private array $docBlock = [];
 
     /** @var list<FullyQualifiedClassName> */
-    private $attributes = [];
+    private array $attributes = [];
 
-    /** @var bool */
-    private $interface = false;
+    private bool $interface = false;
 
-    /** @var bool */
-    private $trait = false;
+    private bool $trait = false;
 
-    /** @var bool */
-    private $enum = false;
+    private bool $enum = false;
 
     public function clear(): void
     {

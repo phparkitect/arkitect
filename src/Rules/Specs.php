@@ -8,8 +8,7 @@ use Arkitect\Expression\Expression;
 
 class Specs
 {
-    /** @var array */
-    private $expressions = [];
+    private array $expressions = [];
 
     public function add(Expression $expression): void
     {

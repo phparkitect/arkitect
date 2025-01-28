@@ -10,8 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class ClassDescriptionTest extends TestCase
 {
-    /** @var ClassDescriptionBuilder */
-    private $builder;
+    private ClassDescriptionBuilder $builder;
 
     protected function setUp(): void
     {

@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class ResideInOneOfTheseNamespacesTest extends TestCase
 {
-    public function shouldMatchNamespacesProvider(): array
+    public static function shouldMatchNamespacesProvider(): array
     {
         return [
             ['Food\Vegetables', 'Food\Vegetables\Carrot', 'matches a class in the root namespace'],
@@ -35,7 +35,7 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
      * @param mixed $actualFQCN
      * @param mixed $explanation
      */
-    public function test_it_should_match_namespace_and_descendants($expectedNamespace, $actualFQCN, $explanation): void
+    public function test_it_should_match_namespace_and_descendants(string $expectedNamespace, string $actualFQCN, string $explanation): void
     {
         $haveNameMatching = new ResideInOneOfTheseNamespaces($expectedNamespace);
 

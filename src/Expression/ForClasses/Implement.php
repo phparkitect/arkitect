@@ -14,8 +14,7 @@ use Arkitect\Rules\Violations;
 
 class Implement implements Expression
 {
-    /** @var string */
-    private $interface;
+    private string $interface;
 
     public function __construct(string $interface)
     {

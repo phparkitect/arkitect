@@ -11,11 +11,9 @@ use PHPUnit\Framework\TestCase;
 
 class ParsingErrorsTest extends TestCase
 {
-    /** @var ParsingErrors */
-    private $parsingStore;
+    private ParsingErrors $parsingStore;
 
-    /** @var ParsingError */
-    private $parsingError;
+    private ParsingError $parsingError;
 
     protected function setUp(): void
     {

@@ -14,12 +14,9 @@ use Arkitect\Rules\Violations;
 
 class NotHaveDependencyOutsideNamespace implements Expression
 {
-    /** @var string */
-    private $namespace;
-    /** @var array */
-    private $externalDependenciesToExclude;
-    /** @var bool */
-    private $excludeCoreNamespace;
+    private string $namespace;
+    private array $externalDependenciesToExclude;
+    private bool $excludeCoreNamespace;
 
     public function __construct(string $namespace, array $externalDependenciesToExclude = [], bool $excludeCoreNamespace = false)
     {

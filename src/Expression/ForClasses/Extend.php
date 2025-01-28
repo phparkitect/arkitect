@@ -14,7 +14,7 @@ use Arkitect\Rules\Violations;
 class Extend implements Expression
 {
     /** @var string[] */
-    private $classNames;
+    private array $classNames;
 
     public function __construct(string ...$classNames)
     {

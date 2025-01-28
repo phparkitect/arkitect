@@ -10,9 +10,9 @@ use PHPUnit\Framework\TestCase;
 
 class ClassDependencyTest extends TestCase
 {
-    private $FQCN;
-    private $line;
-    private $classDependency;
+    private string $FQCN;
+    private int $line;
+    private ClassDependency $classDependency;
 
     protected function setUp(): void
     {
