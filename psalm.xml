@@ -6,6 +6,7 @@
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
 
     allowStringToStandInForClass="true"
+    errorBaseline="psalm-baseline.xml"
 >
     <projectFiles>
         <directory name="src" />

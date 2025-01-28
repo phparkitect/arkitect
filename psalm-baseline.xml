@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<files psalm-version="6.0.0@b8e96bb617bf59382113b1b56cef751f648a7dc9">
+  <file src="src/Analyzer/ClassDependency.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[matches]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="src/Analyzer/ClassDescription.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[getAttributes]]></code>
+      <code><![CDATA[getBuilder]]></code>
+      <code><![CDATA[getDocBlock]]></code>
+    </PossiblyUnusedMethod>
+    <PropertyTypeCoercion>
+      <code><![CDATA[$docBlock]]></code>
+    </PropertyTypeCoercion>
+  </file>
+  <file src="src/Analyzer/FileParser.php">
+    <PossiblyFalseArgument>
+      <code><![CDATA[$targetPhpVersion->get() ?? phpversion()]]></code>
+    </PossiblyFalseArgument>
+  </file>
+  <file src="src/Analyzer/FilePath.php">
+    <UnusedClass>
+      <code><![CDATA[FilePath]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/Analyzer/FileVisitor.php">
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$node->class->isAnonymous()]]></code>
+      <code><![CDATA[$type->isSpecialClassName()]]></code>
+    </RiskyTruthyFalsyComparison>
+    <UnnecessaryVarAnnotation>
+      <code><![CDATA[NullableType]]></code>
+      <code><![CDATA[NullableType]]></code>
+    </UnnecessaryVarAnnotation>
+  </file>
+  <file src="src/Analyzer/FullyQualifiedClassName.php">
+    <PossiblyNullArgument>
+      <code><![CDATA[$className]]></code>
+    </PossiblyNullArgument>
+  </file>
+  <file src="src/Analyzer/NameResolver.php">
+    <ArgumentTypeCoercion>
+      <code><![CDATA[$type]]></code>
+      <code><![CDATA[$type]]></code>
+      <code><![CDATA[$type]]></code>
+      <code><![CDATA[$use]]></code>
+      <code><![CDATA[$use]]></code>
+    </ArgumentTypeCoercion>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[getNameContext]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="src/CLI/Command/Check.php">
+    <PossiblyFalseArgument>
+      <code><![CDATA[file_get_contents($filename)]]></code>
+      <code><![CDATA[json_encode($violations, \JSON_PRETTY_PRINT)]]></code>
+    </PossiblyFalseArgument>
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$useBaseline]]></code>
+      <code><![CDATA[$useBaseline]]></code>
+    </RiskyTruthyFalsyComparison>
+  </file>
+  <file src="src/CLI/Command/DebugExpression.php">
+    <PossiblyUnusedProperty>
+      <code><![CDATA[$defaultDescription]]></code>
+    </PossiblyUnusedProperty>
+  </file>
+  <file src="src/CLI/Command/Init.php">
+    <PossiblyUnusedProperty>
+      <code><![CDATA[$defaultDescription]]></code>
+    </PossiblyUnusedProperty>
+  </file>
+  <file src="src/CLI/Config.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[add]]></code>
+      <code><![CDATA[skipParsingCustomAnnotations]]></code>
+    </PossiblyUnusedMethod>
+    <UnnecessaryVarAnnotation>
+      <code><![CDATA[ArchRule]]></code>
+    </UnnecessaryVarAnnotation>
+  </file>
+  <file src="src/CLI/PhpArkitectApplication.php">
+    <UnusedClass>
+      <code><![CDATA[PhpArkitectApplication]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/CLI/Runner.php">
+    <UnnecessaryVarAnnotation>
+      <code><![CDATA[FileParser]]></code>
+    </UnnecessaryVarAnnotation>
+  </file>
+  <file src="src/CLI/TargetPhpVersion.php">
+    <PossiblyFalseArgument>
+      <code><![CDATA[$version ?? phpversion()]]></code>
+    </PossiblyFalseArgument>
+  </file>
+  <file src="src/CLI/Version.php">
+    <PossiblyFalseArgument>
+      <code><![CDATA[$content]]></code>
+    </PossiblyFalseArgument>
+  </file>
+  <file src="src/ClassSet.php">
+    <MissingTemplateParam>
+      <code><![CDATA[\IteratorAggregate]]></code>
+    </MissingTemplateParam>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[excludePath]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="src/Expression/ForClasses/ContainDocBlockLike.php">
+    <UnusedClass>
+      <code><![CDATA[ContainDocBlockLike]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/Expression/ForClasses/DependsOnlyOnTheseNamespaces.php">
+    <UnnecessaryVarAnnotation>
+      <code><![CDATA[ClassDependency]]></code>
+    </UnnecessaryVarAnnotation>
+  </file>
+  <file src="src/Expression/ForClasses/Extend.php">
+    <UnnecessaryVarAnnotation>
+      <code><![CDATA[string]]></code>
+    </UnnecessaryVarAnnotation>
+    <UnusedClass>
+      <code><![CDATA[Extend]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/Expression/ForClasses/HaveAttribute.php">
+    <UnusedClass>
+      <code><![CDATA[HaveAttribute]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/Expression/ForClasses/HaveNameMatching.php">
+    <UnusedClass>
+      <code><![CDATA[HaveNameMatching]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/Expression/ForClasses/Implement.php">
+    <UnusedClass>
+      <code><![CDATA[Implement]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/Expression/ForClasses/IsAbstract.php">
+    <UnusedClass>
+      <code><![CDATA[IsAbstract]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/Expression/ForClasses/IsEnum.php">
+    <UnusedClass>
+      <code><![CDATA[IsEnum]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/Expression/ForClasses/IsFinal.php">
+    <UnusedClass>
+      <code><![CDATA[IsFinal]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/Expression/ForClasses/IsInterface.php">
+    <UnusedClass>
+      <code><![CDATA[IsInterface]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/Expression/ForClasses/IsNotAbstract.php">
+    <UnusedClass>
+      <code><![CDATA[IsNotAbstract]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/Expression/ForClasses/IsNotEnum.php">
+    <UnusedClass>
+      <code><![CDATA[IsNotEnum]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/Expression/ForClasses/IsNotFinal.php">
+    <UnusedClass>
+      <code><![CDATA[IsNotFinal]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/Expression/ForClasses/IsNotInterface.php">
+    <UnusedClass>
+      <code><![CDATA[IsNotInterface]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/Expression/ForClasses/IsNotReadonly.php">
+    <UnusedClass>
+      <code><![CDATA[IsNotReadonly]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/Expression/ForClasses/IsNotTrait.php">
+    <UnusedClass>
+      <code><![CDATA[IsNotTrait]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/Expression/ForClasses/IsReadonly.php">
+    <UnusedClass>
+      <code><![CDATA[IsReadonly]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/Expression/ForClasses/IsTrait.php">
+    <UnusedClass>
+      <code><![CDATA[IsTrait]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/Expression/ForClasses/MatchOneOfTheseNames.php">
+    <UnusedClass>
+      <code><![CDATA[MatchOneOfTheseNames]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/Expression/ForClasses/NotContainDocBlockLike.php">
+    <UnusedClass>
+      <code><![CDATA[NotContainDocBlockLike]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/Expression/ForClasses/NotDependsOnTheseNamespaces.php">
+    <UnnecessaryVarAnnotation>
+      <code><![CDATA[ClassDependency]]></code>
+    </UnnecessaryVarAnnotation>
+  </file>
+  <file src="src/Expression/ForClasses/NotExtend.php">
+    <UnnecessaryVarAnnotation>
+      <code><![CDATA[string]]></code>
+    </UnnecessaryVarAnnotation>
+    <UnusedClass>
+      <code><![CDATA[NotExtend]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/Expression/ForClasses/NotHaveDependencyOutsideNamespace.php">
+    <UnnecessaryVarAnnotation>
+      <code><![CDATA[ClassDependency]]></code>
+    </UnnecessaryVarAnnotation>
+    <UnusedClass>
+      <code><![CDATA[NotHaveDependencyOutsideNamespace]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/Expression/ForClasses/NotHaveNameMatching.php">
+    <UnusedClass>
+      <code><![CDATA[NotHaveNameMatching]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/Expression/ForClasses/NotImplement.php">
+    <UnusedClass>
+      <code><![CDATA[NotImplement]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/Expression/ForClasses/NotResideInTheseNamespaces.php">
+    <UnusedClass>
+      <code><![CDATA[NotResideInTheseNamespaces]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/PHPUnit/ArchRuleCheckerConstraintAdapter.php">
+    <MissingParamType>
+      <code><![CDATA[$other]]></code>
+      <code><![CDATA[$other]]></code>
+    </MissingParamType>
+    <UnusedClass>
+      <code><![CDATA[ArchRuleCheckerConstraintAdapter]]></code>
+    </UnusedClass>
+  </file>
+  <file src="src/RuleBuilders/Architecture/Architecture.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[withComponents]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="src/RuleBuilders/Architecture/Component.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[component]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="src/RuleBuilders/Architecture/DefinedBy.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[definedBy]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="src/RuleBuilders/Architecture/MayDependOnAnyComponent.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[mayDependOnAnyComponent]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="src/RuleBuilders/Architecture/MayDependOnComponents.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[mayDependOnComponents]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="src/RuleBuilders/Architecture/Rules.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[rules]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="src/RuleBuilders/Architecture/ShouldNotDependOnAnyComponent.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[shouldNotDependOnAnyComponent]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="src/RuleBuilders/Architecture/ShouldOnlyDependOnComponents.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[shouldOnlyDependOnComponents]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="src/RuleBuilders/Architecture/Where.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[where]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="src/Rules/DSL/AndThatShouldParser.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[andThat]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="src/Rules/DSL/ArchRule.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[check]]></code>
+      <code><![CDATA[runOnlyThis]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="src/Rules/DSL/BecauseParser.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[andShould]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="src/Rules/DSL/ThatParser.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[except]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="src/Rules/ParsingErrors.php">
+    <MissingTemplateParam>
+      <code><![CDATA[\IteratorAggregate]]></code>
+    </MissingTemplateParam>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[get]]></code>
+      <code><![CDATA[toArray]]></code>
+    </PossiblyUnusedMethod>
+    <UnnecessaryVarAnnotation>
+      <code><![CDATA[ParsingError]]></code>
+    </UnnecessaryVarAnnotation>
+  </file>
+  <file src="src/Rules/RuleBuilder.php">
+    <PossiblyUnusedMethod>
+      <code><![CDATA[setRunOnlyThis]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="src/Rules/Violations.php">
+    <MissingTemplateParam>
+      <code><![CDATA[\IteratorAggregate]]></code>
+    </MissingTemplateParam>
+    <PossiblyUnusedMethod>
+      <code><![CDATA[compareViolationsIgnoreLineNumber]]></code>
+      <code><![CDATA[get]]></code>
+      <code><![CDATA[toArray]]></code>
+    </PossiblyUnusedMethod>
+  </file>
+</files>
