@@ -1,0 +1,19 @@
+name: Architectural test
+
+on:
+    push:
+
+jobs:
+    phparkitect:
+        name: PHPArkitect
+
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: "Checkout"
+              uses: actions/checkout@v2
+
+            - name: PHPArkitect
+              uses: docker://phparkitect/arkitect-github-actions:latest
+              with:
+                  args: check

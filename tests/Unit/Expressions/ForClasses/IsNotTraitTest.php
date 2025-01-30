@@ -23,6 +23,7 @@ class IsNotTraitTest extends TestCase
             false,
             false,
             false,
+            false,
             true,
             false
         );
@@ -44,6 +45,7 @@ class IsNotTraitTest extends TestCase
             [],
             [],
             null,
+            false,
             false,
             false,
             false,

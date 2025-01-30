@@ -11,15 +11,14 @@ class FullyQualifiedClassNameTest extends TestCase
     public function patternProvider(): array
     {
         return [
-          ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables\Fruits\Banana', true],
-          ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables\*\Banana', true],
-          ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables', true],
+            ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables\Fruits\Banana', true],
+            ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables\*\Banana', true],
+            ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables', true],
             ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables\\', true],
-
             ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables\*', true],
-          ['Food\Vegetables\Fruits\Mango', '', false],
-          ['Food\Veg', 'Food\Vegetables', false],
-          ['Food\Vegetables', 'Food\Veg', false],
+            ['Food\Vegetables\Fruits\Mango', '', false],
+            ['Food\Veg', 'Food\Vegetables', false],
+            ['Food\Vegetables', 'Food\Veg', false],
         ];
     }
 
@@ -39,6 +38,12 @@ class FullyQualifiedClassNameTest extends TestCase
         $this->expectExceptionMessage('-Gvnn is not a valid namespace definition');
 
         FullyQualifiedClassName::fromString('-Gvnn');
+    }
+
+    public function test_single_letter_class_is_valid(): void
+    {
+        $fqcn = FullyQualifiedClassName::fromString('A');
+        $this->assertEquals('A', $fqcn->className());
     }
 
     public function test_should_return_class_name(): void

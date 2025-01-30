@@ -11,16 +11,19 @@ class ClassDescriptionBuilder
     private $classDependencies = [];
 
     /** @var ?FullyQualifiedClassName */
-    private $FQCN = null;
+    private $FQCN;
 
     /** @var list<FullyQualifiedClassName> */
     private $interfaces = [];
 
     /** @var ?FullyQualifiedClassName */
-    private $extend = null;
+    private $extend;
 
     /** @var bool */
     private $final = false;
+
+    /** @var bool */
+    private $readonly = false;
 
     /** @var bool */
     private $abstract = false;
@@ -47,6 +50,7 @@ class ClassDescriptionBuilder
         $this->interfaces = [];
         $this->extend = null;
         $this->final = false;
+        $this->readonly = false;
         $this->abstract = false;
         $this->docBlock = [];
         $this->attributes = [];
@@ -88,6 +92,13 @@ class ClassDescriptionBuilder
     public function setFinal(bool $final): self
     {
         $this->final = $final;
+
+        return $this;
+    }
+
+    public function setReadonly(bool $readonly): self
+    {
+        $this->readonly = $readonly;
 
         return $this;
     }
@@ -145,6 +156,7 @@ class ClassDescriptionBuilder
             $this->interfaces,
             $this->extend,
             $this->final,
+            $this->readonly,
             $this->abstract,
             $this->interface,
             $this->trait,

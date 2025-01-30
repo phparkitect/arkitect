@@ -15,7 +15,7 @@ class FileParser implements Parser
     /** @var \PhpParser\Parser */
     private $parser;
 
-    /** @var \PhpParser\NodeTraverser */
+    /** @var NodeTraverser */
     private $traverser;
 
     /** @var FileVisitor */
@@ -35,7 +35,7 @@ class FileParser implements Parser
 
         $lexer = new Emulative([
             'usedAttributes' => ['comments', 'startLine', 'endLine', 'startTokenPos', 'endTokenPos'],
-             'phpVersion' => $targetPhpVersion->get() ?? phpversion(),
+            'phpVersion' => $targetPhpVersion->get() ?? phpversion(),
         ]);
 
         $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);

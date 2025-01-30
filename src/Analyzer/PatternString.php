@@ -38,10 +38,10 @@ class PatternString
     private function containsWildcard(string $pattern): bool
     {
         return
-            str_contains($pattern, '*') ||
-            str_contains($pattern, '?') ||
-            str_contains($pattern, '.') ||
-            str_contains($pattern, '[');
+            str_contains($pattern, '*')
+            || str_contains($pattern, '?')
+            || str_contains($pattern, '.')
+            || str_contains($pattern, '[');
     }
 
     private function startsWithPattern(string $pattern): bool

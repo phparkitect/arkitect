@@ -11,17 +11,16 @@ use Arkitect\Rules\Violation;
 use Arkitect\Rules\ViolationMessage;
 use Arkitect\Rules\Violations;
 
-class IsAbstract implements Expression
+class IsNotReadonly implements Expression
 {
     public function describe(ClassDescription $theClass, string $because): Description
     {
-        return new Description("{$theClass->getName()} should be abstract", $because);
+        return new Description("{$theClass->getName()} should not be readonly", $because);
     }
 
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
-        if ($theClass->isAbstract() || $theClass->isInterface() || $theClass->isTrait() || $theClass->isEnum()
-            || $theClass->isFinal()) {
+        if (!$theClass->isReadonly()) {
             return;
         }
 

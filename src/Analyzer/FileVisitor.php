@@ -33,13 +33,17 @@ class FileVisitor extends NodeVisitorAbstract
                      ->addInterface($interface->toString(), $interface->getLine());
             }
 
-            if (null !== $node->extends) {
+            if (!$node->isAnonymous() && null !== $node->extends) {
                 $this->classDescriptionBuilder
                     ->setExtends($node->extends->toString(), $node->getLine());
             }
 
             if ($node->isFinal()) {
                 $this->classDescriptionBuilder->setFinal(true);
+            }
+
+            if ($node->isReadonly()) {
+                $this->classDescriptionBuilder->setReadonly(true);
             }
 
             if ($node->isAbstract()) {
@@ -72,8 +76,8 @@ class FileVisitor extends NodeVisitorAbstract
          *
          * @see FileVisitorTest::test_it_should_return_errors_for_const_outside_namespace
          */
-        if ($node instanceof Node\Expr\ClassConstFetch &&
-            method_exists($node->class, 'toString')
+        if ($node instanceof Node\Expr\ClassConstFetch
+            && method_exists($node->class, 'toString')
         ) {
             if ($this->isSelfOrStaticOrParent($node->class->toString())) {
                 return;
@@ -89,8 +93,8 @@ class FileVisitor extends NodeVisitorAbstract
          *
          * @see FileVisitorTest::test_should_returns_all_dependencies
          */
-        if ($node instanceof Node\Expr\StaticCall &&
-            method_exists($node->class, 'toString')
+        if ($node instanceof Node\Expr\StaticCall
+            && method_exists($node->class, 'toString')
         ) {
             if ($this->isSelfOrStaticOrParent($node->class->toString())) {
                 return;
@@ -100,8 +104,8 @@ class FileVisitor extends NodeVisitorAbstract
                 ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
         }
 
-        if ($node instanceof Node\Expr\Instanceof_ &&
-            method_exists($node->class, 'toString')
+        if ($node instanceof Node\Expr\Instanceof_
+            && method_exists($node->class, 'toString')
         ) {
             if ($this->isSelfOrStaticOrParent($node->class->toString())) {
                 return;
@@ -110,11 +114,11 @@ class FileVisitor extends NodeVisitorAbstract
                 ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
         }
 
-        if ($node instanceof Node\Expr\New_ &&
-            !($node->class instanceof Node\Expr\Variable)
+        if ($node instanceof Node\Expr\New_
+            && !($node->class instanceof Node\Expr\Variable)
         ) {
-            if ((method_exists($node->class, 'isAnonymous') && $node->class->isAnonymous()) ||
-                !method_exists($node->class, 'toString')) {
+            if ((method_exists($node->class, 'isAnonymous') && $node->class->isAnonymous())
+                || !method_exists($node->class, 'toString')) {
                 return;
             }
 

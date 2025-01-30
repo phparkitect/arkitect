@@ -11,8 +11,9 @@ jobs:
   build:
     runs-on: "ubuntu-22.04"
     strategy:
+      fail-fast: false
       matrix:
-        php-versions: [ '7.1', '7.2', '7.3', '7.4', '8.0', '8.1', '8.2']
+        php-versions: [ '7.1', '7.2', '7.3', '7.4', '8.0', '8.1', '8.2', '8.3']
         coverage-driver: [ 'pcov' ]
 
     steps:
@@ -55,13 +56,6 @@ jobs:
       uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-
-    - name: Architectural Rules
-      uses: docker://phparkitect/arkitect-github-actions:latest
-      env:
-        PHP_VERSION: ${{ matrix.php-versions }}
-      with:
-        args: check
 
   phar:
     runs-on: "ubuntu-20.04"

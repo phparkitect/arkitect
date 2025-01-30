@@ -12,9 +12,6 @@ use Webmozart\Assert\Assert;
 class Init extends Command
 {
     /** @var string|null */
-    public static $defaultName = 'init';
-
-    /** @var string|null */
     public static $defaultDescription = <<< 'EOT'
 Creates a new phparkitect.php file
 EOT;
@@ -24,6 +21,11 @@ EOT;
 This command creates a new phparkitect.php in the current directory
 You can customize the directory where the file is created specifying <comment>-d /dest/path</comment>
 EOT;
+
+    public function __construct()
+    {
+        parent::__construct('init');
+    }
 
     protected function configure(): void
     {
