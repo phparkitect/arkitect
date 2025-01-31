@@ -28,7 +28,7 @@ class FileParser implements Parser
         NodeTraverser $traverser,
         FileVisitor $fileVisitor,
         NameResolver $nameResolver,
-        TargetPhpVersion $targetPhpVersion
+        TargetPhpVersion $targetPhpVersion,
     ) {
         $this->fileVisitor = $fileVisitor;
         $this->parsingErrors = [];

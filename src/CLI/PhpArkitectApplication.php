@@ -28,6 +28,6 @@ EOD;
 
     public function getLongVersion(): string
     {
-        return sprintf("%s\n\n<info>%s</info> version <comment>%s</comment>", self::$logo, $this->getName(), $this->getVersion());
+        return \sprintf("%s\n\n<info>%s</info> version <comment>%s</comment>", self::$logo, $this->getName(), $this->getVersion());
     }
 }
