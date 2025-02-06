@@ -5,6 +5,6 @@ namespace App\Services;
 
 use ContainerAwareInterface;
 
-class Cart Service implements ContainerAwareInterface
+class CartService implements ContainerAwareInterface
 {
 }
