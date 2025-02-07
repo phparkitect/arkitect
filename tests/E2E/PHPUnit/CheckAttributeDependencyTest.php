@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Arkitect\Tests\E2E\PHPUnit;
 
 use Arkitect\ClassSet;
-use Arkitect\Expression\ForClasses\Implement;
 use Arkitect\Expression\ForClasses\NotDependsOnTheseNamespaces;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\Rules\Rule;
