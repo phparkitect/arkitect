@@ -9,11 +9,11 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
-        php-versions: [ '8.2', '8.3', '8.4']
+        php-versions: [ '8.1', '8.2', '8.3', '8.4']
         coverage-driver: [ 'pcov' ]
 
     steps:
@@ -58,7 +58,7 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
 
   phar:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: build
     steps:
       - uses: actions/checkout@v3
@@ -66,7 +66,7 @@ jobs:
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.4
+          php-version: 8.1
           tools: composer:v2.8
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
@@ -92,10 +92,10 @@ jobs:
 
   smoke-test-phar:
     needs: phar
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
-        php-versions: [ '8.2', '8.3', '8.4' ]
+        php-versions: [ '8.1', '8.2', '8.3', '8.4' ]
 
     steps:
       - name: Install PHP
@@ -116,7 +116,7 @@ jobs:
 
   publish_phar:
     needs: [build, smoke-test-phar]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: github.event_name == 'release'
     steps:
       - name: "Download phar ./phparkitect-${{ github.sha }}.phar"
@@ -135,7 +135,7 @@ jobs:
 
   publish_docker_images:
     needs: [build, smoke-test-phar]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     if: github.ref == 'refs/heads/main' || github.event_name == 'release'
     steps:

@@ -464,7 +464,7 @@ You can add parameters when you launch the tool. At the moment you can add these
 phparkitect check --config=/project/yourConfigFile.php
 ```
 * `--target-php-version`: With this parameter, you can specify which PHP version should use the parser. This can be useful to debug problems and to understand if there are problems with a different PHP version.
-Supported PHP versions are: 7.1, 7.2, 7.3, 7.4, 8.0, 8.1, 8.2
+Supported PHP versions are: 8.1, 8.2, 8.3, 8.4
  * `--stop-on-failure`: With this option the process will end immediately after the first violation.
 
 ## Run only a specific rule

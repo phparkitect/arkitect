@@ -31,7 +31,7 @@ class FileParserTest extends TestCase
             $traverser->reveal(),
             $fileVisitor->reveal(),
             $nameResolver->reveal(),
-            TargetPhpVersion::create('7.4')
+            TargetPhpVersion::create('8.1')
         );
 
         $content = '<?php

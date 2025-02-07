@@ -39,7 +39,7 @@ class FileVisitorTest extends TestCase
             EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -84,7 +84,7 @@ class FileVisitorTest extends TestCase
             EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -120,7 +120,7 @@ class FileVisitorTest extends TestCase
             EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions()[1];
@@ -149,7 +149,7 @@ class FileVisitorTest extends TestCase
             EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions()[1];
@@ -177,7 +177,7 @@ class FileVisitorTest extends TestCase
             EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -212,7 +212,7 @@ class FileVisitorTest extends TestCase
             EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -248,7 +248,7 @@ class FileVisitorTest extends TestCase
             EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -278,7 +278,7 @@ class FileVisitorTest extends TestCase
             EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
 
         $parsingErrors = $fp->getParsingErrors();
@@ -308,7 +308,7 @@ class FileVisitorTest extends TestCase
             EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
 
         $violations = new Violations();
@@ -341,7 +341,7 @@ class FileVisitorTest extends TestCase
             EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -374,7 +374,7 @@ class FileVisitorTest extends TestCase
             EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -402,7 +402,7 @@ class FileVisitorTest extends TestCase
             class Foo {}
             EOF;
 
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.0'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -441,7 +441,7 @@ class FileVisitorTest extends TestCase
             EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -847,7 +847,7 @@ class FileVisitorTest extends TestCase
             EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -935,7 +935,7 @@ class FileVisitorTest extends TestCase
             EOF;
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -965,7 +965,7 @@ class FileVisitorTest extends TestCase
             EOF;
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -995,7 +995,7 @@ class FileVisitorTest extends TestCase
             EOF;
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -1027,7 +1027,7 @@ class FileVisitorTest extends TestCase
             EOF;
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -1059,7 +1059,7 @@ class FileVisitorTest extends TestCase
             EOF;
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -1091,7 +1091,7 @@ class FileVisitorTest extends TestCase
             EOF;
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -1126,7 +1126,7 @@ class FileVisitorTest extends TestCase
             EOF;
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -1159,7 +1159,7 @@ class FileVisitorTest extends TestCase
             EOF;
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -1192,7 +1192,7 @@ class FileVisitorTest extends TestCase
             EOF;
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -1225,7 +1225,7 @@ class FileVisitorTest extends TestCase
             EOF;
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.1'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 

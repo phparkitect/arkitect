@@ -38,7 +38,7 @@
         "symfony/var-dumper": "^6.0|^7.0",
         "vimeo/psalm": "^6.0",
         "friendsofphp/php-cs-fixer": "^3.68",
-        "phpunit/phpunit": "^11.5",
+        "phpunit/phpunit": "^10.0|^11.0",
         "mikey179/vfsstream": "^1.6",
         "phpspec/prophecy": "^1.20"
     },
