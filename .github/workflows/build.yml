@@ -32,7 +32,7 @@ jobs:
 
     - name: Cache Composer packages
       id: composer-cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: vendor
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
@@ -84,7 +84,7 @@ jobs:
         run: mv ./phparkitect.phar phparkitect-${{ github.sha }}.phar
 
       - name: "Upload phar file artifact"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: phar-artifact
           path: ./phparkitect-${{ github.sha }}.phar
@@ -107,7 +107,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
 
       - name: "Download phar ./phparkitect-${{ github.sha }}.phar"
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           # will download phar in project root
           name: phar-artifact
@@ -121,7 +121,7 @@ jobs:
     if: github.event_name == 'release'
     steps:
       - name: "Download phar ./phparkitect-${{ github.sha }}.phar"
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           # will download phar in project root
           name: phar-artifact
