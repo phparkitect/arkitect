@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-versions: [ '7.2', '7.3', '7.4', '8.0', '8.1', '8.2', '8.3']
+        php-versions: [ '7.4', '8.0', '8.1', '8.2', '8.3' ]
         coverage-driver: [ 'pcov' ]
 
     steps:
@@ -92,11 +92,10 @@ jobs:
 
   smoke-test-phar:
     needs: phar
-    runs-on: "ubuntu-20.04"
+    runs-on: "ubuntu-22.04"
     strategy:
       matrix:
-        php-versions: [ '7.2', '7.3', '7.4', '8.0', '8.1' ]
-        coverage-driver: [ 'pcov' ]
+        php-versions: [ '7.4', '8.0', '8.1', '8.2', '8.3' ]
 
     steps:
       - name: Install PHP
@@ -117,7 +116,7 @@ jobs:
 
   publish_phar:
     needs: [build, smoke-test-phar]
-    runs-on: "ubuntu-20.04"
+    runs-on: "ubuntu-22.04"
     if: github.event_name == 'release'
     steps:
       - name: "Download phar ./phparkitect-${{ github.sha }}.phar"
@@ -136,7 +135,7 @@ jobs:
 
   publish_docker_images:
     needs: [build, smoke-test-phar]
-    runs-on: "ubuntu-20.04"
+    runs-on: "ubuntu-22.04"
 
     if: github.ref == 'refs/heads/main' || github.event_name == 'release'
     steps:
