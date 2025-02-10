@@ -28,7 +28,7 @@ class TargetPhpVersionTest extends TestCase
     {
         $targetPhpVersion = TargetPhpVersion::create('7.4.10-14+ubuntu22.04.1+deb.sury.org+1');
 
-        $this->assertEquals('7.3', $targetPhpVersion->get());
+        $this->assertEquals('7.4', $targetPhpVersion->get());
     }
 
     public function test_it_should_throw_exception_if_not_valid_php_version(): void
