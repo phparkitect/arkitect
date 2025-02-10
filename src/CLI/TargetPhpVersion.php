@@ -14,6 +14,7 @@ class TargetPhpVersion
         '8.1',
         '8.2',
         '8.3',
+        '8.4',
     ];
 
     /** @var string|null */
@@ -23,7 +24,7 @@ class TargetPhpVersion
     {
         $versionNumbers = explode('.', $version);
         if (3 <= \count($versionNumbers)) {
-            $version = $versionNumbers[0].'.'.$versionNumbers[1];
+            $version = $versionNumbers[0] . '.' . $versionNumbers[1];
         }
 
         if (!\in_array($version, self::VALID_PHP_VERSIONS)) {

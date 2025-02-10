@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-versions: [ '7.4', '8.0', '8.1', '8.2', '8.3' ]
+        php-versions: [ '7.4', '8.0', '8.1', '8.2', '8.3', '8.4' ]
         coverage-driver: [ 'pcov' ]
 
     steps:
@@ -58,7 +58,7 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
 
   phar:
-    runs-on: "ubuntu-20.04"
+    runs-on: "ubuntu-22.04"
     needs: build
     steps:
       - uses: actions/checkout@v3
@@ -95,8 +95,7 @@ jobs:
     runs-on: "ubuntu-22.04"
     strategy:
       matrix:
-        php-versions: [ '7.4', '8.0', '8.1', '8.2', '8.3' ]
-
+        php-versions: [ '7.4', '8.0', '8.1', '8.2', '8.3', '8.4' ]
     steps:
       - name: Install PHP
         uses: shivammathur/setup-php@v2
