@@ -7,7 +7,7 @@ namespace Arkitect;
 use Symfony\Component\Finder\Finder;
 
 /**
- * @template-implements \IteratorAggregate<string, \SplFileInfo>
+ * @template-implements \IteratorAggregate<string, Symfony\Component\Finder\SplFileInfo>
  */
 class ClassSet implements \IteratorAggregate
 {
