@@ -40,7 +40,7 @@ class Cat implements AnInterface
 EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.2'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -85,7 +85,7 @@ class Cat implements AnInterface
 EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.2'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -121,7 +121,7 @@ class Cat extends Animal
 EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.2'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions()[1];
@@ -150,7 +150,7 @@ class Cat extends Animal
 EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.2'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions()[1];
@@ -178,7 +178,7 @@ class MyClass implements Baz
 EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.2'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -213,7 +213,7 @@ class MyClass implements Baz
 EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.2'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -848,7 +848,7 @@ class MyClass implements Baz
 EOF;
 
         /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.2'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -936,7 +936,7 @@ class MyClass
 EOF;
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.2'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -966,7 +966,7 @@ class MyClass
 EOF;
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.2'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -996,7 +996,7 @@ class MyClass
 EOF;
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.2'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -1028,7 +1028,7 @@ class MyClass
 EOF;
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.2'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -1060,7 +1060,7 @@ class MyClass
 EOF;
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.2'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -1092,7 +1092,7 @@ class MyClass
 EOF;
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.2'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -1127,7 +1127,7 @@ class MyClass
 EOF;
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.2'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -1160,7 +1160,7 @@ class MyClass
 EOF;
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.2'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -1193,7 +1193,7 @@ class MyClass
 EOF;
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.2'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -1226,7 +1226,7 @@ class MyClass
 EOF;
 
         /** @noinspection PhpUnhandledExceptionInspection */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.2'));
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
