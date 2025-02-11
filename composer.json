@@ -37,7 +37,6 @@
     "require-dev": {
         "roave/security-advisories": "dev-master",
         "symfony/var-dumper": "^3.0|^4.0|^5.0|^6.0|^7.0",
-        "vimeo/psalm": "^4.6",
         "phpunit/phpunit": "^7.5|^9.0|^10.0",
         "mikey179/vfsstream": "^1.6",
         "phpspec/prophecy": "^1.10",
@@ -55,7 +54,8 @@
         }
     },
     "config": {
-        "bin-dir": "bin"
+        "bin-dir": "bin",
+        "sort-packages": true
     },
     "bin": [
         "bin-stub/phparkitect"

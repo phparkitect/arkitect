@@ -1,10 +1,14 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Arkitect;
 
 use Symfony\Component\Finder\Finder;
 
+/**
+ * @template-implements \IteratorAggregate<string, \SplFileInfo>
+ */
 class ClassSet implements \IteratorAggregate
 {
     /** @var string */

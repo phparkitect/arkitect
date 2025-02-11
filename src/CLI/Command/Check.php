@@ -97,11 +97,11 @@ class Check extends Command
         $startTime = microtime(true);
 
         try {
-            $verbose = $input->getOption('verbose');
-            $stopOnFailure = $input->getOption(self::STOP_ON_FAILURE_PARAM);
-            $useBaseline = $input->getOption(self::USE_BASELINE_PARAM);
-            $skipBaseline = $input->getOption(self::SKIP_BASELINE_PARAM);
-            $ignoreBaselineLinenumbers = $input->getOption(self::IGNORE_BASELINE_LINENUMBERS_PARAM);
+            $verbose = (bool) $input->getOption('verbose');
+            $stopOnFailure = (bool) $input->getOption(self::STOP_ON_FAILURE_PARAM);
+            $useBaseline = (string) $input->getOption(self::USE_BASELINE_PARAM);
+            $skipBaseline = (bool) $input->getOption(self::SKIP_BASELINE_PARAM);
+            $ignoreBaselineLinenumbers = (bool) $input->getOption(self::IGNORE_BASELINE_LINENUMBERS_PARAM);
 
             if (true !== $skipBaseline && !$useBaseline && file_exists(self::DEFAULT_BASELINE_FILENAME)) {
                 $useBaseline = self::DEFAULT_BASELINE_FILENAME;
