@@ -43,9 +43,11 @@ jobs:
       run: composer install --prefer-dist
 
     - name: Coding Standard Checks
+      if: ${{ matrix.php-versions  == '7.4' }}
       run: PHP_CS_FIXER_IGNORE_ENV=1 ./bin/php-cs-fixer fix --dry-run -v
 
     - name: Static Analysis
+      if: ${{ matrix.php-versions  == '7.4' }}
       run: ./bin/psalm.phar
 
     - name: Test
