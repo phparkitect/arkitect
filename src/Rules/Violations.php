@@ -7,12 +7,16 @@ namespace Arkitect\Rules;
 use Arkitect\Exceptions\FailOnFirstViolationException;
 use Arkitect\Exceptions\IndexNotFoundException;
 
+/**
+ * @template-implements \IteratorAggregate<Violation>
+ */
 class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
 {
     /**
      * @var Violation[]
      */
     private $violations;
+
     /**
      * @var bool
      */

@@ -46,7 +46,7 @@ jobs:
       run: PHP_CS_FIXER_IGNORE_ENV=1 ./bin/php-cs-fixer fix --dry-run -v
 
     - name: Static Analysis
-      run: ./bin/psalm
+      run: ./bin/psalm.phar
 
     - name: Test
       run: ./bin/phpunit -d memory_limit=-1 --coverage-clover clover.xml

@@ -1,10 +1,14 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Arkitect\Rules;
 
 use Arkitect\Exceptions\IndexNotFoundException;
 
+/**
+ * @template-implements \IteratorAggregate<ParsingError>
+ */
 class ParsingErrors implements \IteratorAggregate, \Countable
 {
     /**

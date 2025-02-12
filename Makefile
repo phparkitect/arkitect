@@ -36,7 +36,7 @@ csfix: ## it launches cs fix
 	bin/php-cs-fixer fix -v
 
 psalm: ## it launches psalm
-	bin/psalm
+	bin/psalm.phar
 
 build: ## it launches all the build
 	composer install

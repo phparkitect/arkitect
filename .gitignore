@@ -6,7 +6,9 @@
 /web
 /bin/
 !/bin/box.phar
+!/bin/psalm.phar
 phparkitect.phar
 composer.lock
 .php-version
 composer.phar
+.phpunit.cache/

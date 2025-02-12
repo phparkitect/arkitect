@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
@@ -30,7 +31,7 @@ class FileVisitor extends NodeVisitorAbstract
 
             foreach ($node->implements as $interface) {
                 $this->classDescriptionBuilder
-                     ->addInterface($interface->toString(), $interface->getLine());
+                    ->addInterface($interface->toString(), $interface->getLine());
             }
 
             if (!$node->isAnonymous() && null !== $node->extends) {
@@ -76,7 +77,8 @@ class FileVisitor extends NodeVisitorAbstract
          *
          * @see FileVisitorTest::test_it_should_return_errors_for_const_outside_namespace
          */
-        if ($node instanceof Node\Expr\ClassConstFetch
+        if (
+            $node instanceof Node\Expr\ClassConstFetch
             && method_exists($node->class, 'toString')
         ) {
             if ($this->isSelfOrStaticOrParent($node->class->toString())) {
@@ -93,7 +95,8 @@ class FileVisitor extends NodeVisitorAbstract
          *
          * @see FileVisitorTest::test_should_returns_all_dependencies
          */
-        if ($node instanceof Node\Expr\StaticCall
+        if (
+            $node instanceof Node\Expr\StaticCall
             && method_exists($node->class, 'toString')
         ) {
             if ($this->isSelfOrStaticOrParent($node->class->toString())) {
@@ -104,7 +107,8 @@ class FileVisitor extends NodeVisitorAbstract
                 ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
         }
 
-        if ($node instanceof Node\Expr\Instanceof_
+        if (
+            $node instanceof Node\Expr\Instanceof_
             && method_exists($node->class, 'toString')
         ) {
             if ($this->isSelfOrStaticOrParent($node->class->toString())) {
@@ -114,11 +118,13 @@ class FileVisitor extends NodeVisitorAbstract
                 ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
         }
 
-        if ($node instanceof Node\Expr\New_
+        if (
+            $node instanceof Node\Expr\New_
             && !($node->class instanceof Node\Expr\Variable)
         ) {
-            if ((method_exists($node->class, 'isAnonymous') && $node->class->isAnonymous())
-                || !method_exists($node->class, 'toString')) {
+            if ((method_exists($node->class, 'isAnonymous') && true === $node->class->isAnonymous())
+                || !method_exists($node->class, 'toString')
+            ) {
                 return;
             }
 
@@ -215,7 +221,7 @@ class FileVisitor extends NodeVisitorAbstract
             $returnType = $node->returnType;
             if ($returnType instanceof Node\Name\FullyQualified) {
                 $this->classDescriptionBuilder
-                  ->addDependency(new ClassDependency($returnType->toString(), $returnType->getLine()));
+                    ->addDependency(new ClassDependency($returnType->toString(), $returnType->getLine()));
             }
         }
     }
@@ -271,7 +277,7 @@ class FileVisitor extends NodeVisitorAbstract
             $type = $nullableType->type;
         }
 
-        if (method_exists($type, 'isSpecialClassName') && $type->isSpecialClassName()) {
+        if (method_exists($type, 'isSpecialClassName') && true === $type->isSpecialClassName()) {
             return;
         }
 
