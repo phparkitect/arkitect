@@ -117,7 +117,7 @@ class FileVisitor extends NodeVisitorAbstract
         if ($node instanceof Node\Expr\New_
             && !($node->class instanceof Node\Expr\Variable)
         ) {
-            if ((method_exists($node->class, 'isAnonymous') && $node->class->isAnonymous())
+            if ((method_exists($node->class, 'isAnonymous') && true === $node->class->isAnonymous())
                 || !method_exists($node->class, 'toString')) {
                 return;
             }
@@ -271,7 +271,7 @@ class FileVisitor extends NodeVisitorAbstract
             $type = $nullableType->type;
         }
 
-        if (method_exists($type, 'isSpecialClassName') && $type->isSpecialClassName()) {
+        if (method_exists($type, 'isSpecialClassName') && true === $type->isSpecialClassName()) {
             return;
         }
 

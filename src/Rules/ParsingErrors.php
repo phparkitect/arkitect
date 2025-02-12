@@ -5,6 +5,9 @@ namespace Arkitect\Rules;
 
 use Arkitect\Exceptions\IndexNotFoundException;
 
+/**
+ * @implements \IteratorAggregate<ParsingError>
+ */
 class ParsingErrors implements \IteratorAggregate, \Countable
 {
     /**

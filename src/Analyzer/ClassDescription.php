@@ -35,7 +35,7 @@ class ClassDescription
     /** @var bool */
     private $enum;
 
-    /** @var list<string> */
+    /** @var array<array-key, mixed> */
     private $docBlock;
 
     /** @var list<FullyQualifiedClassName> */

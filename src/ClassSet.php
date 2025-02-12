@@ -5,6 +5,9 @@ namespace Arkitect;
 
 use Symfony\Component\Finder\Finder;
 
+/**
+ * @implements \IteratorAggregate<string, \SplFileInfo>
+ */
 class ClassSet implements \IteratorAggregate
 {
     /** @var string */

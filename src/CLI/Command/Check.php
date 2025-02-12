@@ -107,7 +107,7 @@ class Check extends Command
                 $useBaseline = self::DEFAULT_BASELINE_FILENAME;
             }
 
-            if ($useBaseline && !file_exists($useBaseline)) {
+            if (null !== $useBaseline && !file_exists($useBaseline)) {
                 $output->writeln('<error>Baseline file not found.</error>');
 
                 return self::ERROR_CODE;
@@ -151,7 +151,7 @@ class Check extends Command
                 return self::SUCCESS_CODE;
             }
 
-            if ($useBaseline) {
+            if (null !== $useBaseline) {
                 $baseline = $this->loadBaseline($useBaseline);
 
                 $violations->remove($baseline, $ignoreBaselineLinenumbers);

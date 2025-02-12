@@ -7,6 +7,9 @@ namespace Arkitect\Rules;
 use Arkitect\Exceptions\FailOnFirstViolationException;
 use Arkitect\Exceptions\IndexNotFoundException;
 
+/**
+ * @implements \IteratorAggregate<Violations>
+ */
 class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
 {
     /**
