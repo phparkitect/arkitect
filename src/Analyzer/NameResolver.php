@@ -320,7 +320,12 @@ class NameResolver extends NodeVisitorAbstract
         }
     }
 
-    /** @param Stmt\Use_::TYPE_* $type */
+    /**
+     * @param Stmt\Use_::TYPE_* $type
+     * @param ?Name             $prefix
+     *
+     * @psalm-suppress PossiblyNullArgument
+     */
     private function addAlias(Node\UseItem $use, int $type, ?Name $prefix = null): void
     {
         // Add prefix for group uses
@@ -377,6 +382,7 @@ class NameResolver extends NodeVisitorAbstract
      * @psalm-suppress MissingParamType
      * @psalm-suppress PossiblyNullArgument
      * @psalm-suppress MissingReturnType
+     * @psalm-suppress InvalidReturnStatement
      *
      * @template T of Node\Identifier|Name|Node\ComplexType|null
      *
