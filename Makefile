@@ -41,7 +41,7 @@ psalm: ## it launches psalm
 build: ## it launches all the build
 	composer install
 	PHP_CS_FIXER_IGNORE_ENV=1 bin/php-cs-fixer fix -v
-	bin/psalm
+	bin/psalm.phar --no-cache
 	bin/phpunit
 
 sfbuild: ## it launches all the build

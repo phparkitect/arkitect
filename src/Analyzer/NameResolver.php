@@ -27,13 +27,13 @@ use PHPStan\PhpDocParser\Parser\TypeParser;
 class NameResolver extends NodeVisitorAbstract
 {
     /** @var NameContext Naming context */
-    protected $nameContext;
+    protected NameContext $nameContext;
 
     /** @var bool Whether to preserve original names */
-    protected $preserveOriginalNames;
+    protected bool $preserveOriginalNames;
 
     /** @var bool Whether to replace resolved nodes in place, or to add resolvedNode attributes */
-    protected $replaceNodes;
+    protected bool $replaceNodes;
 
     /** @var bool Whether to parse DocBlock Custom Annotations */
     protected $parseCustomAnnotations;
@@ -55,8 +55,8 @@ class NameResolver extends NodeVisitorAbstract
      *    namespacedName attribute, as usual.)
      *  * parseCustomAnnotations (default true): Whether to parse DocBlock Custom Annotations.
      *
-     * @param ErrorHandler|null $errorHandler Error handler
-     * @param array             $options      Options
+     * @param ErrorHandler|null                                                                       $errorHandler Error handler
+     * @param array{preserveOriginalNames?: bool, replaceNodes?: bool, parseCustomAnnotations?: bool} $options      Options
      */
     public function __construct(?ErrorHandler $errorHandler = null, array $options = [])
     {
@@ -79,7 +79,7 @@ class NameResolver extends NodeVisitorAbstract
         return $this->nameContext;
     }
 
-    public function beforeTraverse(array $nodes)
+    public function beforeTraverse(array $nodes): ?array
     {
         $this->nameContext->startNamespace();
 
@@ -110,6 +110,8 @@ class NameResolver extends NodeVisitorAbstract
             $this->resolveAttrGroups($node);
             if (null !== $node->name) {
                 $this->addNamespacedName($node);
+            } else {
+                $node->namespacedName = null;
             }
         } elseif ($node instanceof Stmt\Interface_) {
             foreach ($node->extends as &$interface) {
@@ -134,7 +136,8 @@ class NameResolver extends NodeVisitorAbstract
             $this->resolveSignature($node);
             $this->resolveAttrGroups($node);
             $this->addNamespacedName($node);
-        } elseif ($node instanceof Stmt\ClassMethod
+        } elseif (
+            $node instanceof Stmt\ClassMethod
             || $node instanceof Expr\Closure
             || $node instanceof Expr\ArrowFunction
         ) {
@@ -183,15 +186,25 @@ class NameResolver extends NodeVisitorAbstract
                     }
                 }
             }
+        } elseif ($node instanceof Node\PropertyHook) {
+            foreach ($node->params as $param) {
+                $param->type = $this->resolveType($param->type);
+                $this->resolveAttrGroups($param);
+            }
+            $this->resolveAttrGroups($node);
         } elseif ($node instanceof Stmt\Const_) {
             foreach ($node->consts as $const) {
                 $this->addNamespacedName($const);
             }
         } elseif ($node instanceof Stmt\ClassConst) {
+            if (null !== $node->type) {
+                $node->type = $this->resolveType($node->type);
+            }
             $this->resolveAttrGroups($node);
         } elseif ($node instanceof Stmt\EnumCase) {
             $this->resolveAttrGroups($node);
-        } elseif ($node instanceof Expr\StaticCall
+        } elseif (
+            $node instanceof Expr\StaticCall
             || $node instanceof Expr\StaticPropertyFetch
             || $node instanceof Expr\ClassConstFetch
             || $node instanceof Expr\New_
@@ -234,8 +247,8 @@ class NameResolver extends NodeVisitorAbstract
     /**
      * Resolve name, according to name resolver options.
      *
-     * @param Name $name Function or constant name to resolve
-     * @param int  $type One of Stmt\Use_::TYPE_*
+     * @param Name              $name Function or constant name to resolve
+     * @param Stmt\Use_::TYPE_* $type One of Stmt\Use_::TYPE_*
      *
      * @return Name Resolved name, or original name with attribute
      */
@@ -307,10 +320,10 @@ class NameResolver extends NodeVisitorAbstract
         }
     }
 
-    private function addAlias(Stmt\UseUse $use, int $type, ?Name $prefix = null): void
+    /** @param Stmt\Use_::TYPE_* $type */
+    private function addAlias(Node\UseItem $use, int $type, ?Name $prefix = null): void
     {
         // Add prefix for group uses
-        /** @var Name $name */
         $name = $prefix ? Name::concat($prefix, $use->name) : $use->name;
         // Type is determined either by individual element or whole use declaration
         $type |= $use->type;
@@ -365,9 +378,13 @@ class NameResolver extends NodeVisitorAbstract
      * @psalm-suppress PossiblyNullArgument
      * @psalm-suppress MissingReturnType
      *
-     * @param mixed $node
+     * @template T of Node\Identifier|Name|Node\ComplexType|null
+     *
+     * @param T $node
+     *
+     * @return T
      */
-    private function resolveType($node)
+    private function resolveType(?Node $node): ?Node
     {
         if ($node instanceof Name) {
             return $this->resolveClassName($node);
