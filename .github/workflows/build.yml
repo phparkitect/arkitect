@@ -48,7 +48,7 @@ jobs:
 
     - name: Static Analysis
       if: ${{ matrix.php-versions  == '7.4' }}
-      run: ./bin/psalm.phar
+      run: ./bin/psalm.phar --no-cache
 
     - name: Test
       run: ./bin/phpunit -d memory_limit=-1 --coverage-clover clover.xml
