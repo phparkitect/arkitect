@@ -33,15 +33,15 @@ coverage: ## it launches coverage
 	phpdbg -qrr ./bin/phpunit --coverage-html build/coverage
 
 csfix: ## it launches cs fix
-	bin/php-cs-fixer fix -v
+	PHP_CS_FIXER_IGNORE_ENV=1 bin/php-cs-fixer fix -v
 
 psalm: ## it launches psalm
-	bin/psalm
+	bin/psalm.phar
 
 build: ## it launches all the build
 	composer install
 	PHP_CS_FIXER_IGNORE_ENV=1 bin/php-cs-fixer fix -v
-	bin/psalm
+	bin/psalm.phar --no-cache
 	bin/phpunit
 
 sfbuild: ## it launches all the build

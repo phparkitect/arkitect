@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
@@ -46,6 +47,7 @@ class ClassDescription
      * @param list<FullyQualifiedClassName> $interfaces
      * @param ?FullyQualifiedClassName      $extends
      * @param list<FullyQualifiedClassName> $attributes
+     * @param list<string>                  $docBlock
      */
     public function __construct(
         FullyQualifiedClassName $FQCN,
