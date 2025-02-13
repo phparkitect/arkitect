@@ -11,9 +11,12 @@ use Arkitect\CLI\TargetPhpVersion;
 use PhpParser\NodeTraverser;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class FileParserTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function test_parse_file(): void
     {
         $traverser = $this->prophesize(NodeTraverser::class);
