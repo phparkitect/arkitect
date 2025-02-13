@@ -45,7 +45,6 @@ class ClassDescription
     /**
      * @param list<ClassDependency>         $dependencies
      * @param list<FullyQualifiedClassName> $interfaces
-     * @param ?FullyQualifiedClassName      $extends
      * @param list<FullyQualifiedClassName> $attributes
      * @param list<string>                  $docBlock
      */

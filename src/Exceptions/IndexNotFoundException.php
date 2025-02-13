@@ -7,6 +7,6 @@ class IndexNotFoundException extends \Exception
 {
     public function __construct(int $index)
     {
-        parent::__construct(sprintf('Index not found %d', $index));
+        parent::__construct(\sprintf('Index not found %d', $index));
     }
 }
