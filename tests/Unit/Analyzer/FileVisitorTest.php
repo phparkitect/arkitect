@@ -1343,4 +1343,38 @@ enum IntEnum: int
 EOF
         ];
     }
+
+    /**
+     * @requires PHP >= 8.4
+     */
+    public function test_it_parse_property_hooks(): void
+    {
+        $code = <<< 'EOF'
+<?php
+namespace App\Foo;
+
+class User {
+    private string $firstName;
+    private string $lastName;
+
+    public function __construct(string $firstName, string $lastName) {
+        $this->firstName = $firstName;
+        $this->lastName = $lastName;
+    }
+
+    public string $fullName {
+        get => $this->firstName . ' ' . $this->lastName;
+        set {[$this->firstName, $this->lastName] = explode(' ', $value, 2);}
+    }
+}
+EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.4'));
+        $fp->parse($code, 'relativePathName');
+
+        $cd = $fp->getClassDescriptions();
+
+        $this->assertInstanceOf(ClassDescription::class, $cd[0]);
+    }
 }
