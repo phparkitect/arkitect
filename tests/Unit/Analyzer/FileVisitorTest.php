@@ -1294,7 +1294,7 @@ enum DefaultEnum
 {
     case FOO;
 }
-EOF
+EOF,
         ];
 
         yield 'string enum' => [
@@ -1306,7 +1306,7 @@ enum StringEnum: string
 {
     case BAR: 'bar';
 }
-EOF
+EOF,
         ];
 
         yield 'integer enum' => [
@@ -1318,7 +1318,7 @@ enum IntEnum: int
 {
     case BAZ: 42;
 }
-EOF
+EOF,
         ];
 
         yield 'multiple enums' => [
@@ -1340,7 +1340,7 @@ enum IntEnum: int
 {
     case BAZ: 42;
 }
-EOF
+EOF,
         ];
     }
 

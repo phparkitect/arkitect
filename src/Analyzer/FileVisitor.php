@@ -234,6 +234,7 @@ class FileVisitor extends NodeVisitorAbstract
     public function clearParsedClassDescriptions(): void
     {
         $this->classDescriptions = [];
+        $this->classDescriptionBuilder->clear();
     }
 
     public function leaveNode(Node $node): void
