@@ -22,9 +22,7 @@ class CheckAttributeDependencyTest extends TestCase
             ->should(new NotDependsOnTheseNamespaces('App\Service\Invalid'))
             ->because('i said so');
 
-        $expectedExceptionMessage = '
-App\Service\Foo has 1 violations
-  should not depend on these namespaces: App\Service\Invalid because i said so';
+        $expectedExceptionMessage = 'depends on App\Service\Invalid\Attr, but should not depend on these namespaces: App\Service\Invalid because i said so';
 
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
