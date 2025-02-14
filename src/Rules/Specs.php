@@ -8,7 +8,7 @@ use Arkitect\Expression\Expression;
 
 class Specs
 {
-    /** @var array */
+    /** @var list<Expression> */
     private $expressions = [];
 
     public function add(Expression $expression): void
@@ -18,7 +18,6 @@ class Specs
 
     public function allSpecsAreMatchedBy(ClassDescription $classDescription, string $because): bool
     {
-        /** @var Expression $spec */
         foreach ($this->expressions as $spec) {
             $violations = new Violations();
             $spec->evaluate($classDescription, $violations, $because);
