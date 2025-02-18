@@ -66,18 +66,11 @@ class NameResolver extends NodeVisitorAbstract
         $this->replaceNodes = $options['replaceNodes'] ?? true;
         $this->parseCustomAnnotations = $options['parseCustomAnnotations'] ?? true;
 
-        if (class_exists(ParserConfig::class)) {
-            $parserConfig = new ParserConfig([]);
-            $constExprParser = new ConstExprParser($parserConfig);
-            $typeParser = new TypeParser($parserConfig, $constExprParser);
-            $this->phpDocParser = new PhpDocParser($parserConfig, $typeParser, $constExprParser);
-            $this->phpDocLexer = new Lexer($parserConfig);
-        } else {
-            $typeParser = new TypeParser();
-            $constExprParser = new ConstExprParser();
-            $this->phpDocParser = new PhpDocParser($typeParser, $constExprParser);
-            $this->phpDocLexer = new Lexer();
-        }
+        $parserConfig = new ParserConfig([]);
+        $constExprParser = new ConstExprParser($parserConfig);
+        $typeParser = new TypeParser($parserConfig, $constExprParser);
+        $this->phpDocParser = new PhpDocParser($parserConfig, $typeParser, $constExprParser);
+        $this->phpDocLexer = new Lexer($parserConfig);
     }
 
     /**
