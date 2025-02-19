@@ -37,13 +37,25 @@ class CheckClassWithMultipleExpressionsTest extends TestCase
         ArchRuleTestCase::assertArchRule($rule, $set);
     }
 
-    public function test_is_final(): void
+    public function test_is_abstract_in_that(): void
     {
-        $set = ClassSet::fromDir(__DIR__.'/../_fixtures/is_final');
+        $set = ClassSet::fromDir(__DIR__.'/../_fixtures/is_something');
 
         $rule = Rule::allClasses()
             ->that(new IsAbstract())
             ->should(new HaveNameMatching('Abstract*'))
+            ->because('we want to prefix abstract classes');
+
+        ArchRuleTestCase::assertArchRule($rule, $set);
+    }
+
+    public function test_is_abstract_in_should(): void
+    {
+        $set = ClassSet::fromDir(__DIR__.'/../_fixtures/is_something');
+
+        $rule = Rule::allClasses()
+            ->that(new ResideInOneOfTheseNamespaces('App'))
+            ->should(new IsAbstract())
             ->because('we want to prefix abstract classes');
 
         ArchRuleTestCase::assertArchRule($rule, $set);

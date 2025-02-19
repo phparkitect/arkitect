@@ -76,6 +76,7 @@ class IsAbstractTest extends TestCase
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
         $isAbstract->evaluate($classDescription, $violations, $because);
+
         self::assertEquals(0, $violations->count());
     }
 
