@@ -13,6 +13,9 @@ use PHPUnit\Framework\TestCase;
 
 class CheckAttributeDependencyTest extends TestCase
 {
+    /**
+     * @requires PHP >= 8.0
+     */
     public function test_assertion_should_fail_on_invalid_dependency(): void
     {
         $set = ClassSet::fromDir(__DIR__.'/../_fixtures/attributes');
