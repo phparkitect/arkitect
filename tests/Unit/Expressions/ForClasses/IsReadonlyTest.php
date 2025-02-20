@@ -7,6 +7,7 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\ForClasses\IsReadonly;
+use Arkitect\Rules\Specs;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
@@ -62,7 +63,9 @@ class IsReadonlyTest extends TestCase
 
     public function test_interfaces_can_not_be_readonly_and_should_be_ignored(): void
     {
-        $isReadonly = new IsReadonly();
+        $specStore = new Specs();
+        $specStore->add(new IsReadonly());
+
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
@@ -75,15 +78,17 @@ class IsReadonlyTest extends TestCase
             false,
             false
         );
+
         $because = 'we want to add this rule for our software';
-        $violations = new Violations();
-        $isReadonly->evaluate($classDescription, $violations, $because);
-        self::assertEquals(0, $violations->count());
+
+        $this->assertFalse($specStore->allSpecsAreMatchedBy($classDescription, $because));
     }
 
     public function test_traits_can_not_be_readonly_and_should_be_ignored(): void
     {
-        $isReadonly = new IsReadonly();
+        $specStore = new Specs();
+        $specStore->add(new IsReadonly());
+
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
@@ -97,14 +102,15 @@ class IsReadonlyTest extends TestCase
             false
         );
         $because = 'we want to add this rule for our software';
-        $violations = new Violations();
-        $isReadonly->evaluate($classDescription, $violations, $because);
-        self::assertEquals(0, $violations->count());
+
+        $this->assertFalse($specStore->allSpecsAreMatchedBy($classDescription, $because));
     }
 
     public function test_enums_can_not_be_readonly_and_should_be_ignored(): void
     {
-        $isReadonly = new IsReadonly();
+        $specStore = new Specs();
+        $specStore->add(new IsReadonly());
+
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
@@ -118,8 +124,7 @@ class IsReadonlyTest extends TestCase
             true
         );
         $because = 'we want to add this rule for our software';
-        $violations = new Violations();
-        $isReadonly->evaluate($classDescription, $violations, $because);
-        self::assertEquals(0, $violations->count());
+
+        $this->assertFalse($specStore->allSpecsAreMatchedBy($classDescription, $because));
     }
 }

@@ -43,7 +43,7 @@ class CheckClassWithMultipleExpressionsTest extends TestCase
 
         $rule = Rule::allClasses()
             ->that(new IsAbstract())
-            ->should(new HaveNameMatching('Abstract*'))
+            ->should(new HaveNameMatching('*Abstract'))
             ->because('we want to prefix abstract classes');
 
         ArchRuleTestCase::assertArchRule($rule, $set);
