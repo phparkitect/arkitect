@@ -7,6 +7,7 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\ForClasses\IsFinal;
+use Arkitect\Rules\Specs;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
@@ -39,9 +40,9 @@ class IsFinalTest extends TestCase
 
     public function test_it_should_return_true_if_is_final(): void
     {
-        $class = 'myClass';
+        $specStore = new Specs();
+        $specStore->add(new IsFinal());
 
-        $isFinal = new IsFinal();
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
@@ -55,16 +56,15 @@ class IsFinalTest extends TestCase
             false
         );
         $because = 'we want to add this rule for our software';
-        $violations = new Violations();
-        $isFinal->evaluate($classDescription, $violations, $because);
-        self::assertEquals(0, $violations->count());
+
+        $this->assertTrue($specStore->allSpecsAreMatchedBy($classDescription, $because));
     }
 
     public function test_abstract_classes_can_not_be_final_and_should_be_ignored(): void
     {
-        $class = 'myClass';
+        $specStore = new Specs();
+        $specStore->add(new IsFinal());
 
-        $isFinal = new IsFinal();
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
@@ -78,16 +78,15 @@ class IsFinalTest extends TestCase
             false
         );
         $because = 'we want to add this rule for our software';
-        $violations = new Violations();
-        $isFinal->evaluate($classDescription, $violations, $because);
-        self::assertEquals(0, $violations->count());
+
+        $this->assertFalse($specStore->allSpecsAreMatchedBy($classDescription, $because));
     }
 
     public function test_interfaces_can_not_be_final_and_should_be_ignored(): void
     {
-        $class = 'myClass';
+        $specStore = new Specs();
+        $specStore->add(new IsFinal());
 
-        $isFinal = new IsFinal();
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
@@ -101,16 +100,15 @@ class IsFinalTest extends TestCase
             false
         );
         $because = 'we want to add this rule for our software';
-        $violations = new Violations();
-        $isFinal->evaluate($classDescription, $violations, $because);
-        self::assertEquals(0, $violations->count());
+
+        $this->assertFalse($specStore->allSpecsAreMatchedBy($classDescription, $because));
     }
 
     public function test_traits_can_not_be_final_and_should_be_ignored(): void
     {
-        $class = 'myClass';
+        $specStore = new Specs();
+        $specStore->add(new IsFinal());
 
-        $isFinal = new IsFinal();
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
@@ -124,16 +122,15 @@ class IsFinalTest extends TestCase
             false
         );
         $because = 'we want to add this rule for our software';
-        $violations = new Violations();
-        $isFinal->evaluate($classDescription, $violations, $because);
-        self::assertEquals(0, $violations->count());
+
+        $this->assertFalse($specStore->allSpecsAreMatchedBy($classDescription, $because));
     }
 
     public function test_enums_can_not_be_final_and_should_be_ignored(): void
     {
-        $class = 'myClass';
+        $specStore = new Specs();
+        $specStore->add(new IsFinal());
 
-        $isFinal = new IsFinal();
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
@@ -147,8 +144,7 @@ class IsFinalTest extends TestCase
             true
         );
         $because = 'we want to add this rule for our software';
-        $violations = new Violations();
-        $isFinal->evaluate($classDescription, $violations, $because);
-        self::assertEquals(0, $violations->count());
+
+        $this->assertFalse($specStore->allSpecsAreMatchedBy($classDescription, $because));
     }
 }
