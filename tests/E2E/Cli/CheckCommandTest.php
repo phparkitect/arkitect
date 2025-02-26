@@ -146,6 +146,13 @@ App\Controller\Foo has 1 violations
         $this->assertCheckHasErrors($cmdTester);
     }
 
+    public function test_dependencies_should_not_leak_between_files(): void
+    {
+        $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configDependenciesLeak.php');
+
+        $this->assertCheckHasSuccess($cmdTester);
+    }
+
     public function test_baseline_line_numbers_can_be_ignored(): void
     {
         $configFilePath = __DIR__.'/../_fixtures/configIgnoreBaselineLineNumbers.php';
