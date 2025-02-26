@@ -3,7 +3,8 @@
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
     ->exclude('vendor/')
-    ->notPath('tests/E2E/_fixtures/parse_error/Services/CartService.php');
+    ->notPath('tests/E2E/_fixtures/parse_error/Services/CartService.php')
+    ->notPath('tests/E2E/_fixtures/is_something/MyEnum.php');
 
 
 return (new PhpCsFixer\Config())
@@ -24,7 +25,7 @@ return (new PhpCsFixer\Config())
         'modernize_types_casting' => true, // Replaces intval, floatval, doubleval, strval and boolval function calls with according type casting operator.
         'multiline_whitespace_before_semicolons' => true, // Forbid multi-line whitespace before the closing semicolon or move the semicolon to the new line for chained calls.
         'no_unreachable_default_argument_value' => true, // In function arguments there must not be arguments with default values before non-default ones.
-	'no_superfluous_phpdoc_tags' => ['allow_mixed' => true],// To avoid problems of compatibility with the old php-cs-fixer version used on PHP 7.3
+        'no_superfluous_phpdoc_tags' => ['allow_mixed' => true], // To avoid problems of compatibility with the old php-cs-fixer version used on PHP 7.3
         'no_useless_else' => true,
         'no_useless_return' => true,
         'ordered_class_elements' => true, // Orders the elements of classes/interfaces/traits.
