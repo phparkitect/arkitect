@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Arkitect\Expression;
@@ -19,6 +20,14 @@ interface Expression
      * $theClass can be used to add contextual information.
      */
     public function describe(ClassDescription $theClass, string $because): Description;
+
+    /**
+     * Checks if the expression applies to the class passed as parameter.
+     * If the current expression does not apply to the class, this method should return false.
+     *
+     * eg: IsAbstract does not applies to interfaces, traits, readonly classes
+     */
+    //public function appliesTo(ClassDescription $theClass): bool;
 
     /**
      * Evaluates the expression for the class passed as parameter.

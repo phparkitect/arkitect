@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Arkitect\Rules;
@@ -20,6 +21,11 @@ class Constraints
     {
         /** @var Expression $expression */
         foreach ($this->expressions as $expression) {
+            // incremental way to introduce this method
+            if (method_exists($expression, 'appliesTo') && !$expression->appliesTo($classDescription)) {
+                continue;
+            }
+
             $expression->evaluate($classDescription, $violations, $because);
         }
     }
