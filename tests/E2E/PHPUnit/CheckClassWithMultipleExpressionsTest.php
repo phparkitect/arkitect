@@ -21,7 +21,7 @@ class CheckClassWithMultipleExpressionsTest extends TestCase
 {
     public function test_it_can_check_multiple_expressions(): void
     {
-        $set = ClassSet::fromDir(__DIR__.'/../_fixtures/happy_island');
+        $set = ClassSet::fromDir(__DIR__ . '/../_fixtures/happy_island');
 
         $rule = Rule::allClasses()
             ->that(new ResideInOneOfTheseNamespaces('App\BadCode'))
@@ -39,7 +39,7 @@ class CheckClassWithMultipleExpressionsTest extends TestCase
 
     public function test_is_abstract_in_that(): void
     {
-        $set = ClassSet::fromDir(__DIR__.'/../_fixtures/is_something');
+        $set = ClassSet::fromDir(__DIR__ . '/../_fixtures/is_something/meh');
 
         $rule = Rule::allClasses()
             ->that(new IsAbstract())
@@ -51,10 +51,22 @@ class CheckClassWithMultipleExpressionsTest extends TestCase
 
     public function test_is_abstract_in_should(): void
     {
-        $set = ClassSet::fromDir(__DIR__.'/../_fixtures/is_something');
+        $set = ClassSet::fromDir(__DIR__ . '/../_fixtures/is_something/meh');
 
         $rule = Rule::allClasses()
             ->that(new ResideInOneOfTheseNamespaces('App'))
+            ->should(new IsAbstract())
+            ->because('we want to prefix abstract classes');
+
+        ArchRuleTestCase::assertArchRule($rule, $set);
+    }
+
+    public function test_is_abstract_in_should_cathes_final(): void
+    {
+        $set = ClassSet::fromDir(__DIR__ . '/../_fixtures/is_something/meh');
+
+        $rule = Rule::allClasses()
+            ->that(new HaveNameMatching('My*'))
             ->should(new IsAbstract())
             ->because('we want to prefix abstract classes');
 
