@@ -39,7 +39,7 @@ class CheckClassWithMultipleExpressionsTest extends TestCase
 
     public function test_is_abstract_in_that(): void
     {
-        $set = ClassSet::fromDir(__DIR__ . '/../_fixtures/is_something/meh');
+        $set = ClassSet::fromDir(__DIR__ . '/../_fixtures/is_something');
 
         $rule = Rule::allClasses()
             ->that(new IsAbstract())
@@ -51,7 +51,7 @@ class CheckClassWithMultipleExpressionsTest extends TestCase
 
     public function test_is_abstract_in_should(): void
     {
-        $set = ClassSet::fromDir(__DIR__ . '/../_fixtures/is_something/meh');
+        $set = ClassSet::fromDir(__DIR__ . '/../_fixtures/is_something');
 
         $rule = Rule::allClasses()
             ->that(new ResideInOneOfTheseNamespaces('App'))
@@ -63,7 +63,7 @@ class CheckClassWithMultipleExpressionsTest extends TestCase
 
     public function test_is_abstract_in_should_cathes_final(): void
     {
-        $set = ClassSet::fromDir(__DIR__ . '/../_fixtures/is_something/meh');
+        $set = ClassSet::fromDir(__DIR__ . '/../_fixtures/is_something');
 
         $rule = Rule::allClasses()
             ->that(new HaveNameMatching('My*'))
