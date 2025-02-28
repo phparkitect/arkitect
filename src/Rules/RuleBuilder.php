@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Arkitect\Rules;
 
 use Arkitect\Expression\Expression;
+use Arkitect\Expression\NegateDecorator;
 
 class RuleBuilder
 {
@@ -18,8 +19,12 @@ class RuleBuilder
 
     /** @var array */
     private $classesToBeExcluded;
+
     /** @var bool */
     private $runOnlyThis;
+
+    /** @var bool */
+    private $negateShoulds;
 
     public function __construct()
     {
@@ -28,6 +33,7 @@ class RuleBuilder
         $this->because = '';
         $this->classesToBeExcluded = [];
         $this->runOnlyThis = false;
+        $this->negateShoulds = false;
     }
 
     public function addThat(Expression $that): self
@@ -39,6 +45,10 @@ class RuleBuilder
 
     public function addShould(Expression $should): self
     {
+        if ($this->negateShoulds) {
+            $should = new NegateDecorator($should);
+        }
+
         $this->shoulds->add($should);
 
         return $this;
@@ -69,9 +79,9 @@ class RuleBuilder
         return $this;
     }
 
-    public function setRunOnlyThis(): self
+    public function negateShoulds(): self
     {
-        $this->runOnlyThis = true;
+        $this->negateShoulds = true;
 
         return $this;
     }
