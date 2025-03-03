@@ -33,6 +33,8 @@ class NotDependsOnTheseNamespaces implements Expression
     {
         $dependencies = $theClass->getDependencies();
 
+        //dump($theClass);
+
         /** @var ClassDependency $dependency */
         foreach ($dependencies as $dependency) {
             if ('' === $dependency->getFQCN()->namespace()) {

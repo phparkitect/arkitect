@@ -26,6 +26,8 @@ interface Expression
      * If the current expression does not apply to the class, this method should return false.
      *
      * eg: IsAbstract does not applies to interfaces, traits, readonly classes
+     *
+     * Not included directly in the interface to allow incremental implementation of it in the rules.
      */
     //public function appliesTo(ClassDescription $theClass): bool;
 
