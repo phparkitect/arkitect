@@ -66,11 +66,18 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
             $this->parsingErrors
         );
 
-        return 0 === $this->violations->count();
+        $violationsCount = $this->violations->count();
+        $parsingErrorsCount = $this->parsingErrors->count();
+
+        return 0 === $violationsCount && 0 === $parsingErrorsCount;
     }
 
     protected function failureDescription($other): string
     {
+        if ($this->parsingErrors->count() > 0) {
+            return "\n".$this->parsingErrors->toString();
+        }
+
         return "\n".$this->violations->toString();
     }
 }

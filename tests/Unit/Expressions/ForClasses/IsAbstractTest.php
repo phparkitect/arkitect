@@ -73,10 +73,8 @@ class IsAbstractTest extends TestCase
             false,
             false
         );
-        $because = 'we want to add this rule for our software';
-        $violations = new Violations();
-        $isAbstract->evaluate($classDescription, $violations, $because);
-        self::assertEquals(0, $violations->count());
+
+        self::assertFalse($isAbstract->appliesTo($classDescription));
     }
 
     public function test_traits_can_not_be_abstract_and_should_be_ignored(): void
@@ -94,10 +92,8 @@ class IsAbstractTest extends TestCase
             true,
             false
         );
-        $because = 'we want to add this rule for our software';
-        $violations = new Violations();
-        $isAbstract->evaluate($classDescription, $violations, $because);
-        self::assertEquals(0, $violations->count());
+
+        self::assertFalse($isAbstract->appliesTo($classDescription));
     }
 
     public function test_enums_can_not_be_abstract_and_should_be_ignored(): void
@@ -115,10 +111,8 @@ class IsAbstractTest extends TestCase
             false,
             true
         );
-        $because = 'we want to add this rule for our software';
-        $violations = new Violations();
-        $isAbstract->evaluate($classDescription, $violations, $because);
-        self::assertEquals(0, $violations->count());
+
+        self::assertFalse($isAbstract->appliesTo($classDescription));
     }
 
     public function test_final_classes_can_not_be_abstract_and_should_be_ignored(): void
@@ -136,9 +130,7 @@ class IsAbstractTest extends TestCase
             false,
             false
         );
-        $because = 'we want to add this rule for our software';
-        $violations = new Violations();
-        $isAbstract->evaluate($classDescription, $violations, $because);
-        self::assertEquals(0, $violations->count());
+
+        self::assertFalse($isAbstract->appliesTo($classDescription));
     }
 }

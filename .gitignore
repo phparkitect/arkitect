@@ -12,3 +12,4 @@ composer.lock
 .php-version
 composer.phar
 .phpunit.cache/
+.vscode

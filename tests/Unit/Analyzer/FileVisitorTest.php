@@ -388,9 +388,6 @@ EOF;
         $this->assertCount(1, $violations);
     }
 
-    /**
-     * @requires PHP >= 8.0
-     */
     public function test_should_parse_class_attributes(): void
     {
         $code = <<< 'EOF'
@@ -483,9 +480,6 @@ EOF;
         $this->assertCount(1, $violations);
     }
 
-    /**
-     * @requires PHP >= 8.1
-     */
     public function test_should_parse_enum_attributes(): void
     {
         $code = <<< 'EOF'
@@ -1268,8 +1262,6 @@ EOF;
     }
 
     /**
-     * @requires PHP >= 8.1
-     *
      * @dataProvider provide_enums
      */
     public function test_it_parse_enums(string $code): void
@@ -1344,9 +1336,6 @@ EOF
         ];
     }
 
-    /**
-     * @requires PHP >= 8.4
-     */
     public function test_it_parse_property_hooks(): void
     {
         $code = <<< 'EOF'
