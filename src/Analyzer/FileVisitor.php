@@ -224,18 +224,6 @@ class FileVisitor extends NodeVisitorAbstract
                     ->addDependency(new ClassDependency($returnType->toString(), $returnType->getLine()));
             }
         }
-
-        /* if ($node instanceof Node\Attribute) {
-            $nodeName = $node->name;
-
-            dump(sprintf("%s %s", $node->name, __LINE__));
-
-
-            if ($nodeName instanceof Node\Name\FullyQualified) {
-                $this->classDescriptionBuilder
-                    ->addDependency(new ClassDependency(implode('\\', $nodeName->getParts()), $node->getLine()));
-            }
-        }*/
     }
 
     public function getClassDescriptions(): array

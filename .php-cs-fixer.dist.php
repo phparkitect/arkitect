@@ -3,9 +3,7 @@
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
     ->exclude('vendor/')
-    ->notPath('tests/E2E/_fixtures/parse_error/Services/CartService.php')
-    ->notPath('tests/E2E/_fixtures/is_something/MyEnum.php');
-
+    ->notPath('tests/E2E/_fixtures/parse_error/Services/CartService.php');
 
 return (new PhpCsFixer\Config())
     ->setFinder($finder)
