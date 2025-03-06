@@ -7,6 +7,7 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\ForClasses\IsFinal;
+use Arkitect\Expression\ForClasses\IsNotFinal;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
@@ -59,6 +60,8 @@ class IsFinalTest extends TestCase
     public function test_final_classes_can_not_be_abstract_and_should_be_ignored(): void
     {
         $isFinal = new IsFinal();
+        $isNotFinal = new IsNotFinal();
+
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
@@ -73,11 +76,14 @@ class IsFinalTest extends TestCase
         );
 
         self::assertFalse($isFinal->appliesTo($classDescription));
+        self::assertFalse($isNotFinal->appliesTo($classDescription));
     }
 
     public function test_interfaces_can_not_be_final_and_should_be_ignored(): void
     {
         $isFinal = new IsFinal();
+        $isNotFinal = new IsNotFinal();
+
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
@@ -92,11 +98,14 @@ class IsFinalTest extends TestCase
         );
 
         self::assertFalse($isFinal->appliesTo($classDescription));
+        self::assertFalse($isNotFinal->appliesTo($classDescription));
     }
 
     public function test_traits_can_not_be_final_and_should_be_ignored(): void
     {
         $isFinal = new IsFinal();
+        $isNotFinal = new IsNotFinal();
+
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
@@ -111,11 +120,14 @@ class IsFinalTest extends TestCase
         );
 
         self::assertFalse($isFinal->appliesTo($classDescription));
+        self::assertFalse($isNotFinal->appliesTo($classDescription));
     }
 
     public function test_enums_can_not_be_final_and_should_be_ignored(): void
     {
         $isFinal = new IsFinal();
+        $isNotFinal = new IsNotFinal();
+
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
@@ -130,5 +142,6 @@ class IsFinalTest extends TestCase
         );
 
         self::assertFalse($isFinal->appliesTo($classDescription));
+        self::assertFalse($isNotFinal->appliesTo($classDescription));
     }
 }

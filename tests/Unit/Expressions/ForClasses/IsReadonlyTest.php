@@ -6,6 +6,7 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
+use Arkitect\Expression\ForClasses\IsNotReadonly;
 use Arkitect\Expression\ForClasses\IsReadonly;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
@@ -60,6 +61,7 @@ class IsReadonlyTest extends TestCase
     public function test_interfaces_can_not_be_readonly_and_should_be_ignored(): void
     {
         $isReadonly = new IsReadonly();
+        $isNotReadonly = new IsNotReadonly();
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
@@ -74,11 +76,14 @@ class IsReadonlyTest extends TestCase
         );
 
         self::assertFalse($isReadonly->appliesTo($classDescription));
+        self::assertFalse($isNotReadonly->appliesTo($classDescription));
     }
 
     public function test_traits_can_not_be_readonly_and_should_be_ignored(): void
     {
         $isReadonly = new IsReadonly();
+        $isNotReadonly = new IsNotReadonly();
+
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
@@ -93,11 +98,14 @@ class IsReadonlyTest extends TestCase
         );
 
         self::assertFalse($isReadonly->appliesTo($classDescription));
+        self::assertFalse($isNotReadonly->appliesTo($classDescription));
     }
 
     public function test_enums_can_not_be_readonly_and_should_be_ignored(): void
     {
         $isReadonly = new IsReadonly();
+        $isNotReadonly = new IsNotReadonly();
+
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
@@ -112,5 +120,6 @@ class IsReadonlyTest extends TestCase
         );
 
         self::assertFalse($isReadonly->appliesTo($classDescription));
+        self::assertFalse($isNotReadonly->appliesTo($classDescription));
     }
 }

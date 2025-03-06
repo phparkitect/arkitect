@@ -7,6 +7,7 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\ForClasses\IsAbstract;
+use Arkitect\Expression\ForClasses\IsNotAbstract;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
@@ -61,6 +62,7 @@ class IsAbstractTest extends TestCase
     public function test_interfaces_can_not_be_abstract_and_should_be_ignored(): void
     {
         $isAbstract = new IsAbstract();
+        $isNotAbstract = new IsNotAbstract();
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
@@ -75,11 +77,14 @@ class IsAbstractTest extends TestCase
         );
 
         self::assertFalse($isAbstract->appliesTo($classDescription));
+        self::assertFalse($isNotAbstract->appliesTo($classDescription));
     }
 
     public function test_traits_can_not_be_abstract_and_should_be_ignored(): void
     {
         $isAbstract = new IsAbstract();
+        $isNotAbstract = new IsNotAbstract();
+
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
@@ -94,11 +99,14 @@ class IsAbstractTest extends TestCase
         );
 
         self::assertFalse($isAbstract->appliesTo($classDescription));
+        self::assertFalse($isNotAbstract->appliesTo($classDescription));
     }
 
     public function test_enums_can_not_be_abstract_and_should_be_ignored(): void
     {
         $isAbstract = new IsAbstract();
+        $isNotAbstract = new IsNotAbstract();
+
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
@@ -113,11 +121,14 @@ class IsAbstractTest extends TestCase
         );
 
         self::assertFalse($isAbstract->appliesTo($classDescription));
+        self::assertFalse($isNotAbstract->appliesTo($classDescription));
     }
 
     public function test_final_classes_can_not_be_abstract_and_should_be_ignored(): void
     {
         $isAbstract = new IsAbstract();
+        $isNotAbstract = new IsNotAbstract();
+
         $classDescription = new ClassDescription(
             FullyQualifiedClassName::fromString('HappyIsland'),
             [],
@@ -132,5 +143,6 @@ class IsAbstractTest extends TestCase
         );
 
         self::assertFalse($isAbstract->appliesTo($classDescription));
+        self::assertFalse($isNotAbstract->appliesTo($classDescription));
     }
 }
