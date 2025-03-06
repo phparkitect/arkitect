@@ -18,6 +18,11 @@ class IsNotAbstract implements Expression
         return new Description("{$theClass->getName()} should not be abstract", $because);
     }
 
+    public function appliesTo(ClassDescription $theClass): bool
+    {
+        return !($theClass->isInterface() || $theClass->isTrait() || $theClass->isEnum() || $theClass->isFinal());
+    }
+
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
         if (!$theClass->isAbstract()) {

@@ -18,10 +18,14 @@ class IsFinal implements Expression
         return new Description("{$theClass->getName()} should be final", $because);
     }
 
+    public function appliesTo(ClassDescription $theClass): bool
+    {
+        return !($theClass->isInterface() || $theClass->isTrait() || $theClass->isEnum() || $theClass->isAbstract());
+    }
+
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
-        if ($theClass->isAbstract() || $theClass->isInterface() || $theClass->isFinal() || $theClass->isTrait()
-            || $theClass->isEnum()) {
+        if ($theClass->isFinal()) {
             return;
         }
 

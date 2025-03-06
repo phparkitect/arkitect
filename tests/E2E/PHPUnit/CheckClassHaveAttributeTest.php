@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\E2E\PHPUnit;
 
-use Arkitect\ClassSet;
 use Arkitect\Expression\ForClasses\HaveAttribute;
 use Arkitect\Expression\ForClasses\HaveNameMatching;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
@@ -18,14 +17,12 @@ final class CheckClassHaveAttributeTest extends TestCase
     {
         $runner = TestRunner::create('8.4');
 
-        $set = ClassSet::fromDir(__DIR__.'/../_fixtures/mvc');
-
         $rule = Rule::allClasses()
             ->that(new HaveAttribute('Entity'))
             ->should(new ResideInOneOfTheseNamespaces('App\Model'))
             ->because('we use an ORM');
 
-        $runner->run($set, $rule);
+        $runner->run(__DIR__.'/../_fixtures/mvc', $rule);
 
         $this->assertCount(0, $runner->getViolations());
         $this->assertCount(0, $runner->getParsingErrors());
@@ -35,14 +32,12 @@ final class CheckClassHaveAttributeTest extends TestCase
     {
         $runner = TestRunner::create('8.4');
 
-        $set = ClassSet::fromDir(__DIR__.'/../_fixtures/mvc');
-
         $rule = Rule::allClasses()
             ->that(new HaveAttribute('AsController'))
             ->should(new HaveNameMatching('*Controller'))
             ->because('its a symfony thing');
 
-        $runner->run($set, $rule);
+        $runner->run(__DIR__.'/../_fixtures/mvc', $rule);
 
         $this->assertCount(1, $runner->getViolations());
         $this->assertCount(0, $runner->getParsingErrors());
@@ -54,14 +49,12 @@ final class CheckClassHaveAttributeTest extends TestCase
     {
         $runner = TestRunner::create('8.4');
 
-        $set = ClassSet::fromDir(__DIR__.'/../_fixtures/mvc');
-
         $rule = Rule::allClasses()
             ->that(new HaveNameMatching('*Controller'))
             ->should(new HaveAttribute('AsController'))
             ->because('it configures the service container');
 
-        $runner->run($set, $rule);
+        $runner->run(__DIR__.'/../_fixtures/mvc', $rule);
 
         $this->assertCount(0, $runner->getViolations());
         $this->assertCount(0, $runner->getParsingErrors());

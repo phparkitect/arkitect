@@ -39,10 +39,12 @@ class TestRunner
         return self::$instance;
     }
 
-    public function run(ClassSet $classSet, ArchRule ...$rules): void
+    public function run(string $srcPath, ArchRule ...$rules): void
     {
         $this->violations = new Violations();
         $this->parsingErrors = new ParsingErrors();
+
+        $classSet = ClassSet::fromDir($srcPath);
 
         foreach ($classSet as $file) {
             $this->fileParser->parse($file->getContents(), $file->getRelativePathname());

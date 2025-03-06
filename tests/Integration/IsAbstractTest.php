@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Tests\E2E\PHPUnit;
+namespace Arkitect\Tests\Integration;
 
-use Arkitect\ClassSet;
 use Arkitect\Expression\ForClasses\HaveNameMatching;
 use Arkitect\Expression\ForClasses\IsAbstract;
 use Arkitect\Expression\ForClasses\IsNotAbstract;
@@ -25,14 +24,12 @@ class IsAbstractTest extends TestCase
     {
         $runner = TestRunner::create('8.4');
 
-        $set = ClassSet::fromDir($this->createClasses());
-
         $rule = Rule::allClasses()
             ->that(new IsAbstract())
             ->should(new HaveNameMatching('*Abstract'))
             ->because('we want to prefix abstract classes');
 
-        $runner->run($set, $rule);
+        $runner->run($this->createClasses(), $rule);
 
         $this->assertCount(0, $runner->getViolations());
         $this->assertCount(0, $runner->getParsingErrors());
@@ -42,14 +39,12 @@ class IsAbstractTest extends TestCase
     {
         $runner = TestRunner::create('8.4');
 
-        $set = ClassSet::fromDir($this->createClasses());
-
         $rule = Rule::allClasses()
             ->that(new HaveNameMatching('My*'))
             ->should(new IsAbstract())
             ->because('everything in the app namespace should be abstract');
 
-        $runner->run($set, $rule);
+        $runner->run($this->createClasses(), $rule);
 
         $this->assertCount(4, $runner->getViolations());
         $this->assertCount(0, $runner->getParsingErrors());
@@ -64,14 +59,12 @@ class IsAbstractTest extends TestCase
     {
         $runner = TestRunner::create('8.4');
 
-        $set = ClassSet::fromDir($this->createClasses());
-
         $rule = Rule::allClasses()
             ->that(new HaveNameMatching('My*'))
             ->should(new IsNotAbstract())
             ->because('everything in the app namespace should be abstract');
 
-        $runner->run($set, $rule);
+        $runner->run($this->createClasses(), $rule);
 
         $this->assertCount(1, $runner->getViolations());
         $this->assertCount(0, $runner->getParsingErrors());
@@ -144,11 +137,7 @@ class IsAbstractTest extends TestCase
             ],
         ];
 
-        $dir = vfsStream::setup('root', null, $structure)->url();
-
         $runner = TestRunner::create('8.4');
-
-        $set = ClassSet::fromDir($dir);
 
         $rule = Rule::allClasses()
             ->that(new ResideInOneOfTheseNamespaces('App\BadCode'))
@@ -161,7 +150,7 @@ class IsAbstractTest extends TestCase
             ->andShould(new IsNotTrait())
             ->because('some reason');
 
-        $runner->run($set, $rule);
+        $runner->run(vfsStream::setup('root', null, $structure)->url(), $rule);
 
         $this->assertCount(0, $runner->getViolations());
         $this->assertCount(0, $runner->getParsingErrors());

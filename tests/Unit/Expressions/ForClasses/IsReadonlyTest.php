@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 class IsReadonlyTest extends TestCase
 {
-    public function test_it_should_return_violation_error(): void
+    public function test_it_should_return_error_description(): void
     {
         $isReadonly = new IsReadonly();
 
@@ -30,10 +30,6 @@ class IsReadonlyTest extends TestCase
         );
         $because = 'we want to add this rule for our software';
         $violationError = $isReadonly->describe($classDescription, $because)->toString();
-
-        $violations = new Violations();
-        $isReadonly->evaluate($classDescription, $violations, $because);
-        self::assertNotEquals(0, $violations->count());
 
         $this->assertEquals('HappyIsland should be readonly because we want to add this rule for our software', $violationError);
     }
@@ -57,6 +53,7 @@ class IsReadonlyTest extends TestCase
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
         $isReadonly->evaluate($classDescription, $violations, $because);
+
         self::assertEquals(0, $violations->count());
     }
 
@@ -75,10 +72,8 @@ class IsReadonlyTest extends TestCase
             false,
             false
         );
-        $because = 'we want to add this rule for our software';
-        $violations = new Violations();
-        $isReadonly->evaluate($classDescription, $violations, $because);
-        self::assertEquals(0, $violations->count());
+
+        self::assertFalse($isReadonly->appliesTo($classDescription));
     }
 
     public function test_traits_can_not_be_readonly_and_should_be_ignored(): void
@@ -96,10 +91,8 @@ class IsReadonlyTest extends TestCase
             true,
             false
         );
-        $because = 'we want to add this rule for our software';
-        $violations = new Violations();
-        $isReadonly->evaluate($classDescription, $violations, $because);
-        self::assertEquals(0, $violations->count());
+
+        self::assertFalse($isReadonly->appliesTo($classDescription));
     }
 
     public function test_enums_can_not_be_readonly_and_should_be_ignored(): void
@@ -117,9 +110,7 @@ class IsReadonlyTest extends TestCase
             false,
             true
         );
-        $because = 'we want to add this rule for our software';
-        $violations = new Violations();
-        $isReadonly->evaluate($classDescription, $violations, $because);
-        self::assertEquals(0, $violations->count());
+
+        self::assertFalse($isReadonly->appliesTo($classDescription));
     }
 }

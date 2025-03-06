@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Tests\E2E\PHPUnit;
+namespace Arkitect\Tests\Integration;
 
-use Arkitect\ClassSet;
 use Arkitect\Expression\ForClasses\NotDependsOnTheseNamespaces;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\Rules\Rule;
@@ -20,14 +19,12 @@ class CheckAttributeDependencyTest extends TestCase
 
         $runner = TestRunner::create('8.4');
 
-        $set = ClassSet::fromDir($dir);
-
         $rule = Rule::allClasses()
             ->that(new ResideInOneOfTheseNamespaces('App'))
             ->should(new NotDependsOnTheseNamespaces('App\Invalid'))
             ->because('i said so');
 
-        $runner->run($set, $rule);
+        $runner->run($dir, $rule);
 
         $this->assertCount(1, $runner->getViolations());
         $this->assertCount(0, $runner->getParsingErrors());
