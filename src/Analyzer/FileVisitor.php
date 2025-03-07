@@ -63,6 +63,11 @@ class FileVisitor extends NodeVisitorAbstract
             $this->classDescriptionBuilder->setClassName($node->namespacedName->toCodeString());
             $this->classDescriptionBuilder->setEnum(true);
 
+            foreach ($node->implements as $interface) {
+                $this->classDescriptionBuilder
+                    ->addInterface($interface->toString(), $interface->getLine());
+            }
+
             foreach ($node->attrGroups as $attributeGroup) {
                 foreach ($attributeGroup->attrs as $attribute) {
                     $this->classDescriptionBuilder
