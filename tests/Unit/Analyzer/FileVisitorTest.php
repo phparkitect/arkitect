@@ -739,24 +739,27 @@ namespace Foo;
 interface Order
 {
 }
+
 interface OrderTwo
 {
 }
-class test implements Order
+
+class Test implements Order
 {
 }
+
 EOF;
 
         /** @var FileParser $fp */
         $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
         $fp->parse($code, 'relativePathName');
 
-        $cd = $fp->getClassDescriptions();
+        $cd = $fp->getClassDescriptions()[2]; // class Test
 
         $violations = new Violations();
 
         $implement = new Implement('Foo\Order');
-        $implement->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+        $implement->evaluate($cd, $violations, 'we want to add this rule for our software');
 
         $this->assertCount(0, $violations, $violations->toString());
     }
