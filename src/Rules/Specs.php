@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Arkitect\Rules;
@@ -20,6 +21,15 @@ class Specs
     {
         /** @var Expression $spec */
         foreach ($this->expressions as $spec) {
+            // incremental way to introduce this method
+            if (method_exists($spec, 'appliesTo')) {
+                $canApply = $spec->appliesTo($classDescription);
+
+                if (false === $canApply) {
+                    return false;
+                }
+            }
+
             $violations = new Violations();
             $spec->evaluate($classDescription, $violations, $because);
 

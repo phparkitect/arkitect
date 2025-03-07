@@ -18,6 +18,11 @@ class IsNotReadonly implements Expression
         return new Description("{$theClass->getName()} should not be readonly", $because);
     }
 
+    public function appliesTo(ClassDescription $theClass): bool
+    {
+        return !($theClass->isInterface() || $theClass->isTrait() || $theClass->isEnum());
+    }
+
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
         if (!$theClass->isReadonly()) {

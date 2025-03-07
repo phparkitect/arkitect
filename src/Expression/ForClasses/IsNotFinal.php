@@ -18,6 +18,11 @@ class IsNotFinal implements Expression
         return new Description("{$theClass->getName()} should not be final", $because);
     }
 
+    public function appliesTo(ClassDescription $theClass): bool
+    {
+        return !($theClass->isInterface() || $theClass->isTrait() || $theClass->isEnum() || $theClass->isAbstract());
+    }
+
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
         if (!$theClass->isFinal()) {
