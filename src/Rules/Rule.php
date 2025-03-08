@@ -9,4 +9,9 @@ class Rule
     {
         return new AllClasses();
     }
+
+    public static function noClass(): NoClass
+    {
+        return new NoClass();
+    }
 }

@@ -34,7 +34,12 @@ class TargetPhpVersion
         $this->version = $version;
     }
 
-    public static function create(?string $version): self
+    /**
+     * @param ?string $version
+     *
+     * @throws PhpVersionNotValidException
+     */
+    public static function create(?string $version = null): self
     {
         return new self($version ?? phpversion());
     }
