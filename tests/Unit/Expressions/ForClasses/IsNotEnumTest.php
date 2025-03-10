@@ -35,7 +35,6 @@ class IsNotEnumTest extends TestCase
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setClassName('HappyIsland')
-            ->setEnum(true)
             ->build();
 
         $because = 'we want to add this rule for our software';

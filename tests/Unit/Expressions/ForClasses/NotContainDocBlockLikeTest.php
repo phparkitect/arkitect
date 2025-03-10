@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
-use Arkitect\Analyzer\ClassDescription;
-use Arkitect\Analyzer\FullyQualifiedClassName;
+use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\NotContainDocBlockLike;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
@@ -16,19 +15,11 @@ class NotContainDocBlockLikeTest extends TestCase
     {
         $expression = new NotContainDocBlockLike('anotherDocBlock');
 
-        $classDescription = new ClassDescription(
-            FullyQualifiedClassName::fromString('HappyIsland\Myclass'),
-            [],
-            [],
-            null,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            ['/**  */myDocBlock with other information']
-        );
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('HappyIsland')
+            ->addDocBlock('/**  */myDocBlock with other information')
+            ->build();
+
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
         $expression->evaluate($classDescription, $violations, $because);
@@ -44,19 +35,11 @@ class NotContainDocBlockLikeTest extends TestCase
     {
         $expression = new NotContainDocBlockLike('anotherDocBlock');
 
-        $classDescription = new ClassDescription(
-            FullyQualifiedClassName::fromString('HappyIsland\Myclass'),
-            [],
-            [],
-            null,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            ['/**  */myDocBlock with other information']
-        );
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('HappyIsland')
+            ->addDocBlock('/**  */myDocBlock with other information')
+            ->build();
+
         $violations = new Violations();
         $expression->evaluate($classDescription, $violations, '');
 
@@ -71,19 +54,11 @@ class NotContainDocBlockLikeTest extends TestCase
     {
         $expression = new NotContainDocBlockLike('myDocBlock');
 
-        $classDescription = new ClassDescription(
-            FullyQualifiedClassName::fromString('HappyIsland\Myclass'),
-            [],
-            [],
-            null,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            ['/**  */myDocBlock with other information']
-        );
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('HappyIsland')
+            ->addDocBlock('/**  */myDocBlock with other information')
+            ->build();
+
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
         $expression->evaluate($classDescription, $violations, $because);
