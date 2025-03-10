@@ -27,6 +27,11 @@ class Implement implements Expression
         return new Description("should implement {$this->interface}", $because);
     }
 
+    public function appliesTo(ClassDescription $theClass): bool
+    {
+        return !($theClass->isInterface() || $theClass->isTrait());
+    }
+
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
         if ($theClass->isInterface() || $theClass->isTrait()) {
