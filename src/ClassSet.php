@@ -11,13 +11,14 @@ use Symfony\Component\Finder\Finder;
  */
 class ClassSet implements \IteratorAggregate
 {
-    private string $directory;
+    /** @var string[] */
+    private array $directoryList;
 
     private array $exclude;
 
-    private function __construct(string $directory)
+    private function __construct(string ...$directoryList)
     {
-        $this->directory = $directory;
+        $this->directoryList = $directoryList;
         $this->exclude = [];
     }
 
@@ -28,21 +29,21 @@ class ClassSet implements \IteratorAggregate
         return $this;
     }
 
-    public static function fromDir(string $directory): self
+    public static function fromDir(string ...$directoryList): self
     {
-        return new self($directory);
+        return new self(...$directoryList);
     }
 
-    public function getDir(): string
+    public function getDirsDescription(): string
     {
-        return $this->directory;
+        return implode(', ', $this->directoryList);
     }
 
     public function getIterator(): \Traversable
     {
         $finder = (new Finder())
             ->files()
-            ->in($this->directory)
+            ->in($this->directoryList)
             ->name('*.php')
             ->sortByName()
             ->followLinks()

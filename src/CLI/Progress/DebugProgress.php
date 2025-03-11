@@ -17,7 +17,7 @@ class DebugProgress implements Progress
 
     public function startFileSetAnalysis(ClassSet $set): void
     {
-        $this->output->writeln("Start analyze dir {$set->getDir()}");
+        $this->output->writeln("Start analyze dirs {$set->getDirsDescription()}");
     }
 
     public function startParsingFile(string $file): void
