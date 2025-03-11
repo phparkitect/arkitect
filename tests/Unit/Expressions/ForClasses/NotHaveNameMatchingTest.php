@@ -19,8 +19,9 @@ class NotHaveNameMatchingTest extends TestCase
         $violations = new Violations();
         $because = 'we want to add this rule for our software';
         $expression->evaluate($myClass, $violations, $because);
+
         self::assertEquals(1, $violations->count());
-        $this->assertEquals(
+        self::assertEquals(
             'should not have a name that matches *Class because we want to add this rule for our software',
             $expression->describe($myClass, $because)->toString()
         );
@@ -35,6 +36,7 @@ class NotHaveNameMatchingTest extends TestCase
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
         $expression->evaluate($badClass, $violations, $because);
+
         self::assertEquals(0, $violations->count());
     }
 }

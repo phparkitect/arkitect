@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
-use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
-use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\ForClasses\Extend;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
@@ -77,18 +75,9 @@ class ExtendTest extends TestCase
     {
         $extend = new Extend('My\BaseClass');
 
-        $classDescription = new ClassDescription(
-            FullyQualifiedClassName::fromString('HappyIsland'),
-            [],
-            [],
-            null,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false
-        );
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('HappyIsland')
+            ->build();
 
         $because = 'we want to add this rule for our software';
         $violationError = $extend->describe($classDescription, $because)->toString();

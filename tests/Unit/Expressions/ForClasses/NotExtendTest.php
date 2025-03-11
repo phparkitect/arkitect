@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
-use Arkitect\Analyzer\ClassDescription;
-use Arkitect\Analyzer\FullyQualifiedClassName;
+use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\NotExtend;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
@@ -16,22 +15,15 @@ class NotExtendTest extends TestCase
     {
         $notExtend = new NotExtend('My\BaseClass');
 
-        $classDescription = new ClassDescription(
-            FullyQualifiedClassName::fromString('HappyIsland'),
-            [],
-            [],
-            FullyQualifiedClassName::fromString('My\BaseClass'),
-            false,
-            false,
-            false,
-            false,
-            false,
-            false
-        );
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('HappyIsland')
+            ->setExtends('My\BaseClass', 1)
+            ->build();
+
         $because = 'we want to add this rule for our software';
         $violationError = $notExtend->describe($classDescription, $because)->toString();
-
         $violations = new Violations();
+
         $notExtend->evaluate($classDescription, $violations, $because);
 
         self::assertEquals(1, $violations->count());
@@ -42,22 +34,14 @@ class NotExtendTest extends TestCase
     {
         $notExtend = new NotExtend('My\BaseClass');
 
-        $classDescription = new ClassDescription(
-            FullyQualifiedClassName::fromString('HappyIsland'),
-            [],
-            [],
-            FullyQualifiedClassName::fromString('My\AnotherClass'),
-            false,
-            false,
-            false,
-            false,
-            false,
-            false
-        );
-        $because = 'we want to add this rule for our software';
-        $violationError = $notExtend->describe($classDescription, $because)->toString();
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('HappyIsland')
+            ->setExtends('My\AnotherClass', 1)
+            ->build();
 
+        $because = 'we want to add this rule for our software';
         $violations = new Violations();
+
         $notExtend->evaluate($classDescription, $violations, $because);
 
         self::assertEquals(0, $violations->count());
@@ -67,22 +51,15 @@ class NotExtendTest extends TestCase
     {
         $notExtend = new NotExtend('My\FirstExtend', 'My\SecondExtend');
 
-        $classDescription = new ClassDescription(
-            FullyQualifiedClassName::fromString('HappyIsland'),
-            [],
-            [],
-            FullyQualifiedClassName::fromString('My\SecondExtend'),
-            false,
-            false,
-            false,
-            false,
-            false,
-            false
-        );
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('HappyIsland')
+            ->setExtends('My\SecondExtend', 1)
+            ->build();
+
         $because = 'we want to add this rule for our software';
         $violationError = $notExtend->describe($classDescription, $because)->toString();
-
         $violations = new Violations();
+
         $notExtend->evaluate($classDescription, $violations, $because);
 
         self::assertEquals(1, $violations->count());

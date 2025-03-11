@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
-use Arkitect\Analyzer\ClassDescription;
-use Arkitect\Analyzer\FullyQualifiedClassName;
+use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\IsNotReadonly;
 use Arkitect\Expression\ForClasses\IsReadonly;
 use Arkitect\Rules\Violations;
@@ -17,18 +16,10 @@ class IsReadonlyTest extends TestCase
     {
         $isReadonly = new IsReadonly();
 
-        $classDescription = new ClassDescription(
-            FullyQualifiedClassName::fromString('HappyIsland'),
-            [],
-            [],
-            null,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false
-        );
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('HappyIsland')
+            ->build();
+
         $because = 'we want to add this rule for our software';
         $violationError = $isReadonly->describe($classDescription, $because)->toString();
 
@@ -39,18 +30,11 @@ class IsReadonlyTest extends TestCase
     {
         $isReadonly = new IsReadonly();
 
-        $classDescription = new ClassDescription(
-            FullyQualifiedClassName::fromString('HappyIsland'),
-            [],
-            [],
-            null,
-            false,
-            true,
-            false,
-            false,
-            false,
-            false
-        );
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('HappyIsland')
+            ->setReadonly(true)
+            ->build();
+
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
         $isReadonly->evaluate($classDescription, $violations, $because);
@@ -62,18 +46,11 @@ class IsReadonlyTest extends TestCase
     {
         $isReadonly = new IsReadonly();
         $isNotReadonly = new IsNotReadonly();
-        $classDescription = new ClassDescription(
-            FullyQualifiedClassName::fromString('HappyIsland'),
-            [],
-            [],
-            null,
-            false,
-            false,
-            false,
-            true,
-            false,
-            false
-        );
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('HappyIsland')
+            ->setInterface(true)
+            ->build();
 
         self::assertFalse($isReadonly->appliesTo($classDescription));
         self::assertFalse($isNotReadonly->appliesTo($classDescription));
@@ -84,18 +61,10 @@ class IsReadonlyTest extends TestCase
         $isReadonly = new IsReadonly();
         $isNotReadonly = new IsNotReadonly();
 
-        $classDescription = new ClassDescription(
-            FullyQualifiedClassName::fromString('HappyIsland'),
-            [],
-            [],
-            null,
-            false,
-            false,
-            false,
-            false,
-            true,
-            false
-        );
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('HappyIsland')
+            ->setTrait(true)
+            ->build();
 
         self::assertFalse($isReadonly->appliesTo($classDescription));
         self::assertFalse($isNotReadonly->appliesTo($classDescription));
@@ -106,18 +75,10 @@ class IsReadonlyTest extends TestCase
         $isReadonly = new IsReadonly();
         $isNotReadonly = new IsNotReadonly();
 
-        $classDescription = new ClassDescription(
-            FullyQualifiedClassName::fromString('HappyIsland'),
-            [],
-            [],
-            null,
-            false,
-            false,
-            false,
-            false,
-            false,
-            true
-        );
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('HappyIsland')
+            ->setEnum(true)
+            ->build();
 
         self::assertFalse($isReadonly->appliesTo($classDescription));
         self::assertFalse($isNotReadonly->appliesTo($classDescription));

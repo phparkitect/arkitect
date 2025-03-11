@@ -38,7 +38,7 @@ class NotDependsOnTheseNamespacesTest extends TestCase
         $notDependOnClasses->evaluate($classDescription, $violations, $because);
 
         self::assertEquals(1, $violations->count());
-        $this->assertEquals(
+        self::assertEquals(
             'depends on myNamespace\Banana, but should not depend on these namespaces: myNamespace because we want to add this rule for our software',
             $violations->get(0)->getError()
         );
@@ -59,7 +59,7 @@ class NotDependsOnTheseNamespacesTest extends TestCase
         $notDependOnClasses->evaluate($classDescription, $violations, $because);
 
         self::assertCount(1, $violations);
-        $this->assertEquals(
+        self::assertEquals(
             'depends on myNamespace\Banana, but should not depend on these namespaces: myNamespace because we want to add this rule for our software',
             $violations->get(0)->getError()
         );
@@ -79,7 +79,7 @@ class NotDependsOnTheseNamespacesTest extends TestCase
         $notDependOnClasses->evaluate($classDescription, $violations, $because);
 
         self::assertEquals(2, $violations->count());
-        $this->assertEquals(
+        self::assertEquals(
             'depends on myNamespace\Banana, but should not depend on these namespaces: myNamespace because we want to add this rule for our software',
             $violations->get(0)->getError()
         );

@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
-use Arkitect\Analyzer\ClassDescription;
-use Arkitect\Analyzer\FullyQualifiedClassName;
+use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\HaveAttribute;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
@@ -16,20 +15,11 @@ class HaveAttributeTest extends TestCase
     {
         $expression = new HaveAttribute('myAttribute');
 
-        $classDescription = new ClassDescription(
-            FullyQualifiedClassName::fromString('HappyIsland\Myclass'),
-            [],
-            [],
-            null,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            [],
-            [FullyQualifiedClassName::fromString('myAttribute')]
-        );
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('HappyIsland\Myclass')
+            ->addAttribute('myAttribute', 1)
+            ->build();
+
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
         $expression->evaluate($classDescription, $violations, $because);
@@ -45,20 +35,11 @@ class HaveAttributeTest extends TestCase
     {
         $expression = new HaveAttribute('myAttribute');
 
-        $classDescription = new ClassDescription(
-            FullyQualifiedClassName::fromString('HappyIsland\Myclass'),
-            [],
-            [],
-            null,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            [],
-            [FullyQualifiedClassName::fromString('myAttribute')]
-        );
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('HappyIsland\Myclass')
+            ->addAttribute('myAttribute', 1)
+            ->build();
+
         $violations = new Violations();
         $expression->evaluate($classDescription, $violations, '');
 
@@ -73,20 +54,11 @@ class HaveAttributeTest extends TestCase
     {
         $expression = new HaveAttribute('anotherAttribute');
 
-        $classDescription = new ClassDescription(
-            FullyQualifiedClassName::fromString('HappyIsland\Myclass'),
-            [],
-            [],
-            null,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            [],
-            [FullyQualifiedClassName::fromString('myAttribute')]
-        );
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('HappyIsland\Myclass')
+            ->addAttribute('myAttribute', 1)
+            ->build();
+
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
         $expression->evaluate($classDescription, $violations, $because);

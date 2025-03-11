@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
-use Arkitect\Analyzer\ClassDescription;
-use Arkitect\Analyzer\FullyQualifiedClassName;
+use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\IsAbstract;
 use Arkitect\Expression\ForClasses\IsNotAbstract;
 use Arkitect\Rules\Violations;
@@ -16,46 +15,36 @@ class IsAbstractTest extends TestCase
     public function test_it_should_return_violation_error(): void
     {
         $isAbstract = new IsAbstract();
-        $classDescription = new ClassDescription(
-            FullyQualifiedClassName::fromString('HappyIsland'),
-            [],
-            [],
-            null,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false
-        );
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('HappyIsland')
+            ->build();
+
         $because = 'we want to add this rule for our software';
         $violationError = $isAbstract->describe($classDescription, $because)->toString();
 
         $violations = new Violations();
         $isAbstract->evaluate($classDescription, $violations, $because);
-        self::assertNotEquals(0, $violations->count());
 
-        $this->assertEquals('HappyIsland should be abstract because we want to add this rule for our software', $violationError);
+        self::assertNotEquals(0, $violations->count());
+        self::assertEquals('HappyIsland should be abstract because we want to add this rule for our software', $violationError);
     }
 
     public function test_it_should_return_true_if_is_abstract(): void
     {
         $isAbstract = new IsAbstract();
-        $classDescription = new ClassDescription(
-            FullyQualifiedClassName::fromString('HappyIsland'),
-            [],
-            [],
-            null,
-            true,
-            true,
-            true,
-            false,
-            false,
-            false
-        );
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('HappyIsland')
+            ->setFinal(true)
+            ->setReadonly(true)
+            ->setAbstract(true)
+            ->build();
+
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
         $isAbstract->evaluate($classDescription, $violations, $because);
+
         self::assertEquals(0, $violations->count());
     }
 
@@ -63,18 +52,11 @@ class IsAbstractTest extends TestCase
     {
         $isAbstract = new IsAbstract();
         $isNotAbstract = new IsNotAbstract();
-        $classDescription = new ClassDescription(
-            FullyQualifiedClassName::fromString('HappyIsland'),
-            [],
-            [],
-            null,
-            false,
-            false,
-            false,
-            true,
-            false,
-            false
-        );
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('HappyIsland')
+            ->setInterface(true)
+            ->build();
 
         self::assertFalse($isAbstract->appliesTo($classDescription));
         self::assertFalse($isNotAbstract->appliesTo($classDescription));
@@ -85,18 +67,10 @@ class IsAbstractTest extends TestCase
         $isAbstract = new IsAbstract();
         $isNotAbstract = new IsNotAbstract();
 
-        $classDescription = new ClassDescription(
-            FullyQualifiedClassName::fromString('HappyIsland'),
-            [],
-            [],
-            null,
-            false,
-            false,
-            false,
-            false,
-            true,
-            false
-        );
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('HappyIsland')
+            ->setTrait(true)
+            ->build();
 
         self::assertFalse($isAbstract->appliesTo($classDescription));
         self::assertFalse($isNotAbstract->appliesTo($classDescription));
@@ -107,18 +81,10 @@ class IsAbstractTest extends TestCase
         $isAbstract = new IsAbstract();
         $isNotAbstract = new IsNotAbstract();
 
-        $classDescription = new ClassDescription(
-            FullyQualifiedClassName::fromString('HappyIsland'),
-            [],
-            [],
-            null,
-            false,
-            false,
-            false,
-            false,
-            false,
-            true
-        );
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('HappyIsland')
+            ->setEnum(true)
+            ->build();
 
         self::assertFalse($isAbstract->appliesTo($classDescription));
         self::assertFalse($isNotAbstract->appliesTo($classDescription));
@@ -129,18 +95,10 @@ class IsAbstractTest extends TestCase
         $isAbstract = new IsAbstract();
         $isNotAbstract = new IsNotAbstract();
 
-        $classDescription = new ClassDescription(
-            FullyQualifiedClassName::fromString('HappyIsland'),
-            [],
-            [],
-            null,
-            true,
-            false,
-            false,
-            false,
-            false,
-            false
-        );
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setClassName('HappyIsland')
+            ->setFinal(true)
+            ->build();
 
         self::assertFalse($isAbstract->appliesTo($classDescription));
         self::assertFalse($isNotAbstract->appliesTo($classDescription));
