@@ -28,8 +28,8 @@ class DebugProgressTest extends TestCase
         $output = $this->prophesize(OutputInterface::class);
         $debugProgress = new DebugProgress($output->reveal());
 
-        $output->writeln('Start analyze dir directory')->shouldBeCalled();
-        $debugProgress->startFileSetAnalysis(ClassSet::fromDir('directory'));
+        $output->writeln('Start analyze dirs directory1, directory2')->shouldBeCalled();
+        $debugProgress->startFileSetAnalysis(ClassSet::fromDir('directory1', 'directory2'));
     }
 
     public function test_it_should_not_generate_text_on_end_parsing_file(): void
