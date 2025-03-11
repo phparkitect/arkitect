@@ -34,7 +34,7 @@ class ClassSet implements \IteratorAggregate
         return new self(...$directoryList);
     }
 
-    public function getDir(): string
+    public function getDirsDescription(): string
     {
         return implode(', ', $this->directoryList);
     }
