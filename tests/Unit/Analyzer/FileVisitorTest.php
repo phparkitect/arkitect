@@ -511,6 +511,68 @@ EOF;
         );
     }
 
+    public function test_it_should_parse_interface_attributes(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+
+        namespace Root\Cars;
+
+        use Bar\FooAttr;
+
+        #[FooAttr('bar')]
+        interface AnInterface
+        {
+            #[Baz]
+            public function foo(): string;
+        }
+        EOF;
+
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
+        $fp->parse($code, 'relativePathName');
+
+        $cd = $fp->getClassDescriptions();
+
+        self::assertEquals(
+            [
+                FullyQualifiedClassName::fromString('Bar\\FooAttr'),
+                FullyQualifiedClassName::fromString('Root\\Cars\\Baz'),
+            ],
+            $cd[0]->getAttributes()
+        );
+    }
+
+    public function test_it_should_parse_traits_attributes(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+
+        namespace Root\Cars;
+
+        use Bar\FooAttr;
+
+        #[FooAttr('bar')]
+        trait ATrait
+        {
+            #[Baz]
+            public function foo(): string { return 'foo'; }
+        }
+        EOF;
+
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
+        $fp->parse($code, 'relativePathName');
+
+        $cd = $fp->getClassDescriptions();
+
+        self::assertEquals(
+            [
+                FullyQualifiedClassName::fromString('Bar\\FooAttr'),
+                FullyQualifiedClassName::fromString('Root\\Cars\\Baz'),
+            ],
+            $cd[0]->getAttributes()
+        );
+    }
+
     public function test_it_parse_docblocks(): void
     {
         $code = <<< 'EOF'

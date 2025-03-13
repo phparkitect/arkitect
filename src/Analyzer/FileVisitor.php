@@ -11,11 +11,10 @@ use PhpParser\NodeVisitorAbstract;
 
 class FileVisitor extends NodeVisitorAbstract
 {
-    /** @var ClassDescriptionBuilder */
-    private $classDescriptionBuilder;
+    private ClassDescriptionBuilder $classDescriptionBuilder;
 
-    /** @var array */
-    private $classDescriptions = [];
+    /** @var array<ClassDescription> */
+    private array $classDescriptions = [];
 
     public function __construct(ClassDescriptionBuilder $classDescriptionBuilder)
     {
@@ -50,13 +49,6 @@ class FileVisitor extends NodeVisitorAbstract
             if ($node->isAbstract()) {
                 $this->classDescriptionBuilder->setAbstract(true);
             }
-
-            foreach ($node->attrGroups as $attributeGroup) {
-                foreach ($attributeGroup->attrs as $attribute) {
-                    $this->classDescriptionBuilder
-                        ->addAttribute($attribute->name->toString(), $attribute->getLine());
-                }
-            }
         }
 
         if ($node instanceof Node\Stmt\Enum_ && null !== $node->namespacedName) {
@@ -66,13 +58,6 @@ class FileVisitor extends NodeVisitorAbstract
             foreach ($node->implements as $interface) {
                 $this->classDescriptionBuilder
                     ->addInterface($interface->toString(), $interface->getLine());
-            }
-
-            foreach ($node->attrGroups as $attributeGroup) {
-                foreach ($attributeGroup->attrs as $attribute) {
-                    $this->classDescriptionBuilder
-                        ->addAttribute($attribute->name->toString(), $attribute->getLine());
-                }
             }
         }
 
@@ -197,13 +182,6 @@ class FileVisitor extends NodeVisitorAbstract
 
             $this->classDescriptionBuilder->setClassName($node->namespacedName->toCodeString());
             $this->classDescriptionBuilder->setInterface(true);
-
-            foreach ($node->attrGroups as $attributeGroup) {
-                foreach ($attributeGroup->attrs as $attribute) {
-                    $this->classDescriptionBuilder
-                        ->addAttribute($attribute->name->toString(), $attribute->getLine());
-                }
-            }
         }
 
         if ($node instanceof Node\Stmt\Trait_) {
@@ -213,13 +191,6 @@ class FileVisitor extends NodeVisitorAbstract
 
             $this->classDescriptionBuilder->setClassName($node->namespacedName->toCodeString());
             $this->classDescriptionBuilder->setTrait(true);
-
-            foreach ($node->attrGroups as $attributeGroup) {
-                foreach ($attributeGroup->attrs as $attribute) {
-                    $this->classDescriptionBuilder
-                        ->addAttribute($attribute->name->toString(), $attribute->getLine());
-                }
-            }
         }
 
         if ($node instanceof Node\Stmt\ClassMethod) {
@@ -227,6 +198,15 @@ class FileVisitor extends NodeVisitorAbstract
             if ($returnType instanceof Node\Name\FullyQualified) {
                 $this->classDescriptionBuilder
                     ->addDependency(new ClassDependency($returnType->toString(), $returnType->getLine()));
+            }
+        }
+
+        if ($node instanceof Node\Attribute) {
+            $nodeName = $node->name;
+
+            if ($nodeName instanceof Node\Name\FullyQualified) {
+                $this->classDescriptionBuilder
+                    ->addAttribute($node->name->toString(), $node->getLine());
             }
         }
     }
