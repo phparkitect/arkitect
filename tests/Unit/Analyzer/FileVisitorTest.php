@@ -106,19 +106,19 @@ EOF;
     public function test_it_should_parse_extends_class(): void
     {
         $code = <<< 'EOF'
-<?php
+        <?php
 
-namespace Root\Animals;
+        namespace Root\Animals;
 
-class Animal
-{
-}
+        class Animal
+        {
+        }
 
-class Cat extends Animal
-{
+        class Cat extends Animal
+        {
 
-}
-EOF;
+        }
+        EOF;
 
         /** @var FileParser $fp */
         $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
@@ -126,7 +126,7 @@ EOF;
 
         $cd = $fp->getClassDescriptions()[1];
 
-        $this->assertEquals('Root\Animals\Animal', $cd->getExtends()->toString());
+        $this->assertEquals('Root\Animals\Animal', $cd->getExtends()[0]->toString());
     }
 
     public function test_it_should_not_parse_extends_from_insider_anonymousclass(): void
@@ -155,7 +155,7 @@ EOF;
 
         $cd = $fp->getClassDescriptions()[1];
 
-        $this->assertEquals('Root\Animals\Animal', $cd->getExtends()->toString());
+        $this->assertEquals('Root\Animals\Animal', $cd->getExtends()[0]->toString());
     }
 
     public function test_should_depends_on_these_namespaces(): void
@@ -880,6 +880,40 @@ EOF;
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         $this->assertCount(1, $violations);
+    }
+
+    public function test_it_parse_interface_extends(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+        namespace MyProject\AppBundle\Application;
+
+        interface FooAble
+        {
+            public function foo();
+        }
+            +
+        interface BarAble
+        {
+            public function bar();
+        }
+
+
+        interface ForBarAble extends FooAble, BarAble
+        {
+            public function foobar();
+        }
+        EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
+        $fp->parse($code, 'relativePathName');
+
+        $cd = $fp->getClassDescriptions();
+
+        $this->assertCount(3, $cd);
+        $this->assertEquals('MyProject\AppBundle\Application\FooAble', $cd[2]->getExtends()[0]->toString());
+        $this->assertEquals('MyProject\AppBundle\Application\BarAble', $cd[2]->getExtends()[1]->toString());
     }
 
     public function test_it_handles_return_types(): void
