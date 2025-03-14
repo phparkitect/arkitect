@@ -17,7 +17,7 @@ class NotExtendTest extends TestCase
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setClassName('HappyIsland')
-            ->setExtends('My\BaseClass', 1)
+            ->addExtends('My\BaseClass', 1)
             ->build();
 
         $because = 'we want to add this rule for our software';
@@ -36,7 +36,7 @@ class NotExtendTest extends TestCase
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setClassName('HappyIsland')
-            ->setExtends('My\AnotherClass', 1)
+            ->addExtends('My\AnotherClass', 1)
             ->build();
 
         $because = 'we want to add this rule for our software';
@@ -53,7 +53,7 @@ class NotExtendTest extends TestCase
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setClassName('HappyIsland')
-            ->setExtends('My\SecondExtend', 1)
+            ->addExtends('My\SecondExtend', 1)
             ->build();
 
         $because = 'we want to add this rule for our software';

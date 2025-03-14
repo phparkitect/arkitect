@@ -32,7 +32,7 @@ class NotImplementTest extends TestCase
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setClassName('HappyIsland')
-            ->setExtends('foo', 1)
+            ->addExtends('foo', 1)
             ->build();
 
         $because = 'we want to add this rule for our software';

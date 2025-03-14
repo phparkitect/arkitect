@@ -35,7 +35,7 @@ class FileVisitor extends NodeVisitorAbstract
 
             if (!$node->isAnonymous() && null !== $node->extends) {
                 $this->classDescriptionBuilder
-                    ->setExtends($node->extends->toString(), $node->getLine());
+                    ->addExtends($node->extends->toString(), $node->getLine());
             }
 
             if ($node->isFinal()) {
@@ -182,6 +182,11 @@ class FileVisitor extends NodeVisitorAbstract
 
             $this->classDescriptionBuilder->setClassName($node->namespacedName->toCodeString());
             $this->classDescriptionBuilder->setInterface(true);
+
+            foreach ($node->extends as $interface) {
+                $this->classDescriptionBuilder
+                    ->addExtends($interface->toString(), $interface->getLine());
+            }
         }
 
         if ($node instanceof Node\Stmt\Trait_) {
