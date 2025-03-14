@@ -43,9 +43,6 @@ class FileParserTest extends TestCase
         $fileParser->parse($content, 'foo');
     }
 
-    /**
-     * @requires PHP < 8.0
-     */
     public function test_parse_file_with_name_match(): void
     {
         $traverser = $this->prophesize(NodeTraverser::class);
