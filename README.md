@@ -152,6 +152,25 @@ For example: `phparkitect debug:expression ResideInOneOfTheseNamespaces App`
 
 Currently, you can check if a class:
 
+### Has a corresponding code unit in another namespace
+
+This will allow us to ensure that certain classes always have a test,
+or that every test has a matching class and their namespaces are correct.
+
+```php
+$rules = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Core\Component\**\Command\*'))
+    ->should(new HaveCorrespondingUnit(
+            // This will assert that class `App\Core\Component\MyComponent\Command\MyCommand`
+            // has a test class in `Tests\App\Core\Component\MyComponent\Command\MyCommandTest`
+            function ($fqcn) {
+                return 'Tests\\'.$fqcn.'Test';
+            }
+        )
+    )
+    ->because('we want all our command handlers to have a test');
+```
+
 ### Depends on a namespace
 
 ```php
