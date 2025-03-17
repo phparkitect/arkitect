@@ -17,7 +17,7 @@ class ExtendTest extends TestCase
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setClassName('My\Class')
-            ->setExtends('My\BaseClass', 10)
+            ->addExtends('My\BaseClass', 10)
             ->build();
 
         $violations = new Violations();
@@ -32,7 +32,7 @@ class ExtendTest extends TestCase
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setClassName('My\Class')
-            ->setExtends('My\B14Class', 10)
+            ->addExtends('My\B14Class', 10)
             ->build();
 
         $violations = new Violations();
@@ -47,7 +47,7 @@ class ExtendTest extends TestCase
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setClassName('My\Class')
-            ->setExtends('My\BaseClass', 10)
+            ->addExtends('My\BaseClass', 10)
             ->build();
 
         $violations = new Violations();
@@ -61,7 +61,7 @@ class ExtendTest extends TestCase
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setClassName('HappyIsland')
-            ->setExtends('My\AnotherClass', 10)
+            ->addExtends('My\AnotherClass', 10)
             ->build();
 
         $violations = new Violations();
@@ -95,7 +95,7 @@ class ExtendTest extends TestCase
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setClassName('My\Class')
-            ->setExtends('My\SecondExtend', 10)
+            ->addExtends('My\SecondExtend', 10)
             ->build();
 
         $violations = new Violations();

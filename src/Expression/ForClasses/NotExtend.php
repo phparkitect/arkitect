@@ -14,7 +14,7 @@ use Arkitect\Rules\Violations;
 class NotExtend implements Expression
 {
     /** @var string[] */
-    private $classNames;
+    private array $classNames;
 
     public function __construct(string ...$classNames)
     {
@@ -34,15 +34,15 @@ class NotExtend implements Expression
 
         /** @var string $className */
         foreach ($this->classNames as $className) {
-            if (null !== $extends && $extends->matches($className)) {
-                $violation = Violation::create(
-                    $theClass->getFQCN(),
-                    ViolationMessage::selfExplanatory($this->describe($theClass, $because))
-                );
+            foreach ($extends as $extend) {
+                if ($extend->matches($className)) {
+                    $violation = Violation::create(
+                        $theClass->getFQCN(),
+                        ViolationMessage::selfExplanatory($this->describe($theClass, $because))
+                    );
 
-                $violations->add($violation);
-
-                return;
+                    $violations->add($violation);
+                }
             }
         }
     }

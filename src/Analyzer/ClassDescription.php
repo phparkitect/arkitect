@@ -6,46 +6,39 @@ namespace Arkitect\Analyzer;
 
 class ClassDescription
 {
-    /** @var FullyQualifiedClassName */
-    private $FQCN;
+    private FullyQualifiedClassName $FQCN;
 
     /** @var list<ClassDependency> */
-    private $dependencies;
+    private array $dependencies;
 
     /** @var list<FullyQualifiedClassName> */
-    private $interfaces;
+    private array $interfaces;
 
-    /** @var ?FullyQualifiedClassName */
-    private $extends;
-
-    /** @var bool */
-    private $final;
-
-    /** @var bool */
-    private $readonly;
-
-    /** @var bool */
-    private $abstract;
-
-    /** @var bool */
-    private $interface;
-
-    /** @var bool */
-    private $trait;
-
-    /** @var bool */
-    private $enum;
+    /** @var list<FullyQualifiedClassName> */
+    private array $extends;
 
     /** @var list<string> */
-    private $docBlock;
+    private array $docBlock;
 
     /** @var list<FullyQualifiedClassName> */
-    private $attributes;
+    private array $attributes;
+
+    private bool $final;
+
+    private bool $readonly;
+
+    private bool $abstract;
+
+    private bool $interface;
+
+    private bool $trait;
+
+    private bool $enum;
 
     /**
      * @param list<ClassDependency>         $dependencies
      * @param list<FullyQualifiedClassName> $interfaces
-     * @param ?FullyQualifiedClassName      $extends
+     * @param list<FullyQualifiedClassName> $extends
      * @param list<FullyQualifiedClassName> $attributes
      * @param list<string>                  $docBlock
      */
@@ -53,7 +46,7 @@ class ClassDescription
         FullyQualifiedClassName $FQCN,
         array $dependencies,
         array $interfaces,
-        ?FullyQualifiedClassName $extends,
+        array $extends,
         bool $final,
         bool $readonly,
         bool $abstract,
@@ -127,7 +120,10 @@ class ClassDescription
         return $this->interfaces;
     }
 
-    public function getExtends(): ?FullyQualifiedClassName
+    /**
+     * @return list<FullyQualifiedClassName>
+     */
+    public function getExtends(): array
     {
         return $this->extends;
     }
