@@ -16,7 +16,7 @@ class ClassDescriptionBuilder
     private array $interfaces = [];
 
     /** @var list<FullyQualifiedClassName> */
-    private array $extend = [];
+    private array $extends = [];
 
     private bool $final = false;
 
@@ -41,7 +41,7 @@ class ClassDescriptionBuilder
         $this->FQCN = null;
         $this->classDependencies = [];
         $this->interfaces = [];
-        $this->extend = [];
+        $this->extends = [];
         $this->final = false;
         $this->readonly = false;
         $this->abstract = false;
@@ -77,7 +77,7 @@ class ClassDescriptionBuilder
     public function addExtends(string $FQCN, int $line): self
     {
         $this->addDependency(new ClassDependency($FQCN, $line));
-        $this->extend[] = FullyQualifiedClassName::fromString($FQCN);
+        $this->extends[] = FullyQualifiedClassName::fromString($FQCN);
 
         return $this;
     }
@@ -147,7 +147,7 @@ class ClassDescriptionBuilder
             $this->FQCN,
             $this->classDependencies,
             $this->interfaces,
-            $this->extend,
+            $this->extends,
             $this->final,
             $this->readonly,
             $this->abstract,
