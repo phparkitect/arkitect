@@ -84,7 +84,7 @@ jobs:
 
       - name: "Rename phar to avoid conflicts"
         run: mv ./phparkitect.phar phparkitect-${{ github.sha }}.phar
-
+      
       - name: "Upload phar file artifact"
         uses: actions/upload-artifact@v4
         with:
@@ -119,20 +119,41 @@ jobs:
     needs: [build, smoke-test-phar]
     runs-on: "ubuntu-22.04"
     if: github.event_name == 'release'
+    permissions:
+      contents: write
     steps:
       - name: "Download phar ./phparkitect-${{ github.sha }}.phar"
         uses: actions/download-artifact@v4
         with:
           # will download phar in project root
           name: phar-artifact
-
-      - name: Upload Release Asset
-        uses: svenstaro/upload-release-action@v2
+      
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./phparkitect-${{ github.sha }}.phar
-          asset_name: phparkitect.phar
-          tag: ${{ github.ref }}
+          gpg_private_key: ${{ secrets.GPG_KEY_47CD54B6398FE21B3709D0A4D9C905CED1932CA2 }}
+          passphrase: ${{ secrets.GPG_KEY_47CD54B6398FE21B3709D0A4D9C905CED1932CA2_PASSPHRASE }}
+
+      - name: "Rename phar"
+        run: mv ./phparkitect-${{ github.sha }}.phar phparkitect.phar 
+
+      - name: Sign the PHAR
+        run: |  
+          gpg --local-user 47CD54B6398FE21B3709D0A4D9C905CED1932CA2 \
+          --batch \
+          --yes \
+          --passphrase="${{ secrets.GPG_KEY_47CD54B6398FE21B3709D0A4D9C905CED1932CA2_PASSPHRASE }}" \
+          --detach-sign \
+          --output ./phparkitect.phar.asc \
+          ./phparkitect.phar
+      
+      - name: Add phar to the release 
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: |
+            phparkitect.phar
+            phparkitect.phar.asc
 
   publish_docker_images:
     needs: [build, smoke-test-phar]
