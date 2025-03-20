@@ -23,7 +23,7 @@ class PatternStringTest extends TestCase
         $this->assertEquals($expectedResult, (new PatternString($string))->matches($pattern));
     }
 
-    public function providePatterns(): array
+    public static function providePatterns(): array
     {
         return [
             ['SoThisIsAnExample', '*This*', true],

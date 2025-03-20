@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class FullyQualifiedClassNameTest extends TestCase
 {
-    public function patternProvider(): array
+    public static function patternProvider(): array
     {
         return [
             ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables\Fruits\Banana', true],
