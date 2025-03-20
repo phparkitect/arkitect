@@ -1,6 +1,8 @@
 .PHONY: test build db dt dbi dphar csfix
 .DEFAULT_GOAL := help
 
+TMP_DIR = /tmp/arkitect
+
 help: ## it shows help menu
 	@awk 'BEGIN {FS = ":.*#"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z0-9_-]+:.*?#/ { printf "  \033[36m%-27s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
@@ -20,11 +22,11 @@ test_%: ## it launches a test
 	bin/phpunit --filter $@
 
 phar: ## it creates phar
-	rm -rf /tmp/arkitect && mkdir -p /tmp/arkitect
-	cp -R src bin-stub box.json README.md composer.json phparkitect-stub.php bin /tmp/arkitect
-	cd /tmp/arkitect && composer install --prefer-source --no-dev -o
-	bin/box.phar compile -c /tmp/arkitect/box.json
-	cp /tmp/arkitect/phparkitect.phar .
+	rm -rf ${TMP_DIR} && mkdir -p ${TMP_DIR}
+	cp -R src bin-stub box.json README.md composer.json phparkitect-stub.php bin ${TMP_DIR}
+	cd ${TMP_DIR} && composer install --prefer-source --no-dev -o
+	bin/box.phar compile -c ${TMP_DIR}/box.json
+	cp ${TMP_DIR}/phparkitect.phar .
 
 outdated:
 	composer outdated
