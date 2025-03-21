@@ -27,23 +27,17 @@ use PHPStan\PhpDocParser\ParserConfig;
 
 class NameResolver extends NodeVisitorAbstract
 {
-    /** @var NameContext Naming context */
     protected NameContext $nameContext;
 
-    /** @var bool Whether to preserve original names */
     protected bool $preserveOriginalNames;
 
-    /** @var bool Whether to replace resolved nodes in place, or to add resolvedNode attributes */
     protected bool $replaceNodes;
 
-    /** @var bool Whether to parse DocBlock Custom Annotations */
-    protected $parseCustomAnnotations;
+    protected bool $parseCustomAnnotations;
 
-    /** @var PhpDocParser */
-    protected $phpDocParser;
+    protected PhpDocParser $phpDocParser;
 
-    /** @var Lexer */
-    protected $phpDocLexer;
+    protected Lexer $phpDocLexer;
 
     /**
      * Constructs a name resolution visitor.
@@ -58,6 +52,9 @@ class NameResolver extends NodeVisitorAbstract
      *
      * @param ErrorHandler|null                                                                       $errorHandler Error handler
      * @param array{preserveOriginalNames?: bool, replaceNodes?: bool, parseCustomAnnotations?: bool} $options      Options
+     *
+     * @psalm-suppress TooFewArguments
+     * @psalm-suppress InvalidArgument
      */
     public function __construct(?ErrorHandler $errorHandler = null, array $options = [])
     {
@@ -66,11 +63,19 @@ class NameResolver extends NodeVisitorAbstract
         $this->replaceNodes = $options['replaceNodes'] ?? true;
         $this->parseCustomAnnotations = $options['parseCustomAnnotations'] ?? true;
 
-        $parserConfig = new ParserConfig([]);
-        $constExprParser = new ConstExprParser($parserConfig);
-        $typeParser = new TypeParser($parserConfig, $constExprParser);
-        $this->phpDocParser = new PhpDocParser($parserConfig, $typeParser, $constExprParser);
-        $this->phpDocLexer = new Lexer($parserConfig);
+        // this if is to allow using v 1.2 or v2
+        if (class_exists(ParserConfig::class)) {
+            $parserConfig = new ParserConfig([]);
+            $constExprParser = new ConstExprParser($parserConfig);
+            $typeParser = new TypeParser($parserConfig, $constExprParser);
+            $this->phpDocParser = new PhpDocParser($parserConfig, $typeParser, $constExprParser);
+            $this->phpDocLexer = new Lexer($parserConfig);
+        } else {
+            $typeParser = new TypeParser();
+            $constExprParser = new ConstExprParser();
+            $this->phpDocParser = new PhpDocParser($typeParser, $constExprParser);
+            $this->phpDocLexer = new Lexer();
+        }
     }
 
     /**
