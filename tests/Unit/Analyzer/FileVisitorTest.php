@@ -1374,88 +1374,88 @@ EOF;
         }
     }
 
-    public function provide_enums(): \Generator
+    public static function provide_enums(): \Generator
     {
         yield 'default enum' => [
             <<< 'EOF'
-<?php
-namespace App\Foo;
+            <?php
+            namespace App\Foo;
 
-enum DefaultEnum
-{
-    case FOO;
-}
-EOF
+            enum DefaultEnum
+            {
+                case FOO;
+            }
+            EOF
         ];
 
         yield 'string enum' => [
             <<< 'EOF'
-<?php
-namespace App\Foo;
+            <?php
+            namespace App\Foo;
 
-enum StringEnum: string
-{
-    case BAR: 'bar';
-}
-EOF
+            enum StringEnum: string
+            {
+                case BAR: 'bar';
+            }
+            EOF
         ];
 
         yield 'integer enum' => [
             <<< 'EOF'
-<?php
-namespace App\Foo;
+            <?php
+            namespace App\Foo;
 
-enum IntEnum: int
-{
-    case BAZ: 42;
-}
-EOF
+            enum IntEnum: int
+            {
+                case BAZ: 42;
+            }
+            EOF
         ];
 
         yield 'multiple enums' => [
             <<< 'EOF'
-<?php
-namespace App\Foo;
+            <?php
+            namespace App\Foo;
 
-enum DefaultEnum
-{
-    case FOO;
-}
+            enum DefaultEnum
+            {
+                case FOO;
+            }
 
-enum IntEnum: int
-{
-    case BAZ: 42;
-}
+            enum IntEnum: int
+            {
+                case BAZ: 42;
+            }
 
-enum IntEnum: int
-{
-    case BAZ: 42;
-}
-EOF
+            enum IntEnum: int
+            {
+                case BAZ: 42;
+            }
+            EOF
         ];
     }
 
     public function test_it_parse_property_hooks(): void
     {
         $code = <<< 'EOF'
-<?php
-namespace App\Foo;
+        <?php
+        namespace App\Foo;
 
-class User {
-    private string $firstName;
-    private string $lastName;
+        class User {
+            private string $firstName;
+            private string $lastName;
 
-    public function __construct(string $firstName, string $lastName) {
-        $this->firstName = $firstName;
-        $this->lastName = $lastName;
-    }
+            public function __construct(string $firstName, string $lastName) {
+                $this->firstName = $firstName;
+                $this->lastName = $lastName;
+            }
 
-    public string $fullName {
-        get => $this->firstName . ' ' . $this->lastName;
-        set {[$this->firstName, $this->lastName] = explode(' ', $value, 2);}
-    }
-}
-EOF;
+            public string $fullName {
+                get => $this->firstName . ' ' . $this->lastName;
+                set {[$this->firstName, $this->lastName] = explode(' ', $value, 2);}
+            }
+        }
+        EOF;
 
         /** @var FileParser $fp */
         $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.4'));

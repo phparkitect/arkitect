@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class ResideInOneOfTheseNamespacesTest extends TestCase
 {
-    public function shouldMatchNamespacesProvider(): array
+    public static function shouldMatchNamespacesProvider(): array
     {
         return [
             ['Food\Vegetables', 'Food\Vegetables\Carrot', 'matches a class in the root namespace'],
