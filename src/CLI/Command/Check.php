@@ -26,6 +26,7 @@ class Check extends Command
     private const USE_BASELINE_PARAM = 'use-baseline';
     private const SKIP_BASELINE_PARAM = 'skip-baseline';
     private const IGNORE_BASELINE_LINENUMBERS_PARAM = 'ignore-baseline-linenumbers';
+    private const FORMAT_PARAM = 'format';
 
     private const GENERATE_BASELINE_PARAM = 'generate-baseline';
     private const DEFAULT_RULES_FILENAME = 'phparkitect.php';
@@ -87,6 +88,13 @@ class Check extends Command
                 'i',
                 InputOption::VALUE_NONE,
                 'Ignore line numbers when checking the baseline'
+            )
+            ->addOption(
+                self::FORMAT_PARAM,
+                'f',
+                InputOption::VALUE_OPTIONAL,
+                'Output format: json or text (default)',
+                'text'
             );
     }
 
@@ -102,6 +110,7 @@ class Check extends Command
             $useBaseline = (string) $input->getOption(self::USE_BASELINE_PARAM);
             $skipBaseline = (bool) $input->getOption(self::SKIP_BASELINE_PARAM);
             $ignoreBaselineLinenumbers = (bool) $input->getOption(self::IGNORE_BASELINE_LINENUMBERS_PARAM);
+            $format = $input->getOption(self::FORMAT_PARAM);
 
             if (true !== $skipBaseline && !$useBaseline && file_exists(self::DEFAULT_BASELINE_FILENAME)) {
                 $useBaseline = self::DEFAULT_BASELINE_FILENAME;
@@ -158,7 +167,7 @@ class Check extends Command
             }
 
             if ($violations->count() > 0) {
-                $this->printViolations($violations, $output);
+                $this->printViolations($violations, $output, $format);
                 $this->printExecutionTime($output, $startTime);
 
                 return self::ERROR_CODE;
@@ -236,10 +245,10 @@ class Check extends Command
         return $filename;
     }
 
-    private function printViolations(Violations $violations, OutputInterface $output): void
+    private function printViolations(Violations $violations, OutputInterface $output, string $format): void
     {
         $output->writeln('<error>ERRORS!</error>');
-        $output->writeln(sprintf('%s', $violations->toString()));
+        $output->writeln(sprintf('%s', $violations->toString($format)));
         $output->writeln(sprintf('<error>%s VIOLATIONS DETECTED!</error>', \count($violations)));
     }
 

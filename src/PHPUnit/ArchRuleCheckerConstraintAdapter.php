@@ -11,6 +11,7 @@ use Arkitect\ClassSetRules;
 use Arkitect\CLI\Progress\VoidProgress;
 use Arkitect\CLI\Runner;
 use Arkitect\CLI\TargetPhpVersion;
+use Arkitect\Printer\Printer;
 use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\Constraint\Constraint;
@@ -78,6 +79,6 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
             return "\n".$this->parsingErrors->toString();
         }
 
-        return "\n".$this->violations->toString();
+        return "\n".$this->violations->toString(Printer::FORMAT_TEXT);
     }
 }

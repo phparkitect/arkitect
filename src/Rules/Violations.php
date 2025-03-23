@@ -6,6 +6,7 @@ namespace Arkitect\Rules;
 
 use Arkitect\Exceptions\FailOnFirstViolationException;
 use Arkitect\Exceptions\IndexNotFoundException;
+use Arkitect\Printer\PrinterFactory;
 
 /**
  * @template-implements \IteratorAggregate<Violation>
@@ -79,30 +80,11 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
         }, []);
     }
 
-    public function toString(): string
+    public function toString(string $format): string
     {
-        $errors = '';
-        $violationsCollection = $this->groupedByFqcn();
+        $printer = (new PrinterFactory())->create($format);
 
-        /**
-         * @var string      $key
-         * @var Violation[] $violationsByFqcn
-         */
-        foreach ($violationsCollection as $key => $violationsByFqcn) {
-            $violationForThisFqcn = \count($violationsByFqcn);
-            $errors .= "\n$key has {$violationForThisFqcn} violations";
-
-            foreach ($violationsByFqcn as $violation) {
-                $errors .= "\n  ".$violation->getError();
-
-                if (null !== $violation->getLine()) {
-                    $errors .= ' (on line '.$violation->getLine().')';
-                }
-            }
-            $errors .= "\n";
-        }
-
-        return $errors;
+        return $printer->print($this->groupedByFqcn());
     }
 
     public function toArray(): array
