@@ -16,17 +16,17 @@ class JsonPrinter implements Printer
          * @var string      $key
          * @var Violation[] $violationsByFqcn
          */
-        foreach ($violationsCollection as $key => $violationsByFqcn) {
+        foreach ($violationsCollection as $class => $violationsByFqcn) {
             $violationForThisFqcn = \count($violationsByFqcn);
             $totalViolations += $violationForThisFqcn;
 
-            $details[$key] = [];
+            $details[$class] = [];
 
-            foreach ($violationsByFqcn as $kv => $violation) {
-                $details[$key][$kv]['error'] = $violation->getError();
+            foreach ($violationsByFqcn as $key => $violation) {
+                $details[$class][$key]['error'] = $violation->getError();
 
                 if (null !== $violation->getLine()) {
-                    $details[$key][$kv]['line'] = $violation->getLine();
+                    $details[$class][$key]['line'] = $violation->getLine();
                 }
             }
         }
