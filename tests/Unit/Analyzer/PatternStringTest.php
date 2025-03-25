@@ -36,6 +36,7 @@ class PatternStringTest extends TestCase
             ['SoThisIsAnExample', 'So*Example', true],
             ['SoThisIsAnExample', '*ThisIsAnExample', true],
             ['SoThisIsAnExample', 'SoThisIsAn*', true],
+            ['SoThisIsAnExample', '*Example', true],
             ['Food\Vegetables\Roots\Carrot', 'Food\*\Roots', false],
             ['Food\Vegetables\Roots\Orange\Carrot', 'Food\*\Roots', false],
             ['Food\Vegetables\Carrot', '*\Vegetables', false],
