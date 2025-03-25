@@ -195,7 +195,7 @@ You can add multiple parameters, the violation will happen when none of them mat
 ```php
 $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
-    ->should(new HaveAttribute(AsController::class))
+    ->should(new HaveAttribute('Symfony\Component\HttpKernel\Attribute\AsController'))
     ->because('it configures the service container');
 ```
 
