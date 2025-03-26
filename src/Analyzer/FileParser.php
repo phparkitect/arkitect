@@ -13,14 +13,11 @@ use PhpParser\PhpVersion;
 
 class FileParser implements Parser
 {
-    /** @var \PhpParser\Parser */
-    private $parser;
+    private \PhpParser\Parser $parser;
 
-    /** @var NodeTraverser */
-    private $traverser;
+    private NodeTraverser $traverser;
 
-    /** @var FileVisitor */
-    private $fileVisitor;
+    private FileVisitor $fileVisitor;
 
     /** @var array */
     private $parsingErrors;

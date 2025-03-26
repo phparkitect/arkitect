@@ -75,7 +75,7 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
     protected function failureDescription($other): string
     {
         if ($this->parsingErrors->count() > 0) {
-            return "\n".$this->parsingErrors->toString();
+            return "\n parsing error: ".$this->parsingErrors->toString();
         }
 
         return "\n".$this->violations->toString();

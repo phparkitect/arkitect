@@ -7,14 +7,11 @@ use Arkitect\Exceptions\InvalidPatternException;
 
 class FullyQualifiedClassName
 {
-    /** @var PatternString */
-    private $fqcnString;
+    private PatternString $fqcnString;
 
-    /** @var PatternString */
-    private $namespace;
+    private PatternString $namespace;
 
-    /** @var PatternString */
-    private $class;
+    private PatternString $class;
 
     private function __construct(PatternString $fqcnString, PatternString $namespace, PatternString $class)
     {
