@@ -27,6 +27,7 @@ class Check extends Command
     private const SKIP_BASELINE_PARAM = 'skip-baseline';
     private const IGNORE_BASELINE_LINENUMBERS_PARAM = 'ignore-baseline-linenumbers';
     private const FORMAT_PARAM = 'format';
+    private const ONLY_ERRORS = 'only-errors';
 
     private const GENERATE_BASELINE_PARAM = 'generate-baseline';
     private const DEFAULT_RULES_FILENAME = 'phparkitect.php';
@@ -90,6 +91,12 @@ class Check extends Command
                 'Ignore line numbers when checking the baseline'
             )
             ->addOption(
+                self::ONLY_ERRORS,
+                'E',
+                InputOption::VALUE_NONE,
+                'Show only errors, suppress headline and footer and all irrelevant output'
+            )
+            ->addOption(
                 self::FORMAT_PARAM,
                 'f',
                 InputOption::VALUE_OPTIONAL,
@@ -111,6 +118,7 @@ class Check extends Command
             $skipBaseline = (bool) $input->getOption(self::SKIP_BASELINE_PARAM);
             $ignoreBaselineLinenumbers = (bool) $input->getOption(self::IGNORE_BASELINE_LINENUMBERS_PARAM);
             $format = $input->getOption(self::FORMAT_PARAM);
+            $onlyErrors = (bool) $input->getOption(self::ONLY_ERRORS);
 
             if (true !== $skipBaseline && !$useBaseline && file_exists(self::DEFAULT_BASELINE_FILENAME)) {
                 $useBaseline = self::DEFAULT_BASELINE_FILENAME;
@@ -121,7 +129,10 @@ class Check extends Command
 
                 return self::ERROR_CODE;
             }
-            $output->writeln('<info>Baseline found: '.$useBaseline.'</info>');
+
+            if (!$onlyErrors) {
+                $output->writeln('<info>Baseline found: '.$useBaseline.'</info>');
+            }
 
             $generateBaseline = $input->getOption(self::GENERATE_BASELINE_PARAM);
 
@@ -131,10 +142,14 @@ class Check extends Command
 
             $progress = $verbose ? new DebugProgress($output) : new ProgressBarProgress($output);
 
-            $this->printHeadingLine($output);
+            if (!$onlyErrors) {
+                $this->printHeadingLine($output);
+            }
 
             $rulesFilename = $this->getConfigFilename($input);
-            $output->writeln(sprintf("Config file: %s\n", $rulesFilename));
+            if (!$onlyErrors) {
+                $output->writeln(sprintf("Config file: %s\n", $rulesFilename));
+            }
 
             $config = new Config();
 
@@ -142,7 +157,7 @@ class Check extends Command
 
             $runner = new Runner($stopOnFailure);
             try {
-                $runner->run($config, $progress, $targetPhpVersion);
+                $runner->run($config, $progress, $targetPhpVersion, $onlyErrors);
             } catch (FailOnFirstViolationException $e) {
             }
             $violations = $runner->getViolations();
@@ -155,7 +170,9 @@ class Check extends Command
                 $this->saveBaseline($generateBaseline, $violations);
 
                 $output->writeln('<info>Baseline file \''.$generateBaseline.'\'created!</info>');
-                $this->printExecutionTime($output, $startTime);
+                if (!$onlyErrors) {
+                    $this->printExecutionTime($output, $startTime);
+                }
 
                 return self::SUCCESS_CODE;
             }
@@ -167,15 +184,17 @@ class Check extends Command
             }
 
             if ($violations->count() > 0) {
-                $this->printViolations($violations, $output, $format);
-                $this->printExecutionTime($output, $startTime);
+                $this->printViolations($violations, $output, $format, $onlyErrors);
+                if (!$onlyErrors) {
+                    $this->printExecutionTime($output, $startTime);
+                }
 
                 return self::ERROR_CODE;
             }
 
             $parsedErrors = $runner->getParsingErrors();
             if ($parsedErrors->count() > 0) {
-                $this->printParsedErrors($parsedErrors, $output);
+                $this->printParsedErrors($parsedErrors, $output, $onlyErrors);
                 $this->printExecutionTime($output, $startTime);
 
                 return self::ERROR_CODE;
@@ -187,8 +206,11 @@ class Check extends Command
             return self::ERROR_CODE;
         }
 
-        $this->printNoViolationsDetectedMessage($output);
-        $this->printExecutionTime($output, $startTime);
+        $this->printNoViolationsDetectedMessage($output, $onlyErrors);
+
+        if (!$onlyErrors) {
+            $this->printExecutionTime($output, $startTime);
+        }
 
         return self::SUCCESS_CODE;
     }
@@ -245,21 +267,29 @@ class Check extends Command
         return $filename;
     }
 
-    private function printViolations(Violations $violations, OutputInterface $output, string $format): void
+    private function printViolations(Violations $violations, OutputInterface $output, string $format, bool $onlyErrors = false): void
     {
-        $output->writeln('<error>ERRORS!</error>');
+        if (!$onlyErrors) {
+            $output->writeln('<error>ERRORS!</error>');
+        }
         $output->writeln(sprintf('%s', $violations->toString($format)));
-        $output->writeln(sprintf('<error>%s VIOLATIONS DETECTED!</error>', \count($violations)));
+        if (!$onlyErrors) {
+            $output->writeln(sprintf('<error>%s VIOLATIONS DETECTED!</error>', \count($violations)));
+        }
     }
 
-    private function printParsedErrors(ParsingErrors $parsingErrors, OutputInterface $output): void
+    private function printParsedErrors(ParsingErrors $parsingErrors, OutputInterface $output, bool $onlyErrors = false): void
     {
-        $output->writeln('<error>ERROR ON PARSING THESE FILES:</error>');
+        if (!$onlyErrors) {
+            $output->writeln('<error>ERROR ON PARSING THESE FILES:</error>');
+        }
         $output->writeln(sprintf('%s', $parsingErrors->toString()));
     }
 
-    private function printNoViolationsDetectedMessage(OutputInterface $output): void
+    private function printNoViolationsDetectedMessage(OutputInterface $output, bool $onlyErrors = false): void
     {
-        $output->writeln('<info>NO VIOLATIONS DETECTED!</info>');
+        if (!$onlyErrors) {
+            $output->writeln('<info>NO VIOLATIONS DETECTED!</info>');
+        }
     }
 }

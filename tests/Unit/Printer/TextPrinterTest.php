@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Printer;
 
-use Arkitect\Printer\TextPrinter;
+use Arkitect\CLI\Printer\TextPrinter;
 use Arkitect\Rules\Violation;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Arkitect\Printer\TextPrinter
+ * @covers \Arkitect\CLI\Printer\TextPrinter
  */
 class TextPrinterTest extends TestCase
 {

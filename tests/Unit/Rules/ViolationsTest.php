@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Rules;
 
+use Arkitect\CLI\Printer\Printer;
 use Arkitect\Exceptions\IndexNotFoundException;
-use Arkitect\Printer\Printer;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;

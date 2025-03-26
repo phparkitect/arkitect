@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Arkitect\Rules;
 
+use Arkitect\CLI\Printer\PrinterFactory;
 use Arkitect\Exceptions\FailOnFirstViolationException;
 use Arkitect\Exceptions\IndexNotFoundException;
-use Arkitect\Printer\PrinterFactory;
 
 /**
  * @template-implements \IteratorAggregate<Violation>

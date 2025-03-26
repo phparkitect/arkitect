@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Printer;
 
-use Arkitect\Printer\JsonPrinter;
-use Arkitect\Printer\PrinterFactory;
-use Arkitect\Printer\TextPrinter;
+use Arkitect\CLI\Printer\JsonPrinter;
+use Arkitect\CLI\Printer\PrinterFactory;
+use Arkitect\CLI\Printer\TextPrinter;
 use PHPUnit\Framework\TestCase;
 
 class PrinterFactoryTest extends TestCase

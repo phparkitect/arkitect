@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Arkitect\Printer;
+namespace Arkitect\CLI\Printer;
 
 use Arkitect\Rules\Violation;
 

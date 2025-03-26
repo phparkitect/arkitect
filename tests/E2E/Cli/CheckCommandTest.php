@@ -166,13 +166,28 @@ App\Controller\Foo has 1 violations
         $this->assertCheckHasErrors($cmdTester);
     }
 
+    public function test_json_format_output(): void
+    {
+        $configFilePath = __DIR__.'/../_fixtures/configMvcForYieldBug.php';
+
+        $cmdTester = $this->runCheck($configFilePath, null, null, false, false, false, 'json', true);
+
+        $this->assertCheckHasErrors($cmdTester);
+
+        $display = $cmdTester->getDisplay();
+
+        $this->assertJson($display);
+    }
+
     protected function runCheck(
         $configFilePath = null,
         ?bool $stopOnFailure = null,
         ?string $useBaseline = null,
         $generateBaseline = false,
         bool $skipBaseline = false,
-        bool $ignoreBaselineNumbers = false
+        bool $ignoreBaselineNumbers = false,
+        string $format = 'text',
+        bool $onlyErrors = false
     ): ApplicationTester {
         $input = ['check'];
         if (null !== $configFilePath) {
@@ -192,10 +207,16 @@ App\Controller\Foo has 1 violations
             $input['--ignore-baseline-linenumbers'] = true;
         }
 
+        if ($onlyErrors) {
+            $input['--only-errors'] = true;
+        }
+
         // false = option not set, null = option set but without value, string = option with value
         if (false !== $generateBaseline) {
             $input['--generate-baseline'] = $generateBaseline;
         }
+
+        $input['--format'] = $format;
 
         $app = new PhpArkitectApplication();
         $app->setAutoExit(false);

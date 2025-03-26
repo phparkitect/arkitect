@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Printer;
 
-use Arkitect\Printer\JsonPrinter;
+use Arkitect\CLI\Printer\JsonPrinter;
 use Arkitect\Rules\Violation;
 use PHPUnit\Framework\TestCase;
 

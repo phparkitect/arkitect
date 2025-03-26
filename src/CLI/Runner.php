@@ -28,18 +28,22 @@ class Runner
         $this->parsingErrors = new ParsingErrors();
     }
 
-    public function run(Config $config, Progress $progress, TargetPhpVersion $targetPhpVersion): void
+    public function run(Config $config, Progress $progress, TargetPhpVersion $targetPhpVersion, bool $onlyErrors): void
     {
         /** @var FileParser $fileParser */
         $fileParser = FileParserFactory::createFileParser($targetPhpVersion, $config->isParseCustomAnnotationsEnabled());
 
         /** @var ClassSetRules $classSetRule */
         foreach ($config->getClassSetRules() as $classSetRule) {
-            $progress->startFileSetAnalysis($classSetRule->getClassSet());
+            if (!$onlyErrors) {
+                $progress->startFileSetAnalysis($classSetRule->getClassSet());
+            }
 
-            $this->check($classSetRule, $progress, $fileParser, $this->violations, $this->parsingErrors);
+            $this->check($classSetRule, $progress, $fileParser, $this->violations, $this->parsingErrors, $onlyErrors);
 
-            $progress->endFileSetAnalysis($classSetRule->getClassSet());
+            if (!$onlyErrors) {
+                $progress->endFileSetAnalysis($classSetRule->getClassSet());
+            }
         }
     }
 
@@ -48,11 +52,14 @@ class Runner
         Progress $progress,
         Parser $fileParser,
         Violations $violations,
-        ParsingErrors $parsingErrors
+        ParsingErrors $parsingErrors,
+        bool $onlyErrors = false
     ): void {
         /** @var SplFileInfo $file */
         foreach ($classSetRule->getClassSet() as $file) {
-            $progress->startParsingFile($file->getRelativePathname());
+            if (!$onlyErrors) {
+                $progress->startParsingFile($file->getRelativePathname());
+            }
 
             $fileParser->parse($file->getContents(), $file->getRelativePathname());
             $parsedErrors = $fileParser->getParsingErrors();
@@ -67,8 +74,9 @@ class Runner
                     $rule->check($classDescription, $violations);
                 }
             }
-
-            $progress->endParsingFile($file->getRelativePathname());
+            if (!$onlyErrors) {
+                $progress->endParsingFile($file->getRelativePathname());
+            }
         }
     }
 
