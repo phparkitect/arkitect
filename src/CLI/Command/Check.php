@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\CLI\Command;
 
 use Arkitect\CLI\Config;
+use Arkitect\CLI\Printer\Printer;
 use Arkitect\CLI\Progress\DebugProgress;
 use Arkitect\CLI\Progress\ProgressBarProgress;
 use Arkitect\CLI\Runner;
@@ -27,7 +28,6 @@ class Check extends Command
     private const SKIP_BASELINE_PARAM = 'skip-baseline';
     private const IGNORE_BASELINE_LINENUMBERS_PARAM = 'ignore-baseline-linenumbers';
     private const FORMAT_PARAM = 'format';
-    private const ONLY_ERRORS = 'only-errors';
 
     private const GENERATE_BASELINE_PARAM = 'generate-baseline';
     private const DEFAULT_RULES_FILENAME = 'phparkitect.php';
@@ -91,12 +91,6 @@ class Check extends Command
                 'Ignore line numbers when checking the baseline'
             )
             ->addOption(
-                self::ONLY_ERRORS,
-                'E',
-                InputOption::VALUE_NONE,
-                'Show only errors, suppress headline and footer and all irrelevant output'
-            )
-            ->addOption(
                 self::FORMAT_PARAM,
                 'f',
                 InputOption::VALUE_OPTIONAL,
@@ -118,7 +112,7 @@ class Check extends Command
             $skipBaseline = (bool) $input->getOption(self::SKIP_BASELINE_PARAM);
             $ignoreBaselineLinenumbers = (bool) $input->getOption(self::IGNORE_BASELINE_LINENUMBERS_PARAM);
             $format = $input->getOption(self::FORMAT_PARAM);
-            $onlyErrors = (bool) $input->getOption(self::ONLY_ERRORS);
+            $onlyErrors = Printer::FORMAT_JSON === $format;
 
             if (true !== $skipBaseline && !$useBaseline && file_exists(self::DEFAULT_BASELINE_FILENAME)) {
                 $useBaseline = self::DEFAULT_BASELINE_FILENAME;

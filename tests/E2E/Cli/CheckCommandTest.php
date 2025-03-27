@@ -170,7 +170,7 @@ App\Controller\Foo has 1 violations
     {
         $configFilePath = __DIR__.'/../_fixtures/configMvcForYieldBug.php';
 
-        $cmdTester = $this->runCheck($configFilePath, null, null, false, false, false, 'json', true);
+        $cmdTester = $this->runCheck($configFilePath, null, null, false, false, false, 'json');
 
         $this->assertCheckHasErrors($cmdTester);
 
@@ -186,8 +186,7 @@ App\Controller\Foo has 1 violations
         $generateBaseline = false,
         bool $skipBaseline = false,
         bool $ignoreBaselineNumbers = false,
-        string $format = 'text',
-        bool $onlyErrors = false
+        string $format = 'text'
     ): ApplicationTester {
         $input = ['check'];
         if (null !== $configFilePath) {
@@ -205,10 +204,6 @@ App\Controller\Foo has 1 violations
 
         if ($ignoreBaselineNumbers) {
             $input['--ignore-baseline-linenumbers'] = true;
-        }
-
-        if ($onlyErrors) {
-            $input['--only-errors'] = true;
         }
 
         // false = option not set, null = option set but without value, string = option with value
