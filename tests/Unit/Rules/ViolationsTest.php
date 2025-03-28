@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Rules;
 
+use Arkitect\CLI\Printer\Printer;
 use Arkitect\Exceptions\IndexNotFoundException;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
@@ -65,7 +66,7 @@ App\Controller\Foo has 1 violations
   should have name end with Controller
 ';
 
-        $this->assertEquals($expected, $this->violationStore->toString());
+        $this->assertEquals($expected, $this->violationStore->toString(Printer::FORMAT_TEXT));
     }
 
     public function test_get_iterable(): void
