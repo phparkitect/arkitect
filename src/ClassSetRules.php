@@ -8,12 +8,10 @@ use Arkitect\Rules\DSL\ArchRule;
 
 class ClassSetRules
 {
-    /** @var ClassSet */
-    private $classSet;
-    /**
-     * @var ArchRule[]
-     */
-    private $rules;
+    private ClassSet $classSet;
+
+    /** @var ArchRule[] */
+    private array $rules;
 
     private function __construct(ClassSet $classSet, ArchRule ...$rules)
     {

@@ -45,4 +45,21 @@ App\Services\UserService has 1 violations
 
         ArchRuleTestCase::assertArchRule($rule, $set);
     }
+
+    public function test_assertion_should_fail_on_parser_errors(): void
+    {
+        $set = ClassSet::fromDir(__DIR__.'/../_fixtures/parse_error');
+
+        $rule = Rule::allClasses()
+            ->that(new ResideInOneOfTheseNamespaces('App\Controller', 'App\Services'))
+            ->should(new Implement('ContainerAwareInterface'))
+            ->because('i said so');
+
+        $expectedExceptionMessage = "Syntax error, unexpected T_STRING, expecting '{' on line 8 in file: Services/CartService.php";
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage($expectedExceptionMessage);
+
+        ArchRuleTestCase::assertArchRule($rule, $set);
+    }
 }
