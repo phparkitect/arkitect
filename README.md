@@ -102,6 +102,12 @@ phparkitect check --ignore-baseline-linenumbers
 
 *Warning*: When ignoring line numbers, phparkitect can no longer discover if a rule is violated additional times in the same file.
 
+## Output format
+
+Output format can be controlled using the parameter `format=[FORMAT]`. There are two available output formats
+* `text`: the default one
+* `json`: this follows Gitlab's [code quality format](https://docs.gitlab.com/ci/testing/code_quality/#code-quality-report-format). Note that this will suppress any output apart from the violation reporting.
+
 ## Configuration
 
 Example of configuration file `phparkitect.php`
