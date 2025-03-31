@@ -94,7 +94,7 @@ class Check extends Command
                 self::FORMAT_PARAM,
                 'f',
                 InputOption::VALUE_OPTIONAL,
-                'Output format: json or text (default)',
+                'Output format: text (default), json, gitlab',
                 'text'
             );
     }
@@ -112,7 +112,7 @@ class Check extends Command
             $skipBaseline = (bool) $input->getOption(self::SKIP_BASELINE_PARAM);
             $ignoreBaselineLinenumbers = (bool) $input->getOption(self::IGNORE_BASELINE_LINENUMBERS_PARAM);
             $format = $input->getOption(self::FORMAT_PARAM);
-            $onlyErrors = Printer::FORMAT_JSON === $format;
+            $onlyErrors = Printer::FORMAT_JSON === $format || Printer::FORMAT_GITLAB === $format;
 
             if (true !== $skipBaseline && !$useBaseline && file_exists(self::DEFAULT_BASELINE_FILENAME)) {
                 $useBaseline = self::DEFAULT_BASELINE_FILENAME;

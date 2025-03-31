@@ -8,6 +8,8 @@ final class PrinterFactory
     public function create(string $format): Printer
     {
         switch ($format) {
+            case 'gitlab':
+                return new GitlabPrinter();
             case 'json':
                 return new JsonPrinter();
             default:

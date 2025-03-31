@@ -195,6 +195,32 @@ App\Controller\Foo has 1 violations
         $this->assertCount(0, $json);
     }
 
+    public function test_gitlab_format_output(): void
+    {
+        $configFilePath = __DIR__.'/../_fixtures/configMvcForYieldBug.php';
+
+        $cmdTester = $this->runCheck($configFilePath, null, null, false, false, false, 'gitlab');
+
+        $this->assertCheckHasErrors($cmdTester);
+
+        $display = $cmdTester->getDisplay();
+
+        $this->assertJson($display);
+
+        $decodedResult = json_decode($display, true);
+
+        $this->assertIsString($display, 'Result should be a string');
+        $this->assertJson($display, 'Result should be a valid JSON string');
+        $this->assertCount(1, $decodedResult, 'Result should contain two violations');
+
+        $this->assertSame('should have a name that matches *Controller because all controllers should be end name with Controller', $decodedResult[0]['description']);
+        $this->assertSame('App\Controller\Foo.should-have-a-name-that-matches-controller-because-all-controllers-should-be-end-name-with-controller', $decodedResult[0]['check_name']);
+        $this->assertSame(hash('sha256', 'App\Controller\Foo.should-have-a-name-that-matches-controller-because-all-controllers-should-be-end-name-with-controller'), $decodedResult[0]['fingerprint']);
+        $this->assertSame('major', $decodedResult[0]['severity']);
+        $this->assertSame(getcwd().'/tests/E2E/_fixtures/mvc/Controller/Foo.php', $decodedResult[0]['location']['path']);
+        $this->assertSame(1, $decodedResult[0]['lines']['begin']);
+    }
+
     protected function runCheck(
         $configFilePath = null,
         ?bool $stopOnFailure = null,
