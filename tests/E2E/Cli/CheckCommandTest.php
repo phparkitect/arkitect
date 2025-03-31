@@ -221,6 +221,22 @@ App\Controller\Foo has 1 violations
         $this->assertSame(1, $decodedResult[0]['lines']['begin']);
     }
 
+    public function test_gitlab_format_output_no_errors(): void
+    {
+        $configFilePath = __DIR__.'/../_fixtures/configMvcWithoutErrors.php';
+
+        $cmdTester = $this->runCheck($configFilePath, null, null, false, false, false, 'gitlab');
+
+        $this->assertCheckHasSuccess($cmdTester);
+
+        $display = $cmdTester->getDisplay();
+
+        $this->assertJson($display);
+
+        $json = json_decode($display, true);
+        $this->assertCount(0, $json);
+    }
+
     protected function runCheck(
         $configFilePath = null,
         ?bool $stopOnFailure = null,

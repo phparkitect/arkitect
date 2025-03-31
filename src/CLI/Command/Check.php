@@ -285,7 +285,7 @@ class Check extends Command
     {
         if (!$onlyErrors) {
             $output->writeln('<info>NO VIOLATIONS DETECTED!</info>');
-        } elseif (Printer::FORMAT_JSON === $format) {
+        } elseif (Printer::FORMAT_JSON === $format || Printer::FORMAT_GITLAB === $format) {
             $output->writeln('<info>[]</info>');
         }
     }
