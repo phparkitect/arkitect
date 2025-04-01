@@ -16,7 +16,7 @@ class NotImplementTest extends TestCase
         $implementConstraint = new NotImplement('interface');
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
             ->build();
 
         $because = 'we want to add this rule for our software';
@@ -31,7 +31,7 @@ class NotImplementTest extends TestCase
         $implementConstraint = new NotImplement('interface');
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
             ->addExtends('foo', 1)
             ->build();
 
@@ -47,7 +47,7 @@ class NotImplementTest extends TestCase
         $implementConstraint = new NotImplement('interface');
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
             ->addInterface('interface', 1)
             ->build();
 
@@ -69,7 +69,7 @@ class NotImplementTest extends TestCase
         $implementConstraint = new NotImplement('interface');
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
             ->setInterface(true)
             ->build();
 

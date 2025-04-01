@@ -35,7 +35,7 @@ class ConstraintsTest extends TestCase
         $because = 'we want to add this rule for our software';
 
         $cb = new ClassDescriptionBuilder();
-        $cb->setClassName('Banana');
+        $cb->setFilePath('src/Foo.php')->setClassName('Banana');
 
         $expressionStore->checkAll(
             $cb->build(),
@@ -71,7 +71,7 @@ class ConstraintsTest extends TestCase
         $because = 'we want to add this rule for our software';
 
         $cb = new ClassDescriptionBuilder();
-        $cb->setClassName('Banana');
+        $cb->setFilePath('src/Foo.php')->setClassName('Banana');
 
         $expressionStore->checkAll(
             $cb->build(),

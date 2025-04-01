@@ -16,7 +16,7 @@ class NotExtendTest extends TestCase
         $notExtend = new NotExtend('My\BaseClass');
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
             ->addExtends('My\BaseClass', 1)
             ->build();
 
@@ -35,7 +35,7 @@ class NotExtendTest extends TestCase
         $notExtend = new NotExtend('My\BaseClass');
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
             ->addExtends('My\AnotherClass', 1)
             ->build();
 
@@ -52,7 +52,7 @@ class NotExtendTest extends TestCase
         $notExtend = new NotExtend('My\FirstExtend', 'My\SecondExtend');
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
             ->addExtends('My\SecondExtend', 1)
             ->build();
 

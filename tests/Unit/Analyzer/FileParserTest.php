@@ -26,6 +26,7 @@ class FileParserTest extends TestCase
         $traverser->addVisitor($nameResolver);
         $traverser->addVisitor($fileVisitor);
 
+        $fileVisitor->setFilePath('foo')->shouldBeCalled();
         $fileVisitor->clearParsedClassDescriptions()->shouldBeCalled();
 
         $fileParser = new FileParser(
@@ -52,6 +53,7 @@ class FileParserTest extends TestCase
         $traverser->addVisitor($nameResolver);
         $traverser->addVisitor($fileVisitor);
 
+        $fileVisitor->setFilePath('foo')->shouldBeCalled();
         $fileVisitor->clearParsedClassDescriptions()->shouldBeCalled();
 
         $fileParser = new FileParser(

@@ -16,7 +16,7 @@ class NotContainDocBlockLikeTest extends TestCase
         $expression = new NotContainDocBlockLike('anotherDocBlock');
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
             ->addDocBlock('/**  */myDocBlock with other information')
             ->build();
 
@@ -36,7 +36,7 @@ class NotContainDocBlockLikeTest extends TestCase
         $expression = new NotContainDocBlockLike('anotherDocBlock');
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
             ->addDocBlock('/**  */myDocBlock with other information')
             ->build();
 
@@ -55,7 +55,7 @@ class NotContainDocBlockLikeTest extends TestCase
         $expression = new NotContainDocBlockLike('myDocBlock');
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
             ->addDocBlock('/**  */myDocBlock with other information')
             ->build();
 

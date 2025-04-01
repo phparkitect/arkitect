@@ -16,7 +16,7 @@ class IsTraitTest extends TestCase
         $isFinal = new IsTrait();
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
             ->build();
 
         $because = 'we want to add this rule for our software';
@@ -34,7 +34,7 @@ class IsTraitTest extends TestCase
         $isFinal = new IsTrait();
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
             ->setTrait(true)
             ->build();
 

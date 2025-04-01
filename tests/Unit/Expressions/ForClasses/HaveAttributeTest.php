@@ -16,7 +16,7 @@ class HaveAttributeTest extends TestCase
         $expression = new HaveAttribute('myAttribute');
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setClassName('HappyIsland\Myclass')
+            ->setFilePath('src/Foo.php')->setClassName('HappyIsland\Myclass')
             ->addAttribute('myAttribute', 1)
             ->build();
 
@@ -36,7 +36,7 @@ class HaveAttributeTest extends TestCase
         $expression = new HaveAttribute('myAttribute');
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setClassName('HappyIsland\Myclass')
+            ->setFilePath('src/Foo.php')->setClassName('HappyIsland\Myclass')
             ->addAttribute('myAttribute', 1)
             ->build();
 
@@ -55,7 +55,7 @@ class HaveAttributeTest extends TestCase
         $expression = new HaveAttribute('anotherAttribute');
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setClassName('HappyIsland\Myclass')
+            ->setFilePath('src/Foo.php')->setClassName('HappyIsland\Myclass')
             ->addAttribute('myAttribute', 1)
             ->build();
 

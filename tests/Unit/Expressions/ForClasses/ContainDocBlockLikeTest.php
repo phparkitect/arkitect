@@ -16,7 +16,7 @@ class ContainDocBlockLikeTest extends TestCase
         $expression = new ContainDocBlockLike('myDocBlock');
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setClassName('HappyIsland\Myclass')
+            ->setFilePath('src/Foo.php')->setClassName('HappyIsland\Myclass')
             ->addDocBlock('/**  */myDocBlock with other information')
             ->build();
 
@@ -36,7 +36,7 @@ class ContainDocBlockLikeTest extends TestCase
         $expression = new ContainDocBlockLike('anotherDocBlock');
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setClassName('HappyIsland\Myclass')
+            ->setFilePath('src/Foo.php')->setClassName('HappyIsland\Myclass')
             ->addDocBlock('/**  */myDocBlock with other information')
             ->build();
 

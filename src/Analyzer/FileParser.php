@@ -50,6 +50,7 @@ class FileParser implements Parser
         $this->parsingErrors = [];
         try {
             $this->fileVisitor->clearParsedClassDescriptions();
+            $this->fileVisitor->setFilePath($filename);
 
             $errorHandler = new Collecting();
             $stmts = $this->parser->parse($fileContent, $errorHandler);

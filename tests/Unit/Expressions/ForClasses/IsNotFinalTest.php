@@ -16,7 +16,7 @@ class IsNotFinalTest extends TestCase
         $isFinal = new IsNotFinal();
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
             ->setFinal(true)
             ->build();
 
