@@ -200,7 +200,7 @@ class Check extends Command
             return self::ERROR_CODE;
         }
 
-        $this->printNoViolationsDetectedMessage($output, $onlyErrors);
+        $this->printNoViolationsDetectedMessage($output, $onlyErrors, $format);
 
         if (!$onlyErrors) {
             $this->printExecutionTime($output, $startTime);
@@ -266,6 +266,7 @@ class Check extends Command
         if (!$onlyErrors) {
             $output->writeln('<error>ERRORS!</error>');
         }
+
         $output->writeln(sprintf('%s', $violations->toString($format)));
         if (!$onlyErrors) {
             $output->writeln(sprintf('<error>%s VIOLATIONS DETECTED!</error>', \count($violations)));
@@ -280,10 +281,12 @@ class Check extends Command
         $output->writeln(sprintf('%s', $parsingErrors->toString()));
     }
 
-    private function printNoViolationsDetectedMessage(OutputInterface $output, bool $onlyErrors = false): void
+    private function printNoViolationsDetectedMessage(OutputInterface $output, bool $onlyErrors = false, string $format = Printer::FORMAT_TEXT): void
     {
         if (!$onlyErrors) {
             $output->writeln('<info>NO VIOLATIONS DETECTED!</info>');
+        } elseif (Printer::FORMAT_JSON === $format) {
+            $output->writeln('<info>[]</info>');
         }
     }
 }

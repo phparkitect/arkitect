@@ -179,6 +179,22 @@ App\Controller\Foo has 1 violations
         $this->assertJson($display);
     }
 
+    public function test_json_format_output_no_errors(): void
+    {
+        $configFilePath = __DIR__.'/../_fixtures/configMvcWithoutErrors.php';
+
+        $cmdTester = $this->runCheck($configFilePath, null, null, false, false, false, 'json');
+
+        $this->assertCheckHasSuccess($cmdTester);
+
+        $display = $cmdTester->getDisplay();
+
+        $this->assertJson($display);
+
+        $json = json_decode($display, true);
+        $this->assertCount(0, $json);
+    }
+
     protected function runCheck(
         $configFilePath = null,
         ?bool $stopOnFailure = null,
