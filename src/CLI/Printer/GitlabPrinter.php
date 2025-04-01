@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Arkitect\CLI\Printer;
 
 use Arkitect\Rules\Violation;
+use Symfony\Component\Filesystem\Path;
 
 class GitlabPrinter implements Printer
 {
@@ -25,7 +26,7 @@ class GitlabPrinter implements Printer
                 $errorClassGrouped[$class][$key]['check_name'] = $class.'.'.$this->toKebabCase($violation->getError());
                 $errorClassGrouped[$class][$key]['fingerprint'] = hash('sha256', $errorClassGrouped[$class][$key]['check_name']);
                 $errorClassGrouped[$class][$key]['severity'] = 'major'; // Todo enable severity on violation
-                $errorClassGrouped[$class][$key]['location']['path'] = $this->getPathFromFqcn($fqcn);
+                $errorClassGrouped[$class][$key]['location']['path'] = Path::makeRelative($this->getPathFromFqcn($fqcn), getcwd());
 
                 if (null !== $violation->getLine()) {
                     $errorClassGrouped[$class][$key]['lines']['begin'] = $violation->getLine();

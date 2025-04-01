@@ -8,9 +8,9 @@ final class PrinterFactory
     public function create(string $format): Printer
     {
         switch ($format) {
-            case 'gitlab':
+            case Printer::FORMAT_GITLAB:
                 return new GitlabPrinter();
-            case 'json':
+            case Printer::FORMAT_JSON:
                 return new JsonPrinter();
             default:
                 return new TextPrinter();
