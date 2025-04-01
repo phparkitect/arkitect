@@ -15,7 +15,8 @@ class IsEnumTest extends TestCase
         $isEnum = new IsEnum();
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
             ->build();
 
         $because = 'we want to add this rule for our software';
@@ -33,7 +34,8 @@ class IsEnumTest extends TestCase
         $isEnum = new IsEnum();
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
             ->setEnum(true)
             ->build();
 

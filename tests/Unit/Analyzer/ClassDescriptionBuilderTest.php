@@ -16,7 +16,8 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'HappyIsland';
         $classDescriptionBuilder = new ClassDescriptionBuilder();
-        $classDescriptionBuilder->setFilePath('src/Foo.php')->setClassName($FQCN);
+        $classDescriptionBuilder->setFilePath('src/Foo.php')
+            ->setClassName($FQCN);
 
         $classDependency = new ClassDependency('DepClass', 10);
 
@@ -35,7 +36,8 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'HappyIsland';
         $classDescriptionBuilder = new ClassDescriptionBuilder();
-        $classDescriptionBuilder->setFilePath('src/Foo.php')->setClassName($FQCN);
+        $classDescriptionBuilder->setFilePath('src/Foo.php')
+            ->setClassName($FQCN);
         $classDescriptionBuilder->setFinal(true);
 
         $classDescription = $classDescriptionBuilder->build();
@@ -49,7 +51,8 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'HappyIsland';
         $classDescriptionBuilder = new ClassDescriptionBuilder();
-        $classDescriptionBuilder->setFilePath('src/Foo.php')->setClassName($FQCN);
+        $classDescriptionBuilder->setFilePath('src/Foo.php')
+            ->setClassName($FQCN);
         $classDescriptionBuilder->setFinal(false);
 
         $classDescription = $classDescriptionBuilder->build();
@@ -63,7 +66,8 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'HappyIsland';
         $classDescriptionBuilder = new ClassDescriptionBuilder();
-        $classDescriptionBuilder->setFilePath('src/Foo.php')->setClassName($FQCN);
+        $classDescriptionBuilder->setFilePath('src/Foo.php')
+            ->setClassName($FQCN);
         $classDescriptionBuilder->setAbstract(true);
 
         $classDescription = $classDescriptionBuilder->build();
@@ -77,7 +81,8 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'HappyIsland';
         $classDescriptionBuilder = new ClassDescriptionBuilder();
-        $classDescriptionBuilder->setFilePath('src/Foo.php')->setClassName($FQCN);
+        $classDescriptionBuilder->setFilePath('src/Foo.php')
+            ->setClassName($FQCN);
         $classDescriptionBuilder->setAbstract(false);
 
         $classDescription = $classDescriptionBuilder->build();
@@ -91,7 +96,8 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'HappyIsland';
         $classDescriptionBuilder = new ClassDescriptionBuilder();
-        $classDescriptionBuilder->setFilePath('src/Foo.php')->setClassName($FQCN);
+        $classDescriptionBuilder->setFilePath('src/Foo.php')
+            ->setClassName($FQCN);
         $classDescriptionBuilder->addDocBlock('/**
  * @psalm-immutable
  */');
@@ -112,7 +118,8 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'HappyIsland';
         $classDescriptionBuilder = new ClassDescriptionBuilder();
-        $classDescriptionBuilder->setFilePath('src/Foo.php')->setClassName($FQCN);
+        $classDescriptionBuilder->setFilePath('src/Foo.php')
+            ->setClassName($FQCN);
         $classDescriptionBuilder->addAttribute('AttrClass', 27);
 
         $classDescription = $classDescriptionBuilder->build();
@@ -127,7 +134,8 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'HappyIsland';
         $classDescriptionBuilder = new ClassDescriptionBuilder();
-        $classDescriptionBuilder->setFilePath('src/Foo.php')->setClassName($FQCN);
+        $classDescriptionBuilder->setFilePath('src/Foo.php')
+            ->setClassName($FQCN);
         $classDescriptionBuilder->setInterface(true);
 
         $classDescription = $classDescriptionBuilder->build();
@@ -141,7 +149,8 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'HappyIsland';
         $classDescriptionBuilder = new ClassDescriptionBuilder();
-        $classDescriptionBuilder->setFilePath('src/Foo.php')->setClassName($FQCN);
+        $classDescriptionBuilder->setFilePath('src/Foo.php')
+            ->setClassName($FQCN);
         $classDescriptionBuilder->setInterface(false);
 
         $classDescription = $classDescriptionBuilder->build();
@@ -155,7 +164,8 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'HappyIsland';
         $classDescriptionBuilder = new ClassDescriptionBuilder();
-        $classDescriptionBuilder->setFilePath('src/Foo.php')->setClassName($FQCN);
+        $classDescriptionBuilder->setFilePath('src/Foo.php')
+            ->setClassName($FQCN);
         $classDescriptionBuilder->setTrait(true);
 
         $classDescription = $classDescriptionBuilder->build();
@@ -169,7 +179,8 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'HappyIsland';
         $classDescriptionBuilder = new ClassDescriptionBuilder();
-        $classDescriptionBuilder->setFilePath('src/Foo.php')->setClassName($FQCN);
+        $classDescriptionBuilder->setFilePath('src/Foo.php')
+            ->setClassName($FQCN);
         $classDescriptionBuilder->setTrait(false);
 
         $classDescription = $classDescriptionBuilder->build();

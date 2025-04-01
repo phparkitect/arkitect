@@ -16,7 +16,8 @@ class IsInterfaceTest extends TestCase
         $isFinal = new IsInterface();
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
             ->build();
 
         $because = 'we want to add this rule for our software';
@@ -34,7 +35,8 @@ class IsInterfaceTest extends TestCase
         $isFinal = new IsInterface();
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
             ->setInterface(true)
             ->build();
 

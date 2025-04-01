@@ -17,7 +17,8 @@ class IsAbstractTest extends TestCase
         $isAbstract = new IsAbstract();
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
             ->build();
 
         $because = 'we want to add this rule for our software';
@@ -35,7 +36,8 @@ class IsAbstractTest extends TestCase
         $isAbstract = new IsAbstract();
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
             ->setFinal(true)
             ->setReadonly(true)
             ->setAbstract(true)
@@ -54,7 +56,8 @@ class IsAbstractTest extends TestCase
         $isNotAbstract = new IsNotAbstract();
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
             ->setInterface(true)
             ->build();
 
@@ -68,7 +71,8 @@ class IsAbstractTest extends TestCase
         $isNotAbstract = new IsNotAbstract();
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
             ->setTrait(true)
             ->build();
 
@@ -82,7 +86,8 @@ class IsAbstractTest extends TestCase
         $isNotAbstract = new IsNotAbstract();
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
             ->setEnum(true)
             ->build();
 
@@ -96,7 +101,8 @@ class IsAbstractTest extends TestCase
         $isNotAbstract = new IsNotAbstract();
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
             ->setFinal(true)
             ->build();
 

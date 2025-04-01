@@ -17,7 +17,8 @@ class IsReadonlyTest extends TestCase
         $isReadonly = new IsReadonly();
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
             ->build();
 
         $because = 'we want to add this rule for our software';
@@ -31,7 +32,8 @@ class IsReadonlyTest extends TestCase
         $isReadonly = new IsReadonly();
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
             ->setReadonly(true)
             ->build();
 
@@ -48,7 +50,8 @@ class IsReadonlyTest extends TestCase
         $isNotReadonly = new IsNotReadonly();
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
             ->setInterface(true)
             ->build();
 
@@ -62,7 +65,8 @@ class IsReadonlyTest extends TestCase
         $isNotReadonly = new IsNotReadonly();
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
             ->setTrait(true)
             ->build();
 
@@ -76,7 +80,8 @@ class IsReadonlyTest extends TestCase
         $isNotReadonly = new IsNotReadonly();
 
         $classDescription = (new ClassDescriptionBuilder())
-            ->setFilePath('src/Foo.php')->setClassName('HappyIsland')
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
             ->setEnum(true)
             ->build();
 
