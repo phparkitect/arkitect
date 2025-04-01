@@ -6,14 +6,11 @@ namespace Arkitect\Rules;
 
 class Violation implements \JsonSerializable
 {
-    /** @var string */
-    private $fqcn;
+    private string $fqcn;
 
-    /** @var int|null */
-    private $line;
+    private ?int $line;
 
-    /** @var string */
-    private $error;
+    private string $error;
 
     public function __construct(string $fqcn, string $error, ?int $line = null)
     {

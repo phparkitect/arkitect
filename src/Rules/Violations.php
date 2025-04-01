@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Arkitect\Rules;
 
 use Arkitect\CLI\Printer\PrinterFactory;
-use Arkitect\Exceptions\FailOnFirstViolationException;
 use Arkitect\Exceptions\IndexNotFoundException;
 
 /**
@@ -16,24 +15,18 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
     /**
      * @var Violation[]
      */
-    private $violations;
+    private array $violations;
 
-    /**
-     * @var bool
-     */
-    private $stopOnFailure;
-
-    public function __construct(bool $stopOnFailure = false)
+    public function __construct()
     {
         $this->violations = [];
-        $this->stopOnFailure = $stopOnFailure;
     }
 
     public static function fromJson(string $json): self
     {
         $json = json_decode($json, true);
 
-        $instance = new self($json['stopOnFailure']);
+        $instance = new self();
 
         $instance->violations = array_map(function (array $json): Violation {
             return Violation::fromJson($json);
@@ -45,9 +38,11 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
     public function add(Violation $violation): void
     {
         $this->violations[] = $violation;
-        if ($this->stopOnFailure) {
-            throw new FailOnFirstViolationException();
-        }
+    }
+
+    public function merge(self $other): void
+    {
+        $this->violations = array_merge($this->violations, $other->toArray());
     }
 
     public function get(int $index): Violation
