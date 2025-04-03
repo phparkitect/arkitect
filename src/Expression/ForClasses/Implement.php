@@ -47,7 +47,8 @@ class Implement implements Expression
         if (0 === \count(array_filter($interfaces, $implements))) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
-                ViolationMessage::selfExplanatory($this->describe($theClass, $because))
+                ViolationMessage::selfExplanatory($this->describe($theClass, $because)),
+                $theClass->getFilePath()
             );
             $violations->add($violation);
         }

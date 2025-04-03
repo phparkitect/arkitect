@@ -15,7 +15,7 @@ use Arkitect\Rules\Violations;
 class NotDependsOnTheseNamespaces implements Expression
 {
     /** @var string[] */
-    private $namespaces;
+    private array $namespaces;
 
     public function __construct(string ...$namespace)
     {
@@ -46,7 +46,8 @@ class NotDependsOnTheseNamespaces implements Expression
                         $this->describe($theClass, $because),
                         "depends on {$dependency->getFQCN()->toString()}"
                     ),
-                    $dependency->getLine()
+                    $dependency->getLine(),
+                    $theClass->getFilePath()
                 );
 
                 $violations->add($violation);

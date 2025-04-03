@@ -21,24 +21,68 @@ use PHPUnit\Framework\TestCase;
 
 class FileVisitorTest extends TestCase
 {
+    public function test_should_parse_empty_file(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+        EOF;
+
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp->parse($code, 'path/to/class.php');
+
+        $this->assertEmpty($fp->getClassDescriptions());
+    }
+
+    public function test_violation_should_have_ref_to_filepath(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+        namespace Foo\Bar;
+
+        use Doctrine\MongoDB\Collection;
+        use Foo\Baz\Baz;
+        use Symfony\Component\HttpFoundation\Request;
+
+        class MyClass implements Baz
+        {
+            public function __construct(Request $request)
+            {
+                $collection = new Collection($request);
+            }
+        }
+        EOF;
+
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp->parse($code, 'path/to/class.php');
+
+        $violations = new Violations();
+
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Foo');
+        $dependsOnTheseNamespaces->evaluate($fp->getClassDescriptions()[0], $violations, 'because');
+
+        $this->assertCount(2, $violations);
+        $this->assertEquals('path/to/class.php', $violations->get(0)->getFilePath());
+        $this->assertEquals('path/to/class.php', $violations->get(1)->getFilePath());
+    }
+
     public function test_should_create_a_class_description(): void
     {
         $code = <<< 'EOF'
-<?php
+        <?php
 
-namespace Root\Namespace1;
+        namespace Root\Namespace1;
 
-use Root\Namespace2\D;
+        use Root\Namespace2\D;
 
-class Dog implements AnInterface, InterfaceTwo
-{
-}
+        class Dog implements AnInterface, InterfaceTwo
+        {
+        }
 
-class Cat implements AnInterface
-{
+        class Cat implements AnInterface
+        {
 
-}
-EOF;
+        }
+        EOF;
 
         /** @var FileParser $fp */
         $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
@@ -53,37 +97,37 @@ EOF;
     public function test_should_create_a_class_description_and_parse_anonymous_class(): void
     {
         $code = <<< 'EOF'
-<?php
+        <?php
 
-namespace Root\Namespace1;
+        namespace Root\Namespace1;
 
-use Root\Namespace2\D;
+        use Root\Namespace2\D;
 
-class Dog implements AnInterface, InterfaceTwo
-{
-    public function foo()
-    {
-        $projector2 = new class() implements Another\ForbiddenInterface
+        class Dog implements AnInterface, InterfaceTwo
+        {
+            public function foo()
             {
-                public function applyDummyDomainEvent(int $anInteger): void
-                {
-                }
+                $projector2 = new class() implements Another\ForbiddenInterface
+                    {
+                        public function applyDummyDomainEvent(int $anInteger): void
+                        {
+                        }
 
-                public function getEventsTypes(): string
-                {
-                    return "";
-                }
-            };
+                        public function getEventsTypes(): string
+                        {
+                            return "";
+                        }
+                    };
 
-            $projector = new Proj();
-    }
-}
+                    $projector = new Proj();
+            }
+        }
 
-class Cat implements AnInterface
-{
+        class Cat implements AnInterface
+        {
 
-}
-EOF;
+        }
+        EOF;
 
         /** @var FileParser $fp */
         $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
@@ -133,22 +177,22 @@ EOF;
     public function test_it_should_not_parse_extends_from_insider_anonymousclass(): void
     {
         $code = <<< 'EOF'
-<?php
+        <?php
 
-namespace Root\Animals;
+        namespace Root\Animals;
 
-class Animal
-{
-}
+        class Animal
+        {
+        }
 
-class Cat extends Animal
-{
-    public function methodWithAnonymous(): void
-    {
-        $obj = new class extends \stdClass {};
-    }
-}
-EOF;
+        class Cat extends Animal
+        {
+            public function methodWithAnonymous(): void
+            {
+                $obj = new class extends \stdClass {};
+            }
+        }
+        EOF;
 
         /** @var FileParser $fp */
         $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
@@ -162,21 +206,21 @@ EOF;
     public function test_should_depends_on_these_namespaces(): void
     {
         $code = <<< 'EOF'
-<?php
-namespace Foo\Bar;
+        <?php
+        namespace Foo\Bar;
 
-use Doctrine\MongoDB\Collection;
-use Foo\Baz\Baz;
-use Symfony\Component\HttpFoundation\Request;
+        use Doctrine\MongoDB\Collection;
+        use Foo\Baz\Baz;
+        use Symfony\Component\HttpFoundation\Request;
 
-class MyClass implements Baz
-{
-    public function __construct(Request $request)
-    {
-        $collection = new Collection($request);
-    }
-}
-EOF;
+        class MyClass implements Baz
+        {
+            public function __construct(Request $request)
+            {
+                $collection = new Collection($request);
+            }
+        }
+        EOF;
 
         /** @var FileParser $fp */
         $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
@@ -194,24 +238,24 @@ EOF;
     public function test_should_returns_all_dependencies(): void
     {
         $code = <<< 'EOF'
-<?php
-namespace Foo\Bar;
+        <?php
+        namespace Foo\Bar;
 
-use Doctrine\MongoDB\Collection;
-use Foo\Baz\Baz;
-use Symfony\Component\HttpFoundation\Request;
-use Foo\Baz\StaticClass;
-use Foo\Baz\Nullable;
+        use Doctrine\MongoDB\Collection;
+        use Foo\Baz\Baz;
+        use Symfony\Component\HttpFoundation\Request;
+        use Foo\Baz\StaticClass;
+        use Foo\Baz\Nullable;
 
-class MyClass implements Baz
-{
-    public function __construct(Request $request, ?Nullable $nullable)
-    {
-        $collection = new Collection($request);
-        $static = StaticClass::foo();
-    }
-}
-EOF;
+        class MyClass implements Baz
+        {
+            public function __construct(Request $request, ?Nullable $nullable)
+            {
+                $collection = new Collection($request);
+                $static = StaticClass::foo();
+            }
+        }
+        EOF;
 
         /** @var FileParser $fp */
         $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
@@ -229,25 +273,22 @@ EOF;
         $this->assertEquals($expectedDependencies, $cd[0]->getDependencies());
     }
 
-    /**
-     * @requires PHP >= 7.4
-     */
     public function test_it_should_parse_arrow_function(): void
     {
         $code = <<< 'EOF'
-<?php
+        <?php
 
-namespace Root\Animals;
+        namespace Root\Animals;
 
-class Animal
-{
-    public function __construct()
-    {
-        $y = 1;
-        $fn1 = fn($x) => $x + $y;
-    }
-}
-EOF;
+        class Animal
+        {
+            public function __construct()
+            {
+                $y = 1;
+                $fn1 = fn($x) => $x + $y;
+            }
+        }
+        EOF;
 
         /** @var FileParser $fp */
         $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
@@ -266,18 +307,18 @@ EOF;
     public function test_it_should_catch_parsing_errors(): void
     {
         $code = <<< 'EOF'
-<?php
+        <?php
 
-namespace Root\Animals;
+        namespace Root\Animals;
 
-class Animal
-{
-    public function __construct()
-    {
-       FOO
-    }
-}
-EOF;
+        class Animal
+        {
+            public function __construct()
+            {
+            FOO
+            }
+        }
+        EOF;
 
         /** @var FileParser $fp */
         $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
@@ -292,22 +333,22 @@ EOF;
     public function test_null_class_description_builder(): void
     {
         $code = <<< 'EOF'
-<?php
+        <?php
 
-declare(strict_types=1);
+        declare(strict_types=1);
 
-namespace App\Application\Command;
+        namespace App\Application\Command;
 
-use App\Domain\Quote\Quote;
+        use App\Domain\Quote\Quote;
 
-interface QuoteCommandInterface
-{
-    /**
-     * Save a stock quote.
-     */
-    public function save(Quote $quote): void;
-}
-EOF;
+        interface QuoteCommandInterface
+        {
+            /**
+             * Save a stock quote.
+             */
+            public function save(Quote $quote): void;
+        }
+        EOF;
 
         /** @var FileParser $fp */
         $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
@@ -321,26 +362,26 @@ EOF;
     public function test_it_should_parse_self_correctly(): void
     {
         $code = <<< 'EOF'
-<?php
+        <?php
 
-namespace Root\Animals;
+        namespace Root\Animals;
 
-class Tiger extends Animal
-{
-    public function foo()
-    {
-       self::bar();
-       static::bar();
-       parent::baz();
-    }
-    public static function bar()
-    {
-    }
-    public function doSomething(self $self, static $static)
-    {
-    }
-}
-EOF;
+        class Tiger extends Animal
+        {
+            public function foo()
+            {
+            self::bar();
+            static::bar();
+            parent::baz();
+            }
+            public static function bar()
+            {
+            }
+            public function doSomething(self $self, static $static)
+            {
+            }
+        }
+        EOF;
 
         /** @var FileParser $fp */
         $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
@@ -359,21 +400,21 @@ EOF;
     public function test_it_should_return_errors_for_class_outside_namespace(): void
     {
         $code = <<< 'EOF'
-<?php
+        <?php
 
-namespace MyNamespace\MyClasses;
+        namespace MyNamespace\MyClasses;
 
-use AnotherNamespace\Baz;
+        use AnotherNamespace\Baz;
 
-class Foo
-{
-    public function foo()
-    {
-        $bar = new Bar();
-        $baz = new Baz();
-    }
-}
-EOF;
+        class Foo
+        {
+            public function foo()
+            {
+                $bar = new Bar();
+                $baz = new Baz();
+            }
+        }
+        EOF;
 
         /** @var FileParser $fp */
         $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));

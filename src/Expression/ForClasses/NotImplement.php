@@ -47,7 +47,8 @@ class NotImplement implements Expression
         if (\count(array_filter($interfaces, $implements)) > 0) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
-                ViolationMessage::selfExplanatory($this->describe($theClass, $because))
+                ViolationMessage::selfExplanatory($this->describe($theClass, $because)),
+                $theClass->getFilePath()
             );
             $violations->add($violation);
         }
