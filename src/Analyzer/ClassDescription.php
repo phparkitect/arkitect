@@ -74,11 +74,11 @@ class ClassDescription
         $this->enum = $enum;
     }
 
-    public static function getBuilder(string $FQCN, string $relativeFilePath): ClassDescriptionBuilder
+    public static function getBuilder(string $FQCN, string $filePath): ClassDescriptionBuilder
     {
         $cb = new ClassDescriptionBuilder();
         $cb->setClassName($FQCN);
-        $cb->setFilePath($relativeFilePath);
+        $cb->setFilePath($filePath);
 
         return $cb;
     }

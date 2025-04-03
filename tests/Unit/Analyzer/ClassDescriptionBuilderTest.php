@@ -15,14 +15,13 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_create_builder_with_dependency_and_interface(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = new ClassDescriptionBuilder();
-        $classDescriptionBuilder
+
+        $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
             ->addDependency(new ClassDependency('DepClass', 10))
-            ->addInterface('InterfaceClass', 10);
-
-        $classDescription = $classDescriptionBuilder->build();
+            ->addInterface('InterfaceClass', 10)
+            ->build();
 
         $this->assertInstanceOf(ClassDescription::class, $classDescription);
 
@@ -33,13 +32,12 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_create_final_class(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = new ClassDescriptionBuilder();
-        $classDescriptionBuilder
+
+        $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
-            ->setFinal(true);
-
-        $classDescription = $classDescriptionBuilder->build();
+            ->setFinal(true)
+            ->build();
 
         $this->assertInstanceOf(ClassDescription::class, $classDescription);
 
@@ -49,13 +47,12 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_create_not_final_class(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = new ClassDescriptionBuilder();
-        $classDescriptionBuilder
+
+        $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
-            ->setFinal(false);
-
-        $classDescription = $classDescriptionBuilder->build();
+            ->setFinal(false)
+            ->build();
 
         $this->assertInstanceOf(ClassDescription::class, $classDescription);
 
@@ -65,13 +62,12 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_create_abstract_class(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = new ClassDescriptionBuilder();
-        $classDescriptionBuilder
+
+        $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
-            ->setAbstract(true);
-
-        $classDescription = $classDescriptionBuilder->build();
+            ->setAbstract(true)
+            ->build();
 
         $this->assertInstanceOf(ClassDescription::class, $classDescription);
 
@@ -81,13 +77,12 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_create_not_abstract_class(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = new ClassDescriptionBuilder();
-        $classDescriptionBuilder
+
+        $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
-            ->setAbstract(false);
-
-        $classDescription = $classDescriptionBuilder->build();
+            ->setAbstract(false)
+            ->build();
 
         $this->assertInstanceOf(ClassDescription::class, $classDescription);
 
@@ -97,36 +92,32 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_create_annotated_class(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = new ClassDescriptionBuilder();
-        $classDescriptionBuilder
+
+        $docBlock = <<< 'EOT'
+        /**
+         * @psalm-immutable
+         */
+        EOT;
+
+        $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
-            ->addDocBlock('/**
- * @psalm-immutable
- */');
-
-        $classDescription = $classDescriptionBuilder->build();
+            ->addDocBlock($docBlock)
+            ->build();
 
         $this->assertInstanceOf(ClassDescription::class, $classDescription);
-
-        $this->assertEquals(
-            ['/**
- * @psalm-immutable
- */'],
-            $classDescription->getDocBlock()
-        );
+        $this->assertEquals([$docBlock], $classDescription->getDocBlock());
     }
 
     public function test_it_should_add_attributes(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = new ClassDescriptionBuilder();
-        $classDescriptionBuilder
+
+        $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
-            ->addAttribute('AttrClass', 27);
-
-        $classDescription = $classDescriptionBuilder->build();
+            ->addAttribute('AttrClass', 27)
+            ->build();
 
         self::assertEquals(
             [FullyQualifiedClassName::fromString('AttrClass')],
@@ -137,63 +128,56 @@ class ClassDescriptionBuilderTest extends TestCase
     public function test_it_should_create_interface(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = new ClassDescriptionBuilder();
-        $classDescriptionBuilder
+
+        $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
-            ->setInterface(true);
-
-        $classDescription = $classDescriptionBuilder->build();
+            ->setInterface(true)
+            ->build();
 
         $this->assertInstanceOf(ClassDescription::class, $classDescription);
-
         $this->assertTrue($classDescription->isInterface());
     }
 
     public function test_it_should_create_not_interface(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = new ClassDescriptionBuilder();
-        $classDescriptionBuilder
+
+        $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
-            ->setInterface(false);
-
-        $classDescription = $classDescriptionBuilder->build();
+            ->setInterface(false)
+            ->build();
 
         $this->assertInstanceOf(ClassDescription::class, $classDescription);
-
         $this->assertFalse($classDescription->isInterface());
     }
 
     public function test_it_should_create_trait(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = new ClassDescriptionBuilder();
-        $classDescriptionBuilder
+
+        $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
-            ->setTrait(true);
-
-        $classDescription = $classDescriptionBuilder->build();
+            ->setTrait(true)
+            ->build();
 
         $this->assertInstanceOf(ClassDescription::class, $classDescription);
-
         $this->assertTrue($classDescription->isTrait());
     }
 
     public function test_it_should_create_not_trait(): void
     {
         $FQCN = 'HappyIsland';
-        $classDescriptionBuilder = new ClassDescriptionBuilder();
-        $classDescriptionBuilder->setFilePath('src/Foo.php')
-            ->setClassName($FQCN)
-            ->setTrait(false);
 
-        $classDescription = $classDescriptionBuilder->build();
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName($FQCN)
+            ->setTrait(false)
+            ->build();
 
         $this->assertInstanceOf(ClassDescription::class, $classDescription);
-
         $this->assertFalse($classDescription->isTrait());
     }
 }
