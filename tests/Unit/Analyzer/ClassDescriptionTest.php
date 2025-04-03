@@ -10,12 +10,18 @@ use PHPUnit\Framework\TestCase;
 
 class ClassDescriptionTest extends TestCase
 {
-    /** @var ClassDescriptionBuilder */
-    private $builder;
+    private ClassDescriptionBuilder $builder;
 
     protected function setUp(): void
     {
         $this->builder = ClassDescription::getBuilder('Fruit\Banana', 'src/Foo.php');
+    }
+
+    public function test_should_return_file_path(): void
+    {
+        $cd = $this->builder->build();
+
+        $this->assertEquals('src/Foo.php', $cd->getFilePath());
     }
 
     public function test_should_return_true_if_there_class_is_in_namespace(): void
