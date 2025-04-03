@@ -10,21 +10,23 @@ use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\Analyzer\Parser;
 use Arkitect\ClassSetRules;
 use Arkitect\CLI\Progress\Progress;
+use Arkitect\Exceptions\FailOnFirstViolationException;
 use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violations;
 use Symfony\Component\Finder\SplFileInfo;
 
 class Runner
 {
-    /** @var Violations */
-    private $violations;
+    private Violations $violations;
 
-    /** @var ParsingErrors */
-    private $parsingErrors;
+    private ParsingErrors $parsingErrors;
+
+    private bool $stopOnFailure;
 
     public function __construct(bool $stopOnFailure = false)
     {
-        $this->violations = new Violations($stopOnFailure);
+        $this->stopOnFailure = $stopOnFailure;
+        $this->violations = new Violations();
         $this->parsingErrors = new ParsingErrors();
     }
 
@@ -57,6 +59,8 @@ class Runner
     ): void {
         /** @var SplFileInfo $file */
         foreach ($classSetRule->getClassSet() as $file) {
+            $fileViolations = new Violations();
+
             if (!$onlyErrors) {
                 $progress->startParsingFile($file->getRelativePathname());
             }
@@ -71,9 +75,18 @@ class Runner
             /** @var ClassDescription $classDescription */
             foreach ($fileParser->getClassDescriptions() as $classDescription) {
                 foreach ($classSetRule->getRules() as $rule) {
-                    $rule->check($classDescription, $violations);
+                    $rule->check($classDescription, $fileViolations);
+
+                    if ($this->stopOnFailure && $fileViolations->count() > 0) {
+                        $violations->merge($fileViolations);
+
+                        throw new FailOnFirstViolationException();
+                    }
                 }
             }
+
+            $violations->merge($fileViolations);
+
             if (!$onlyErrors) {
                 $progress->endParsingFile($file->getRelativePathname());
             }
