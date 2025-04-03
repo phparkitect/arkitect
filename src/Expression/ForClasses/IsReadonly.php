@@ -31,7 +31,8 @@ class IsReadonly implements Expression
 
         $violation = Violation::create(
             $theClass->getFQCN(),
-            ViolationMessage::selfExplanatory($this->describe($theClass, $because))
+            ViolationMessage::selfExplanatory($this->describe($theClass, $because)),
+            $theClass->getFilePath()
         );
 
         $violations->add($violation);

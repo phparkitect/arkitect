@@ -22,9 +22,9 @@ class Violation implements \JsonSerializable
         $this->filePath = $filePath;
     }
 
-    public static function create(string $fqcn, ViolationMessage $error): self
+    public static function create(string $fqcn, ViolationMessage $error, string $filePath): self
     {
-        return new self($fqcn, $error->toString());
+        return new self($fqcn, $error->toString(), null, $filePath);
     }
 
     public static function createWithErrorLine(string $fqcn, ViolationMessage $error, int $line, string $filePath): self

@@ -40,7 +40,8 @@ class MatchOneOfTheseNames implements Expression
         if (!$matches) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
-                ViolationMessage::selfExplanatory($this->describe($theClass, $because))
+                ViolationMessage::selfExplanatory($this->describe($theClass, $because)),
+                $theClass->getFilePath()
             );
             $violations->add($violation);
         }
