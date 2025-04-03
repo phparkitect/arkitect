@@ -16,6 +16,7 @@ class NotImplementTest extends TestCase
         $implementConstraint = new NotImplement('interface');
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->build();
 
@@ -31,6 +32,7 @@ class NotImplementTest extends TestCase
         $implementConstraint = new NotImplement('interface');
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addExtends('foo', 1)
             ->build();
@@ -47,6 +49,7 @@ class NotImplementTest extends TestCase
         $implementConstraint = new NotImplement('interface');
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addInterface('interface', 1)
             ->build();
@@ -69,6 +72,7 @@ class NotImplementTest extends TestCase
         $implementConstraint = new NotImplement('interface');
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setInterface(true)
             ->build();

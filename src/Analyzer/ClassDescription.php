@@ -8,6 +8,8 @@ class ClassDescription
 {
     private FullyQualifiedClassName $FQCN;
 
+    private string $filePath;
+
     /** @var list<ClassDependency> */
     private array $dependencies;
 
@@ -53,10 +55,12 @@ class ClassDescription
         bool $interface,
         bool $trait,
         bool $enum,
-        array $docBlock = [],
-        array $attributes = []
+        array $docBlock,
+        array $attributes,
+        string $filePath
     ) {
         $this->FQCN = $FQCN;
+        $this->filePath = $filePath;
         $this->dependencies = $dependencies;
         $this->interfaces = $interfaces;
         $this->extends = $extends;
@@ -70,10 +74,11 @@ class ClassDescription
         $this->enum = $enum;
     }
 
-    public static function getBuilder(string $FQCN): ClassDescriptionBuilder
+    public static function getBuilder(string $FQCN, string $filePath): ClassDescriptionBuilder
     {
         $cb = new ClassDescriptionBuilder();
         $cb->setClassName($FQCN);
+        $cb->setFilePath($filePath);
 
         return $cb;
     }
@@ -86,6 +91,11 @@ class ClassDescription
     public function getFQCN(): string
     {
         return $this->FQCN->toString();
+    }
+
+    public function getFilePath(): string
+    {
+        return $this->filePath;
     }
 
     public function namespaceMatches(string $pattern): bool

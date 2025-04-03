@@ -15,6 +15,7 @@ class IsNotEnumTest extends TestCase
         $isEnum = new IsNotEnum();
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setEnum(true)
             ->build();
@@ -34,6 +35,7 @@ class IsNotEnumTest extends TestCase
         $isEnum = new IsNotEnum();
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->build();
 

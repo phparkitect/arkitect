@@ -39,7 +39,7 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
     {
         $haveNameMatching = new ResideInOneOfTheseNamespaces($expectedNamespace);
 
-        $classDesc = ClassDescription::getBuilder($actualFQCN)->build();
+        $classDesc = ClassDescription::getBuilder($actualFQCN, 'src/Foo.php')->build();
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
         $haveNameMatching->evaluate($classDesc, $violations, $because);
@@ -51,7 +51,7 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
     {
         $haveNameMatching = new ResideInOneOfTheseNamespaces('MyNamespace');
 
-        $classDesc = ClassDescription::getBuilder('AnotherNamespace\HappyIsland')->build();
+        $classDesc = ClassDescription::getBuilder('AnotherNamespace\HappyIsland', 'src/Foo.php')->build();
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
         $haveNameMatching->evaluate($classDesc, $violations, $because);
@@ -63,23 +63,23 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
     {
         $haveNameMatching = new ResideInOneOfTheseNamespaces('MyNamespace', 'AnotherNamespace', 'AThirdNamespace');
 
-        $classDesc = ClassDescription::getBuilder('AnotherNamespace\HappyIsland')->build();
+        $classDesc = ClassDescription::getBuilder('AnotherNamespace\HappyIsland', 'src/Foo.php')->build();
         $violations = new Violations();
         $because = 'we want to add this rule for our software';
         $haveNameMatching->evaluate($classDesc, $violations, $because);
         self::assertEquals(0, $violations->count());
 
-        $classDesc = ClassDescription::getBuilder('MyNamespace\HappyIsland')->build();
+        $classDesc = ClassDescription::getBuilder('MyNamespace\HappyIsland', 'src/Foo.php')->build();
         $violations = new Violations();
         $haveNameMatching->evaluate($classDesc, $violations, $because);
         self::assertEquals(0, $violations->count());
 
-        $classDesc = ClassDescription::getBuilder('AThirdNamespace\HappyIsland')->build();
+        $classDesc = ClassDescription::getBuilder('AThirdNamespace\HappyIsland', 'src/Foo.php')->build();
         $violations = new Violations();
         $haveNameMatching->evaluate($classDesc, $violations, $because);
         self::assertEquals(0, $violations->count());
 
-        $classDesc = ClassDescription::getBuilder('NopeNamespace\HappyIsland')->build();
+        $classDesc = ClassDescription::getBuilder('NopeNamespace\HappyIsland', 'src/Foo.php')->build();
         $violations = new Violations();
         $haveNameMatching->evaluate($classDesc, $violations, $because);
         self::assertNotEquals(0, $violations->count());
@@ -91,7 +91,7 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
 
         self::assertSame(
             'should reside in one of these namespaces: A, B, C, D because rave',
-            $expression->describe(ClassDescription::getBuilder('Marko')->build(), 'rave')->toString()
+            $expression->describe(ClassDescription::getBuilder('Marko', 'src/Foo.php')->build(), 'rave')->toString()
         );
     }
 }

@@ -16,6 +16,7 @@ class ImplementTest extends TestCase
         $implementConstraint = new Implement('interface');
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->build();
 
@@ -34,6 +35,7 @@ class ImplementTest extends TestCase
         $implementConstraint = new Implement('interface');
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addInterface('Foo', 1)
             ->build();
@@ -50,6 +52,7 @@ class ImplementTest extends TestCase
         $implementConstraint = new Implement('interface');
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addInterface('interface', 1)
             ->build();
@@ -67,6 +70,7 @@ class ImplementTest extends TestCase
         $implementConstraint = new Implement('\Foo\Order');
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addInterface('\Foo\Orderable', 1)
             ->build();
@@ -84,6 +88,7 @@ class ImplementTest extends TestCase
         $implementConstraint = new Implement($interface);
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setInterface(true)
             ->build();

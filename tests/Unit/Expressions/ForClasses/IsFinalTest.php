@@ -17,6 +17,7 @@ class IsFinalTest extends TestCase
         $isFinal = new IsFinal();
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->build();
 
@@ -31,6 +32,7 @@ class IsFinalTest extends TestCase
         $isFinal = new IsFinal();
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setFinal(true)
             ->build();
@@ -49,6 +51,7 @@ class IsFinalTest extends TestCase
         $isNotFinal = new IsNotFinal();
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setAbstract(true)
             ->build();
@@ -63,6 +66,7 @@ class IsFinalTest extends TestCase
         $isNotFinal = new IsNotFinal();
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setInterface(true)
             ->build();
@@ -77,6 +81,7 @@ class IsFinalTest extends TestCase
         $isNotFinal = new IsNotFinal();
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setTrait(true)
             ->build();
@@ -91,6 +96,7 @@ class IsFinalTest extends TestCase
         $isNotFinal = new IsNotFinal();
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setEnum(true)
             ->build();

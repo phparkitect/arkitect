@@ -21,6 +21,11 @@ class FileVisitor extends NodeVisitorAbstract
         $this->classDescriptionBuilder = $classDescriptionBuilder;
     }
 
+    public function setFilePath(string $filePath): void
+    {
+        $this->classDescriptionBuilder->setFilePath($filePath);
+    }
+
     public function enterNode(Node $node): void
     {
         if ($node instanceof Node\Stmt\Class_) {
@@ -224,6 +229,7 @@ class FileVisitor extends NodeVisitorAbstract
     public function clearParsedClassDescriptions(): void
     {
         $this->classDescriptions = [];
+        $this->classDescriptionBuilder->setFilePath(null);
         $this->classDescriptionBuilder->clear();
     }
 

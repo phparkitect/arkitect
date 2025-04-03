@@ -16,7 +16,7 @@ class NotDependsOnTheseNamespacesTest extends TestCase
     {
         $notDependOnClasses = new NotDependsOnTheseNamespaces('myNamespace');
 
-        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass')->build();
+        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass', 'src/Foo.php')->build();
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
         $notDependOnClasses->evaluate($classDescription, $violations, $because);
@@ -28,7 +28,7 @@ class NotDependsOnTheseNamespacesTest extends TestCase
     {
         $notDependOnClasses = new NotDependsOnTheseNamespaces('myNamespace');
 
-        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass')
+        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass', 'src/Foo.php')
             ->addDependency(new ClassDependency('myNamespace\Banana', 0))
             ->addDependency(new ClassDependency('anotherNamespace\Banana', 1))
             ->build();
@@ -48,7 +48,7 @@ class NotDependsOnTheseNamespacesTest extends TestCase
     {
         $notDependOnClasses = new NotDependsOnTheseNamespaces('myNamespace');
 
-        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass')
+        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass', 'src/Foo.php')
             ->addDependency(new ClassDependency('myNamespace\Banana', 0))
             ->addDependency(new ClassDependency('\anotherNamespace\Banana', 1))
             ->addDependency(new ClassDependency('\DateTime', 10))
@@ -69,7 +69,7 @@ class NotDependsOnTheseNamespacesTest extends TestCase
     {
         $notDependOnClasses = new NotDependsOnTheseNamespaces('myNamespace');
 
-        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass')
+        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass', 'src/Foo.php')
             ->addDependency(new ClassDependency('myNamespace\Banana', 0))
             ->addDependency(new ClassDependency('myNamespace\Mango', 10))
             ->build();

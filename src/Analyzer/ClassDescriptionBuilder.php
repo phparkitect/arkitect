@@ -36,6 +36,8 @@ class ClassDescriptionBuilder
 
     private bool $enum = false;
 
+    private ?string $filePath = null;
+
     public function clear(): void
     {
         $this->FQCN = null;
@@ -50,6 +52,13 @@ class ClassDescriptionBuilder
         $this->interface = false;
         $this->trait = false;
         $this->enum = false;
+    }
+
+    public function setFilePath(?string $filePath): self
+    {
+        $this->filePath = $filePath;
+
+        return $this;
     }
 
     public function setClassName(string $FQCN): self
@@ -142,6 +151,7 @@ class ClassDescriptionBuilder
     public function build(): ClassDescription
     {
         Assert::notNull($this->FQCN, 'You must set an FQCN');
+        Assert::notNull($this->filePath, 'You must set a file path');
 
         return new ClassDescription(
             $this->FQCN,
@@ -155,7 +165,8 @@ class ClassDescriptionBuilder
             $this->trait,
             $this->enum,
             $this->docBlock,
-            $this->attributes
+            $this->attributes,
+            $this->filePath
         );
     }
 }

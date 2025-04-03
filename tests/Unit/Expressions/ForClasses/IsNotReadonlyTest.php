@@ -16,6 +16,7 @@ class IsNotReadonlyTest extends TestCase
         $isNotReadonly = new IsNotReadonly();
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setReadonly(true)
             ->build();
@@ -35,6 +36,7 @@ class IsNotReadonlyTest extends TestCase
         $isNotReadonly = new IsNotReadonly();
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->build();
 

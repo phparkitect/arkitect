@@ -16,6 +16,7 @@ class IsNotInterfaceTest extends TestCase
         $isFinal = new IsNotInterface();
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setInterface(true)
             ->build();
@@ -35,6 +36,7 @@ class IsNotInterfaceTest extends TestCase
         $isFinal = new IsNotInterface();
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->build();
 

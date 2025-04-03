@@ -16,6 +16,7 @@ class IsNotAbstractTest extends TestCase
         $isAbstract = new IsNotAbstract();
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setAbstract(true)
             ->build();
@@ -35,6 +36,7 @@ class IsNotAbstractTest extends TestCase
         $isAbstract = new IsNotAbstract();
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->build();
 

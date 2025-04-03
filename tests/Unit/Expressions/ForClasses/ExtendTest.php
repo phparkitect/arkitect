@@ -16,6 +16,7 @@ class ExtendTest extends TestCase
         $extend = new Extend('My\BaseClass');
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('My\Class')
             ->addExtends('My\BaseClass', 10)
             ->build();
@@ -31,6 +32,7 @@ class ExtendTest extends TestCase
         $extend = new Extend('My\B14*');
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('My\Class')
             ->addExtends('My\B14Class', 10)
             ->build();
@@ -46,6 +48,7 @@ class ExtendTest extends TestCase
         $extend = new Extend('App\Providers\(Auth|Event|Route|Horizon)ServiceProvider');
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('My\Class')
             ->addExtends('My\BaseClass', 10)
             ->build();
@@ -60,6 +63,7 @@ class ExtendTest extends TestCase
         $extend = new Extend('My\BaseClass');
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addExtends('My\AnotherClass', 10)
             ->build();
@@ -76,6 +80,7 @@ class ExtendTest extends TestCase
         $extend = new Extend('My\BaseClass');
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->build();
 
@@ -94,6 +99,7 @@ class ExtendTest extends TestCase
         $extend = new Extend('My\FirstExtend', 'My\SecondExtend');
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('My\Class')
             ->addExtends('My\SecondExtend', 10)
             ->build();

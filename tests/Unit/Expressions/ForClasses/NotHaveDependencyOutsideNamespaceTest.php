@@ -18,6 +18,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace($namespace);
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->build();
 
@@ -35,6 +36,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('myNamespace');
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addDependency(new ClassDependency('myNamespace', 100))
             ->build();
@@ -51,6 +53,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('myNamespace');
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addDependency(new ClassDependency('myNamespace', 100))
             ->addDependency(new ClassDependency('another\class', 200))
@@ -69,6 +72,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('myNamespace', ['foo']);
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addDependency(new ClassDependency('foo', 100))
             ->build();
@@ -85,6 +89,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('myNamespace', [], true);
 
         $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addDependency(new ClassDependency('\DateTime', 100))
             ->build();
