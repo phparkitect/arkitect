@@ -13,7 +13,7 @@ class FileVisitor extends NodeVisitorAbstract
 {
     private ClassDescriptionBuilder $classDescriptionBuilder;
 
-    /** @var array<ClassDescription> */
+    /** @var ClassDescription[] */
     private array $classDescriptions = [];
 
     public function __construct(ClassDescriptionBuilder $classDescriptionBuilder)
@@ -21,7 +21,7 @@ class FileVisitor extends NodeVisitorAbstract
         $this->classDescriptionBuilder = $classDescriptionBuilder;
     }
 
-    public function setFilePath(string $filePath): void
+    public function setFilePath(?string $filePath): void
     {
         $this->classDescriptionBuilder->setFilePath($filePath);
     }

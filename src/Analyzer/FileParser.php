@@ -19,8 +19,8 @@ class FileParser implements Parser
 
     private FileVisitor $fileVisitor;
 
-    /** @var array */
-    private $parsingErrors;
+    /** @var ParsingError[] */
+    private array $parsingErrors;
 
     public function __construct(
         NodeTraverser $traverser,

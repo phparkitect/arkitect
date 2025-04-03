@@ -14,12 +14,12 @@ use Arkitect\Rules\Violations;
 
 class NotHaveDependencyOutsideNamespace implements Expression
 {
-    /** @var string */
-    private $namespace;
-    /** @var array */
-    private $externalDependenciesToExclude;
-    /** @var bool */
-    private $excludeCoreNamespace;
+    private string $namespace;
+
+    /** @var string[] */
+    private array $externalDependenciesToExclude;
+
+    private bool $excludeCoreNamespace;
 
     public function __construct(string $namespace, array $externalDependenciesToExclude = [], bool $excludeCoreNamespace = false)
     {
@@ -59,7 +59,8 @@ class NotHaveDependencyOutsideNamespace implements Expression
                     $this->describe($theClass, $because),
                     "depends on {$externalDep->getFQCN()->toString()}"
                 ),
-                $externalDep->getLine()
+                $externalDep->getLine(),
+                $theClass->getFilePath()
             );
             $violations->add($violation);
         }
