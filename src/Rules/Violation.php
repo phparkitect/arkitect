@@ -10,23 +10,26 @@ class Violation implements \JsonSerializable
 
     private ?int $line;
 
+    private ?string $filePath;
+
     private string $error;
 
-    public function __construct(string $fqcn, string $error, ?int $line = null)
+    public function __construct(string $fqcn, string $error, ?int $line = null, ?string $filePath = null)
     {
         $this->fqcn = $fqcn;
         $this->error = $error;
         $this->line = $line;
+        $this->filePath = $filePath;
     }
 
-    public static function create(string $fqcn, ViolationMessage $error): self
+    public static function create(string $fqcn, ViolationMessage $error, string $filePath): self
     {
-        return new self($fqcn, $error->toString());
+        return new self($fqcn, $error->toString(), null, $filePath);
     }
 
-    public static function createWithErrorLine(string $fqcn, ViolationMessage $error, int $line): self
+    public static function createWithErrorLine(string $fqcn, ViolationMessage $error, int $line, string $filePath): self
     {
-        return new self($fqcn, $error->toString(), $line);
+        return new self($fqcn, $error->toString(), $line, $filePath);
     }
 
     public function getFqcn(): string
@@ -44,6 +47,11 @@ class Violation implements \JsonSerializable
         return $this->line;
     }
 
+    public function getFilePath(): ?string
+    {
+        return $this->filePath;
+    }
+
     public function jsonSerialize(): array
     {
         return get_object_vars($this);
@@ -51,6 +59,6 @@ class Violation implements \JsonSerializable
 
     public static function fromJson(array $json): self
     {
-        return new self($json['fqcn'], $json['error'], $json['line']);
+        return new self($json['fqcn'], $json['error'], $json['line'], $json['filePath'] ?? null);
     }
 }
