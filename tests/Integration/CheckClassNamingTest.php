@@ -25,8 +25,8 @@ class CheckClassNamingTest extends TestCase
 
         $runner->run($dir, $rule);
 
-        $this->assertCount(0, $runner->getViolations());
-        $this->assertCount(0, $runner->getParsingErrors());
+        self::assertCount(0, $runner->getViolations());
+        self::assertCount(0, $runner->getParsingErrors());
     }
 
     public function createDummyProject(): array
@@ -47,7 +47,7 @@ class CheckClassNamingTest extends TestCase
                             $this->happy = $happy;
                         }
                     }
-                    EOF
+                    EOF,
             ],
             'OtherBadCode' => [
                 'OtherBadCode.php' => <<<'EOF'
@@ -64,7 +64,7 @@ class CheckClassNamingTest extends TestCase
                             $this->happy = $happy;
                         }
                     }
-                    EOF
+                    EOF,
             ],
 
             'HappyIsland' => [

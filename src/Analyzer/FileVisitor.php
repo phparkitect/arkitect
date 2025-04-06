@@ -13,7 +13,7 @@ class FileVisitor extends NodeVisitorAbstract
 {
     private ClassDescriptionBuilder $classDescriptionBuilder;
 
-    /** @var ClassDescription[] */
+    /** @var array<ClassDescription> */
     private array $classDescriptions = [];
 
     public function __construct(ClassDescriptionBuilder $classDescriptionBuilder)

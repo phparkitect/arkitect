@@ -26,14 +26,14 @@ class ImplementsTest extends TestCase
 
         $runner->run($dir, $rule);
 
-        $this->assertCount(0, $runner->getParsingErrors());
-        $this->assertCount(2, $runner->getViolations());
+        self::assertCount(0, $runner->getParsingErrors());
+        self::assertCount(2, $runner->getViolations());
 
-        $this->assertEquals('App\AClass', $runner->getViolations()->get(0)->getFqcn());
-        $this->assertStringContainsString('should have a name that matches An* because reasons', $runner->getViolations()->get(0)->getError());
+        self::assertEquals('App\AClass', $runner->getViolations()->get(0)->getFqcn());
+        self::assertStringContainsString('should have a name that matches An* because reasons', $runner->getViolations()->get(0)->getError());
 
-        $this->assertEquals('App\AEnum', $runner->getViolations()->get(1)->getFqcn());
-        $this->assertStringContainsString('should have a name that matches An* because reasons', $runner->getViolations()->get(1)->getError());
+        self::assertEquals('App\AEnum', $runner->getViolations()->get(1)->getFqcn());
+        self::assertStringContainsString('should have a name that matches An* because reasons', $runner->getViolations()->get(1)->getError());
     }
 
     public function createDirStructure(): array

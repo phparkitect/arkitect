@@ -14,6 +14,6 @@ class FilePathTest extends TestCase
         $filePath = new FilePath();
         $filePath->set('thePath');
 
-        $this->assertEquals('thePath', $filePath->toString());
+        self::assertEquals('thePath', $filePath->toString());
     }
 }

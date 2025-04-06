@@ -19,7 +19,7 @@ class FileParser implements Parser
 
     private FileVisitor $fileVisitor;
 
-    /** @var ParsingError[] */
+    /** @var array<ParsingError> */
     private array $parsingErrors;
 
     public function __construct(
@@ -38,7 +38,7 @@ class FileParser implements Parser
     }
 
     /**
-     * @return ClassDescription[]
+     * @return array<ClassDescription>
      */
     public function getClassDescriptions(): array
     {

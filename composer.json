@@ -34,13 +34,13 @@
         "ondram/ci-detector": "^4.1"
     },
     "require-dev": {
-        "roave/security-advisories": "dev-master",
-        "symfony/var-dumper": "^3.0|^4.0|^5.0|^6.0|^7.0",
-        "phpunit/phpunit": "^7.5|^9.0|^10.0",
+        "friendsofphp/php-cs-fixer": "^3.75",
         "mikey179/vfsstream": "^1.6",
         "phpspec/prophecy": "^1.10",
-        "friendsofphp/php-cs-fixer": "3.4.0",
-        "phpspec/prophecy-phpunit": "^2.3"
+        "phpspec/prophecy-phpunit": "^2.3",
+        "phpunit/phpunit": "^7.5|^9.0|^10.0",
+        "roave/security-advisories": "dev-master",
+        "symfony/var-dumper": "^3.0|^4.0|^5.0|^6.0|^7.0"
     },
     "autoload": {
         "psr-4": {

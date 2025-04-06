@@ -10,7 +10,7 @@ class ClassSetRules
 {
     private ClassSet $classSet;
 
-    /** @var ArchRule[] */
+    /** @var array<ArchRule> */
     private array $rules;
 
     private function __construct(ClassSet $classSet, ArchRule ...$rules)

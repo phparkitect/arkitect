@@ -21,28 +21,28 @@ class ClassDescriptionTest extends TestCase
     {
         $cd = $this->builder->build();
 
-        $this->assertEquals('src/Foo.php', $cd->getFilePath());
+        self::assertEquals('src/Foo.php', $cd->getFilePath());
     }
 
     public function test_should_return_true_if_there_class_is_in_namespace(): void
     {
         $cd = $this->builder->build();
 
-        $this->assertTrue($cd->namespaceMatches('Fruit'));
+        self::assertTrue($cd->namespaceMatches('Fruit'));
     }
 
     public function test_should_return_name(): void
     {
         $cd = $this->builder->build();
 
-        $this->assertEquals('Banana', $cd->getName());
+        self::assertEquals('Banana', $cd->getName());
     }
 
     public function test_should_return_true_if_there_class_is_in_namespace_array(): void
     {
         $cd = $this->builder->build();
 
-        $this->assertTrue($cd->namespaceMatchesOneOfTheseNamespaces(['Fruit']));
+        self::assertTrue($cd->namespaceMatchesOneOfTheseNamespaces(['Fruit']));
     }
 
     public function test_should_return_true_if_is_annotated_with(): void
@@ -53,7 +53,7 @@ class ClassDescriptionTest extends TestCase
  */')
             ->build();
 
-        $this->assertTrue($cd->containsDocBlock('@psalm-immutable'));
+        self::assertTrue($cd->containsDocBlock('@psalm-immutable'));
     }
 
     public function test_should_return_false_if_not_annotated_with(): void
@@ -64,7 +64,7 @@ class ClassDescriptionTest extends TestCase
  */')
             ->build();
 
-        $this->assertFalse($cd->containsDocBlock('@another-annotation'));
+        self::assertFalse($cd->containsDocBlock('@another-annotation'));
     }
 
     public function test_should_return_true_if_has_attribute(): void

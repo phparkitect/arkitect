@@ -29,7 +29,7 @@ class FullyQualifiedClassNameTest extends TestCase
     {
         $fqcn = FullyQualifiedClassName::fromString($fqcn);
 
-        $this->assertEquals($shouldMatch, $fqcn->matches($pattern), "{$fqcn->toString()} should ".($shouldMatch ? '' : 'not ')."match $pattern");
+        self::assertEquals($shouldMatch, $fqcn->matches($pattern), "{$fqcn->toString()} should ".($shouldMatch ? '' : 'not ')."match $pattern");
     }
 
     public function test_should_throw_if_invalid_namespace_is_passed(): void
@@ -43,29 +43,29 @@ class FullyQualifiedClassNameTest extends TestCase
     public function test_single_letter_class_is_valid(): void
     {
         $fqcn = FullyQualifiedClassName::fromString('A');
-        $this->assertEquals('A', $fqcn->className());
+        self::assertEquals('A', $fqcn->className());
     }
 
     public function test_should_return_class_name(): void
     {
         $fqcn = FullyQualifiedClassName::fromString('Food\Vegetables\Fruits\Banana');
-        $this->assertEquals('Banana', $fqcn->className());
+        self::assertEquals('Banana', $fqcn->className());
     }
 
     public function test_should_have_root_ns_preserved(): void
     {
         $fqcn = FullyQualifiedClassName::fromString('\Banana');
 
-        $this->assertEquals('Banana', $fqcn->className());
-        $this->assertEquals('', $fqcn->namespace());
+        self::assertEquals('Banana', $fqcn->className());
+        self::assertEquals('', $fqcn->namespace());
     }
 
     public function test_should_have_ns_normalized(): void
     {
         $fqcn = FullyQualifiedClassName::fromString('Food\Vegetables\Fruits\Banana');
 
-        $this->assertEquals('Banana', $fqcn->className());
-        $this->assertEquals('Food\Vegetables\Fruits', $fqcn->namespace());
-        $this->assertEquals('Food\Vegetables\Fruits\Banana', $fqcn->toString());
+        self::assertEquals('Banana', $fqcn->className());
+        self::assertEquals('Food\Vegetables\Fruits', $fqcn->namespace());
+        self::assertEquals('Food\Vegetables\Fruits\Banana', $fqcn->toString());
     }
 }

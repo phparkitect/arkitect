@@ -176,7 +176,7 @@ App\Controller\Foo has 1 violations
 
         $display = $cmdTester->getDisplay();
 
-        $this->assertJson($display);
+        self::assertJson($display);
     }
 
     public function test_json_format_output_no_errors(): void
@@ -189,10 +189,10 @@ App\Controller\Foo has 1 violations
 
         $display = $cmdTester->getDisplay();
 
-        $this->assertJson($display);
+        self::assertJson($display);
 
         $json = json_decode($display, true);
-        $this->assertCount(0, $json);
+        self::assertCount(0, $json);
     }
 
     public function test_gitlab_format_output(): void
@@ -274,27 +274,27 @@ App\Controller\Foo has 1 violations
 
     protected function assertCheckHasErrors(ApplicationTester $applicationTester, ?string $expectedOutput = null): void
     {
-        $this->assertEquals(self::ERROR_CODE, $applicationTester->getStatusCode());
+        self::assertEquals(self::ERROR_CODE, $applicationTester->getStatusCode());
         if (null != $expectedOutput) {
             $actualOutput = str_replace(["\r", "\n"], '', $applicationTester->getDisplay());
             $expectedOutput = str_replace(["\r", "\n"], '', $expectedOutput);
-            $this->assertStringContainsString($expectedOutput, $actualOutput);
+            self::assertStringContainsString($expectedOutput, $actualOutput);
         }
     }
 
     protected function assertCheckHasNoErrorsLike(ApplicationTester $applicationTester, ?string $expectedOutput = null): void
     {
-        $this->assertEquals(self::ERROR_CODE, $applicationTester->getStatusCode());
+        self::assertEquals(self::ERROR_CODE, $applicationTester->getStatusCode());
         if (null != $expectedOutput) {
             $actualOutput = str_replace(["\r", "\n"], '', $applicationTester->getDisplay());
             $expectedOutput = str_replace(["\r", "\n"], '', $expectedOutput);
-            $this->assertStringNotContainsString($expectedOutput, $actualOutput);
+            self::assertStringNotContainsString($expectedOutput, $actualOutput);
         }
     }
 
     protected function assertCheckHasSuccess(ApplicationTester $applicationTester): void
     {
-        $this->assertEquals(self::SUCCESS_CODE, $applicationTester->getStatusCode(), 'Command failed: '.$applicationTester->getDisplay());
-        $this->assertStringNotContainsString('ERRORS!', $applicationTester->getDisplay(), 'Error message not expected in successful execution');
+        self::assertEquals(self::SUCCESS_CODE, $applicationTester->getStatusCode(), 'Command failed: '.$applicationTester->getDisplay());
+        self::assertStringNotContainsString('ERRORS!', $applicationTester->getDisplay(), 'Error message not expected in successful execution');
     }
 }

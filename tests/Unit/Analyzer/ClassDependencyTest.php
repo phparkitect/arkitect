@@ -24,27 +24,27 @@ class ClassDependencyTest extends TestCase
 
     public function test_it_should_create_class_dependency(): void
     {
-        $this->assertEquals(FullyQualifiedClassName::fromString($this->FQCN), $this->classDependency->getFQCN());
-        $this->assertEquals($this->line, $this->classDependency->getLine());
+        self::assertEquals(FullyQualifiedClassName::fromString($this->FQCN), $this->classDependency->getFQCN());
+        self::assertEquals($this->line, $this->classDependency->getLine());
     }
 
     public function test_it_should_match(): void
     {
-        $this->assertTrue($this->classDependency->matches('HappyIsland'));
+        self::assertTrue($this->classDependency->matches('HappyIsland'));
     }
 
     public function test_it_should_not_match(): void
     {
-        $this->assertFalse($this->classDependency->matches('Happy'));
+        self::assertFalse($this->classDependency->matches('Happy'));
     }
 
     public function test_it_should_match_one_of(): void
     {
-        $this->assertTrue($this->classDependency->matchesOneOf('HappyIsland', 'Foo', 'Bar'));
+        self::assertTrue($this->classDependency->matchesOneOf('HappyIsland', 'Foo', 'Bar'));
     }
 
     public function test_it_should_not_match_one_of(): void
     {
-        $this->assertFalse($this->classDependency->matchesOneOf('Baz', 'Foo', 'Bar'));
+        self::assertFalse($this->classDependency->matchesOneOf('Baz', 'Foo', 'Bar'));
     }
 }

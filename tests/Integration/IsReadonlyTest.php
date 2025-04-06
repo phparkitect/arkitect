@@ -25,8 +25,8 @@ class IsReadonlyTest extends TestCase
 
         $runner->run($this->createClasses(), $rule);
 
-        $this->assertCount(0, $runner->getViolations());
-        $this->assertCount(0, $runner->getParsingErrors());
+        self::assertCount(0, $runner->getViolations());
+        self::assertCount(0, $runner->getParsingErrors());
     }
 
     public function test_is_readonly_in_should_should_consider_traits_enums_interfaces(): void
@@ -40,12 +40,12 @@ class IsReadonlyTest extends TestCase
 
         $runner->run($this->createClasses(), $rule);
 
-        $this->assertCount(3, $runner->getViolations());
-        $this->assertCount(0, $runner->getParsingErrors());
+        self::assertCount(3, $runner->getViolations());
+        self::assertCount(0, $runner->getParsingErrors());
 
-        $this->assertEquals('App\MyEnum', $runner->getViolations()->get(0)->getFqcn());
-        $this->assertEquals('App\MyInterface', $runner->getViolations()->get(1)->getFqcn());
-        $this->assertEquals('App\MyTrait', $runner->getViolations()->get(2)->getFqcn());
+        self::assertEquals('App\MyEnum', $runner->getViolations()->get(0)->getFqcn());
+        self::assertEquals('App\MyInterface', $runner->getViolations()->get(1)->getFqcn());
+        self::assertEquals('App\MyTrait', $runner->getViolations()->get(2)->getFqcn());
     }
 
     public function test_is_not_readonly_in_should_should_consider_traits_enums_interfaces(): void
@@ -59,10 +59,10 @@ class IsReadonlyTest extends TestCase
 
         $runner->run($this->createClasses(), $rule);
 
-        $this->assertCount(1, $runner->getViolations());
-        $this->assertCount(0, $runner->getParsingErrors());
+        self::assertCount(1, $runner->getViolations());
+        self::assertCount(0, $runner->getParsingErrors());
 
-        $this->assertEquals('App\MyReadonly', $runner->getViolations()->get(0)->getFqcn());
+        self::assertEquals('App\MyReadonly', $runner->getViolations()->get(0)->getFqcn());
     }
 
     protected function createClasses(): string

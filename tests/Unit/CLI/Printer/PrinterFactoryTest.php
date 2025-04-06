@@ -19,7 +19,7 @@ class PrinterFactoryTest extends TestCase
 
         $printer = $factory->create('json');
 
-        $this->assertInstanceOf(JsonPrinter::class, $printer);
+        self::assertInstanceOf(JsonPrinter::class, $printer);
     }
 
     /**
@@ -31,6 +31,6 @@ class PrinterFactoryTest extends TestCase
 
         $printer = $factory->create('text');
 
-        $this->assertInstanceOf(TextPrinter::class, $printer);
+        self::assertInstanceOf(TextPrinter::class, $printer);
     }
 }

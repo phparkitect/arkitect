@@ -34,11 +34,11 @@ class CheckEnumTest extends TestCase
 
         $runner->run($dir, ...$rules);
 
-        $this->assertCount(2, $runner->getViolations());
-        $this->assertCount(0, $runner->getParsingErrors());
+        self::assertCount(2, $runner->getViolations());
+        self::assertCount(0, $runner->getParsingErrors());
 
-        $this->assertStringContainsString('should have a name that matches *Enum because', $runner->getViolations()->get(0)->getError());
-        $this->assertStringContainsString('Aclass should be an enum because Enums should be enums', $runner->getViolations()->get(1)->getError());
+        self::assertStringContainsString('should have a name that matches *Enum because', $runner->getViolations()->get(0)->getError());
+        self::assertStringContainsString('Aclass should be an enum because Enums should be enums', $runner->getViolations()->get(1)->getError());
     }
 
     public function createDirStructure(): array

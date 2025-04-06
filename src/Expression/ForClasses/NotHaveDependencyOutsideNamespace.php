@@ -16,7 +16,7 @@ class NotHaveDependencyOutsideNamespace implements Expression
 {
     private string $namespace;
 
-    /** @var string[] */
+    /** @var array<string> */
     private array $externalDependenciesToExclude;
 
     private bool $excludeCoreNamespace;

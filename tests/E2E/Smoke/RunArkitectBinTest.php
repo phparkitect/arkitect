@@ -39,8 +39,8 @@ App\Domain\Model has 2 violations
   depends on App\Services\UserService, but should not depend on classes outside namespace App\Domain because we want protect our domain (on line 14)
   depends on App\Services\CartService, but should not depend on classes outside namespace App\Domain because we want protect our domain (on line 15)';
 
-        $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
-        $this->assertStringContainsString($expectedErrors, $process->getOutput());
+        self::assertEquals(self::ERROR_CODE, $process->getExitCode());
+        self::assertStringContainsString($expectedErrors, $process->getOutput());
     }
 
     public function test_returns_error_with_multiple_violations_without_passing_config_file(): void
@@ -66,23 +66,23 @@ App\Domain\Model has 2 violations
   depends on App\Services\UserService, but should not depend on classes outside namespace App\Domain because we want protect our domain (on line 14)
   depends on App\Services\CartService, but should not depend on classes outside namespace App\Domain because we want protect our domain (on line 15)';
 
-        $this->assertStringContainsString($expectedErrors, $process->getOutput());
-        $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
+        self::assertStringContainsString($expectedErrors, $process->getOutput());
+        self::assertEquals(self::ERROR_CODE, $process->getExitCode());
     }
 
     public function test_does_not_explode_if_an_exception_is_thrown(): void
     {
         $process = $this->runArkitectPassingConfigFilePath(__DIR__.'/../_fixtures/configThrowsException.php');
 
-        $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
+        self::assertEquals(self::ERROR_CODE, $process->getExitCode());
     }
 
     public function test_run_command_with_success(): void
     {
         $process = $this->runArkitectPassingConfigFilePath(__DIR__.'/../_fixtures/configMvcWithoutErrors.php');
 
-        $this->assertEquals(self::SUCCESS_CODE, $process->getExitCode());
-        $this->assertStringNotContainsString('ERRORS!', $process->getOutput());
+        self::assertEquals(self::SUCCESS_CODE, $process->getExitCode());
+        self::assertStringNotContainsString('ERRORS!', $process->getOutput());
     }
 
     public function test_bug_yield(): void
@@ -94,8 +94,8 @@ App\Domain\Model has 2 violations
 App\Controller\Foo has 1 violations
   should have a name that matches *Controller';
 
-        $this->assertEquals(self::ERROR_CODE, $process->getExitCode());
-        $this->assertStringContainsString($expectedErrors, $process->getOutput());
+        self::assertEquals(self::ERROR_CODE, $process->getExitCode());
+        self::assertStringContainsString($expectedErrors, $process->getOutput());
     }
 
     protected function runArkitectPassingConfigFilePath($configFilePath): Process

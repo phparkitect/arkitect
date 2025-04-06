@@ -13,8 +13,8 @@ class JsonPrinter implements Printer
         $details = [];
 
         /**
-         * @var string      $key
-         * @var Violation[] $violationsByFqcn
+         * @var string           $key
+         * @var array<Violation> $violationsByFqcn
          */
         foreach ($violationsCollection as $class => $violationsByFqcn) {
             $violationForThisFqcn = \count($violationsByFqcn);

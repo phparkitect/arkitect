@@ -11,8 +11,8 @@ class PatternStringTest extends TestCase
     public function test_it_works_for_simple_strings(): void
     {
         $pattern = new PatternString('Example');
-        $this->assertTrue($pattern->matches('Example'));
-        $this->assertFalse($pattern->matches('Something else'));
+        self::assertTrue($pattern->matches('Example'));
+        self::assertFalse($pattern->matches('Something else'));
     }
 
     /**
@@ -20,7 +20,7 @@ class PatternStringTest extends TestCase
      */
     public function test_wildcard_is_for_alphanumeric(string $string, string $pattern, bool $expectedResult): void
     {
-        $this->assertEquals($expectedResult, (new PatternString($string))->matches($pattern));
+        self::assertEquals($expectedResult, (new PatternString($string))->matches($pattern));
     }
 
     public static function providePatterns(): array

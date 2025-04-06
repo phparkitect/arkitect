@@ -14,9 +14,9 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
     private $componentName;
     /** @var array<string, string> */
     private $componentSelectors;
-    /** @var array<string, string[]> */
+    /** @var array<string, array<string>> */
     private $allowedDependencies;
-    /** @var array<string, string[]> */
+    /** @var array<string, array<string>> */
     private $componentDependsOnlyOnTheseNamespaces;
 
     private function __construct()

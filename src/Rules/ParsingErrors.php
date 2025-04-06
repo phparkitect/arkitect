@@ -12,7 +12,7 @@ use Arkitect\Exceptions\IndexNotFoundException;
 class ParsingErrors implements \IteratorAggregate, \Countable
 {
     /**
-     * @var ParsingError[]
+     * @var array<ParsingError>
      */
     private $parsingErrors;
 

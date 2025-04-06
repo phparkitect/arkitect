@@ -11,7 +11,7 @@ use Symfony\Component\Finder\Finder;
  */
 class ClassSet implements \IteratorAggregate
 {
-    /** @var string[] */
+    /** @var array<string> */
     private array $directoryList;
 
     private array $exclude;

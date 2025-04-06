@@ -32,7 +32,7 @@ class HaveNameMatchingTest extends TestCase
         $violations = new Violations();
         $expression->evaluate($badClass, $violations, $because);
         self::assertNotEquals(0, $violations->count());
-        $this->assertEquals(
+        self::assertEquals(
             'should have a name that matches *GoodName* because we want to add this rule for our software',
             $expression->describe($badClass, $because)->toString()
         );

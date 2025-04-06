@@ -142,7 +142,7 @@ class Check extends Command
 
             $rulesFilename = $this->getConfigFilename($input);
             if (!$onlyErrors) {
-                $output->writeln(sprintf("Config file: %s\n", $rulesFilename));
+                $output->writeln(\sprintf("Config file: %s\n", $rulesFilename));
             }
 
             $config = new Config();
@@ -267,9 +267,9 @@ class Check extends Command
             $output->writeln('<error>ERRORS!</error>');
         }
 
-        $output->writeln(sprintf('%s', $violations->toString($format)));
+        $output->writeln(\sprintf('%s', $violations->toString($format)));
         if (!$onlyErrors) {
-            $output->writeln(sprintf('<error>%s VIOLATIONS DETECTED!</error>', \count($violations)));
+            $output->writeln(\sprintf('<error>%s VIOLATIONS DETECTED!</error>', \count($violations)));
         }
     }
 
@@ -278,7 +278,7 @@ class Check extends Command
         if (!$onlyErrors) {
             $output->writeln('<error>ERROR ON PARSING THESE FILES:</error>');
         }
-        $output->writeln(sprintf('%s', $parsingErrors->toString()));
+        $output->writeln(\sprintf('%s', $parsingErrors->toString()));
     }
 
     private function printNoViolationsDetectedMessage(OutputInterface $output, bool $onlyErrors = false, string $format = Printer::FORMAT_TEXT): void

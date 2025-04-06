@@ -29,7 +29,7 @@ interface Expression
      *
      * Not included directly in the interface to allow incremental implementation of it in the rules.
      */
-    //public function appliesTo(ClassDescription $theClass): bool;
+    // public function appliesTo(ClassDescription $theClass): bool;
 
     /**
      * Evaluates the expression for the class passed as parameter.

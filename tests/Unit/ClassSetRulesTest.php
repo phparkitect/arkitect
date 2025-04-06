@@ -32,7 +32,7 @@ class ClassSetRulesTest extends TestCase
 
         $classSetRules = ClassSetRules::create($classSet, ...$rules);
 
-        $this->assertEquals($classSet, $classSetRules->getClassSet());
-        $this->assertEquals($rules, $classSetRules->getRules());
+        self::assertEquals($classSet, $classSetRules->getClassSet());
+        self::assertEquals($rules, $classSetRules->getRules());
     }
 }

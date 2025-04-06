@@ -26,10 +26,10 @@ class ExtendsThrowableTest extends TestCase
 
         $runner->run($dir, $rule);
 
-        $this->assertCount(1, $runner->getViolations());
-        $this->assertCount(0, $runner->getParsingErrors());
+        self::assertCount(1, $runner->getViolations());
+        self::assertCount(0, $runner->getParsingErrors());
 
-        $this->assertStringContainsString('should have a name that matches *Exception because', $runner->getViolations()->get(0)->getError());
+        self::assertStringContainsString('should have a name that matches *Exception because', $runner->getViolations()->get(0)->getError());
     }
 
     public function createDirStructure(): array

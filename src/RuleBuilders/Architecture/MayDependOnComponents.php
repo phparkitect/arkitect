@@ -8,7 +8,7 @@ interface MayDependOnComponents
     /**
      * May depend on the specified components, plus itself.
      *
-     * @param string[] $componentNames
+     * @param array<string> $componentNames
      *
      * @return Where&Rules
      */

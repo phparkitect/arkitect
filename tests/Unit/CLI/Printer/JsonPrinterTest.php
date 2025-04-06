@@ -22,7 +22,7 @@ class JsonPrinterTest extends TestCase
             'details' => [],
         ]);
 
-        $this->assertSame($expected, $result);
+        self::assertSame($expected, $result);
     }
 
     /**
@@ -53,7 +53,7 @@ class JsonPrinterTest extends TestCase
             ],
         ]);
 
-        $this->assertSame($expected, $result);
+        self::assertSame($expected, $result);
     }
 
     /**
@@ -93,6 +93,6 @@ class JsonPrinterTest extends TestCase
             ],
         ]);
 
-        $this->assertSame($expected, $result);
+        self::assertSame($expected, $result);
     }
 }
