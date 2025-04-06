@@ -17,8 +17,8 @@ class GitlabPrinterTest extends TestCase
      */
     public function test_print_with_violations(): void
     {
-        $violation1 = new Violation(ExampleClass::class, 'Some error message', 42);
-        $violation2 = new Violation(AnotherExampleClass::class, 'Another error message', null);
+        $violation1 = new Violation(ExampleClass::class, 'Some error message', 42, 'tests/Unit/CLI/Printer/GitlabPrinterTest.php');
+        $violation2 = new Violation(AnotherExampleClass::class, 'Another error message', null, 'tests/Unit/CLI/Printer/GitlabPrinterTest.php');
 
         $violationsCollection = [
             'RuleA' => [$violation1],
