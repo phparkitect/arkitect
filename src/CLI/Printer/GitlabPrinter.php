@@ -9,30 +9,34 @@ class GitlabPrinter implements Printer
 {
     public function print(array $violationsCollection): string
     {
-        $details = [];
-        $errorClassGrouped = [];
+        $allErrors = [];
 
         /**
          * @var string      $key
          * @var Violation[] $violationsByFqcn
          */
         foreach ($violationsCollection as $class => $violationsByFqcn) {
-            foreach ($violationsByFqcn as $key => $violation) {
-                $errorClassGrouped[$class][$key]['description'] = $violation->getError();
-                $errorClassGrouped[$class][$key]['check_name'] = $class.'.'.$this->toKebabCase($violation->getError());
-                $errorClassGrouped[$class][$key]['fingerprint'] = hash('sha256', $errorClassGrouped[$class][$key]['check_name']);
-                $errorClassGrouped[$class][$key]['severity'] = 'major'; // Todo enable severity on violation
-                $errorClassGrouped[$class][$key]['location']['path'] = $violation->getFilePath();
+            foreach ($violationsByFqcn as $violation) {
+                $checkName = $class.'.'.$this->toKebabCase($violation->getError());
 
-                if (null !== $violation->getLine()) {
-                    $errorClassGrouped[$class][$key]['lines']['begin'] = $violation->getLine();
-                } else {
-                    $errorClassGrouped[$class][$key]['lines']['begin'] = 1;
-                }
+                $error = [
+                    'description' => $violation->getError(),
+                    'check_name' => $checkName,
+                    'fingerprint' => hash('sha256', $checkName),
+                    'severity' => 'major',
+                    'location' => [
+                        'path' => $violation->getFilePath(),
+                        'lines' => [
+                            'begin' => $violation->getLine() ?? 1,
+                        ],
+                    ],
+                ];
+
+                $allErrors[] = $error;
             }
         }
 
-        return json_encode(array_merge($details, ...array_values($errorClassGrouped)));
+        return json_encode($allErrors);
     }
 
     private function toKebabCase(string $string): string

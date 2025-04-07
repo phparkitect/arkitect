@@ -208,7 +208,7 @@ App\Controller\Foo has 1 violations
         $this->assertJson($display);
 
         self::assertSame(<<<JSON
-        [{"description":"should have a name that matches *Controller because all controllers should be end name with Controller","check_name":"App\\\\Controller\\\\Foo.should-have-a-name-that-matches-controller-because-all-controllers-should-be-end-name-with-controller","fingerprint":"1e960c3f49b5ec63ece40321072ef2bd0bc33ad11b7be326f304255d277dc860","severity":"major","location":{"path":"Controller\/Foo.php"},"lines":{"begin":1}}]
+        [{"description":"should have a name that matches *Controller because all controllers should be end name with Controller","check_name":"App\\\\Controller\\\\Foo.should-have-a-name-that-matches-controller-because-all-controllers-should-be-end-name-with-controller","fingerprint":"1e960c3f49b5ec63ece40321072ef2bd0bc33ad11b7be326f304255d277dc860","severity":"major","location":{"path":"Controller\/Foo.php","lines":{"begin":1}}}]
 
         JSON, $display);
     }
