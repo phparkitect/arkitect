@@ -30,7 +30,7 @@ class FileVisitorTest extends TestCase
         $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
         $fp->parse($code, 'path/to/class.php');
 
-        $this->assertEmpty($fp->getClassDescriptions());
+        self::assertEmpty($fp->getClassDescriptions());
     }
 
     public function test_violation_should_have_ref_to_filepath(): void
@@ -60,9 +60,9 @@ class FileVisitorTest extends TestCase
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Foo');
         $dependsOnTheseNamespaces->evaluate($fp->getClassDescriptions()[0], $violations, 'because');
 
-        $this->assertCount(2, $violations);
-        $this->assertEquals('path/to/class.php', $violations->get(0)->getFilePath());
-        $this->assertEquals('path/to/class.php', $violations->get(1)->getFilePath());
+        self::assertCount(2, $violations);
+        self::assertEquals('path/to/class.php', $violations->get(0)->getFilePath());
+        self::assertEquals('path/to/class.php', $violations->get(1)->getFilePath());
     }
 
     public function test_should_create_a_class_description(): void
@@ -145,7 +145,7 @@ class FileVisitorTest extends TestCase
             new ClassDependency('Root\Namespace1\Proj', 23),
         ];
 
-        $this->assertEquals($expectedInterfaces, $cd[0]->getDependencies());
+        self::assertEquals($expectedInterfaces, $cd[0]->getDependencies());
     }
 
     public function test_it_should_parse_extends_class(): void
@@ -171,7 +171,7 @@ class FileVisitorTest extends TestCase
 
         $cd = $fp->getClassDescriptions()[1];
 
-        $this->assertEquals('Root\Animals\Animal', $cd->getExtends()[0]->toString());
+        self::assertEquals('Root\Animals\Animal', $cd->getExtends()[0]->toString());
     }
 
     public function test_it_should_not_parse_extends_from_insider_anonymousclass(): void
@@ -200,7 +200,7 @@ class FileVisitorTest extends TestCase
 
         $cd = $fp->getClassDescriptions()[1];
 
-        $this->assertEquals('Root\Animals\Animal', $cd->getExtends()[0]->toString());
+        self::assertEquals('Root\Animals\Animal', $cd->getExtends()[0]->toString());
     }
 
     public function test_should_depends_on_these_namespaces(): void
@@ -232,7 +232,7 @@ class FileVisitorTest extends TestCase
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Foo', 'Symfony', 'Doctrine');
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     public function test_should_returns_all_dependencies(): void
@@ -270,7 +270,7 @@ class FileVisitorTest extends TestCase
             new ClassDependency('Foo\Baz\StaticClass', 15),
         ];
 
-        $this->assertEquals($expectedDependencies, $cd[0]->getDependencies());
+        self::assertEquals($expectedDependencies, $cd[0]->getDependencies());
     }
 
     public function test_it_should_parse_arrow_function(): void
@@ -301,7 +301,7 @@ class FileVisitorTest extends TestCase
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Foo', 'Symfony', 'Doctrine');
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     public function test_it_should_catch_parsing_errors(): void
@@ -325,7 +325,7 @@ class FileVisitorTest extends TestCase
         $fp->parse($code, 'relativePathName');
 
         $parsingErrors = $fp->getParsingErrors();
-        $this->assertEquals([
+        self::assertEquals([
             ParsingError::create('relativePathName', 'Syntax error, unexpected \'}\' on line 10'),
         ], $parsingErrors);
     }
@@ -356,7 +356,7 @@ class FileVisitorTest extends TestCase
 
         $violations = new Violations();
 
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     public function test_it_should_parse_self_correctly(): void
@@ -394,7 +394,7 @@ class FileVisitorTest extends TestCase
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('Root\Animals');
         $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     public function test_it_should_return_errors_for_class_outside_namespace(): void
@@ -427,7 +427,7 @@ class FileVisitorTest extends TestCase
         $dependsOnlyOnTheseNamespaces = new DependsOnlyOnTheseNamespaces();
         $dependsOnlyOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function test_should_parse_class_attributes(): void
@@ -491,7 +491,7 @@ EOF;
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('Root\Cars');
         $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function test_it_can_parse_enum(): void
@@ -519,7 +519,7 @@ EOF;
         $notHaveDependencyOutsideNamespace = new Implement('MyInterface');
         $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function test_should_parse_enum_attributes(): void
@@ -647,12 +647,12 @@ EOF;
         $notHaveDependencyOutsideNamespace = new NotContainDocBlockLike('ItemNotFound');
         $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
 
         $notHaveDependencyOutsideNamespace = new NotContainDocBlockLike('Exception');
         $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(2, $violations);
+        self::assertCount(2, $violations);
     }
 
     public function test_it_parse_typed_property(): void
@@ -680,7 +680,7 @@ EOF;
         $notHaveDependencyOutsideNamespace = new DependsOnlyOnTheseNamespaces('MyProject\AppBundle\Application');
         $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function test_it_parse_typed_nullable_property(): void
@@ -708,7 +708,7 @@ EOF;
         $notHaveDependencyOutsideNamespace = new DependsOnlyOnTheseNamespaces('MyProject\AppBundle\Application');
         $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function test_it_parse_scalar_typed_property(): void
@@ -736,7 +736,7 @@ EOF;
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('MyProject\AppBundle\Application');
         $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     public function test_it_parse_nullable_scalar_typed_property(): void
@@ -768,7 +768,7 @@ EOF;
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('MyProject\AppBundle\Application');
         $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     public function test_it_parse_dependencies_in_docblocks_customs(): void
@@ -802,7 +802,7 @@ EOF;
         $notHaveDependencyOutsideNamespace = new DependsOnlyOnTheseNamespaces('MyProject\AppBundle\Application');
         $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function test_it_parse_custom_tags_in_docblocks(): void
@@ -832,7 +832,7 @@ EOF;
         $notHaveDependencyOutsideNamespace = new DependsOnlyOnTheseNamespaces('MyProject\AppBundle\Application');
         $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function test_should_implement_exact_classname(): void
@@ -865,7 +865,7 @@ EOF;
         $implement = new Implement('Foo\Order');
         $implement->evaluate($cd, $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(0, $violations, $violations->toString(Printer::FORMAT_TEXT));
+        self::assertCount(0, $violations, $violations->toString(Printer::FORMAT_TEXT));
     }
 
     public function test_it_parse_dependencies_in_docblocks_with_alias(): void
@@ -895,7 +895,7 @@ EOF;
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('MyProject\AppBundle\Application');
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function test_it_parse_interfaces(): void
@@ -921,7 +921,7 @@ EOF;
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('MyProject\AppBundle\Application');
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function test_it_parse_interface_extends(): void
@@ -953,9 +953,9 @@ EOF;
 
         $cd = $fp->getClassDescriptions();
 
-        $this->assertCount(3, $cd);
-        $this->assertEquals('MyProject\AppBundle\Application\FooAble', $cd[2]->getExtends()[0]->toString());
-        $this->assertEquals('MyProject\AppBundle\Application\BarAble', $cd[2]->getExtends()[1]->toString());
+        self::assertCount(3, $cd);
+        self::assertEquals('MyProject\AppBundle\Application\FooAble', $cd[2]->getExtends()[0]->toString());
+        self::assertEquals('MyProject\AppBundle\Application\BarAble', $cd[2]->getExtends()[1]->toString());
     }
 
     public function test_it_handles_return_types(): void
@@ -992,7 +992,7 @@ EOF;
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Foo', 'Symfony', 'Doctrine');
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     public function test_it_skip_custom_annotations_in_docblocks_if_the_option_parse_custom_annotation_is_false(): void
@@ -1021,7 +1021,7 @@ EOF;
         $dependsOnlyOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('MyProject\AppBundle\Application');
         $dependsOnlyOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     public function test_it_parse_arrays_as_scalar_types(): void
@@ -1050,7 +1050,7 @@ EOF;
         $notHaveDependenciesOutside = new NotHaveDependencyOutsideNamespace('App\Domain');
         $notHaveDependenciesOutside->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(0, $violations);
+        self::assertCount(0, $violations);
     }
 
     public function test_it_handles_typed_arrays_in_properties_with_generics_syntax(): void
@@ -1080,7 +1080,7 @@ EOF;
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Domain');
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function test_it_handles_typed_arrays_in_properties_with_list_syntax(): void
@@ -1110,7 +1110,7 @@ EOF;
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Domain');
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function test_it_handles_typed_arrays_in_properties_with_legacy_syntax(): void
@@ -1140,7 +1140,7 @@ EOF;
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Domain');
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function test_it_handles_typed_arrays_in_method_params_with_generics_syntax(): void
@@ -1172,7 +1172,7 @@ EOF;
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Domain');
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function test_it_handles_typed_arrays_in_method_params_with_list_syntax(): void
@@ -1204,7 +1204,7 @@ EOF;
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Domain');
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function test_it_handles_typed_arrays_in_method_params_with_legacy_syntax(): void
@@ -1236,7 +1236,7 @@ EOF;
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Domain');
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function test_it_handles_typed_arrays_in_method_params_with_multiple_params(): void
@@ -1271,7 +1271,7 @@ EOF;
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Domain');
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function test_it_handles_typed_arrays_in_return_type_with_generics_syntax(): void
@@ -1304,7 +1304,7 @@ EOF;
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Domain');
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function test_it_handles_typed_arrays_in_return_type_with_list_syntax(): void
@@ -1337,7 +1337,7 @@ EOF;
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Domain');
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function test_it_handles_typed_arrays_in_return_type_with_legacy_syntax(): void
@@ -1370,7 +1370,7 @@ EOF;
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Domain');
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     public function test_it_parse_traits(): void
@@ -1399,7 +1399,7 @@ EOF;
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('MyProject\AppBundle\Application');
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
-        $this->assertCount(1, $violations);
+        self::assertCount(1, $violations);
     }
 
     /**
@@ -1412,7 +1412,7 @@ EOF;
         $fp->parse($code, 'relativePathName');
 
         foreach ($fp->getClassDescriptions() as $classDescription) {
-            $this->assertTrue($classDescription->isEnum());
+            self::assertTrue($classDescription->isEnum());
         }
     }
 
@@ -1427,7 +1427,7 @@ EOF;
             {
                 case FOO;
             }
-            EOF
+            EOF,
         ];
 
         yield 'string enum' => [
@@ -1439,7 +1439,7 @@ EOF;
             {
                 case BAR: 'bar';
             }
-            EOF
+            EOF,
         ];
 
         yield 'integer enum' => [
@@ -1451,7 +1451,7 @@ EOF;
             {
                 case BAZ: 42;
             }
-            EOF
+            EOF,
         ];
 
         yield 'multiple enums' => [
@@ -1473,7 +1473,7 @@ EOF;
             {
                 case BAZ: 42;
             }
-            EOF
+            EOF,
         ];
     }
 
@@ -1505,6 +1505,6 @@ EOF;
 
         $cd = $fp->getClassDescriptions();
 
-        $this->assertInstanceOf(ClassDescription::class, $cd[0]);
+        self::assertInstanceOf(ClassDescription::class, $cd[0]);
     }
 }

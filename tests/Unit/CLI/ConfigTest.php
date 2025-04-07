@@ -26,10 +26,10 @@ class ConfigTest extends TestCase
         $config = new Config();
         $config->add($classSet, ...[$rule]);
 
-        $this->assertInstanceOf(Config::class, $config);
+        self::assertInstanceOf(Config::class, $config);
 
         $classSetRulesExpected[] = ClassSetRules::create($classSet, ...[$rule]);
-        $this->assertEquals($classSetRulesExpected, $config->getClassSetRules());
+        self::assertEquals($classSetRulesExpected, $config->getClassSetRules());
     }
 
     public function test_it_should_create_config_with_only_one_rule_to_run(): void
@@ -50,18 +50,18 @@ class ConfigTest extends TestCase
         $config = new Config();
         $config->add($classSet, ...[$rule1, $rule2]);
 
-        $this->assertInstanceOf(Config::class, $config);
+        self::assertInstanceOf(Config::class, $config);
 
         $classSetRulesExpected[] = ClassSetRules::create($classSet, ...[$rule2]);
-        $this->assertEquals($classSetRulesExpected, $config->getClassSetRules());
+        self::assertEquals($classSetRulesExpected, $config->getClassSetRules());
     }
 
     public function test_it_should_allow_to_change_the_default_value_for_parsing_custom_annotations(): void
     {
         $config = new Config();
-        $this->assertTrue($config->isParseCustomAnnotationsEnabled());
+        self::assertTrue($config->isParseCustomAnnotationsEnabled());
 
         $config->skipParsingCustomAnnotations();
-        $this->assertFalse($config->isParseCustomAnnotationsEnabled());
+        self::assertFalse($config->isParseCustomAnnotationsEnabled());
     }
 }

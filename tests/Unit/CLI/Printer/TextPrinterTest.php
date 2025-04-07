@@ -25,7 +25,7 @@ class TextPrinterTest extends TestCase
 
         $expectedOutput = "\nExampleClass has 1 violations\n  Error message\n";
 
-        $this->assertSame($expectedOutput, $result);
+        self::assertSame($expectedOutput, $result);
     }
 
     public function test_prints_violation_with_line(): void
@@ -41,7 +41,7 @@ class TextPrinterTest extends TestCase
 
         $expectedOutput = "\nExampleClass has 1 violations\n  Error message (on line 42)\n";
 
-        $this->assertSame($expectedOutput, $result);
+        self::assertSame($expectedOutput, $result);
     }
 
     public function test_prints_multiple_violations_grouped_by_fqcn(): void
@@ -61,6 +61,6 @@ class TextPrinterTest extends TestCase
 
         $expectedOutput = "\nExampleClass has 2 violations\n  First error\n  Second error (on line 10)\n\nAnotherClass has 1 violations\n  Another error (on line 15)\n";
 
-        $this->assertSame($expectedOutput, $result);
+        self::assertSame($expectedOutput, $result);
     }
 }

@@ -13,7 +13,7 @@ use Arkitect\Exceptions\IndexNotFoundException;
 class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
 {
     /**
-     * @var Violation[]
+     * @var array<Violation>
      */
     private array $violations;
 

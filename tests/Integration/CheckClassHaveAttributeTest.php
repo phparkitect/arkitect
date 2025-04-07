@@ -27,8 +27,8 @@ final class CheckClassHaveAttributeTest extends TestCase
 
         $runner->run($dir, $rule);
 
-        $this->assertCount(1, $runner->getViolations());
-        $this->assertCount(0, $runner->getParsingErrors());
+        self::assertCount(1, $runner->getViolations());
+        self::assertCount(0, $runner->getParsingErrors());
     }
 
     public function test_controllers_should_have_name_ending_in_controller(): void
@@ -44,10 +44,10 @@ final class CheckClassHaveAttributeTest extends TestCase
 
         $runner->run($dir, $rule);
 
-        $this->assertCount(1, $runner->getViolations());
-        $this->assertCount(0, $runner->getParsingErrors());
+        self::assertCount(1, $runner->getViolations());
+        self::assertCount(0, $runner->getParsingErrors());
 
-        $this->assertEquals('App\Controller\Foo', $runner->getViolations()->get(0)->getFqcn());
+        self::assertEquals('App\Controller\Foo', $runner->getViolations()->get(0)->getFqcn());
     }
 
     public function test_controllers_should_have_controller_attribute(): void
@@ -63,8 +63,8 @@ final class CheckClassHaveAttributeTest extends TestCase
 
         $runner->run($dir, $rule);
 
-        $this->assertCount(0, $runner->getViolations());
-        $this->assertCount(0, $runner->getParsingErrors());
+        self::assertCount(0, $runner->getViolations());
+        self::assertCount(0, $runner->getParsingErrors());
     }
 
     public function createDirStructure(): array

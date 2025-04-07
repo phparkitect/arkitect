@@ -24,7 +24,7 @@ class IsReadonlyTest extends TestCase
         $because = 'we want to add this rule for our software';
         $violationError = $isReadonly->describe($classDescription, $because)->toString();
 
-        $this->assertEquals('HappyIsland should be readonly because we want to add this rule for our software', $violationError);
+        self::assertEquals('HappyIsland should be readonly because we want to add this rule for our software', $violationError);
     }
 
     public function test_it_should_return_true_if_is_readonly(): void

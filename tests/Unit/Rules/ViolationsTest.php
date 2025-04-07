@@ -30,14 +30,14 @@ class ViolationsTest extends TestCase
 
     public function test_add_elements_to_store_and_get_it(): void
     {
-        $this->assertEquals($this->violation, $this->violationStore->get(0));
+        self::assertEquals($this->violation, $this->violationStore->get(0));
     }
 
     public function test_add_elements_to_store_and_cant_get_it_if_index_not_valid(): void
     {
         $this->expectException(IndexNotFoundException::class);
         $this->expectExceptionMessage('Index not found 1111');
-        $this->assertEquals('', $this->violationStore->get(1111));
+        self::assertEquals('', $this->violationStore->get(1111));
     }
 
     public function test_count(): void
@@ -47,7 +47,7 @@ class ViolationsTest extends TestCase
             'should have name end with Controller'
         );
         $this->violationStore->add($violation);
-        $this->assertEquals(2, $this->violationStore->count());
+        self::assertEquals(2, $this->violationStore->count());
     }
 
     public function test_to_string(): void
@@ -66,7 +66,7 @@ App\Controller\Foo has 1 violations
   should have name end with Controller
 ';
 
-        $this->assertEquals($expected, $this->violationStore->toString(Printer::FORMAT_TEXT));
+        self::assertEquals($expected, $this->violationStore->toString(Printer::FORMAT_TEXT));
     }
 
     public function test_get_iterable(): void
@@ -78,7 +78,7 @@ App\Controller\Foo has 1 violations
         $this->violationStore->add($violation);
         $iterable = $this->violationStore->getIterator();
 
-        $this->assertEquals([
+        self::assertEquals([
             $this->violation,
             $violation,
         ], iterator_to_array($iterable));
@@ -97,7 +97,7 @@ App\Controller\Foo has 1 violations
         $this->violationStore->add($violation1);
         $this->violationStore->add($violation2);
 
-        $this->assertEquals([
+        self::assertEquals([
             $this->violation,
             $violation1,
             $violation2,
@@ -118,15 +118,15 @@ App\Controller\Foo has 1 violations
         );
         $this->violationStore->add($violation2);
 
-        $this->assertCount(3, $this->violationStore->toArray());
+        self::assertCount(3, $this->violationStore->toArray());
 
         $violationsBaseline = new Violations();
         $violationsBaseline->add($this->violation);
 
         $this->violationStore->remove($violationsBaseline);
 
-        $this->assertCount(2, $this->violationStore->toArray());
-        $this->assertEquals([
+        self::assertCount(2, $this->violationStore->toArray());
+        self::assertEquals([
             $violation1,
             $violation2,
         ], $this->violationStore->toArray());
@@ -160,7 +160,7 @@ App\Controller\Foo has 1 violations
         $violationStore->add($violation3);
         $violationStore->add($violation4);
 
-        $this->assertEquals([
+        self::assertEquals([
             $violation1,
             $violation2,
             $violation3,
@@ -169,7 +169,7 @@ App\Controller\Foo has 1 violations
 
         $violationStore->sort();
 
-        $this->assertSame([
+        self::assertSame([
             $violation4, // fqcn is most important
             $violation3, // then line number
             $violation2, // then error message
@@ -200,7 +200,7 @@ App\Controller\Foo has 1 violations
         );
         $this->violationStore->add($violation3);
 
-        $this->assertCount(4, $this->violationStore->toArray());
+        self::assertCount(4, $this->violationStore->toArray());
 
         $violationsBaseline = new Violations();
         $violationsBaseline->add(new Violation(
@@ -211,8 +211,8 @@ App\Controller\Foo has 1 violations
 
         $this->violationStore->remove($violationsBaseline, true);
 
-        $this->assertCount(3, $this->violationStore->toArray());
-        $this->assertEquals([
+        self::assertCount(3, $this->violationStore->toArray());
+        self::assertEquals([
             $this->violation,
             $violation2,
             $violation3,

@@ -23,10 +23,10 @@ class ClassDescriptionBuilderTest extends TestCase
             ->addInterface('InterfaceClass', 10)
             ->build();
 
-        $this->assertInstanceOf(ClassDescription::class, $classDescription);
+        self::assertInstanceOf(ClassDescription::class, $classDescription);
 
-        $this->assertEquals($FQCN, $classDescription->getName());
-        $this->assertEquals($FQCN, $classDescription->getFQCN());
+        self::assertEquals($FQCN, $classDescription->getName());
+        self::assertEquals($FQCN, $classDescription->getFQCN());
     }
 
     public function test_it_should_create_final_class(): void
@@ -39,9 +39,9 @@ class ClassDescriptionBuilderTest extends TestCase
             ->setFinal(true)
             ->build();
 
-        $this->assertInstanceOf(ClassDescription::class, $classDescription);
+        self::assertInstanceOf(ClassDescription::class, $classDescription);
 
-        $this->assertTrue($classDescription->isFinal());
+        self::assertTrue($classDescription->isFinal());
     }
 
     public function test_it_should_create_not_final_class(): void
@@ -54,9 +54,9 @@ class ClassDescriptionBuilderTest extends TestCase
             ->setFinal(false)
             ->build();
 
-        $this->assertInstanceOf(ClassDescription::class, $classDescription);
+        self::assertInstanceOf(ClassDescription::class, $classDescription);
 
-        $this->assertFalse($classDescription->isFinal());
+        self::assertFalse($classDescription->isFinal());
     }
 
     public function test_it_should_create_abstract_class(): void
@@ -69,9 +69,9 @@ class ClassDescriptionBuilderTest extends TestCase
             ->setAbstract(true)
             ->build();
 
-        $this->assertInstanceOf(ClassDescription::class, $classDescription);
+        self::assertInstanceOf(ClassDescription::class, $classDescription);
 
-        $this->assertTrue($classDescription->isAbstract());
+        self::assertTrue($classDescription->isAbstract());
     }
 
     public function test_it_should_create_not_abstract_class(): void
@@ -84,9 +84,9 @@ class ClassDescriptionBuilderTest extends TestCase
             ->setAbstract(false)
             ->build();
 
-        $this->assertInstanceOf(ClassDescription::class, $classDescription);
+        self::assertInstanceOf(ClassDescription::class, $classDescription);
 
-        $this->assertFalse($classDescription->isAbstract());
+        self::assertFalse($classDescription->isAbstract());
     }
 
     public function test_it_should_create_annotated_class(): void
@@ -105,8 +105,8 @@ class ClassDescriptionBuilderTest extends TestCase
             ->addDocBlock($docBlock)
             ->build();
 
-        $this->assertInstanceOf(ClassDescription::class, $classDescription);
-        $this->assertEquals([$docBlock], $classDescription->getDocBlock());
+        self::assertInstanceOf(ClassDescription::class, $classDescription);
+        self::assertEquals([$docBlock], $classDescription->getDocBlock());
     }
 
     public function test_it_should_add_attributes(): void
@@ -135,8 +135,8 @@ class ClassDescriptionBuilderTest extends TestCase
             ->setInterface(true)
             ->build();
 
-        $this->assertInstanceOf(ClassDescription::class, $classDescription);
-        $this->assertTrue($classDescription->isInterface());
+        self::assertInstanceOf(ClassDescription::class, $classDescription);
+        self::assertTrue($classDescription->isInterface());
     }
 
     public function test_it_should_create_not_interface(): void
@@ -149,8 +149,8 @@ class ClassDescriptionBuilderTest extends TestCase
             ->setInterface(false)
             ->build();
 
-        $this->assertInstanceOf(ClassDescription::class, $classDescription);
-        $this->assertFalse($classDescription->isInterface());
+        self::assertInstanceOf(ClassDescription::class, $classDescription);
+        self::assertFalse($classDescription->isInterface());
     }
 
     public function test_it_should_create_trait(): void
@@ -163,8 +163,8 @@ class ClassDescriptionBuilderTest extends TestCase
             ->setTrait(true)
             ->build();
 
-        $this->assertInstanceOf(ClassDescription::class, $classDescription);
-        $this->assertTrue($classDescription->isTrait());
+        self::assertInstanceOf(ClassDescription::class, $classDescription);
+        self::assertTrue($classDescription->isTrait());
     }
 
     public function test_it_should_create_not_trait(): void
@@ -177,7 +177,7 @@ class ClassDescriptionBuilderTest extends TestCase
             ->setTrait(false)
             ->build();
 
-        $this->assertInstanceOf(ClassDescription::class, $classDescription);
-        $this->assertFalse($classDescription->isTrait());
+        self::assertInstanceOf(ClassDescription::class, $classDescription);
+        self::assertFalse($classDescription->isTrait());
     }
 }

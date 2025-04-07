@@ -15,6 +15,6 @@ class ArchRuleTestCase extends TestCase
     {
         $constraint = new ArchRuleCheckerConstraintAdapter($set);
 
-        static::assertThat($rule, $constraint);
+        self::assertThat($rule, $constraint);
     }
 }

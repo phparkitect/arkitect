@@ -23,14 +23,14 @@ class TestRunner
 
     private FileParser $fileParser;
 
-    private function __construct(string $version = null)
+    private function __construct(?string $version = null)
     {
         $this->violations = new Violations();
         $this->parsingErrors = new ParsingErrors();
         $this->fileParser = FileParserFactory::createFileParser(TargetPhpVersion::create($version));
     }
 
-    public static function create(string $version = null): self
+    public static function create(?string $version = null): self
     {
         if (null === self::$instance) {
             self::$instance = new self($version);

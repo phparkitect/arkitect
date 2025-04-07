@@ -329,7 +329,6 @@ class NameResolver extends NodeVisitorAbstract
 
     /**
      * @param Stmt\Use_::TYPE_* $type
-     * @param ?Name             $prefix
      *
      * @psalm-suppress PossiblyNullArgument
      */

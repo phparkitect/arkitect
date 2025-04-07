@@ -19,9 +19,9 @@ class InitCommandTest extends TestCase
 
         $output = $appTester->getDisplay();
 
-        $this->assertFileExists($fs.'/phparkitect.php');
-        $this->assertStringContainsString('Creating phparkitect.php file...', $output);
-        $this->assertStringContainsString('customize it and run with php bin/phparkitect check', $output);
+        self::assertFileExists($fs.'/phparkitect.php');
+        self::assertStringContainsString('Creating phparkitect.php file...', $output);
+        self::assertStringContainsString('customize it and run with php bin/phparkitect check', $output);
     }
 
     public function test_it_creates_a_file_in_a_custom_dir(): void
@@ -38,9 +38,9 @@ class InitCommandTest extends TestCase
 
         $output = $appTester->getDisplay();
 
-        $this->assertFileExists($fs.'/nested/path/phparkitect.php');
-        $this->assertStringContainsString('Creating phparkitect.php file...', $output);
-        $this->assertStringContainsString('customize it and run with php bin/phparkitect check', $output);
+        self::assertFileExists($fs.'/nested/path/phparkitect.php');
+        self::assertStringContainsString('Creating phparkitect.php file...', $output);
+        self::assertStringContainsString('customize it and run with php bin/phparkitect check', $output);
     }
 
     public function test_do_nothing_if_file_exists(): void
@@ -57,7 +57,7 @@ class InitCommandTest extends TestCase
 
         $appTester = $this->runInit($fs.'/nested/path');
 
-        $this->assertStringContainsString(
+        self::assertStringContainsString(
             'File phparkitect.php found in current directory, nothing to do',
             $appTester->getDisplay()
         );
@@ -69,7 +69,7 @@ class InitCommandTest extends TestCase
 
         $appTester = $this->runInit($fs);
 
-        $this->assertStringContainsString(
+        self::assertStringContainsString(
             'Ops, it seems I cannot create the file in vfs://root',
             $appTester->getDisplay()
         );

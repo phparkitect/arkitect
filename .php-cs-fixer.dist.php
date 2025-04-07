@@ -9,6 +9,7 @@ return (new PhpCsFixer\Config())
     ->setFinder($finder)
     ->setRiskyAllowed(true)
     ->setRules([
+        '@PER-CS' => true,
         '@Symfony' => true,
         '@Symfony:risky' => true,
         '@PHP71Migration:risky' => true,
@@ -39,5 +40,8 @@ return (new PhpCsFixer\Config())
         'list_syntax' => ['syntax' => 'short'],
         'phpdoc_to_comment' => false,
         'php_unit_method_casing' => ['case' => 'snake_case'],
-        'function_to_constant' => false
+        'function_to_constant' => false,
+        'php_unit_data_provider_static' => true ,
+        'php_unit_test_case_static_method_calls' => ['call_type' => 'self'],
+        'phpdoc_array_type' => true
     ]);

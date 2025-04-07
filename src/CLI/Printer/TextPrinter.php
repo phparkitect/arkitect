@@ -12,8 +12,8 @@ class TextPrinter implements Printer
         $errors = '';
 
         /**
-         * @var string      $key
-         * @var Violation[] $violationsByFqcn
+         * @var string           $key
+         * @var array<Violation> $violationsByFqcn
          */
         foreach ($violationsCollection as $key => $violationsByFqcn) {
             $violationForThisFqcn = \count($violationsByFqcn);

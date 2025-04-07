@@ -12,8 +12,8 @@ class GitlabPrinter implements Printer
         $allErrors = [];
 
         /**
-         * @var string      $key
-         * @var Violation[] $violationsByFqcn
+         * @var string           $key
+         * @var array<Violation> $violationsByFqcn
          */
         foreach ($violationsCollection as $class => $violationsByFqcn) {
             foreach ($violationsByFqcn as $violation) {

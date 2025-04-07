@@ -31,8 +31,8 @@ class IsAbstractTest extends TestCase
 
         $runner->run($this->createClasses(), $rule);
 
-        $this->assertCount(0, $runner->getViolations());
-        $this->assertCount(0, $runner->getParsingErrors());
+        self::assertCount(0, $runner->getViolations());
+        self::assertCount(0, $runner->getParsingErrors());
     }
 
     public function test_is_abstract_in_should_should_consider_final_traits_enums_interfaces(): void
@@ -46,13 +46,13 @@ class IsAbstractTest extends TestCase
 
         $runner->run($this->createClasses(), $rule);
 
-        $this->assertCount(4, $runner->getViolations());
-        $this->assertCount(0, $runner->getParsingErrors());
+        self::assertCount(4, $runner->getViolations());
+        self::assertCount(0, $runner->getParsingErrors());
 
-        $this->assertEquals('App\MyEnum', $runner->getViolations()->get(0)->getFqcn());
-        $this->assertEquals('App\MyFinal', $runner->getViolations()->get(1)->getFqcn());
-        $this->assertEquals('App\MyInterface', $runner->getViolations()->get(2)->getFqcn());
-        $this->assertEquals('App\MyTrait', $runner->getViolations()->get(3)->getFqcn());
+        self::assertEquals('App\MyEnum', $runner->getViolations()->get(0)->getFqcn());
+        self::assertEquals('App\MyFinal', $runner->getViolations()->get(1)->getFqcn());
+        self::assertEquals('App\MyInterface', $runner->getViolations()->get(2)->getFqcn());
+        self::assertEquals('App\MyTrait', $runner->getViolations()->get(3)->getFqcn());
     }
 
     public function test_is_not_abstract_in_should_should_consider_final_traits_enums_interfaces(): void
@@ -66,10 +66,10 @@ class IsAbstractTest extends TestCase
 
         $runner->run($this->createClasses(), $rule);
 
-        $this->assertCount(1, $runner->getViolations());
-        $this->assertCount(0, $runner->getParsingErrors());
+        self::assertCount(1, $runner->getViolations());
+        self::assertCount(0, $runner->getParsingErrors());
 
-        $this->assertEquals('App\MyAbstract', $runner->getViolations()->get(0)->getFqcn());
+        self::assertEquals('App\MyAbstract', $runner->getViolations()->get(0)->getFqcn());
     }
 
     public function test_it_can_check_multiple_class_properties(): void
@@ -152,8 +152,8 @@ class IsAbstractTest extends TestCase
 
         $runner->run(vfsStream::setup('root', null, $structure)->url(), $rule);
 
-        $this->assertCount(0, $runner->getViolations());
-        $this->assertCount(0, $runner->getParsingErrors());
+        self::assertCount(0, $runner->getViolations());
+        self::assertCount(0, $runner->getParsingErrors());
     }
 
     protected function createClasses(): string

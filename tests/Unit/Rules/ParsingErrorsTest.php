@@ -30,14 +30,14 @@ class ParsingErrorsTest extends TestCase
 
     public function test_add_elements_to_store_and_get_it(): void
     {
-        $this->assertEquals($this->parsingError, $this->parsingStore->get(0));
+        self::assertEquals($this->parsingError, $this->parsingStore->get(0));
     }
 
     public function test_add_elements_to_store_and_cant_get_it_if_index_not_valid(): void
     {
         $this->expectException(IndexNotFoundException::class);
         $this->expectExceptionMessage('Index not found 1111');
-        $this->assertEquals('', $this->parsingStore->get(1111));
+        self::assertEquals('', $this->parsingStore->get(1111));
     }
 
     public function test_count(): void
@@ -48,7 +48,7 @@ class ParsingErrorsTest extends TestCase
             2
         );
         $this->parsingStore->add($parsingError);
-        $this->assertEquals(2, $this->parsingStore->count());
+        self::assertEquals(2, $this->parsingStore->count());
     }
 
     public function test_to_string(): void
@@ -65,12 +65,12 @@ Syntax error, unexpected T_STRING on line 8 in file: App\Controller\ProductContr
 Syntax error, unexpected T_STRING on line 8 in file: App\Controller\Foo
 ';
 
-        $this->assertEquals($expected, $this->parsingStore->toString());
+        self::assertEquals($expected, $this->parsingStore->toString());
     }
 
     public function test_calling_iterator(): void
     {
-        $this->assertInstanceOf(\Generator::class, $this->parsingStore->getIterator());
+        self::assertInstanceOf(\Generator::class, $this->parsingStore->getIterator());
     }
 
     public function test_convert_to_array(): void
@@ -79,7 +79,7 @@ Syntax error, unexpected T_STRING on line 8 in file: App\Controller\Foo
             $this->parsingError,
         ];
 
-        $this->assertEquals($expected, $this->parsingStore->toArray());
+        self::assertEquals($expected, $this->parsingStore->toArray());
     }
 
     public function test_get_iterable(): void
@@ -92,6 +92,6 @@ Syntax error, unexpected T_STRING on line 8 in file: App\Controller\Foo
         $this->parsingStore->add($parsingError);
         $iterable = $this->parsingStore->getIterator();
 
-        $this->assertEquals([$this->parsingError, $parsingError], iterator_to_array($iterable));
+        self::assertEquals([$this->parsingError, $parsingError], iterator_to_array($iterable));
     }
 }
