@@ -9,5 +9,7 @@ interface Printer
 
     public const FORMAT_JSON = 'json';
 
+    public const FORMAT_GITLAB = 'gitlab';
+
     public function print(array $violationsCollection): string;
 }
