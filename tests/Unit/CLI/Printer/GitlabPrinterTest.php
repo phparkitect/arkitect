@@ -44,10 +44,10 @@ class GitlabPrinterTest extends TestCase
 
         $result = $printer->print($violationsCollection);
 
-        $this->assertIsString($result, 'Result should be a string');
-        $this->assertJson($result, 'Result should be a valid JSON string');
+        self::assertIsString($result, 'Result should be a string');
+        self::assertJson($result, 'Result should be a valid JSON string');
 
         $decodedResult = json_decode($result, true);
-        $this->assertEmpty($decodedResult, 'Result should be an empty array');
+        self::assertEmpty($decodedResult, 'Result should be an empty array');
     }
 }
