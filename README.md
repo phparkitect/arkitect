@@ -106,7 +106,8 @@ phparkitect check --ignore-baseline-linenumbers
 
 Output format can be controlled using the parameter `format=[FORMAT]`. There are two available output formats
 * `text`: the default one
-* `json`: this follows Gitlab's [code quality format](https://docs.gitlab.com/ci/testing/code_quality/#code-quality-report-format). Note that this will suppress any output apart from the violation reporting.
+* `json`: this format allows custom report using github action or another platform as Sonarqube and so on... Note that this will suppress any output apart from the violation reporting.
+* `gitlab`: this follows Gitlab's [code quality format](https://docs.gitlab.com/ci/testing/code_quality/#code-quality-report-format). Note that this will suppress any output apart from the violation reporting.
 
 ## Configuration
 
