@@ -10,7 +10,6 @@ use Arkitect\CLI\Progress\DebugProgress;
 use Arkitect\CLI\Progress\ProgressBarProgress;
 use Arkitect\CLI\Runner;
 use Arkitect\CLI\TargetPhpVersion;
-use Arkitect\Exceptions\FailOnFirstViolationException;
 use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violations;
 use Symfony\Component\Console\Command\Command;
@@ -150,10 +149,8 @@ class Check extends Command
             $this->readRules($config, $rulesFilename);
 
             $runner = new Runner($stopOnFailure);
-            try {
-                $runner->run($config, $progress, $targetPhpVersion, $onlyErrors);
-            } catch (FailOnFirstViolationException $e) {
-            }
+            $runner->run($config, $progress, $targetPhpVersion, $onlyErrors);
+
             $violations = $runner->getViolations();
             $violations->sort();
 
