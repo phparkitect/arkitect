@@ -41,7 +41,11 @@ class Runner
                 $progress->startFileSetAnalysis($classSetRule->getClassSet());
             }
 
-            $this->check($classSetRule, $progress, $fileParser, $this->violations, $this->parsingErrors, $onlyErrors);
+            try {
+                $this->check($classSetRule, $progress, $fileParser, $this->violations, $this->parsingErrors, $onlyErrors);
+            } catch (FailOnFirstViolationException $e) {
+                return;
+            }
 
             if (!$onlyErrors) {
                 $progress->endFileSetAnalysis($classSetRule->getClassSet());
