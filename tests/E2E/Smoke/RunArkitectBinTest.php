@@ -13,8 +13,7 @@ class RunArkitectBinTest extends TestCase
 
     const ERROR_CODE = 1;
 
-    /** @var string */
-    private $phparkitect = __DIR__.'/../../../bin-stub/phparkitect';
+    private string $phparkitect = __DIR__.'/../../../bin-stub/phparkitect';
 
     public function test_returns_error_with_multiple_violations(): void
     {
@@ -96,6 +95,20 @@ App\Controller\Foo has 1 violations
 
         self::assertEquals(self::ERROR_CODE, $process->getExitCode());
         self::assertStringContainsString($expectedErrors, $process->getOutput());
+    }
+
+    public function test_only_violations_are_printed_on_stdout(): void
+    {
+        $tmpFile = tempnam(sys_get_temp_dir(), 'format_json');
+        $binPath = $this->phparkitect;
+        $configFilePath = __DIR__.'/../_fixtures/configMvc.php';
+
+        $process = Process::fromShellCommandline("php {$binPath} check --config=$configFilePath --format=gitlab > $tmpFile");
+        $process->run();
+
+        $fileContent = file_get_contents($tmpFile);
+
+        self::assertJson($fileContent);
     }
 
     protected function runArkitectPassingConfigFilePath($configFilePath): Process
