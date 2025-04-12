@@ -110,12 +110,18 @@ class Check extends Command
             $useBaseline = (string) $input->getOption(self::USE_BASELINE_PARAM);
             $skipBaseline = (bool) $input->getOption(self::SKIP_BASELINE_PARAM);
             $ignoreBaselineLinenumbers = (bool) $input->getOption(self::IGNORE_BASELINE_LINENUMBERS_PARAM);
+            $phpVersion = $input->getOption('target-php-version');
             $format = $input->getOption(self::FORMAT_PARAM);
-            $onlyErrors = Printer::FORMAT_JSON === $format || Printer::FORMAT_GITLAB === $format;
 
             // we write everything on STDERR apart from the list of violations which goes on STDOUT
+            // this allows to pipe the output of this command to a file while showing output on the terminal
             $stdOut = $output;
             $output = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
+
+            /** @var string|null $phpVersion */
+            $targetPhpVersion = TargetPhpVersion::create($phpVersion);
+
+            $progress = $verbose ? new DebugProgress($output) : new ProgressBarProgress($output);
 
             if (true !== $skipBaseline && !$useBaseline && file_exists(self::DEFAULT_BASELINE_FILENAME)) {
                 $useBaseline = self::DEFAULT_BASELINE_FILENAME;
@@ -131,12 +137,6 @@ class Check extends Command
 
             $generateBaseline = $input->getOption(self::GENERATE_BASELINE_PARAM);
 
-            /** @var string|null $phpVersion */
-            $phpVersion = $input->getOption('target-php-version');
-            $targetPhpVersion = TargetPhpVersion::create($phpVersion);
-
-            $progress = $verbose ? new DebugProgress($output) : new ProgressBarProgress($output);
-
             $this->printHeadingLine($output);
 
             $rulesFilename = $this->getConfigFilename($input);
@@ -148,7 +148,7 @@ class Check extends Command
             $this->readRules($config, $rulesFilename);
 
             $runner = new Runner($stopOnFailure);
-            $runner->run($config, $progress, $targetPhpVersion, $onlyErrors);
+            $runner->run($config, $progress, $targetPhpVersion);
 
             $violations = $runner->getViolations();
             $violations->sort();
@@ -254,9 +254,5 @@ class Check extends Command
         Assert::file($filename, 'Config file not found');
 
         return $filename;
-    }
-
-    private function printNoViolationsDetectedMessage(OutputInterface $output, bool $onlyErrors = false, string $format = Printer::FORMAT_TEXT): void
-    {
     }
 }
