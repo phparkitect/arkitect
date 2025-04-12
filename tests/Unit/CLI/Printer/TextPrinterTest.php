@@ -23,7 +23,7 @@ class TextPrinterTest extends TestCase
         $printer = new TextPrinter();
         $result = $printer->print($violations);
 
-        $expectedOutput = "\nExampleClass has 1 violations\n  Error message\n";
+        $expectedOutput = "\n\nExampleClass has 1 violations\n  Error message\n";
 
         self::assertSame($expectedOutput, $result);
     }
@@ -39,7 +39,7 @@ class TextPrinterTest extends TestCase
         $printer = new TextPrinter();
         $result = $printer->print($violations);
 
-        $expectedOutput = "\nExampleClass has 1 violations\n  Error message (on line 42)\n";
+        $expectedOutput = "\n\nExampleClass has 1 violations\n  Error message (on line 42)\n";
 
         self::assertSame($expectedOutput, $result);
     }
@@ -59,7 +59,7 @@ class TextPrinterTest extends TestCase
         $printer = new TextPrinter();
         $result = $printer->print($violations);
 
-        $expectedOutput = "\nExampleClass has 2 violations\n  First error\n  Second error (on line 10)\n\nAnotherClass has 1 violations\n  Another error (on line 15)\n";
+        $expectedOutput = "\n\nExampleClass has 2 violations\n  First error\n  Second error (on line 10)\n\nAnotherClass has 1 violations\n  Another error (on line 15)\n";
 
         self::assertSame($expectedOutput, $result);
     }

@@ -19,7 +19,7 @@ class RunArkitectBinTest extends TestCase
     {
         $process = $this->runArkitectPassingConfigFilePath(__DIR__.'/../_fixtures/configMvc.php');
 
-        $expectedErrors = 'ERRORS!
+        $expectedErrors = '
 
 App\Controller\Foo has 2 violations
   should have a name that matches *Controller because we want uniform naming
@@ -46,7 +46,7 @@ App\Domain\Model has 2 violations
     {
         $process = $this->runArkitect();
 
-        $expectedErrors = 'ERRORS!
+        $expectedErrors = '
 
 App\Controller\Foo has 2 violations
   should have a name that matches *Controller because we want uniform naming
@@ -81,14 +81,14 @@ App\Domain\Model has 2 violations
         $process = $this->runArkitectPassingConfigFilePath(__DIR__.'/../_fixtures/configMvcWithoutErrors.php');
 
         self::assertEquals(self::SUCCESS_CODE, $process->getExitCode());
-        self::assertStringNotContainsString('ERRORS!', $process->getOutput());
+        self::assertStringNotContainsString('⚠️', $process->getOutput());
     }
 
     public function test_bug_yield(): void
     {
         $process = $this->runArkitectPassingConfigFilePath(__DIR__.'/../_fixtures/configMvcForYieldBug.php');
 
-        $expectedErrors = 'ERRORS!
+        $expectedErrors = '
 
 App\Controller\Foo has 1 violations
   should have a name that matches *Controller';

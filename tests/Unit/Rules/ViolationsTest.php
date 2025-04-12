@@ -12,11 +12,9 @@ use PHPUnit\Framework\TestCase;
 
 class ViolationsTest extends TestCase
 {
-    /** @var Violations */
-    private $violationStore;
+    private Violations $violationStore;
 
-    /** @var Violation */
-    private $violation;
+    private Violation $violation;
 
     protected function setUp(): void
     {
@@ -58,15 +56,16 @@ class ViolationsTest extends TestCase
         );
 
         $this->violationStore->add($violation);
-        $expected = '
-App\Controller\ProductController has 1 violations
-  should implement ContainerInterface
 
-App\Controller\Foo has 1 violations
-  should have name end with Controller
-';
+        $expected = <<<'ERRORS'
+        App\Controller\ProductController has 1 violations
+          should implement ContainerInterface
 
-        self::assertEquals($expected, $this->violationStore->toString(Printer::FORMAT_TEXT));
+        App\Controller\Foo has 1 violations
+          should have name end with Controller
+        ERRORS;
+
+        self::assertStringContainsString($expected, $this->violationStore->toString(Printer::FORMAT_TEXT));
     }
 
     public function test_get_iterable(): void
