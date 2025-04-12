@@ -175,7 +175,7 @@ class Check extends Command
             $stdOut->writeln($violations->toString($format));
 
             if ($violations->count() > 0) {
-                $output->writeln(\sprintf('<error> %s Violations Detected!</error>', \count($violations)));
+                $output->writeln(\sprintf('<error>⚠️ %s violations detected!</error>', \count($violations)));
                 $this->printExecutionTime($output, $startTime);
 
                 return self::ERROR_CODE;
