@@ -13,14 +13,13 @@ class RunArkitectBinTest extends TestCase
 
     const ERROR_CODE = 1;
 
-    /** @var string */
-    private $phparkitect = __DIR__.'/../../../bin-stub/phparkitect';
+    private string $phparkitect = __DIR__.'/../../../bin-stub/phparkitect';
 
     public function test_returns_error_with_multiple_violations(): void
     {
         $process = $this->runArkitectPassingConfigFilePath(__DIR__.'/../_fixtures/configMvc.php');
 
-        $expectedErrors = 'ERRORS!
+        $expectedErrors = '
 
 App\Controller\Foo has 2 violations
   should have a name that matches *Controller because we want uniform naming
@@ -47,7 +46,7 @@ App\Domain\Model has 2 violations
     {
         $process = $this->runArkitect();
 
-        $expectedErrors = 'ERRORS!
+        $expectedErrors = '
 
 App\Controller\Foo has 2 violations
   should have a name that matches *Controller because we want uniform naming
@@ -82,20 +81,34 @@ App\Domain\Model has 2 violations
         $process = $this->runArkitectPassingConfigFilePath(__DIR__.'/../_fixtures/configMvcWithoutErrors.php');
 
         self::assertEquals(self::SUCCESS_CODE, $process->getExitCode());
-        self::assertStringNotContainsString('ERRORS!', $process->getOutput());
+        self::assertStringNotContainsString('⚠️', $process->getOutput());
     }
 
     public function test_bug_yield(): void
     {
         $process = $this->runArkitectPassingConfigFilePath(__DIR__.'/../_fixtures/configMvcForYieldBug.php');
 
-        $expectedErrors = 'ERRORS!
+        $expectedErrors = '
 
 App\Controller\Foo has 1 violations
   should have a name that matches *Controller';
 
         self::assertEquals(self::ERROR_CODE, $process->getExitCode());
         self::assertStringContainsString($expectedErrors, $process->getOutput());
+    }
+
+    public function test_only_violations_are_printed_on_stdout(): void
+    {
+        $tmpFile = tempnam(sys_get_temp_dir(), 'format_json');
+        $binPath = $this->phparkitect;
+        $configFilePath = __DIR__.'/../_fixtures/configMvc.php';
+
+        $process = Process::fromShellCommandline("php {$binPath} check --config=$configFilePath --format=gitlab > $tmpFile");
+        $process->run();
+
+        $fileContent = file_get_contents($tmpFile);
+
+        self::assertJson($fileContent);
     }
 
     protected function runArkitectPassingConfigFilePath($configFilePath): Process

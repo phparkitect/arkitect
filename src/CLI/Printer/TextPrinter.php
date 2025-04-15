@@ -9,7 +9,7 @@ class TextPrinter implements Printer
 {
     public function print(array $violationsCollection): string
     {
-        $errors = '';
+        $errors = "\n";
 
         /**
          * @var string           $key

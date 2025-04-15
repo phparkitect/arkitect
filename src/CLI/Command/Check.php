@@ -5,16 +5,15 @@ declare(strict_types=1);
 namespace Arkitect\CLI\Command;
 
 use Arkitect\CLI\Config;
-use Arkitect\CLI\Printer\Printer;
 use Arkitect\CLI\Progress\DebugProgress;
 use Arkitect\CLI\Progress\ProgressBarProgress;
 use Arkitect\CLI\Runner;
 use Arkitect\CLI\TargetPhpVersion;
-use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violations;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\Assert;
 
@@ -110,8 +109,18 @@ class Check extends Command
             $useBaseline = (string) $input->getOption(self::USE_BASELINE_PARAM);
             $skipBaseline = (bool) $input->getOption(self::SKIP_BASELINE_PARAM);
             $ignoreBaselineLinenumbers = (bool) $input->getOption(self::IGNORE_BASELINE_LINENUMBERS_PARAM);
+            $phpVersion = $input->getOption('target-php-version');
             $format = $input->getOption(self::FORMAT_PARAM);
-            $onlyErrors = Printer::FORMAT_JSON === $format || Printer::FORMAT_GITLAB === $format;
+
+            // we write everything on STDERR apart from the list of violations which goes on STDOUT
+            // this allows to pipe the output of this command to a file while showing output on the terminal
+            $stdOut = $output;
+            $output = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
+
+            /** @var string|null $phpVersion */
+            $targetPhpVersion = TargetPhpVersion::create($phpVersion);
+
+            $progress = $verbose ? new DebugProgress($output) : new ProgressBarProgress($output);
 
             if (true !== $skipBaseline && !$useBaseline && file_exists(self::DEFAULT_BASELINE_FILENAME)) {
                 $useBaseline = self::DEFAULT_BASELINE_FILENAME;
@@ -123,33 +132,22 @@ class Check extends Command
                 return self::ERROR_CODE;
             }
 
-            if (!$onlyErrors) {
-                $output->writeln('<info>Baseline found: '.$useBaseline.'</info>');
-            }
+            $output->writeln('<info>Baseline found: '.$useBaseline.'</info>');
 
             $generateBaseline = $input->getOption(self::GENERATE_BASELINE_PARAM);
 
-            /** @var string|null $phpVersion */
-            $phpVersion = $input->getOption('target-php-version');
-            $targetPhpVersion = TargetPhpVersion::create($phpVersion);
-
-            $progress = $verbose ? new DebugProgress($output) : new ProgressBarProgress($output);
-
-            if (!$onlyErrors) {
-                $this->printHeadingLine($output);
-            }
+            $this->printHeadingLine($output);
 
             $rulesFilename = $this->getConfigFilename($input);
-            if (!$onlyErrors) {
-                $output->writeln(\sprintf("Config file: %s\n", $rulesFilename));
-            }
+
+            $output->writeln(\sprintf("Config file: %s\n", $rulesFilename));
 
             $config = new Config();
 
             $this->readRules($config, $rulesFilename);
 
             $runner = new Runner($stopOnFailure);
-            $runner->run($config, $progress, $targetPhpVersion, $onlyErrors);
+            $runner->run($config, $progress, $targetPhpVersion);
 
             $violations = $runner->getViolations();
             $violations->sort();
@@ -161,9 +159,7 @@ class Check extends Command
                 $this->saveBaseline($generateBaseline, $violations);
 
                 $output->writeln('<info>Baseline file \''.$generateBaseline.'\'created!</info>');
-                if (!$onlyErrors) {
-                    $this->printExecutionTime($output, $startTime);
-                }
+                $this->printExecutionTime($output, $startTime);
 
                 return self::SUCCESS_CODE;
             }
@@ -174,18 +170,21 @@ class Check extends Command
                 $violations->remove($baseline, $ignoreBaselineLinenumbers);
             }
 
+            // we always print this so we do not have to do additional ifs later
+            $stdOut->writeln($violations->toString($format));
+
             if ($violations->count() > 0) {
-                $this->printViolations($violations, $output, $format, $onlyErrors);
-                if (!$onlyErrors) {
-                    $this->printExecutionTime($output, $startTime);
-                }
+                $output->writeln(\sprintf('<error>⚠️ %s violations detected!</error>', \count($violations)));
+                $this->printExecutionTime($output, $startTime);
 
                 return self::ERROR_CODE;
             }
 
             $parsedErrors = $runner->getParsingErrors();
+
             if ($parsedErrors->count() > 0) {
-                $this->printParsedErrors($parsedErrors, $output, $onlyErrors);
+                $output->writeln('<error>❌ could not parse these files:</error>');
+                $output->writeln($parsedErrors->toString());
                 $this->printExecutionTime($output, $startTime);
 
                 return self::ERROR_CODE;
@@ -197,11 +196,9 @@ class Check extends Command
             return self::ERROR_CODE;
         }
 
-        $this->printNoViolationsDetectedMessage($output, $onlyErrors, $format);
+        $output->writeln('<info>✅ No violations detected</info>');
 
-        if (!$onlyErrors) {
-            $this->printExecutionTime($output, $startTime);
-        }
+        $this->printExecutionTime($output, $startTime);
 
         return self::SUCCESS_CODE;
     }
@@ -256,34 +253,5 @@ class Check extends Command
         Assert::file($filename, 'Config file not found');
 
         return $filename;
-    }
-
-    private function printViolations(Violations $violations, OutputInterface $output, string $format, bool $onlyErrors = false): void
-    {
-        if (!$onlyErrors) {
-            $output->writeln('<error>ERRORS!</error>');
-        }
-
-        $output->writeln(\sprintf('%s', $violations->toString($format)));
-        if (!$onlyErrors) {
-            $output->writeln(\sprintf('<error>%s VIOLATIONS DETECTED!</error>', \count($violations)));
-        }
-    }
-
-    private function printParsedErrors(ParsingErrors $parsingErrors, OutputInterface $output, bool $onlyErrors = false): void
-    {
-        if (!$onlyErrors) {
-            $output->writeln('<error>ERROR ON PARSING THESE FILES:</error>');
-        }
-        $output->writeln(\sprintf('%s', $parsingErrors->toString()));
-    }
-
-    private function printNoViolationsDetectedMessage(OutputInterface $output, bool $onlyErrors = false, string $format = Printer::FORMAT_TEXT): void
-    {
-        if (!$onlyErrors) {
-            $output->writeln('<info>NO VIOLATIONS DETECTED!</info>');
-        } elseif (Printer::FORMAT_JSON === $format || Printer::FORMAT_GITLAB === $format) {
-            $output->writeln('<info>[]</info>');
-        }
     }
 }

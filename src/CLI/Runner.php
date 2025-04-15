@@ -30,26 +30,22 @@ class Runner
         $this->parsingErrors = new ParsingErrors();
     }
 
-    public function run(Config $config, Progress $progress, TargetPhpVersion $targetPhpVersion, bool $onlyErrors): void
+    public function run(Config $config, Progress $progress, TargetPhpVersion $targetPhpVersion): void
     {
         /** @var FileParser $fileParser */
         $fileParser = FileParserFactory::createFileParser($targetPhpVersion, $config->isParseCustomAnnotationsEnabled());
 
         /** @var ClassSetRules $classSetRule */
         foreach ($config->getClassSetRules() as $classSetRule) {
-            if (!$onlyErrors) {
-                $progress->startFileSetAnalysis($classSetRule->getClassSet());
-            }
+            $progress->startFileSetAnalysis($classSetRule->getClassSet());
 
             try {
-                $this->check($classSetRule, $progress, $fileParser, $this->violations, $this->parsingErrors, $onlyErrors);
+                $this->check($classSetRule, $progress, $fileParser, $this->violations, $this->parsingErrors);
             } catch (FailOnFirstViolationException $e) {
                 return;
             }
 
-            if (!$onlyErrors) {
-                $progress->endFileSetAnalysis($classSetRule->getClassSet());
-            }
+            $progress->endFileSetAnalysis($classSetRule->getClassSet());
         }
     }
 
@@ -58,16 +54,13 @@ class Runner
         Progress $progress,
         Parser $fileParser,
         Violations $violations,
-        ParsingErrors $parsingErrors,
-        bool $onlyErrors = false
+        ParsingErrors $parsingErrors
     ): void {
         /** @var SplFileInfo $file */
         foreach ($classSetRule->getClassSet() as $file) {
             $fileViolations = new Violations();
 
-            if (!$onlyErrors) {
-                $progress->startParsingFile($file->getRelativePathname());
-            }
+            $progress->startParsingFile($file->getRelativePathname());
 
             $fileParser->parse($file->getContents(), $file->getRelativePathname());
             $parsedErrors = $fileParser->getParsingErrors();
@@ -91,9 +84,7 @@ class Runner
 
             $violations->merge($fileViolations);
 
-            if (!$onlyErrors) {
-                $progress->endParsingFile($file->getRelativePathname());
-            }
+            $progress->endParsingFile($file->getRelativePathname());
         }
     }
 

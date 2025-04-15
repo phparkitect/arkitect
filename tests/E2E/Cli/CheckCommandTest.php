@@ -14,9 +14,9 @@ class CheckCommandTest extends TestCase
 
     const ERROR_CODE = 1;
 
-    /** @var string */
-    private $customBaselineFilename = __DIR__.'/my-baseline.json';
-    private $defaultBaselineFilename = 'phparkitect-baseline.json';
+    private string $customBaselineFilename = __DIR__.'/my-baseline.json';
+
+    private string $defaultBaselineFilename = 'phparkitect-baseline.json';
 
     protected function tearDown(): void
     {
@@ -32,72 +32,81 @@ class CheckCommandTest extends TestCase
     {
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvc.php');
 
-        $expectedErrors = 'ERRORS!
+        $expectedErrors = <<<'ERRORS'
+        App\Controller\Foo has 2 violations
+          should have a name that matches *Controller because we want uniform naming
+          should implement ContainerAwareInterface because all controllers should be container aware
 
-App\Controller\Foo has 2 violations
-  should have a name that matches *Controller because we want uniform naming
-  should implement ContainerAwareInterface because all controllers should be container aware
+        App\Controller\ProductsController has 1 violations
+          should implement ContainerAwareInterface because all controllers should be container aware
 
-App\Controller\ProductsController has 1 violations
-  should implement ContainerAwareInterface because all controllers should be container aware
+        App\Controller\UserController has 1 violations
+          should implement ContainerAwareInterface because all controllers should be container aware
 
-App\Controller\UserController has 1 violations
-  should implement ContainerAwareInterface because all controllers should be container aware
+        App\Controller\YieldController has 1 violations
+          should implement ContainerAwareInterface because all controllers should be container aware
 
-App\Controller\YieldController has 1 violations
-  should implement ContainerAwareInterface because all controllers should be container aware
+        App\Domain\Model has 2 violations
+          depends on App\Services\UserService, but should not depend on classes outside namespace App\Domain because we want protect our domain (on line 14)
+          depends on App\Services\CartService, but should not depend on classes outside namespace App\Domain because we want protect our domain (on line 15)
+        ERRORS;
 
-App\Domain\Model has 2 violations
-  depends on App\Services\UserService, but should not depend on classes outside namespace App\Domain because we want protect our domain (on line 14)
-  depends on App\Services\CartService, but should not depend on classes outside namespace App\Domain because we want protect our domain (on line 15)';
-
-        $this->assertCheckHasErrors($cmdTester, $expectedErrors);
+        self::assertCommandExitedWithError($cmdTester);
+        self::assertStringContainsString($expectedErrors, $cmdTester->getDisplay());
     }
 
     public function test_app_returns_single_error_because_there_is_stop_on_failure_param(): void
     {
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvc.php', true);
 
-        $expectedErrors = 'ERRORS!
-App\Controller\Foo has 1 violations
-  should implement ContainerAwareInterface because all controllers should be container aware';
+        $expectedErrors = <<<'ERRORS'
+        App\Controller\Foo has 1 violations
+          should implement ContainerAwareInterface because all controllers should be container aware
+        ERRORS;
 
-        $this->assertCheckHasErrors($cmdTester, $expectedErrors);
-        $this->assertCheckHasNoErrorsLike($cmdTester, "App\Controller\ProductsController has 1 violations");
+        self::assertCommandExitedWithError($cmdTester);
+        self::assertStringContainsString($expectedErrors, $cmdTester->getDisplay());
+        self::assertStringNotContainsString("App\Controller\ProductsController has 1 violations", $cmdTester->getDisplay());
     }
 
     public function test_does_not_explode_if_an_exception_is_thrown(): void
     {
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configThrowsException.php');
 
-        $this->assertCheckHasErrors($cmdTester);
+        self::assertCommandExitedWithError($cmdTester);
     }
 
     public function test_run_command_with_success(): void
     {
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvcWithoutErrors.php');
 
-        $this->assertCheckHasSuccess($cmdTester);
+        self::assertCommandWasSuccessful($cmdTester);
+        self::assertStringNotContainsString('⚠️', $cmdTester->getDisplay());
     }
 
     public function test_parse_error_in_the_codebase(): void
     {
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configParseError.php');
 
-        $expectedErrors = "ERROR ON PARSING THESE FILES:Syntax error, unexpected T_STRING, expecting '{' on line 8 in file: Services/CartService.php";
-        $this->assertCheckHasErrors($cmdTester, $expectedErrors);
+        $expectedErrors = <<<'ERRORS'
+        Syntax error, unexpected T_STRING, expecting '{' on line 8 in file: Services/CartService.php
+        ERRORS;
+
+        self::assertCommandExitedWithError($cmdTester);
+        self::assertStringContainsString($expectedErrors, $cmdTester->getErrorOutput());
     }
 
     public function test_bug_yield(): void
     {
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvcForYieldBug.php');
 
-        $expectedErrors = 'ERRORS!
+        $expectedErrors = <<<'ERRORS'
+        App\Controller\Foo has 1 violations
+          should have a name that matches *Controller
+        ERRORS;
 
-App\Controller\Foo has 1 violations
-  should have a name that matches *Controller';
-
-        $this->assertCheckHasErrors($cmdTester, $expectedErrors);
+        self::assertCommandExitedWithError($cmdTester);
+        self::assertStringContainsString($expectedErrors, $cmdTester->getDisplay());
     }
 
     public function test_baseline(): void
@@ -112,12 +121,13 @@ App\Controller\Foo has 1 violations
 
         $cmdTester = $this->runCheck($configFilePath, null, null);
 
-        $this->assertCheckHasErrors($cmdTester);
+        self::assertCommandExitedWithError($cmdTester);
 
         // Check it ignores error if baseline is used
 
         $cmdTester = $this->runCheck($configFilePath, null, $this->customBaselineFilename);
-        $this->assertCheckHasSuccess($cmdTester);
+
+        self::assertCommandWasSuccessful($cmdTester);
     }
 
     public function test_baseline_with_default_filename_is_enabled_automatically(): void
@@ -131,7 +141,8 @@ App\Controller\Foo has 1 violations
         // Check it ignores error if baseline is used
 
         $cmdTester = $this->runCheck($configFilePath, null, null);
-        $this->assertCheckHasSuccess($cmdTester);
+
+        self::assertCommandWasSuccessful($cmdTester);
     }
 
     public function test_you_can_ignore_the_default_baseline(): void
@@ -143,14 +154,15 @@ App\Controller\Foo has 1 violations
 
         // Check it ignores the default baseline
         $cmdTester = $this->runCheck($configFilePath, null, null, false, true);
-        $this->assertCheckHasErrors($cmdTester);
+
+        self::assertCommandExitedWithError($cmdTester);
     }
 
     public function test_dependencies_should_not_leak_between_files(): void
     {
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configDependenciesLeak.php');
 
-        $this->assertCheckHasSuccess($cmdTester);
+        self::assertCommandWasSuccessful($cmdTester);
     }
 
     public function test_baseline_line_numbers_can_be_ignored(): void
@@ -159,24 +171,34 @@ App\Controller\Foo has 1 violations
 
         // No errors when ignoring baseline line numbers
         $cmdTester = $this->runCheck($configFilePath, null, __DIR__.'/../_fixtures/line_numbers/baseline.json', false, false, true);
-        $this->assertCheckHasSuccess($cmdTester);
+        self::assertCommandWasSuccessful($cmdTester);
 
         // Errors when not ignoring baseline line numbers
         $cmdTester = $this->runCheck($configFilePath, null, __DIR__.'/../_fixtures/line_numbers/baseline.json');
-        $this->assertCheckHasErrors($cmdTester);
+        self::assertCommandExitedWithError($cmdTester);
     }
 
-    public function test_json_format_output(): void
+    public function test_json_format_output_errors(): void
     {
         $configFilePath = __DIR__.'/../_fixtures/configMvcForYieldBug.php';
 
         $cmdTester = $this->runCheck($configFilePath, null, null, false, false, false, 'json');
 
-        $this->assertCheckHasErrors($cmdTester);
+        $expectedJson = <<<'ERRORS'
+        {
+            "totalViolations": 1,
+            "details": {
+                "App\\Controller\\Foo": [
+                    {
+                        "error": "should have a name that matches *Controller because all controllers should be end name with Controller"
+                    }
+                ]
+            }
+        }
+        ERRORS;
 
-        $display = $cmdTester->getDisplay();
-
-        self::assertJson($display);
+        self::assertCommandExitedWithError($cmdTester);
+        self::assertJsonStringEqualsJsonString($expectedJson, $cmdTester->getDisplay());
     }
 
     public function test_json_format_output_no_errors(): void
@@ -185,32 +207,37 @@ App\Controller\Foo has 1 violations
 
         $cmdTester = $this->runCheck($configFilePath, null, null, false, false, false, 'json');
 
-        $this->assertCheckHasSuccess($cmdTester);
+        $expectedJson = '{"totalViolations":0,"details":[]}';
 
-        $display = $cmdTester->getDisplay();
-
-        self::assertJson($display);
-
-        $json = json_decode($display, true);
-        self::assertCount(0, $json);
+        self::assertCommandWasSuccessful($cmdTester);
+        self::assertJsonStringEqualsJsonString($expectedJson, $cmdTester->getDisplay());
     }
 
-    public function test_gitlab_format_output(): void
+    public function test_gitlab_format_output_errors(): void
     {
         $configFilePath = __DIR__.'/../_fixtures/configMvcForYieldBug.php';
 
         $cmdTester = $this->runCheck($configFilePath, null, null, false, false, false, 'gitlab');
 
-        $this->assertCheckHasErrors($cmdTester);
+        $expectedJson = <<<'ERRORS'
+        [
+            {
+                "description": "should have a name that matches *Controller because all controllers should be end name with Controller",
+                "check_name": "App\\Controller\\Foo.should-have-a-name-that-matches-controller-because-all-controllers-should-be-end-name-with-controller",
+                "fingerprint": "1e960c3f49b5ec63ece40321072ef2bd0bc33ad11b7be326f304255d277dc860",
+                "severity": "major",
+                "location": {
+                    "path": "Controller\/Foo.php",
+                    "lines": {
+                        "begin": 1
+                    }
+                }
+            }
+        ]
+        ERRORS;
 
-        $display = $cmdTester->getDisplay();
-
-        self::assertJson($display);
-
-        self::assertSame(<<<JSON
-        [{"description":"should have a name that matches *Controller because all controllers should be end name with Controller","check_name":"App\\\\Controller\\\\Foo.should-have-a-name-that-matches-controller-because-all-controllers-should-be-end-name-with-controller","fingerprint":"1e960c3f49b5ec63ece40321072ef2bd0bc33ad11b7be326f304255d277dc860","severity":"major","location":{"path":"Controller\/Foo.php","lines":{"begin":1}}}]
-
-        JSON, $display);
+        self::assertCommandExitedWithError($cmdTester);
+        self::assertJsonStringEqualsJsonString($expectedJson, $cmdTester->getDisplay());
     }
 
     public function test_gitlab_format_output_no_errors(): void
@@ -219,14 +246,10 @@ App\Controller\Foo has 1 violations
 
         $cmdTester = $this->runCheck($configFilePath, null, null, false, false, false, 'gitlab');
 
-        $this->assertCheckHasSuccess($cmdTester);
+        $expectedJson = '[]';
 
-        $display = $cmdTester->getDisplay();
-
-        self::assertJson($display);
-
-        $json = json_decode($display, true);
-        self::assertCount(0, $json);
+        self::assertCommandWasSuccessful($cmdTester);
+        self::assertJsonStringEqualsJsonString($expectedJson, $cmdTester->getDisplay());
     }
 
     protected function runCheck(
@@ -267,34 +290,18 @@ App\Controller\Foo has 1 violations
         $app->setAutoExit(false);
 
         $appTester = new ApplicationTester($app);
-        $appTester->run($input);
+        $appTester->run($input, ['capture_stderr_separately' => true]);
 
         return $appTester;
     }
 
-    protected function assertCheckHasErrors(ApplicationTester $applicationTester, ?string $expectedOutput = null): void
+    protected static function assertCommandExitedWithError(ApplicationTester $applicationTester): void
     {
         self::assertEquals(self::ERROR_CODE, $applicationTester->getStatusCode());
-        if (null != $expectedOutput) {
-            $actualOutput = str_replace(["\r", "\n"], '', $applicationTester->getDisplay());
-            $expectedOutput = str_replace(["\r", "\n"], '', $expectedOutput);
-            self::assertStringContainsString($expectedOutput, $actualOutput);
-        }
     }
 
-    protected function assertCheckHasNoErrorsLike(ApplicationTester $applicationTester, ?string $expectedOutput = null): void
+    protected static function assertCommandWasSuccessful(ApplicationTester $applicationTester): void
     {
-        self::assertEquals(self::ERROR_CODE, $applicationTester->getStatusCode());
-        if (null != $expectedOutput) {
-            $actualOutput = str_replace(["\r", "\n"], '', $applicationTester->getDisplay());
-            $expectedOutput = str_replace(["\r", "\n"], '', $expectedOutput);
-            self::assertStringNotContainsString($expectedOutput, $actualOutput);
-        }
-    }
-
-    protected function assertCheckHasSuccess(ApplicationTester $applicationTester): void
-    {
-        self::assertEquals(self::SUCCESS_CODE, $applicationTester->getStatusCode(), 'Command failed: '.$applicationTester->getDisplay());
-        self::assertStringNotContainsString('ERRORS!', $applicationTester->getDisplay(), 'Error message not expected in successful execution');
+        self::assertEquals(self::SUCCESS_CODE, $applicationTester->getStatusCode());
     }
 }
