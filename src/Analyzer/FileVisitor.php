@@ -26,36 +26,35 @@ class FileVisitor extends NodeVisitorAbstract
         $this->classDescriptionBuilder->setFilePath($filePath);
     }
 
-    public function enterNode(Node $node): void
+    public function parseClassNode(Node $node): void
     {
-        if ($node instanceof Node\Stmt\Class_) {
-            if (!$node->isAnonymous() && null !== $node->namespacedName) {
-                $this->classDescriptionBuilder->setClassName($node->namespacedName->toCodeString());
-            }
-
-            foreach ($node->implements as $interface) {
-                $this->classDescriptionBuilder
-                    ->addInterface($interface->toString(), $interface->getLine());
-            }
-
-            if (!$node->isAnonymous() && null !== $node->extends) {
-                $this->classDescriptionBuilder
-                    ->addExtends($node->extends->toString(), $node->getLine());
-            }
-
-            if ($node->isFinal()) {
-                $this->classDescriptionBuilder->setFinal(true);
-            }
-
-            if ($node->isReadonly()) {
-                $this->classDescriptionBuilder->setReadonly(true);
-            }
-
-            if ($node->isAbstract()) {
-                $this->classDescriptionBuilder->setAbstract(true);
-            }
+        if (!($node instanceof Node\Stmt\Class_)) {
+            return;
         }
 
+        if (!$node->isAnonymous() && null !== $node->namespacedName) {
+            $this->classDescriptionBuilder->setClassName($node->namespacedName->toCodeString());
+        }
+
+        foreach ($node->implements as $interface) {
+            $this->classDescriptionBuilder
+                ->addInterface($interface->toString(), $interface->getLine());
+        }
+
+        if (!$node->isAnonymous() && null !== $node->extends) {
+            $this->classDescriptionBuilder
+                ->addExtends($node->extends->toString(), $node->getLine());
+        }
+
+        $this->classDescriptionBuilder->setFinal($node->isFinal());
+
+        $this->classDescriptionBuilder->setReadonly($node->isReadonly());
+
+        $this->classDescriptionBuilder->setAbstract($node->isAbstract());
+    }
+
+    public function parseEnumNode(Node $node): void
+    {
         if ($node instanceof Node\Stmt\Enum_ && null !== $node->namespacedName) {
             $this->classDescriptionBuilder->setClassName($node->namespacedName->toCodeString());
             $this->classDescriptionBuilder->setEnum(true);
@@ -65,7 +64,10 @@ class FileVisitor extends NodeVisitorAbstract
                     ->addInterface($interface->toString(), $interface->getLine());
             }
         }
+    }
 
+    public function parseStaticClassConstantNode(Node $node): void
+    {
         /**
          * adding static classes as dependencies
          * $constantValue = StaticClass::constant;.
@@ -83,7 +85,10 @@ class FileVisitor extends NodeVisitorAbstract
             $this->classDescriptionBuilder
                 ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
         }
+    }
 
+    public function parseStaticClassCallsNode(Node $node): void
+    {
         /**
          * adding static function classes as dependencies
          * $static = StaticClass::foo();.
@@ -101,6 +106,17 @@ class FileVisitor extends NodeVisitorAbstract
             $this->classDescriptionBuilder
                 ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
         }
+    }
+
+    public function enterNode(Node $node): void
+    {
+        $this->parseClassNode($node);
+
+        $this->parseEnumNode($node);
+
+        $this->parseStaticClassConstantNode($node);
+
+        $this->parseStaticClassCallsNode($node);
 
         if (
             $node instanceof Node\Expr\Instanceof_
