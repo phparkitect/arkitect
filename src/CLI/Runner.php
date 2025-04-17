@@ -92,14 +92,4 @@ class Runner
             $progress->endParsingFile($file->getRelativePathname());
         }
     }
-
-    public function getViolations(): Violations
-    {
-        return $this->violations;
-    }
-
-    public function getParsingErrors(): ParsingErrors
-    {
-        return $this->parsingErrors;
-    }
 }
