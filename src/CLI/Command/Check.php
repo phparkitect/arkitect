@@ -130,7 +130,7 @@ class Check extends Command
 
             $this->printHeadingLine($output);
 
-            $output->writeln("Baseline file '$useBaseline' found");
+            $baseline->getFilename() && $output->writeln("Baseline file '{$baseline->getFilename()}' found");
 
             $rulesFilename = $this->getConfigFilename($input);
 

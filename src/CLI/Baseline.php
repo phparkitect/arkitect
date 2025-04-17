@@ -22,11 +22,6 @@ class Baseline
         return $this->filename;
     }
 
-    public function getViolations(): Violations
-    {
-        return $this->violations;
-    }
-
     public function applyTo(Violations $violations, bool $ignoreBaselineLinenumbers): void
     {
         $violations->remove($this->violations, $ignoreBaselineLinenumbers);
