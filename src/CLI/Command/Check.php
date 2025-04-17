@@ -129,11 +129,7 @@ class Check extends Command
                 $useBaseline = self::DEFAULT_BASELINE_FILENAME;
             }
 
-            if ($useBaseline && !file_exists($useBaseline)) {
-                $output->writeln("❌ Baseline file '$useBaseline' not found.");
-
-                return self::ERROR_CODE;
-            }
+            $baseline = $useBaseline ? Baseline::loadFromFile($useBaseline) : Baseline::empty();
 
             $output->writeln("Baseline file '$useBaseline' found");
 
@@ -151,18 +147,14 @@ class Check extends Command
             $violations = $result->getViolations();
 
             if (false !== $generateBaseline) {
-                Baseline::save($generateBaseline, self::DEFAULT_BASELINE_FILENAME, $violations);
+                $baselineFilePath = Baseline::save($generateBaseline, self::DEFAULT_BASELINE_FILENAME, $violations);
 
-                $output->writeln("ℹ️ Baseline file '$generateBaseline' created!");
+                $output->writeln("ℹ️ Baseline file '$baselineFilePath' created!");
 
                 return self::SUCCESS_CODE;
             }
 
-            if ($useBaseline) {
-                $baseline = $this->loadBaseline($useBaseline);
-
-                $violations->remove($baseline, $ignoreBaselineLinenumbers);
-            }
+            $violations->remove($baseline, $ignoreBaselineLinenumbers);
 
             $printer = (new PrinterFactory())->create($format);
 
@@ -219,11 +211,6 @@ class Check extends Command
         $output->writeln("⏱️ Execution time: $executionTime\n");
     }
 
-    private function loadBaseline(string $filename): Violations
-    {
-        return Violations::fromJson(file_get_contents($filename));
-    }
-
     private function getConfigFilename(InputInterface $input): string
     {
         $filename = $input->getOption(self::CONFIG_FILENAME_PARAM);
@@ -240,12 +227,28 @@ class Check extends Command
 
 class Baseline
 {
-    public static function save(?string $filename, string $defaultFilePath, Violations $violations): void
+    public static function empty(): Violations
+    {
+        return new Violations();
+    }
+
+    public static function loadFromFile(string $filename): Violations
+    {
+        if (!file_exists($filename)) {
+            throw new \RuntimeException("Baseline file '$filename' not found.");
+        }
+
+        return Violations::fromJson(file_get_contents($filename));
+    }
+
+    public static function save(?string $filename, string $defaultFilePath, Violations $violations): string
     {
         if (null === $filename) {
             $filename = $defaultFilePath;
         }
 
         file_put_contents($filename, json_encode($violations, \JSON_PRETTY_PRINT));
+
+        return $filename;
     }
 }
