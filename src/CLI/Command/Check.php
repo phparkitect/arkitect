@@ -151,10 +151,7 @@ class Check extends Command
             $violations = $result->getViolations();
 
             if (false !== $generateBaseline) {
-                if (null === $generateBaseline) {
-                    $generateBaseline = self::DEFAULT_BASELINE_FILENAME;
-                }
-                $this->saveBaseline($generateBaseline, $violations);
+                Baseline::save($generateBaseline, self::DEFAULT_BASELINE_FILENAME, $violations);
 
                 $output->writeln("ℹ️ Baseline file '$generateBaseline' created!");
 
@@ -227,11 +224,6 @@ class Check extends Command
         return Violations::fromJson(file_get_contents($filename));
     }
 
-    private function saveBaseline(string $filename, Violations $violations): void
-    {
-        file_put_contents($filename, json_encode($violations, \JSON_PRETTY_PRINT));
-    }
-
     private function getConfigFilename(InputInterface $input): string
     {
         $filename = $input->getOption(self::CONFIG_FILENAME_PARAM);
@@ -243,5 +235,17 @@ class Check extends Command
         Assert::file($filename, "Config file '$filename' not found");
 
         return $filename;
+    }
+}
+
+class Baseline
+{
+    public static function save(?string $filename, string $defaultFilePath, Violations $violations): void
+    {
+        if (null === $filename) {
+            $filename = $defaultFilePath;
+        }
+
+        file_put_contents($filename, json_encode($violations, \JSON_PRETTY_PRINT));
     }
 }
