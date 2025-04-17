@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\CLI\Command;
 
 use Arkitect\CLI\Config;
+use Arkitect\CLI\Printer\PrinterFactory;
 use Arkitect\CLI\Progress\DebugProgress;
 use Arkitect\CLI\Progress\ProgressBarProgress;
 use Arkitect\CLI\Runner;
@@ -109,6 +110,7 @@ class Check extends Command
             $useBaseline = (string) $input->getOption(self::USE_BASELINE_PARAM);
             $skipBaseline = (bool) $input->getOption(self::SKIP_BASELINE_PARAM);
             $ignoreBaselineLinenumbers = (bool) $input->getOption(self::IGNORE_BASELINE_LINENUMBERS_PARAM);
+            $generateBaseline = $input->getOption(self::GENERATE_BASELINE_PARAM);
             $phpVersion = $input->getOption('target-php-version');
             $format = $input->getOption(self::FORMAT_PARAM);
 
@@ -117,40 +119,36 @@ class Check extends Command
             $stdOut = $output;
             $output = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
 
-            /** @var string|null $phpVersion */
             $targetPhpVersion = TargetPhpVersion::create($phpVersion);
 
             $progress = $verbose ? new DebugProgress($output) : new ProgressBarProgress($output);
+
+            $this->printHeadingLine($output);
 
             if (true !== $skipBaseline && !$useBaseline && file_exists(self::DEFAULT_BASELINE_FILENAME)) {
                 $useBaseline = self::DEFAULT_BASELINE_FILENAME;
             }
 
             if ($useBaseline && !file_exists($useBaseline)) {
-                $output->writeln('<error>Baseline file not found.</error>');
+                $output->writeln("❌ Baseline file '$useBaseline' not found.");
 
                 return self::ERROR_CODE;
             }
 
-            $output->writeln('<info>Baseline found: '.$useBaseline.'</info>');
-
-            $generateBaseline = $input->getOption(self::GENERATE_BASELINE_PARAM);
-
-            $this->printHeadingLine($output);
+            $output->writeln("Baseline file '$useBaseline' found");
 
             $rulesFilename = $this->getConfigFilename($input);
 
-            $output->writeln(\sprintf("Config file: %s\n", $rulesFilename));
+            $output->writeln("Config file '$rulesFilename' found\n");
 
             $config = new Config();
 
             $this->readRules($config, $rulesFilename);
 
             $runner = new Runner($stopOnFailure);
-            $runner->run($config, $progress, $targetPhpVersion);
+            $result = $runner->run($config, $progress, $targetPhpVersion);
 
-            $violations = $runner->getViolations();
-            $violations->sort();
+            $violations = $result->getViolations();
 
             if (false !== $generateBaseline) {
                 if (null === $generateBaseline) {
@@ -158,8 +156,7 @@ class Check extends Command
                 }
                 $this->saveBaseline($generateBaseline, $violations);
 
-                $output->writeln('<info>Baseline file \''.$generateBaseline.'\'created!</info>');
-                $this->printExecutionTime($output, $startTime);
+                $output->writeln("ℹ️ Baseline file '$generateBaseline' created!");
 
                 return self::SUCCESS_CODE;
             }
@@ -170,37 +167,30 @@ class Check extends Command
                 $violations->remove($baseline, $ignoreBaselineLinenumbers);
             }
 
+            $printer = (new PrinterFactory())->create($format);
+
             // we always print this so we do not have to do additional ifs later
-            $stdOut->writeln($violations->toString($format));
+            $stdOut->writeln($printer->print($violations->groupedByFqcn()));
 
             if ($violations->count() > 0) {
-                $output->writeln(\sprintf('<error>⚠️ %s violations detected!</error>', \count($violations)));
-                $this->printExecutionTime($output, $startTime);
-
-                return self::ERROR_CODE;
+                $output->writeln(\sprintf('⚠️ %s violations detected!', \count($violations)));
             }
 
-            $parsedErrors = $runner->getParsingErrors();
-
-            if ($parsedErrors->count() > 0) {
-                $output->writeln('<error>❌ could not parse these files:</error>');
-                $output->writeln($parsedErrors->toString());
-                $this->printExecutionTime($output, $startTime);
-
-                return self::ERROR_CODE;
+            if ($result->hasParsingErrors()) {
+                $output->writeln('❌ could not parse these files:');
+                $output->writeln($result->getParsingErrors()->toString());
             }
+
+            !$result->hasErrors() && $output->writeln('✅ No violations detected');
+
+            return $result->hasErrors() ? self::ERROR_CODE : self::SUCCESS_CODE;
         } catch (\Throwable $e) {
-            $output->writeln($e->getMessage());
-            $this->printExecutionTime($output, $startTime);
+            $output->writeln("❌ {$e->getMessage()}");
 
             return self::ERROR_CODE;
+        } finally {
+            $this->printExecutionTime($output, $startTime);
         }
-
-        $output->writeln('<info>✅ No violations detected</info>');
-
-        $this->printExecutionTime($output, $startTime);
-
-        return self::SUCCESS_CODE;
     }
 
     protected function readRules(Config $ruleChecker, string $rulesFilename): void
@@ -229,7 +219,7 @@ class Check extends Command
         $endTime = microtime(true);
         $executionTime = number_format($endTime - $startTime, 2);
 
-        $output->writeln('<info>Execution time: '.$executionTime."s</info>\n");
+        $output->writeln("⏱️ Execution time: $executionTime\n");
     }
 
     private function loadBaseline(string $filename): Violations
@@ -250,7 +240,7 @@ class Check extends Command
             $filename = self::DEFAULT_RULES_FILENAME;
         }
 
-        Assert::file($filename, 'Config file not found');
+        Assert::file($filename, "Config file '$filename' not found");
 
         return $filename;
     }

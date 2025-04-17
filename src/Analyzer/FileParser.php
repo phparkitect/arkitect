@@ -8,12 +8,13 @@ use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Rules\ParsingError;
 use PhpParser\ErrorHandler\Collecting;
 use PhpParser\NodeTraverser;
+use PhpParser\Parser as PhpParser;
 use PhpParser\ParserFactory;
 use PhpParser\PhpVersion;
 
 class FileParser implements Parser
 {
-    private \PhpParser\Parser $parser;
+    private PhpParser $parser;
 
     private NodeTraverser $traverser;
 
@@ -31,7 +32,7 @@ class FileParser implements Parser
         $this->fileVisitor = $fileVisitor;
         $this->parsingErrors = [];
 
-        $this->parser = (new ParserFactory())->createForVersion(PhpVersion::fromString($targetPhpVersion->get() ?? phpversion()));
+        $this->parser = (new ParserFactory())->createForVersion(PhpVersion::fromString($targetPhpVersion->get()));
         $this->traverser = $traverser;
         $this->traverser->addVisitor($nameResolver);
         $this->traverser->addVisitor($this->fileVisitor);

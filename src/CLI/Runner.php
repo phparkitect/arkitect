@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Arkitect\CLI;
 
 use Arkitect\Analyzer\ClassDescription;
-use Arkitect\Analyzer\FileParser;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\Analyzer\Parser;
 use Arkitect\ClassSetRules;
@@ -30,9 +29,8 @@ class Runner
         $this->parsingErrors = new ParsingErrors();
     }
 
-    public function run(Config $config, Progress $progress, TargetPhpVersion $targetPhpVersion): void
+    public function run(Config $config, Progress $progress, TargetPhpVersion $targetPhpVersion): AnalysisResult
     {
-        /** @var FileParser $fileParser */
         $fileParser = FileParserFactory::createFileParser($targetPhpVersion, $config->isParseCustomAnnotationsEnabled());
 
         /** @var ClassSetRules $classSetRule */
@@ -42,11 +40,18 @@ class Runner
             try {
                 $this->check($classSetRule, $progress, $fileParser, $this->violations, $this->parsingErrors);
             } catch (FailOnFirstViolationException $e) {
-                return;
+                break;
+            } finally {
+                $progress->endFileSetAnalysis($classSetRule->getClassSet());
             }
-
-            $progress->endFileSetAnalysis($classSetRule->getClassSet());
         }
+
+        $this->violations->sort();
+
+        return new AnalysisResult(
+            $this->violations,
+            $this->parsingErrors,
+        );
     }
 
     public function check(
