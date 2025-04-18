@@ -11,7 +11,6 @@ use Arkitect\CLI\Progress\DebugProgress;
 use Arkitect\CLI\Progress\ProgressBarProgress;
 use Arkitect\CLI\Runner;
 use Arkitect\CLI\TargetPhpVersion;
-use Arkitect\Rules\Violations;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -107,6 +106,7 @@ class Check extends Command
 
         try {
             $verbose = (bool) $input->getOption('verbose');
+            $rulesFilename = $input->getOption(self::CONFIG_FILENAME_PARAM);
             $stopOnFailure = (bool) $input->getOption(self::STOP_ON_FAILURE_PARAM);
             $useBaseline = (string) $input->getOption(self::USE_BASELINE_PARAM);
             $skipBaseline = (bool) $input->getOption(self::SKIP_BASELINE_PARAM);
@@ -120,46 +120,43 @@ class Check extends Command
             $stdOut = $output;
             $output = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
 
-            $targetPhpVersion = TargetPhpVersion::create($phpVersion);
+            $this->printHeadingLine($output);
+
+            $printer = (new PrinterFactory())->create($format);
 
             $progress = $verbose ? new DebugProgress($output) : new ProgressBarProgress($output);
 
             $baseline = Baseline::create($skipBaseline, $useBaseline, self::DEFAULT_BASELINE_FILENAME);
 
-            $printer = (new PrinterFactory())->create($format);
+            $rulesFilename = $rulesFilename ?: self::DEFAULT_RULES_FILENAME;
 
-            $this->printHeadingLine($output);
+            $config = ConfigBuilder::loadFromFile($rulesFilename);
+            $config->stopOnFailure($stopOnFailure);
+            $config->targetPhpVersion(TargetPhpVersion::create($phpVersion));
+            $config->ignoreBaselineLinenumbers($ignoreBaselineLinenumbers);
 
             $baseline->getFilename() && $output->writeln("Baseline file '{$baseline->getFilename()}' found");
-
-            $rulesFilename = $this->getConfigFilename($input);
-
             $output->writeln("Config file '$rulesFilename' found\n");
 
-            $config = new Config();
-
-            $this->readRules($config, $rulesFilename);
-
-            $runner = new Runner($stopOnFailure);
-            $result = $runner->run($config, $progress, $targetPhpVersion);
-
-            $violations = $result->getViolations();
+            $runner = new Runner();
 
             if (false !== $generateBaseline) {
-                $baselineFilePath = Baseline::save($generateBaseline, self::DEFAULT_BASELINE_FILENAME, $violations);
+                $result = $runner->baseline($config, $progress);
+
+                $baselineFilePath = Baseline::save($generateBaseline, self::DEFAULT_BASELINE_FILENAME, $result->getViolations());
 
                 $output->writeln("ℹ️ Baseline file '$baselineFilePath' created!");
 
                 return self::SUCCESS_CODE;
             }
 
-            $baseline->applyTo($violations, $ignoreBaselineLinenumbers);
+            $result = $runner->run($config, $baseline, $progress);
 
             // we always print this so we do not have to do additional ifs later
-            $stdOut->writeln($printer->print($violations->groupedByFqcn()));
+            $stdOut->writeln($printer->print($result->getViolations()->groupedByFqcn()));
 
-            if ($violations->count() > 0) {
-                $output->writeln("⚠️ {$violations->count()} violations detected!");
+            if ($result->hasViolations()) {
+                $output->writeln("⚠️ {$result->getViolations()->count()} violations detected!");
             }
 
             if ($result->hasParsingErrors()) {
@@ -179,18 +176,6 @@ class Check extends Command
         }
     }
 
-    protected function readRules(Config $ruleChecker, string $rulesFilename): void
-    {
-        \Closure::fromCallable(function () use ($ruleChecker, $rulesFilename): ?bool {
-            /** @psalm-suppress UnresolvableInclude $config */
-            $config = require $rulesFilename;
-
-            Assert::isCallable($config);
-
-            return $config($ruleChecker);
-        })();
-    }
-
     protected function printHeadingLine(OutputInterface $output): void
     {
         $app = $this->getApplication();
@@ -207,17 +192,25 @@ class Check extends Command
 
         $output->writeln("⏱️ Execution time: $executionTime\n");
     }
+}
 
-    private function getConfigFilename(InputInterface $input): string
+class ConfigBuilder
+{
+    public static function loadFromFile(string $filePath): Config
     {
-        $filename = $input->getOption(self::CONFIG_FILENAME_PARAM);
+        Assert::file($filePath, "Config file '$filePath' not found");
 
-        if (null === $filename) {
-            $filename = self::DEFAULT_RULES_FILENAME;
-        }
+        $config = new Config();
 
-        Assert::file($filename, "Config file '$filename' not found");
+        \Closure::fromCallable(function () use ($config, $filePath): ?bool {
+            /** @psalm-suppress UnresolvableInclude $config */
+            $configFunction = require $filePath;
 
-        return $filename;
+            Assert::isCallable($configFunction);
+
+            return $configFunction($config);
+        })();
+
+        return $config;
     }
 }
