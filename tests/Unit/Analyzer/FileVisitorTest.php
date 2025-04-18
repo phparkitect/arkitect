@@ -9,7 +9,6 @@ use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FileParser;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\Analyzer\FullyQualifiedClassName;
-use Arkitect\CLI\Printer\Printer;
 use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
 use Arkitect\Expression\ForClasses\Implement;
@@ -865,7 +864,7 @@ EOF;
         $implement = new Implement('Foo\Order');
         $implement->evaluate($cd, $violations, 'we want to add this rule for our software');
 
-        self::assertCount(0, $violations, $violations->toString(Printer::FORMAT_TEXT));
+        self::assertCount(0, $violations);
     }
 
     public function test_it_parse_dependencies_in_docblocks_with_alias(): void
