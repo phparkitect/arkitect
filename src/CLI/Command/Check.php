@@ -50,7 +50,8 @@ class Check extends Command
                 self::CONFIG_FILENAME_PARAM,
                 'c',
                 InputOption::VALUE_OPTIONAL,
-                'File containing configs, such as rules to be matched'
+                'File containing configs, such as rules to be matched',
+                self::DEFAULT_RULES_FILENAME
             )
             ->addOption(
                 self::TARGET_PHP_PARAM,
@@ -127,8 +128,6 @@ class Check extends Command
             $progress = $verbose ? new DebugProgress($output) : new ProgressBarProgress($output);
 
             $baseline = Baseline::create($skipBaseline, $useBaseline, self::DEFAULT_BASELINE_FILENAME);
-
-            $rulesFilename = $rulesFilename ?: self::DEFAULT_RULES_FILENAME;
 
             $config = ConfigBuilder::loadFromFile($rulesFilename);
             $config->stopOnFailure($stopOnFailure);
