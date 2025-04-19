@@ -33,6 +33,11 @@ class TargetPhpVersion
         $this->version = $version;
     }
 
+    public static function latest(): self
+    {
+        return new self('8.4');
+    }
+
     public static function create(?string $version): self
     {
         return new self($version ?? phpversion());

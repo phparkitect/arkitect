@@ -27,25 +27,30 @@ class Baseline
         $violations->remove($this->violations, $ignoreBaselineLinenumbers);
     }
 
+    /**
+     * @psalm-suppress RiskyTruthyFalsyComparison
+     */
+    public static function resolveFilePath(?string $filePath, string $defaultFilePath): ?string
+    {
+        if (!$filePath && file_exists($defaultFilePath)) {
+            $filePath = $defaultFilePath;
+        }
+
+        return $filePath ?: null;
+    }
+
     public static function empty(): self
     {
         return new self(new Violations(), '');
     }
 
-    /**
-     * @psalm-suppress RiskyTruthyFalsyComparison
-     */
-    public static function create(bool $skipBaseline, ?string $baselineFilePath, string $defaultFilePath): self
+    public static function create(bool $skipBaseline, ?string $baselineFilePath): self
     {
-        if ($skipBaseline) {
+        if ($skipBaseline || null === $baselineFilePath) {
             return self::empty();
         }
 
-        if (!$baselineFilePath && file_exists($defaultFilePath)) {
-            $baselineFilePath = $defaultFilePath;
-        }
-
-        return $baselineFilePath ? self::loadFromFile($baselineFilePath) : self::empty();
+        return self::loadFromFile($baselineFilePath);
     }
 
     public static function loadFromFile(string $filename): self

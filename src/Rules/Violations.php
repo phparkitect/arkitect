@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Arkitect\Rules;
 
-use Arkitect\CLI\Printer\PrinterFactory;
 use Arkitect\Exceptions\IndexNotFoundException;
 
 /**
@@ -73,13 +72,6 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
 
             return $accumulator;
         }, []);
-    }
-
-    public function toString(string $format): string
-    {
-        $printer = (new PrinterFactory())->create($format);
-
-        return $printer->print($this->groupedByFqcn());
     }
 
     public function toArray(): array
