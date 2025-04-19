@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\CLI\Command;
 
 use Arkitect\CLI\Baseline;
-use Arkitect\CLI\Config;
+use Arkitect\CLI\ConfigBuilder;
 use Arkitect\CLI\Printer\PrinterFactory;
 use Arkitect\CLI\Progress\DebugProgress;
 use Arkitect\CLI\Progress\ProgressBarProgress;
@@ -16,7 +16,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Webmozart\Assert\Assert;
 
 class Check extends Command
 {
@@ -123,18 +122,21 @@ class Check extends Command
 
             $this->printHeadingLine($output);
 
-            $printer = (new PrinterFactory())->create($format);
+            $config = ConfigBuilder::loadFromFile($rulesFilename)
+                ->stopOnFailure($stopOnFailure)
+                ->targetPhpVersion(TargetPhpVersion::create($phpVersion))
+                ->baselineFilePath(Baseline::resolveFilePath($useBaseline, self::DEFAULT_BASELINE_FILENAME))
+                ->ignoreBaselineLinenumbers($ignoreBaselineLinenumbers)
+                ->skipBaseline($skipBaseline)
+                ->format($format);
+
+            $printer = PrinterFactory::create($config->getFormat());
 
             $progress = $verbose ? new DebugProgress($output) : new ProgressBarProgress($output);
 
-            $baseline = Baseline::create($skipBaseline, $useBaseline, self::DEFAULT_BASELINE_FILENAME);
+            $baseline = Baseline::create($config->isSkipBaseline(), $config->getBaselineFilePath());
 
-            $config = ConfigBuilder::loadFromFile($rulesFilename);
-            $config->stopOnFailure($stopOnFailure);
-            $config->targetPhpVersion(TargetPhpVersion::create($phpVersion));
-            $config->ignoreBaselineLinenumbers($ignoreBaselineLinenumbers);
-
-            $baseline->getFilename() && $output->writeln("Baseline file '{$baseline->getFilename()}' found");
+            null !== $config->getBaselineFilePath() && $output->writeln("Baseline file '{$config->getBaselineFilePath()}' found");
             $output->writeln("Config file '$rulesFilename' found\n");
 
             $runner = new Runner();
@@ -190,26 +192,5 @@ class Check extends Command
         $executionTime = number_format($endTime - $startTime, 2);
 
         $output->writeln("⏱️ Execution time: $executionTime\n");
-    }
-}
-
-class ConfigBuilder
-{
-    public static function loadFromFile(string $filePath): Config
-    {
-        Assert::file($filePath, "Config file '$filePath' not found");
-
-        $config = new Config();
-
-        \Closure::fromCallable(function () use ($config, $filePath): ?bool {
-            /** @psalm-suppress UnresolvableInclude $config */
-            $configFunction = require $filePath;
-
-            Assert::isCallable($configFunction);
-
-            return $configFunction($config);
-        })();
-
-        return $config;
     }
 }

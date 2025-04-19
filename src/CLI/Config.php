@@ -5,6 +5,7 @@ namespace Arkitect\CLI;
 
 use Arkitect\ClassSet;
 use Arkitect\ClassSetRules;
+use Arkitect\CLI\Printer\PrinterFactory;
 use Arkitect\Rules\DSL\ArchRule;
 
 class Config
@@ -18,7 +19,13 @@ class Config
 
     private bool $stopOnFailure;
 
+    private bool $skipBaseline;
+
+    private ?string $baselineFilePath;
+
     private bool $ignoreBaselineLinenumbers;
+
+    private string $format;
 
     private TargetPhpVersion $targetPhpVersion;
 
@@ -28,7 +35,10 @@ class Config
         $this->runOnlyARule = false;
         $this->parseCustomAnnotations = true;
         $this->stopOnFailure = false;
+        $this->skipBaseline = false;
+        $this->baselineFilePath = null;
         $this->ignoreBaselineLinenumbers = false;
+        $this->format = PrinterFactory::default();
         $this->targetPhpVersion = TargetPhpVersion::latest();
     }
 
@@ -83,14 +93,28 @@ class Config
         return $this->targetPhpVersion;
     }
 
-    public function stopOnFailure(bool $stopOnFailure): bool
+    public function stopOnFailure(bool $stopOnFailure): self
     {
-        return $this->stopOnFailure = $stopOnFailure;
+        $this->stopOnFailure = $stopOnFailure;
+
+        return $this;
     }
 
     public function isStopOnFailure(): bool
     {
         return $this->stopOnFailure;
+    }
+
+    public function baselineFilePath(?string $baselineFilePath): self
+    {
+        $this->baselineFilePath = $baselineFilePath;
+
+        return $this;
+    }
+
+    public function getBaselineFilePath(): ?string
+    {
+        return $this->baselineFilePath;
     }
 
     public function ignoreBaselineLinenumbers(bool $ignoreBaselineLinenumbers): self
@@ -103,5 +127,29 @@ class Config
     public function isIgnoreBaselineLinenumbers(): bool
     {
         return $this->ignoreBaselineLinenumbers;
+    }
+
+    public function format(string $format): self
+    {
+        $this->format = $format;
+
+        return $this;
+    }
+
+    public function getFormat(): string
+    {
+        return $this->format;
+    }
+
+    public function skipBaseline(bool $skipBaseline): self
+    {
+        $this->skipBaseline = $skipBaseline;
+
+        return $this;
+    }
+
+    public function isSkipBaseline(): bool
+    {
+        return $this->skipBaseline;
     }
 }
