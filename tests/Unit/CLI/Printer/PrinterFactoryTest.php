@@ -15,9 +15,7 @@ class PrinterFactoryTest extends TestCase
      */
     public function test_create_returns_json_printer_for_json_format(): void
     {
-        $factory = new PrinterFactory();
-
-        $printer = $factory->create('json');
+        $printer = PrinterFactory::create('json');
 
         self::assertInstanceOf(JsonPrinter::class, $printer);
     }
@@ -27,9 +25,7 @@ class PrinterFactoryTest extends TestCase
      */
     public function test_create_returns_text_printer_for_non_json_format(): void
     {
-        $factory = new PrinterFactory();
-
-        $printer = $factory->create('text');
+        $printer = PrinterFactory::create('text');
 
         self::assertInstanceOf(TextPrinter::class, $printer);
     }

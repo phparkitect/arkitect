@@ -9,6 +9,7 @@ use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\ClassSet;
 use Arkitect\ClassSetRules;
 use Arkitect\CLI\Printer\Printer;
+use Arkitect\CLI\Printer\PrinterFactory;
 use Arkitect\CLI\Progress\VoidProgress;
 use Arkitect\CLI\Runner;
 use Arkitect\CLI\TargetPhpVersion;
@@ -40,6 +41,8 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
     /** @var ParsingErrors */
     private $parsingErrors;
 
+    private Printer $printer;
+
     public function __construct(ClassSet $classSet)
     {
         $targetPhpVersion = TargetPhpVersion::create(null);
@@ -48,6 +51,7 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
         $this->classSet = $classSet;
         $this->violations = new Violations();
         $this->parsingErrors = new ParsingErrors();
+        $this->printer = PrinterFactory::create(Printer::FORMAT_TEXT);
     }
 
     public function toString(): string
@@ -80,6 +84,6 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
             return "\n parsing error: ".$this->parsingErrors->toString();
         }
 
-        return "\n".$this->violations->toString(Printer::FORMAT_TEXT);
+        return "\n".$this->printer->print($this->violations->groupedByFqcn());
     }
 }
