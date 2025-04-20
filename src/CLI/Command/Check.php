@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI\Command;
 
+use Arkitect\CLI\Baseline;
 use Arkitect\CLI\Config;
 use Arkitect\CLI\Printer\PrinterFactory;
 use Arkitect\CLI\Progress\DebugProgress;
@@ -123,19 +124,13 @@ class Check extends Command
 
             $progress = $verbose ? new DebugProgress($output) : new ProgressBarProgress($output);
 
+            $baseline = Baseline::create($skipBaseline, $useBaseline, self::DEFAULT_BASELINE_FILENAME);
+
+            $printer = (new PrinterFactory())->create($format);
+
             $this->printHeadingLine($output);
 
-            if (true !== $skipBaseline && !$useBaseline && file_exists(self::DEFAULT_BASELINE_FILENAME)) {
-                $useBaseline = self::DEFAULT_BASELINE_FILENAME;
-            }
-
-            if ($useBaseline && !file_exists($useBaseline)) {
-                $output->writeln("❌ Baseline file '$useBaseline' not found.");
-
-                return self::ERROR_CODE;
-            }
-
-            $output->writeln("Baseline file '$useBaseline' found");
+            $baseline->getFilename() && $output->writeln("Baseline file '{$baseline->getFilename()}' found");
 
             $rulesFilename = $this->getConfigFilename($input);
 
@@ -151,29 +146,20 @@ class Check extends Command
             $violations = $result->getViolations();
 
             if (false !== $generateBaseline) {
-                if (null === $generateBaseline) {
-                    $generateBaseline = self::DEFAULT_BASELINE_FILENAME;
-                }
-                $this->saveBaseline($generateBaseline, $violations);
+                $baselineFilePath = Baseline::save($generateBaseline, self::DEFAULT_BASELINE_FILENAME, $violations);
 
-                $output->writeln("ℹ️ Baseline file '$generateBaseline' created!");
+                $output->writeln("ℹ️ Baseline file '$baselineFilePath' created!");
 
                 return self::SUCCESS_CODE;
             }
 
-            if ($useBaseline) {
-                $baseline = $this->loadBaseline($useBaseline);
-
-                $violations->remove($baseline, $ignoreBaselineLinenumbers);
-            }
-
-            $printer = (new PrinterFactory())->create($format);
+            $baseline->applyTo($violations, $ignoreBaselineLinenumbers);
 
             // we always print this so we do not have to do additional ifs later
             $stdOut->writeln($printer->print($violations->groupedByFqcn()));
 
             if ($violations->count() > 0) {
-                $output->writeln(\sprintf('⚠️ %s violations detected!', \count($violations)));
+                $output->writeln("⚠️ {$violations->count()} violations detected!");
             }
 
             if ($result->hasParsingErrors()) {
@@ -220,16 +206,6 @@ class Check extends Command
         $executionTime = number_format($endTime - $startTime, 2);
 
         $output->writeln("⏱️ Execution time: $executionTime\n");
-    }
-
-    private function loadBaseline(string $filename): Violations
-    {
-        return Violations::fromJson(file_get_contents($filename));
-    }
-
-    private function saveBaseline(string $filename, Violations $violations): void
-    {
-        file_put_contents($filename, json_encode($violations, \JSON_PRETTY_PRINT));
     }
 
     private function getConfigFilename(InputInterface $input): string
