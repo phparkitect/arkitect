@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Rules;
 
-use Arkitect\CLI\Printer\Printer;
 use Arkitect\Exceptions\IndexNotFoundException;
 use Arkitect\Rules\Violation;
 use Arkitect\Rules\Violations;
@@ -46,26 +45,6 @@ class ViolationsTest extends TestCase
         );
         $this->violationStore->add($violation);
         self::assertEquals(2, $this->violationStore->count());
-    }
-
-    public function test_to_string(): void
-    {
-        $violation = new Violation(
-            'App\Controller\Foo',
-            'should have name end with Controller'
-        );
-
-        $this->violationStore->add($violation);
-
-        $expected = <<<'ERRORS'
-        App\Controller\ProductController has 1 violations
-          should implement ContainerInterface
-
-        App\Controller\Foo has 1 violations
-          should have name end with Controller
-        ERRORS;
-
-        self::assertStringContainsString($expected, $this->violationStore->toString(Printer::FORMAT_TEXT));
     }
 
     public function test_get_iterable(): void

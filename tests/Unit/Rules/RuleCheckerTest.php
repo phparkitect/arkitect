@@ -24,6 +24,7 @@ class RuleCheckerTest extends TestCase
         $fileParser = new FakeParser();
         $rule = new FakeRule();
         $parsingErrors = new ParsingErrors();
+        $stopOnFailure = false;
 
         $runner = new Runner();
 
@@ -32,7 +33,8 @@ class RuleCheckerTest extends TestCase
             new VoidProgress(),
             $fileParser,
             $violations,
-            $parsingErrors
+            $parsingErrors,
+            $stopOnFailure
         );
 
         self::assertCount(3, $violations);

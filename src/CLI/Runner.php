@@ -16,41 +16,25 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class Runner
 {
-    private Violations $violations;
-
-    private ParsingErrors $parsingErrors;
-
-    private bool $stopOnFailure;
-
-    public function __construct(bool $stopOnFailure = false)
+    public function run(Config $config, Baseline $baseline, Progress $progress): AnalysisResult
     {
-        $this->stopOnFailure = $stopOnFailure;
-        $this->violations = new Violations();
-        $this->parsingErrors = new ParsingErrors();
-    }
+        [$violations, $parsingErrors] = $this->doRun($config, $progress);
 
-    public function run(Config $config, Progress $progress, TargetPhpVersion $targetPhpVersion): AnalysisResult
-    {
-        $fileParser = FileParserFactory::createFileParser($targetPhpVersion, $config->isParseCustomAnnotationsEnabled());
-
-        /** @var ClassSetRules $classSetRule */
-        foreach ($config->getClassSetRules() as $classSetRule) {
-            $progress->startFileSetAnalysis($classSetRule->getClassSet());
-
-            try {
-                $this->check($classSetRule, $progress, $fileParser, $this->violations, $this->parsingErrors);
-            } catch (FailOnFirstViolationException $e) {
-                break;
-            } finally {
-                $progress->endFileSetAnalysis($classSetRule->getClassSet());
-            }
-        }
-
-        $this->violations->sort();
+        $baseline->applyTo($violations, $config->isIgnoreBaselineLinenumbers());
 
         return new AnalysisResult(
-            $this->violations,
-            $this->parsingErrors,
+            $violations,
+            $parsingErrors,
+        );
+    }
+
+    public function baseline(Config $config, Progress $progress): AnalysisResult
+    {
+        [$violations, $parsingErrors] = $this->doRun($config, $progress);
+
+        return new AnalysisResult(
+            $violations,
+            $parsingErrors,
         );
     }
 
@@ -59,7 +43,8 @@ class Runner
         Progress $progress,
         Parser $fileParser,
         Violations $violations,
-        ParsingErrors $parsingErrors
+        ParsingErrors $parsingErrors,
+        bool $stopOnFailure
     ): void {
         /** @var SplFileInfo $file */
         foreach ($classSetRule->getClassSet() as $file) {
@@ -79,7 +64,7 @@ class Runner
                 foreach ($classSetRule->getRules() as $rule) {
                     $rule->check($classDescription, $fileViolations);
 
-                    if ($this->stopOnFailure && $fileViolations->count() > 0) {
+                    if ($stopOnFailure && $fileViolations->count() > 0) {
                         $violations->merge($fileViolations);
 
                         throw new FailOnFirstViolationException();
@@ -91,5 +76,33 @@ class Runner
 
             $progress->endParsingFile($file->getRelativePathname());
         }
+    }
+
+    protected function doRun(Config $config, Progress $progress): array
+    {
+        $violations = new Violations();
+        $parsingErrors = new ParsingErrors();
+
+        $fileParser = FileParserFactory::createFileParser(
+            $config->getTargetPhpVersion(),
+            $config->isParseCustomAnnotationsEnabled()
+        );
+
+        /** @var ClassSetRules $classSetRule */
+        foreach ($config->getClassSetRules() as $classSetRule) {
+            $progress->startFileSetAnalysis($classSetRule->getClassSet());
+
+            try {
+                $this->check($classSetRule, $progress, $fileParser, $violations, $parsingErrors, $config->isStopOnFailure());
+            } catch (FailOnFirstViolationException $e) {
+                break;
+            } finally {
+                $progress->endFileSetAnalysis($classSetRule->getClassSet());
+            }
+        }
+
+        $violations->sort();
+
+        return [$violations, $parsingErrors];
     }
 }
