@@ -4,7 +4,41 @@ declare(strict_types=1);
 
 use Arkitect\CLI\PhpArkitectApplication;
 
-require __DIR__ . '/../vendor/autoload.php';
+// $_composer_autoload_path is set by composer (available from composer 2.2)
+// https://getcomposer.org/doc/articles/vendor-binaries.md#finding-the-composer-autoloader-from-a-binary
+if (isset($_composer_autoload_path)) {
+    
+    define('PHPARKITECT_COMPOSER_INSTALL', $_composer_autoload_path);
+
+} else {
+// if $_composer_autoload_path is not set, we will try to find the autoload.php file
+// guessing the location of the phparkitect binary:
+    $possible_autoload_locations = [ 
+        __DIR__ . '/../../autoload.php',        // inside vendor dir like "vendor/phparkitect/bin"
+        __DIR__ . '/../vendor/autoload.php',    // first level project dir like "bin"
+        __DIR__ . '/vendor/autoload.php'        // project root
+    ];
+    
+    foreach ($possible_autoload_locations as $path) {
+        if (file_exists($path)) {
+            define('PHPARKITECT_COMPOSER_INSTALL', $path);
+            break;
+        }
+    }
+}
+
+if (!defined('PHPARKITECT_COMPOSER_INSTALL')) {
+    fwrite(
+        STDERR,
+        'You need to set up the project dependencies using Composer:' . PHP_EOL . PHP_EOL .
+        '    composer install' . PHP_EOL . PHP_EOL .
+        'You can learn all about Composer on https://getcomposer.org/.' . PHP_EOL
+    );
+
+    die(1);
+}
+
+require PHPARKITECT_COMPOSER_INSTALL;
 
 $application = new PhpArkitectApplication();
 
