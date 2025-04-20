@@ -136,7 +136,7 @@ class Check extends Command
 
             $baseline = Baseline::create($config->isSkipBaseline(), $config->getBaselineFilePath());
 
-            null !== $config->getBaselineFilePath() && $output->writeln("Baseline file '{$config->getBaselineFilePath()}' found");
+            $baseline->getFilename() && $output->writeln("Baseline file '{$baseline->getFilename()}' found");
             $output->writeln("Config file '$rulesFilename' found\n");
 
             $runner = new Runner();
