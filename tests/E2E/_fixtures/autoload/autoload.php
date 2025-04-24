@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-spl_autoload_register(function ($class) {
+spl_autoload_register(function ($class): void {
     $classmap = [
         'Autoload\Services\UserService' => __DIR__.'/src/Service/UserService.php',
         'Autoload\Model\User' => __DIR__.'/src/Model/User.php',
@@ -18,5 +18,5 @@ spl_autoload_register(function ($class) {
         return;
     }
 
-    return require $path;
+    require_once $path;
 });
