@@ -14,6 +14,7 @@ use Arkitect\Rules\Violations;
 
 return static function (Config $config): void {
     // a dummy rule to check if the class is autoloaded
+    // is_a with 'true' passed as the third parameter triggers the autoloader
     $autoload_rule = new class('Autoload\Model\UserInterface') implements Expression {
         public string $implements;
 
@@ -43,7 +44,7 @@ return static function (Config $config): void {
         }
     };
 
-    $mvc_class_set = ClassSet::fromDir(__DIR__.'/src');
+    $class_set = ClassSet::fromDir(__DIR__.'/src');
 
     $rule = Rule::allClasses()
         ->except('Autoload\Model\UserInterface')
@@ -52,5 +53,5 @@ return static function (Config $config): void {
         ->because('we want check if the class is autoloaded');
 
     $config
-        ->add($mvc_class_set, $rule);
+        ->add($class_set, $rule);
 };
