@@ -252,6 +252,15 @@ class CheckCommandTest extends TestCase
         self::assertJsonStringEqualsJsonString($expectedJson, $cmdTester->getDisplay());
     }
 
+    public function test_autoload_file(): void
+    {
+        $configFilePath = __DIR__.'/../_fixtures/autoload/phparkitect.php';
+
+        $cmdTester = $this->runCheck($configFilePath, null, null, false, false, false, 'text', __DIR__.'/../_fixtures/autoload/autoload.php');
+
+        self::assertCommandWasSuccessful($cmdTester);
+    }
+
     protected function runCheck(
         $configFilePath = null,
         ?bool $stopOnFailure = null,
@@ -259,9 +268,11 @@ class CheckCommandTest extends TestCase
         $generateBaseline = false,
         bool $skipBaseline = false,
         bool $ignoreBaselineNumbers = false,
-        string $format = 'text'
+        string $format = 'text',
+        ?string $autoloadFilePath = null
     ): ApplicationTester {
         $input = ['check'];
+
         if (null !== $configFilePath) {
             $input['--config'] = $configFilePath;
         }
@@ -285,6 +296,10 @@ class CheckCommandTest extends TestCase
         }
 
         $input['--format'] = $format;
+
+        if ($autoloadFilePath) {
+            $input['--autoload'] = $autoloadFilePath;
+        }
 
         $app = new PhpArkitectApplication();
         $app->setAutoExit(false);

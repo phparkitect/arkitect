@@ -27,8 +27,33 @@ class GitlabPrinterTest extends TestCase
 
         $result = $printer->print($violationsCollection);
 
-        self::assertSame(<<<JSON
-        [{"description":"Some error message","check_name":"RuleA.some-error-message","fingerprint":"7ddcfd42f5f2af3d00864ef959a0327f508cb5227aedca96d919d681a5dcde4a","severity":"major","location":{"path":"tests\/Unit\/CLI\/Printer\/GitlabPrinterTest.php","lines":{"begin":42}}},{"description":"Another error message","check_name":"RuleB.another-error-message","fingerprint":"800c2ceafbf4023e401200186ecabdfe59891c5d6670e86571e3c50339df07dc","severity":"major","location":{"path":"tests\/Unit\/CLI\/Printer\/GitlabPrinterTest.php","lines":{"begin":1}}}]
+        self::assertJsonStringEqualsJsonString(<<<JSON
+        [
+            {
+                "description": "Some error message",
+                "check_name": "RuleA.some-error-message",
+                "fingerprint": "7ddcfd42f5f2af3d00864ef959a0327f508cb5227aedca96d919d681a5dcde4a",
+                "severity": "major",
+                "location": {
+                    "path": "tests\/Unit\/CLI\/Printer\/GitlabPrinterTest.php",
+                    "lines": {
+                        "begin": 42
+                    }
+                }
+            },
+            {
+                "description": "Another error message",
+                "check_name": "RuleB.another-error-message",
+                "fingerprint": "800c2ceafbf4023e401200186ecabdfe59891c5d6670e86571e3c50339df07dc",
+                "severity": "major",
+                "location": {
+                    "path": "tests\/Unit\/CLI\/Printer\/GitlabPrinterTest.php",
+                    "lines": {
+                        "begin": 1
+                    }
+                }
+            }
+        ]
         JSON, $result);
     }
 
