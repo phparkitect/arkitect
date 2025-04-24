@@ -12,7 +12,8 @@ if (isset($_composer_autoload_path)) {
 
 } else {
 // if $_composer_autoload_path is not set, we will try to find the autoload.php file
-// guessing the location of the phparkitect binary:
+// guessing the location of the phparkitect binary
+// ps: e2e tests are run from the bin-stub dir and needs that
     $possible_autoload_locations = [ 
         __DIR__ . '/../../autoload.php',        // inside vendor dir like "vendor/phparkitect/bin"
         __DIR__ . '/../vendor/autoload.php',    // first level project dir like "bin"
