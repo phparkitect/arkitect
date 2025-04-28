@@ -141,10 +141,10 @@ class Check extends Command
                 ->skipBaseline($skipBaseline)
                 ->format($format);
 
-            $this->requireAutoload($config->getAutoloadFilePath(), $output);
-            $printer = $this->createPrinter($config->getFormat(), $output);
-            $progress = $this->createProgress($verbose, $output);
-            $baseline = $this->createBaseline($config->isSkipBaseline(), $config->getBaselineFilePath(), $output);
+            $this->requireAutoload($output, $config->getAutoloadFilePath());
+            $printer = $this->createPrinter($output, $config->getFormat());
+            $progress = $this->createProgress($output, $verbose);
+            $baseline = $this->createBaseline($output, $config->isSkipBaseline(), $config->getBaselineFilePath());
 
             $output->writeln("Config file '$rulesFilename' found\n");
 
@@ -189,7 +189,7 @@ class Check extends Command
     /**
      * @psalm-suppress UnresolvableInclude
      */
-    protected function requireAutoload(?string $filePath, OutputInterface $output): void
+    protected function requireAutoload(OutputInterface $output, ?string $filePath): void
     {
         if (null === $filePath) {
             return;
@@ -202,21 +202,21 @@ class Check extends Command
         $output->writeln("Autoload file '$filePath' added");
     }
 
-    protected function createPrinter(string $format, OutputInterface $output): Printer
+    protected function createPrinter(OutputInterface $output, string $format): Printer
     {
         $output->writeln("Output format: $format");
 
         return PrinterFactory::create($format);
     }
 
-    protected function createProgress(bool $verbose, OutputInterface $output): Progress
+    protected function createProgress(OutputInterface $output, bool $verbose): Progress
     {
         $output->writeln('Progress: '.($verbose ? 'debug' : 'bar'));
 
         return $verbose ? new DebugProgress($output) : new ProgressBarProgress($output);
     }
 
-    protected function createBaseline(bool $skipBaseline, ?string $baselineFilePath, OutputInterface $output): Baseline
+    protected function createBaseline(OutputInterface $output, bool $skipBaseline, ?string $baselineFilePath): Baseline
     {
         $baseline = Baseline::create($skipBaseline, $baselineFilePath);
 
