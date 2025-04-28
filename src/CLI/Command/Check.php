@@ -6,8 +6,10 @@ namespace Arkitect\CLI\Command;
 
 use Arkitect\CLI\Baseline;
 use Arkitect\CLI\ConfigBuilder;
+use Arkitect\CLI\Printer\Printer;
 use Arkitect\CLI\Printer\PrinterFactory;
 use Arkitect\CLI\Progress\DebugProgress;
+use Arkitect\CLI\Progress\Progress;
 use Arkitect\CLI\Progress\ProgressBarProgress;
 use Arkitect\CLI\Runner;
 use Arkitect\CLI\TargetPhpVersion;
@@ -16,6 +18,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Webmozart\Assert\Assert;
 
 class Check extends Command
 {
@@ -26,6 +29,7 @@ class Check extends Command
     private const SKIP_BASELINE_PARAM = 'skip-baseline';
     private const IGNORE_BASELINE_LINENUMBERS_PARAM = 'ignore-baseline-linenumbers';
     private const FORMAT_PARAM = 'format';
+    private const AUTOLOAD_PARAM = 'autoload';
 
     private const GENERATE_BASELINE_PARAM = 'generate-baseline';
     private const DEFAULT_RULES_FILENAME = 'phparkitect.php';
@@ -95,6 +99,12 @@ class Check extends Command
                 InputOption::VALUE_OPTIONAL,
                 'Output format: text (default), json, gitlab',
                 'text'
+            )
+            ->addOption(
+                self::AUTOLOAD_PARAM,
+                'a',
+                InputOption::VALUE_REQUIRED,
+                'Specify an autoload file to use',
             );
     }
 
@@ -123,6 +133,7 @@ class Check extends Command
             $this->printHeadingLine($output);
 
             $config = ConfigBuilder::loadFromFile($rulesFilename)
+                ->autoloadFilePath($input->getOption(self::AUTOLOAD_PARAM))
                 ->stopOnFailure($stopOnFailure)
                 ->targetPhpVersion(TargetPhpVersion::create($phpVersion))
                 ->baselineFilePath(Baseline::resolveFilePath($useBaseline, self::DEFAULT_BASELINE_FILENAME))
@@ -130,13 +141,11 @@ class Check extends Command
                 ->skipBaseline($skipBaseline)
                 ->format($format);
 
-            $printer = PrinterFactory::create($config->getFormat());
+            $this->requireAutoload($output, $config->getAutoloadFilePath());
+            $printer = $this->createPrinter($output, $config->getFormat());
+            $progress = $this->createProgress($output, $verbose);
+            $baseline = $this->createBaseline($output, $config->isSkipBaseline(), $config->getBaselineFilePath());
 
-            $progress = $verbose ? new DebugProgress($output) : new ProgressBarProgress($output);
-
-            $baseline = Baseline::create($config->isSkipBaseline(), $config->getBaselineFilePath());
-
-            $baseline->getFilename() && $output->writeln("Baseline file '{$baseline->getFilename()}' found");
             $output->writeln("Config file '$rulesFilename' found\n");
 
             $runner = new Runner();
@@ -175,6 +184,45 @@ class Check extends Command
         } finally {
             $this->printExecutionTime($output, $startTime);
         }
+    }
+
+    /**
+     * @psalm-suppress UnresolvableInclude
+     */
+    protected function requireAutoload(OutputInterface $output, ?string $filePath): void
+    {
+        if (null === $filePath) {
+            return;
+        }
+
+        Assert::file($filePath, "Cannot find '$filePath'");
+
+        require_once $filePath;
+
+        $output->writeln("Autoload file '$filePath' added");
+    }
+
+    protected function createPrinter(OutputInterface $output, string $format): Printer
+    {
+        $output->writeln("Output format: $format");
+
+        return PrinterFactory::create($format);
+    }
+
+    protected function createProgress(OutputInterface $output, bool $verbose): Progress
+    {
+        $output->writeln('Progress: '.($verbose ? 'debug' : 'bar'));
+
+        return $verbose ? new DebugProgress($output) : new ProgressBarProgress($output);
+    }
+
+    protected function createBaseline(OutputInterface $output, bool $skipBaseline, ?string $baselineFilePath): Baseline
+    {
+        $baseline = Baseline::create($skipBaseline, $baselineFilePath);
+
+        $baseline->getFilename() && $output->writeln("Baseline file '{$baseline->getFilename()}' found");
+
+        return $baseline;
     }
 
     protected function printHeadingLine(OutputInterface $output): void

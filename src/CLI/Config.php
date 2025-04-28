@@ -27,6 +27,8 @@ class Config
 
     private string $format;
 
+    private ?string $autoloadFilePath;
+
     private TargetPhpVersion $targetPhpVersion;
 
     public function __construct()
@@ -39,6 +41,7 @@ class Config
         $this->baselineFilePath = null;
         $this->ignoreBaselineLinenumbers = false;
         $this->format = PrinterFactory::default();
+        $this->autoloadFilePath = null;
         $this->targetPhpVersion = TargetPhpVersion::latest();
     }
 
@@ -151,5 +154,17 @@ class Config
     public function isSkipBaseline(): bool
     {
         return $this->skipBaseline;
+    }
+
+    public function autoloadFilePath(?string $autoloadFilePath): self
+    {
+        $this->autoloadFilePath = $autoloadFilePath;
+
+        return $this;
+    }
+
+    public function getAutoloadFilePath(): ?string
+    {
+        return $this->autoloadFilePath;
     }
 }
