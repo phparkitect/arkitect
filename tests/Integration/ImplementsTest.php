@@ -46,7 +46,7 @@ class ImplementsTest extends TestCase
 
                     enum AEnum implements AnInterface {
                         case PENDING;
-                        case PAYED;
+                        case PAID;
 
                         public function amethod() {}
                     }

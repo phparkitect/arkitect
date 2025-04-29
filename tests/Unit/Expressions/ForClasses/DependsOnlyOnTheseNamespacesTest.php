@@ -83,7 +83,7 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
         self::assertEquals(0, $violations->count());
     }
 
-    public function test_it_should_return_true_if_depends_on_same_namespace_without_specifing_it(): void
+    public function test_it_should_return_true_if_depends_on_same_namespace_without_specifying_it(): void
     {
         $dependOnClasses = new DependsOnlyOnTheseNamespaces();
 
