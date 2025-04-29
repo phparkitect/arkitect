@@ -71,10 +71,10 @@ class FullyQualifiedClassName
 
     public function isNotAValidPattern(string $pattern): bool
     {
-        $validClassNameCharacted = '[a-zA-Z0-9_\x80-\xff]';
+        $validClassNameCharacters = '[a-zA-Z0-9_\x80-\xff]';
         $or = '|';
         $backslash = '\\\\';
 
-        return 0 === preg_match('/^('.$validClassNameCharacted.$or.$backslash.$or.'\*'.$or.'\?)*$/', $pattern);
+        return 0 === preg_match('/^('.$validClassNameCharacters.$or.$backslash.$or.'\*'.$or.'\?)*$/', $pattern);
     }
 }

@@ -42,7 +42,7 @@ class ExtendsThrowableTest extends TestCase
 
                     enum BillingEnum {
                         case PENDING;
-                        case PAYED;
+                        case PAID;
                     }
                     ',
                 'AnException.php' => '<?php

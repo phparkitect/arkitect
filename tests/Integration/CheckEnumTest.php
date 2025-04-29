@@ -56,7 +56,7 @@ class CheckEnumTest extends TestCase
 
                                     enum BillingEnum {
                                         case PENDING;
-                                        case PAYED;
+                                        case PAID;
                                     }
                                     ',
                                     'GenderEnum.php' => '<?php
