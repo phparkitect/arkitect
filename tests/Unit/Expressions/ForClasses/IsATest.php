@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
-use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
-use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\ForClasses\IsA;
 use Arkitect\Rules\Violations;
 use Arkitect\Tests\Unit\Expressions\ForClasses\DummyClasses\Banana;
