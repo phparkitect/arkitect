@@ -33,7 +33,8 @@ final class IsA implements Expression
         if (!$this->isA($theClass, ...$this->allowedFqcnList)) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
-                ViolationMessage::selfExplanatory($this->describe($theClass, $because))
+                ViolationMessage::selfExplanatory($this->describe($theClass, $because)),
+                $theClass->getFilePath()
             );
 
             $violations->add($violation);
