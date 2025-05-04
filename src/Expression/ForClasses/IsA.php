@@ -13,22 +13,25 @@ use Arkitect\Rules\Violations;
 
 final class IsA implements Expression
 {
-    /** @var string[] */
-    private $allowedFqcnList;
+    /** @var array<class-string> */
+    private array $allowedFqcnList;
 
+    /**
+     * @param class-string ...$allowedFqcnList
+     */
     public function __construct(string ...$allowedFqcnList)
     {
         $this->allowedFqcnList = $allowedFqcnList;
     }
 
-    public function describe(ClassDescription $theClass, string $because): Description
+    public function describe(ClassDescription $theClass, string $because = ''): Description
     {
         $allowedFqcnList = implode(', ', $this->allowedFqcnList);
 
         return new Description("should inherit from one of: $allowedFqcnList", $because);
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+    public function evaluate(ClassDescription $theClass, Violations $violations, string $because = ''): void
     {
         if (!$this->isA($theClass, ...$this->allowedFqcnList)) {
             $violation = Violation::create(
@@ -41,6 +44,9 @@ final class IsA implements Expression
         }
     }
 
+    /**
+     * @param class-string ...$allowedFqcnList
+     */
     private function isA(ClassDescription $theClass, string ...$allowedFqcnList): bool
     {
         foreach ($allowedFqcnList as $allowedFqcn) {
