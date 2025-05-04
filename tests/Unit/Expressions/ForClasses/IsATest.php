@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\ForClasses\IsA;
 use Arkitect\Rules\Violations;
@@ -21,17 +22,11 @@ final class IsATest extends TestCase
     {
         $interface = FruitInterface::class;
         $isA = new IsA($interface);
-        $classDescription = new ClassDescription(
-            FullyQualifiedClassName::fromString(CavendishBanana::class),
-            [],
-            [FullyQualifiedClassName::fromString($interface)],
-            null,
-            false,
-            false,
-            false,
-            false,
-            false
-        );
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName(CavendishBanana::class)
+            ->addInterface($interface, 10)
+            ->build();
 
         $violations = new Violations();
         $isA->evaluate($classDescription, $violations, '');
@@ -43,17 +38,11 @@ final class IsATest extends TestCase
     {
         $class = Banana::class;
         $isA = new IsA($class);
-        $classDescription = new ClassDescription(
-            FullyQualifiedClassName::fromString(DwarfCavendishBanana::class),
-            [],
-            [],
-            FullyQualifiedClassName::fromString($class),
-            false,
-            false,
-            false,
-            false,
-            false
-        );
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName(DwarfCavendishBanana::class)
+            ->addExtends($class, 10)
+            ->build();
 
         $violations = new Violations();
         $isA->evaluate($classDescription, $violations, '');
@@ -66,17 +55,10 @@ final class IsATest extends TestCase
         $interface = FruitInterface::class;
         $class = Banana::class;
         $isA = new IsA($class, $interface);
-        $classDescription = new ClassDescription(
-            FullyQualifiedClassName::fromString(Dog::class),
-            [],
-            [],
-            null,
-            false,
-            false,
-            false,
-            false,
-            false
-        );
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName(Dog::class)
+            ->build();
 
         $violations = new Violations();
         $isA->evaluate($classDescription, $violations, '');
