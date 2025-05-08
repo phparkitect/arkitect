@@ -23,6 +23,14 @@ use PHPUnit\Framework\TestCase;
 
 class FileVisitorTest extends TestCase
 {
+    public function test_should_parse_non_php_file(): void
+    {
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp->parse('', 'path/to/class.php');
+
+        self::assertEmpty($fp->getClassDescriptions());
+    }
+
     public function test_should_parse_empty_file(): void
     {
         $code = <<< 'EOF'
