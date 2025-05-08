@@ -12,6 +12,9 @@ use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
 use Arkitect\Expression\ForClasses\Implement;
+use Arkitect\Expression\ForClasses\IsAbstract;
+use Arkitect\Expression\ForClasses\IsFinal;
+use Arkitect\Expression\ForClasses\IsReadonly;
 use Arkitect\Expression\ForClasses\NotContainDocBlockLike;
 use Arkitect\Expression\ForClasses\NotHaveDependencyOutsideNamespace;
 use Arkitect\Rules\ParsingError;
@@ -1505,5 +1508,82 @@ EOF;
         $cd = $fp->getClassDescriptions();
 
         self::assertInstanceOf(ClassDescription::class, $cd[0]);
+    }
+
+    public function test_is_final_when_there_is_anonymous_final(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+        namespace App\Foo;
+
+        final class User {
+            public function __construct() {
+               $class = new class() extends Bundle {}
+            }
+        }
+        EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.4'));
+        $fp->parse($code, 'relativePathName');
+
+        $cd = $fp->getClassDescriptions();
+        $violations = new Violations();
+        $isFinal = new IsFinal();
+        $isFinal->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+
+        self::assertCount(0, $violations);
+    }
+
+    public function test_is_abstract_when_there_is_anonymous_final(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+        namespace App\Foo;
+
+        abstract class User {
+            public function bar() {
+                $class = new class() extends Bundle {}
+            }
+
+            abstract public function foo() {}
+        }
+        EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.4'));
+        $fp->parse($code, 'relativePathName');
+
+        $cd = $fp->getClassDescriptions();
+        $violations = new Violations();
+        $isAbstract = new IsAbstract();
+        $isAbstract->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+
+        self::assertCount(0, $violations);
+    }
+
+    public function test_is_readonly_when_there_is_anonymous_final(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+        namespace App\Foo;
+
+         readonly class User {
+            public function __construct() {
+               $class = new class() extends Bundle {}
+            }
+        }
+        EOF;
+
+        /** @var FileParser $fp */
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.4'));
+        $fp->parse($code, 'relativePathName');
+
+        $cd = $fp->getClassDescriptions();
+        $violations = new Violations();
+        $isReadOnly = new IsReadonly();
+        $isReadOnly->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+
+        self::assertCount(0, $violations);
     }
 }

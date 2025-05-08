@@ -109,11 +109,17 @@ class FileVisitor extends NodeVisitorAbstract
                 ->addExtends($node->extends->toString(), $node->getLine());
         }
 
-        $this->classDescriptionBuilder->setFinal($node->isFinal());
+        if (!$node->isAnonymous()) {
+            $this->classDescriptionBuilder->setFinal($node->isFinal());
+        }
 
-        $this->classDescriptionBuilder->setReadonly($node->isReadonly());
+        if (!$node->isAnonymous()) {
+            $this->classDescriptionBuilder->setReadonly($node->isReadonly());
+        }
 
-        $this->classDescriptionBuilder->setAbstract($node->isAbstract());
+        if (!$node->isAnonymous()) {
+            $this->classDescriptionBuilder->setAbstract($node->isAbstract());
+        }
     }
 
     private function handleEnumNode(Node $node): void
