@@ -166,7 +166,7 @@ Currently, you can check if a class:
 ```php
 $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
-    ->should(new DependsOnlyOnTheseNamespaces('App\Domain', 'Ramsey\Uuid'))
+    ->should(new DependsOnlyOnTheseNamespaces(['App\Domain', 'Ramsey\Uuid'], ['App\Exluded']))
     ->because('we want to protect our domain from external dependencies except for Ramsey\Uuid');
 ```
 
@@ -348,7 +348,7 @@ $rules[] = Rule::allClasses()
 ```php
 $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Application'))
-    ->should(new NotDependsOnTheseNamespaces('App\Infrastructure'))
+    ->should(new NotDependsOnTheseNamespaces(['App\Infrastructure'], ['App\Infrastructure\Repository']))
     ->because('we want to avoid coupling between application layer and infrastructure layer');
 ```
 
