@@ -21,7 +21,7 @@ class CheckAttributeDependencyTest extends TestCase
 
         $rule = Rule::allClasses()
             ->that(new ResideInOneOfTheseNamespaces('App'))
-            ->should(new NotDependsOnTheseNamespaces('App\Invalid'))
+            ->should(new NotDependsOnTheseNamespaces(['App\Invalid']))
             ->because('i said so');
 
         $runner->run($dir, $rule);

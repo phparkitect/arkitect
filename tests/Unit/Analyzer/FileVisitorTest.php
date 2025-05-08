@@ -59,7 +59,7 @@ class FileVisitorTest extends TestCase
 
         $violations = new Violations();
 
-        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Foo');
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['Foo']);
         $dependsOnTheseNamespaces->evaluate($fp->getClassDescriptions()[0], $violations, 'because');
 
         self::assertCount(2, $violations);
@@ -231,7 +231,7 @@ class FileVisitorTest extends TestCase
 
         $violations = new Violations();
 
-        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Foo', 'Symfony', 'Doctrine');
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['Foo', 'Symfony', 'Doctrine']);
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         self::assertCount(0, $violations);
@@ -300,7 +300,7 @@ class FileVisitorTest extends TestCase
 
         $violations = new Violations();
 
-        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Foo', 'Symfony', 'Doctrine');
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['Foo', 'Symfony', 'Doctrine']);
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         self::assertCount(0, $violations);
@@ -679,7 +679,7 @@ EOF;
 
         $violations = new Violations();
 
-        $notHaveDependencyOutsideNamespace = new DependsOnlyOnTheseNamespaces('MyProject\AppBundle\Application');
+        $notHaveDependencyOutsideNamespace = new DependsOnlyOnTheseNamespaces(['MyProject\AppBundle\Application']);
         $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         self::assertCount(1, $violations);
@@ -707,7 +707,7 @@ EOF;
 
         $violations = new Violations();
 
-        $notHaveDependencyOutsideNamespace = new DependsOnlyOnTheseNamespaces('MyProject\AppBundle\Application');
+        $notHaveDependencyOutsideNamespace = new DependsOnlyOnTheseNamespaces(['MyProject\AppBundle\Application']);
         $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         self::assertCount(1, $violations);
@@ -801,7 +801,7 @@ EOF;
 
         $violations = new Violations();
 
-        $notHaveDependencyOutsideNamespace = new DependsOnlyOnTheseNamespaces('MyProject\AppBundle\Application');
+        $notHaveDependencyOutsideNamespace = new DependsOnlyOnTheseNamespaces(['MyProject\AppBundle\Application']);
         $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         self::assertCount(1, $violations);
@@ -831,7 +831,7 @@ EOF;
 
         $violations = new Violations();
 
-        $notHaveDependencyOutsideNamespace = new DependsOnlyOnTheseNamespaces('MyProject\AppBundle\Application');
+        $notHaveDependencyOutsideNamespace = new DependsOnlyOnTheseNamespaces(['MyProject\AppBundle\Application']);
         $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         self::assertCount(1, $violations);
@@ -894,7 +894,7 @@ EOF;
 
         $violations = new Violations();
 
-        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('MyProject\AppBundle\Application');
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['MyProject\AppBundle\Application']);
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         self::assertCount(1, $violations);
@@ -920,7 +920,7 @@ EOF;
 
         $violations = new Violations();
 
-        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('MyProject\AppBundle\Application');
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['MyProject\AppBundle\Application']);
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         self::assertCount(1, $violations);
@@ -991,7 +991,7 @@ EOF;
 
         $violations = new Violations();
 
-        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Foo', 'Symfony', 'Doctrine');
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['Foo', 'Symfony', 'Doctrine']);
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         self::assertCount(0, $violations);
@@ -1020,7 +1020,7 @@ EOF;
 
         $violations = new Violations();
 
-        $dependsOnlyOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('MyProject\AppBundle\Application');
+        $dependsOnlyOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['MyProject\AppBundle\Application']);
         $dependsOnlyOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         self::assertCount(0, $violations);
@@ -1079,7 +1079,7 @@ EOF;
 
         $violations = new Violations();
 
-        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Domain');
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['Domain']);
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         self::assertCount(1, $violations);
@@ -1109,7 +1109,7 @@ EOF;
 
         $violations = new Violations();
 
-        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Domain');
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['Domain']);
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         self::assertCount(1, $violations);
@@ -1139,7 +1139,7 @@ EOF;
 
         $violations = new Violations();
 
-        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Domain');
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['Domain']);
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         self::assertCount(1, $violations);
@@ -1171,7 +1171,7 @@ EOF;
 
         $violations = new Violations();
 
-        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Domain');
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['Domain']);
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         self::assertCount(1, $violations);
@@ -1203,7 +1203,7 @@ EOF;
 
         $violations = new Violations();
 
-        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Domain');
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['Domain']);
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         self::assertCount(1, $violations);
@@ -1235,7 +1235,7 @@ EOF;
 
         $violations = new Violations();
 
-        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Domain');
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['Domain']);
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         self::assertCount(1, $violations);
@@ -1270,7 +1270,7 @@ EOF;
 
         $violations = new Violations();
 
-        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Domain');
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['Domain']);
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         self::assertCount(1, $violations);
@@ -1303,7 +1303,7 @@ EOF;
 
         $violations = new Violations();
 
-        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Domain');
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['Domain']);
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         self::assertCount(1, $violations);
@@ -1336,7 +1336,7 @@ EOF;
 
         $violations = new Violations();
 
-        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Domain');
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['Domain']);
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         self::assertCount(1, $violations);
@@ -1369,7 +1369,7 @@ EOF;
 
         $violations = new Violations();
 
-        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('Domain');
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['Domain']);
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         self::assertCount(1, $violations);
@@ -1398,7 +1398,7 @@ EOF;
 
         $violations = new Violations();
 
-        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces('MyProject\AppBundle\Application');
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['MyProject\AppBundle\Application']);
         $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         self::assertCount(1, $violations);

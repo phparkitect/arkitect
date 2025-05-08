@@ -12,7 +12,7 @@ return static function (Config $config): void {
 
     $rule_1 = Rule::allClasses()
         ->that(new ResideInOneOfTheseNamespaces('App\DependenciesLeak\SecondModule'))
-        ->should(new NotDependsOnTheseNamespaces('App\DependenciesLeak\FirstModule'))
+        ->should(new NotDependsOnTheseNamespaces(['App\DependenciesLeak\FirstModule']))
         ->because('modules should be independent');
 
     $config

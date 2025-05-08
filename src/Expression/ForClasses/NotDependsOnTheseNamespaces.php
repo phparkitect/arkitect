@@ -17,9 +17,13 @@ class NotDependsOnTheseNamespaces implements Expression
     /** @var array<string> */
     private array $namespaces;
 
-    public function __construct(string ...$namespace)
+    /** @var array<string> */
+    private array $exclude;
+
+    public function __construct(array $namespaces, array $exclude = [])
     {
-        $this->namespaces = $namespace;
+        $this->namespaces = $namespaces;
+        $this->exclude = $exclude;
     }
 
     public function describe(ClassDescription $theClass, string $because): Description
@@ -36,7 +40,11 @@ class NotDependsOnTheseNamespaces implements Expression
         /** @var ClassDependency $dependency */
         foreach ($dependencies as $dependency) {
             if ('' === $dependency->getFQCN()->namespace()) {
-                continue;
+                continue; // skip root namespace
+            }
+
+            if ($dependency->matchesOneOf(...$this->exclude)) {
+                continue; // skip excluded namespaces
             }
 
             if ($dependency->matchesOneOf(...$this->namespaces)) {

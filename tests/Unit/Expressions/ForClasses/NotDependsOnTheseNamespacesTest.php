@@ -14,7 +14,7 @@ class NotDependsOnTheseNamespacesTest extends TestCase
 {
     public function test_it_should_return_true_if_it_has_no_dependencies(): void
     {
-        $notDependOnClasses = new NotDependsOnTheseNamespaces('myNamespace');
+        $notDependOnClasses = new NotDependsOnTheseNamespaces(['myNamespace']);
 
         $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass', 'src/Foo.php')->build();
         $because = 'we want to add this rule for our software';
@@ -26,7 +26,7 @@ class NotDependsOnTheseNamespacesTest extends TestCase
 
     public function test_it_should_return_true_if_not_depends_on_namespace(): void
     {
-        $notDependOnClasses = new NotDependsOnTheseNamespaces('myNamespace');
+        $notDependOnClasses = new NotDependsOnTheseNamespaces(['myNamespace']);
 
         $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass', 'src/Foo.php')
             ->addDependency(new ClassDependency('myNamespace\Banana', 0))
@@ -46,7 +46,7 @@ class NotDependsOnTheseNamespacesTest extends TestCase
 
     public function test_it_should_return_true_if_depends_on_class_in_root_namespace(): void
     {
-        $notDependOnClasses = new NotDependsOnTheseNamespaces('myNamespace');
+        $notDependOnClasses = new NotDependsOnTheseNamespaces(['myNamespace']);
 
         $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass', 'src/Foo.php')
             ->addDependency(new ClassDependency('myNamespace\Banana', 0))
@@ -67,7 +67,7 @@ class NotDependsOnTheseNamespacesTest extends TestCase
 
     public function test_it_should_return_false_if_depends_on_namespace(): void
     {
-        $notDependOnClasses = new NotDependsOnTheseNamespaces('myNamespace');
+        $notDependOnClasses = new NotDependsOnTheseNamespaces(['myNamespace']);
 
         $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass', 'src/Foo.php')
             ->addDependency(new ClassDependency('myNamespace\Banana', 0))
