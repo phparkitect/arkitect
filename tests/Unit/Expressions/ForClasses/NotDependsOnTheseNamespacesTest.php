@@ -84,4 +84,20 @@ class NotDependsOnTheseNamespacesTest extends TestCase
             $violations->get(0)->getError()
         );
     }
+
+    public function test_it_should_ignore_excluded_namespaces(): void
+    {
+        $notDependOnClasses = new NotDependsOnTheseNamespaces(['myNamespace'], ['myNamespace\Mango']);
+
+        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass', 'src/Foo.php')
+            ->addDependency(new ClassDependency('myNamespace\Banana', 0))
+            ->addDependency(new ClassDependency('myNamespace\Mango', 10))
+            ->build();
+
+        $because = 'we want to add this rule for our software';
+        $violations = new Violations();
+        $notDependOnClasses->evaluate($classDescription, $violations, $because);
+
+        self::assertEquals(1, $violations->count());
+    }
 }
