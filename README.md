@@ -166,7 +166,7 @@ Currently, you can check if a class:
 ```php
 $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
-    ->should(new DependsOnlyOnTheseNamespaces(['App\Domain', 'Ramsey\Uuid'], ['App\Exluded']))
+    ->should(new DependsOnlyOnTheseNamespaces(['App\Domain', 'Ramsey\Uuid'], ['App\Excluded']))
     ->because('we want to protect our domain from external dependencies except for Ramsey\Uuid');
 ```
 
