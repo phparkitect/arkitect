@@ -28,11 +28,11 @@ class ArchitectureTest extends TestCase
         $expectedRules = [
             Rule::allClasses()
                 ->that(new ResideInOneOfTheseNamespaces('App\*\Domain\*'))
-                ->should(new NotDependsOnTheseNamespaces('App\*\Application\*', 'App\*\Infrastructure\*'))
+                ->should(new NotDependsOnTheseNamespaces(['App\*\Application\*', 'App\*\Infrastructure\*']))
                 ->because('of component architecture'),
             Rule::allClasses()
                 ->that(new ResideInOneOfTheseNamespaces('App\*\Application\*'))
-                ->should(new NotDependsOnTheseNamespaces('App\*\Infrastructure\*'))
+                ->should(new NotDependsOnTheseNamespaces(['App\*\Infrastructure\*']))
                 ->because('of component architecture'),
         ];
 
@@ -50,7 +50,7 @@ class ArchitectureTest extends TestCase
         $expectedRules = [
             Rule::allClasses()
                 ->that(new ResideInOneOfTheseNamespaces('App\*\Domain\*'))
-                ->should(new DependsOnlyOnTheseNamespaces('App\*\Domain\*'))
+                ->should(new DependsOnlyOnTheseNamespaces(['App\*\Domain\*']))
                 ->because('of component architecture'),
         ];
 

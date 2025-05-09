@@ -14,7 +14,7 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
 {
     public function test_it_should_return_true_if_it_has_no_dependencies(): void
     {
-        $dependOnClasses = new DependsOnlyOnTheseNamespaces('myNamespace');
+        $dependOnClasses = new DependsOnlyOnTheseNamespaces(['myNamespace']);
 
         $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass', 'src/Foo.php')->build();
 
@@ -31,7 +31,7 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
 
     public function test_it_should_return_true_if_not_depends_on_namespace(): void
     {
-        $dependOnClasses = new DependsOnlyOnTheseNamespaces('myNamespace');
+        $dependOnClasses = new DependsOnlyOnTheseNamespaces(['myNamespace']);
 
         $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass', 'src/Foo.php')
             ->addDependency(new ClassDependency('myNamespace\Banana', 0))
@@ -51,7 +51,7 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
 
     public function test_it_should_return_true_if_depends_on_class_in_root_namespace(): void
     {
-        $dependOnClasses = new DependsOnlyOnTheseNamespaces('myNamespace');
+        $dependOnClasses = new DependsOnlyOnTheseNamespaces(['myNamespace']);
 
         $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass', 'src/Foo.php')
             ->addDependency(new ClassDependency('myNamespace\Banana', 0))
@@ -69,7 +69,7 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
 
     public function test_it_should_return_false_if_depends_on_namespace(): void
     {
-        $dependOnClasses = new DependsOnlyOnTheseNamespaces('myNamespace');
+        $dependOnClasses = new DependsOnlyOnTheseNamespaces(['myNamespace']);
 
         $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass', 'src/Foo.php')
             ->addDependency(new ClassDependency('myNamespace\Banana', 0))
@@ -97,5 +97,21 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
         $dependOnClasses->evaluate($classDescription, $violations, $because);
 
         self::assertEquals(1, $violations->count());
+    }
+
+    public function test_it_should_return_false_if_namespace_is_excluded(): void
+    {
+        $dependOnClasses = new DependsOnlyOnTheseNamespaces(['HappyIsland'], ['myNamespace']);
+
+        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass', 'src/Foo.php')
+            ->addDependency(new ClassDependency('HappyIsland\Banana', 0))
+            ->addDependency(new ClassDependency('myNamespace\Mango', 10))
+            ->build();
+
+        $because = 'we want to add this rule for our software';
+        $violations = new Violations();
+        $dependOnClasses->evaluate($classDescription, $violations, $because);
+
+        self::assertEquals(0, $violations->count());
     }
 }

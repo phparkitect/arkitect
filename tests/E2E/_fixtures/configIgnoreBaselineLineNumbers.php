@@ -15,7 +15,7 @@ return static function (Config $config): void {
     $rules = [
         Rule::allClasses()
             ->that(new ResideInOneOfTheseNamespaces('App\Application'))
-            ->should(new DependsOnlyOnTheseNamespaces('App\Application'))
+            ->should(new DependsOnlyOnTheseNamespaces(['App\Application']))
             ->because('That is how I want it'),
     ];
 
