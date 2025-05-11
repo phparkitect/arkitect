@@ -6,6 +6,7 @@ namespace Arkitect\Tests\Unit\Analyzer\FileParser;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FileParserFactory;
+use Arkitect\CLI\TargetPhpVersion;
 use PHPUnit\Framework\TestCase;
 
 class CanParsePropertyHooksTest extends TestCase
@@ -32,8 +33,7 @@ class CanParsePropertyHooksTest extends TestCase
         }
         EOF;
 
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::forLatestPhpVersion();
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_4);
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();

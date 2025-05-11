@@ -14,7 +14,7 @@ class CanParseNonWellFormedFilesTest extends TestCase
 {
     public function test_should_parse_non_php_file(): void
     {
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
         $fp->parse('', 'path/to/class.php');
 
         self::assertEmpty($fp->getClassDescriptions());
@@ -26,7 +26,7 @@ class CanParseNonWellFormedFilesTest extends TestCase
         <?php
         EOF;
 
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
         $fp->parse($code, 'path/to/class.php');
 
         self::assertEmpty($fp->getClassDescriptions());
@@ -48,8 +48,7 @@ class CanParseNonWellFormedFilesTest extends TestCase
         }
         EOF;
 
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
         $fp->parse($code, 'relativePathName');
 
         $parsingErrors = $fp->getParsingErrors();
@@ -79,8 +78,7 @@ class CanParseNonWellFormedFilesTest extends TestCase
         }
         EOF;
 
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
         $fp->parse($code, 'relativePathName');
 
         $violations = new Violations();

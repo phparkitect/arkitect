@@ -6,7 +6,6 @@ namespace Arkitect\Tests\Unit\Analyzer;
 
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
-use Arkitect\Analyzer\FileParser;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
@@ -39,7 +38,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
         $fp->parse($code, 'path/to/class.php');
 
         $violations = new Violations();
@@ -71,8 +70,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -116,8 +114,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -152,8 +149,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions()[1];
@@ -181,8 +177,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions()[1];
@@ -209,8 +204,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -244,8 +238,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -277,8 +270,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -317,8 +309,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -350,8 +341,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -392,8 +382,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -425,8 +414,7 @@ class CanParseClassTest extends TestCase
 
         EOF;
 
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions()[2]; // class Test
@@ -454,8 +442,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -492,8 +479,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -527,8 +513,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('7.4'));
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -553,8 +538,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.4'));
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_4);
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -580,8 +564,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.4'));
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_4);
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -605,8 +588,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        /** @var FileParser $fp */
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.4'));
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_4);
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
