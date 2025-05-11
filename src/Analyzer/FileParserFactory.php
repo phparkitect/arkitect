@@ -23,4 +23,14 @@ class FileParserFactory
     {
         return self::createFileParser(TargetPhpVersion::create($targetPhpVersion), true);
     }
+
+    public static function forLatestPhpVersion(): FileParser
+    {
+        return self::createFileParser(TargetPhpVersion::latest(), true);
+    }
+
+    public static function forOldestPhpVersion(): FileParser
+    {
+        return self::createFileParser(TargetPhpVersion::oldest(), true);
+    }
 }
