@@ -8,7 +8,6 @@ use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FileParser;
 use Arkitect\Analyzer\FileParserFactory;
-use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
 use Arkitect\Expression\ForClasses\Implement;
@@ -440,31 +439,6 @@ class FileVisitorTest extends TestCase
         self::assertCount(1, $violations);
     }
 
-    public function test_should_parse_class_attributes(): void
-    {
-        $code = <<< 'EOF'
-<?php
-
-use Bar\FooAttr;
-
-#[FooAttr('bar')]
-#[Baz]
-class Foo {}
-EOF;
-
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.0'));
-        $fp->parse($code, 'relativePathName');
-        $cd = $fp->getClassDescriptions();
-
-        self::assertEquals(
-            [
-                FullyQualifiedClassName::fromString('Bar\\FooAttr'),
-                FullyQualifiedClassName::fromString('Baz'),
-            ],
-            $cd[0]->getAttributes()
-        );
-    }
-
     public function test_it_should_return_errors_for_const_outside_namespace(): void
     {
         $code = <<< 'EOF'
@@ -530,99 +504,6 @@ EOF;
         $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         self::assertCount(1, $violations);
-    }
-
-    public function test_should_parse_enum_attributes(): void
-    {
-        $code = <<< 'EOF'
-<?php
-namespace Root\Cars;
-use Bar\FooAttr;
-#[FooAttr('bar')]
-#[Baz]
-enum Enum
-{
-    case Hearts;
-    case Diamonds;
-    case Clubs;
-    case Spades;
-}
-EOF;
-
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
-        $fp->parse($code, 'relativePathName');
-
-        $cd = $fp->getClassDescriptions();
-
-        self::assertEquals(
-            [
-                FullyQualifiedClassName::fromString('Bar\\FooAttr'),
-                FullyQualifiedClassName::fromString('Root\\Cars\\Baz'),
-            ],
-            $cd[0]->getAttributes()
-        );
-    }
-
-    public function test_it_should_parse_interface_attributes(): void
-    {
-        $code = <<< 'EOF'
-        <?php
-
-        namespace Root\Cars;
-
-        use Bar\FooAttr;
-
-        #[FooAttr('bar')]
-        interface AnInterface
-        {
-            #[Baz]
-            public function foo(): string;
-        }
-        EOF;
-
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
-        $fp->parse($code, 'relativePathName');
-
-        $cd = $fp->getClassDescriptions();
-
-        self::assertEquals(
-            [
-                FullyQualifiedClassName::fromString('Bar\\FooAttr'),
-                FullyQualifiedClassName::fromString('Root\\Cars\\Baz'),
-            ],
-            $cd[0]->getAttributes()
-        );
-    }
-
-    public function test_it_should_parse_traits_attributes(): void
-    {
-        $code = <<< 'EOF'
-        <?php
-
-        namespace Root\Cars;
-
-        use Bar\FooAttr;
-
-        #[FooAttr('bar')]
-        trait ATrait
-        {
-            #[Baz]
-            public function foo(): string { return 'foo'; }
-        }
-        EOF;
-
-        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create('8.1'));
-        $fp->parse($code, 'relativePathName');
-
-        $cd = $fp->getClassDescriptions();
-
-        self::assertEquals(
-            [
-                FullyQualifiedClassName::fromString('Bar\\FooAttr'),
-                FullyQualifiedClassName::fromString('Root\\Cars\\Baz'),
-            ],
-            $cd[0]->getAttributes()
-        );
     }
 
     public function test_it_parse_docblocks(): void

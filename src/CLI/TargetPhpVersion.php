@@ -8,6 +8,13 @@ use Arkitect\Exceptions\PhpVersionNotValidException;
 
 class TargetPhpVersion
 {
+    public const PHP_7_4 = '7.4';
+    public const PHP_8_0 = '8.0';
+    public const PHP_8_1 = '8.1';
+    public const PHP_8_2 = '8.2';
+    public const PHP_8_3 = '8.3';
+    public const PHP_8_4 = '8.4';
+
     public const VALID_PHP_VERSIONS = [
         '7.4',
         '8.0',
