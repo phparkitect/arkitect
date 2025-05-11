@@ -45,11 +45,6 @@ class TargetPhpVersion
         return new self(self::PHP_8_4);
     }
 
-    public static function oldest(): self
-    {
-        return new self(self::PHP_7_4);
-    }
-
     public static function create(?string $version): self
     {
         return new self($version ?? phpversion());
