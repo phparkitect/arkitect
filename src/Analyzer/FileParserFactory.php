@@ -18,4 +18,9 @@ class FileParserFactory
             $targetPhpVersion
         );
     }
+
+    public static function forPhpVersion(string $targetPhpVersion): FileParser
+    {
+        return self::createFileParser(TargetPhpVersion::create($targetPhpVersion), true);
+    }
 }
