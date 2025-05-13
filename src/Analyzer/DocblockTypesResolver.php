@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
 
+use PhpParser\Comment\Doc;
 use PhpParser\ErrorHandler;
 use PhpParser\NameContext;
 use PhpParser\Node;
@@ -44,6 +45,10 @@ class DocblockTypesResolver extends NodeVisitorAbstract
 
     private bool $parseCustomAnnotations;
 
+    /**
+     * @psalm-suppress TooFewArguments
+     * @psalm-suppress InvalidArgument
+     */
     public function __construct(bool $parseCustomAnnotations = true)
     {
         $this->nameContext = new NameContext(new ErrorHandler\Throwing());
@@ -90,60 +95,57 @@ class DocblockTypesResolver extends NodeVisitorAbstract
             }
         }
 
-        $this->resolveFunctionSignature($node);
+        $this->resolveFunctionTypes($node);
+
+        $this->resolveParamTypes($node);
     }
 
-    /**
-     * Resolve name, according to name resolver options.
-     *
-     * @param Name              $name Function or constant name to resolve
-     * @param Stmt\Use_::TYPE_* $type One of Stmt\Use_::TYPE_*
-     *
-     * @return Name Resolved name, or original name with attribute
-     */
-    protected function resolveName(Name $name, int $type): Name
+    public function resolveParamTypes(Node $node): void
     {
-        $resolvedName = $this->nameContext->getResolvedName($name, $type);
-
-        if (null !== $resolvedName) {
-            return $resolvedName;
+        if (!($node instanceof Stmt\Property)) {
+            return;
         }
 
-        // unqualified names inside a namespace cannot be resolved at compile-time
-        // add the namespaced version of the name as an attribute
-        $name->setAttribute('namespacedName', FullyQualified::concat(
-            $this->nameContext->getNamespace(),
-            $name,
-            $name->getAttributes()
-        ));
+        $phpDocNode = $this->parseDocblock($node);
 
-        return $name;
+        if (null === $phpDocNode) {
+            return;
+        }
+
+        if ($this->isNodeOfTypeArray($node)) {
+            $arrayItemType = null;
+
+            foreach ($phpDocNode->getVarTagValues() as $tagValue) {
+                $arrayItemType = $this->getArrayItemType($tagValue->type);
+            }
+
+            if (null !== $arrayItemType) {
+                $node->type = $this->resolveName(new Name($arrayItemType), Stmt\Use_::TYPE_NORMAL);
+
+                return;
+            }
+        }
+
+        foreach ($phpDocNode->getVarTagValues() as $tagValue) {
+            $type = $this->resolveName(new Name((string) $tagValue->type), Stmt\Use_::TYPE_NORMAL);
+            $node->type = $type;
+            break;
+        }
+
+        if ($this->parseCustomAnnotations && !($node->type instanceof FullyQualified)) {
+            foreach ($phpDocNode->getTags() as $tagValue) {
+                if ('@' === $tagValue->name[0] && !str_contains($tagValue->name, '@var')) {
+                    $customTag = str_replace('@', '', $tagValue->name);
+                    $type = $this->resolveName(new Name($customTag), Stmt\Use_::TYPE_NORMAL);
+                    $node->type = $type;
+
+                    break;
+                }
+            }
+        }
     }
 
-    protected function resolveClassName(Name $name): Name
-    {
-        return $this->resolveName($name, Stmt\Use_::TYPE_NORMAL);
-    }
-
-    private function addAlias(Node\UseItem $use, int $type, ?Name $prefix = null): void
-    {
-        // Add prefix for group uses
-        $name = $prefix ? Name::concat($prefix, $use->name) : $use->name;
-        // Type is determined either by individual element or whole use declaration
-        $type |= $use->type;
-
-        $this->nameContext->addAlias(
-            $name,
-            (string) $use->getAlias(),
-            $type,
-            $use->getAttributes()
-        );
-    }
-
-    /**
-     * @param Stmt\Function_|Stmt\ClassMethod|Expr\Closure|Expr\ArrowFunction $node
-     */
-    private function resolveFunctionSignature($node): void
+    private function resolveFunctionTypes(Node $node): void
     {
         if (
             !($node instanceof Stmt\ClassMethod
@@ -187,6 +189,52 @@ class DocblockTypesResolver extends NodeVisitorAbstract
                 $node->returnType = $this->resolveName(new Name($arrayItemType), Stmt\Use_::TYPE_NORMAL);
             }
         }
+    }
+
+    /**
+     * Resolve name, according to name resolver options.
+     *
+     * @param Name              $name Function or constant name to resolve
+     * @param Stmt\Use_::TYPE_* $type One of Stmt\Use_::TYPE_*
+     *
+     * @return Name Resolved name, or original name with attribute
+     */
+    private function resolveName(Name $name, int $type): Name
+    {
+        $resolvedName = $this->nameContext->getResolvedName($name, $type);
+
+        if (null !== $resolvedName) {
+            return $resolvedName;
+        }
+
+        // unqualified names inside a namespace cannot be resolved at compile-time
+        // add the namespaced version of the name as an attribute
+        $name->setAttribute('namespacedName', FullyQualified::concat(
+            $this->nameContext->getNamespace(),
+            $name,
+            $name->getAttributes()
+        ));
+
+        return $name;
+    }
+
+    /**
+     * @psalm-suppress PossiblyNullArgument
+     * @psalm-suppress ArgumentTypeCoercion
+     */
+    private function addAlias(Node\UseItem $use, int $type, ?Name $prefix = null): void
+    {
+        // Add prefix for group uses
+        $name = $prefix ? Name::concat($prefix, $use->name) : $use->name;
+        // Type is determined either by individual element or whole use declaration
+        $type |= $use->type;
+
+        $this->nameContext->addAlias(
+            $name,
+            (string) $use->getAlias(),
+            $type,
+            $use->getAttributes()
+        );
     }
 
     private function parseDocblock(NodeAbstract $node): ?PhpDocNode
@@ -238,38 +286,5 @@ class DocblockTypesResolver extends NodeVisitorAbstract
         }
 
         return $arrayItemType;
-    }
-
-    /**
-     * @psalm-suppress MissingParamType
-     * @psalm-suppress PossiblyNullArgument
-     * @psalm-suppress MissingReturnType
-     * @psalm-suppress InvalidReturnStatement
-     *
-     * @template T of Node\Identifier|Name|Node\ComplexType|null
-     *
-     * @param T $node
-     *
-     * @return T
-     */
-    private function resolveType(?Node $node): ?Node
-    {
-        if ($node instanceof Name) {
-            return $this->resolveClassName($node);
-        }
-        if ($node instanceof Node\NullableType) {
-            $node->type = $this->resolveType($node->type);
-
-            return $node;
-        }
-        if ($node instanceof Node\UnionType || $node instanceof Node\IntersectionType) {
-            foreach ($node->types as &$type) {
-                $type = $this->resolveType($type);
-            }
-
-            return $node;
-        }
-
-        return $node;
     }
 }

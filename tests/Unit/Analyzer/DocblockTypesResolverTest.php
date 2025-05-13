@@ -50,8 +50,6 @@ class DocblockTypesResolverTest extends TestCase
         $cd = $parser->getClassDescriptions()[0];
         $dep = $cd->getDependencies();
 
-        dump($cd);
-
         self::assertCount(2, $cd->getDependencies());
         self::assertEquals('Application\MyDto', $dep[0]->getFQCN()->toString());
         self::assertEquals('Domain\ValueObject', $dep[1]->getFQCN()->toString());
