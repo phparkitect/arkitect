@@ -35,15 +35,6 @@ class DocblockTypesResolver extends NodeVisitorAbstract
 
     private DocblockParser $docblockParser;
 
-<<<<<<< HEAD
-    private DocblockParser $docblockParser;
-
-=======
-    /**
-     * @psalm-suppress TooFewArguments
-     * @psalm-suppress InvalidArgument
-     */
->>>>>>> c3d808e (wip)
     public function __construct(bool $parseCustomAnnotations = true)
     {
         $this->nameContext = new NameContext(new ErrorHandler\Throwing());
