@@ -7,11 +7,11 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\IsA;
 use Arkitect\Rules\Violations;
-use Arkitect\Tests\Unit\Expressions\ForClasses\DummyClasses\Banana;
-use Arkitect\Tests\Unit\Expressions\ForClasses\DummyClasses\CavendishBanana;
-use Arkitect\Tests\Unit\Expressions\ForClasses\DummyClasses\Dog;
-use Arkitect\Tests\Unit\Expressions\ForClasses\DummyClasses\DwarfCavendishBanana;
-use Arkitect\Tests\Unit\Expressions\ForClasses\DummyClasses\FruitInterface;
+use Arkitect\Tests\Unit\Expressions\ForClasses\IsOneOfTest\Animal\Dog;
+use Arkitect\Tests\Unit\Expressions\ForClasses\IsOneOfTest\Fruit\Banana;
+use Arkitect\Tests\Unit\Expressions\ForClasses\IsOneOfTest\Fruit\CavendishBanana;
+use Arkitect\Tests\Unit\Expressions\ForClasses\IsOneOfTest\Fruit\DwarfCavendishBanana;
+use Arkitect\Tests\Unit\Expressions\ForClasses\IsOneOfTest\Fruit\FruitInterface;
 use PHPUnit\Framework\TestCase;
 
 final class IsATest extends TestCase
@@ -67,4 +67,28 @@ final class IsATest extends TestCase
             $isA->describe($classDescription, '')->toString()
         );
     }
+}
+
+namespace Arkitect\Tests\Unit\Expressions\ForClasses\IsOneOfTest\Animal;
+
+final class Dog
+{
+}
+
+namespace Arkitect\Tests\Unit\Expressions\ForClasses\IsOneOfTest\Fruit;
+
+interface FruitInterface
+{
+}
+
+class Banana implements FruitInterface
+{
+}
+
+class CavendishBanana extends Banana
+{
+}
+
+final class DwarfCavendishBanana extends CavendishBanana
+{
 }
