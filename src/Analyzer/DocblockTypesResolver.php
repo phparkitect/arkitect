@@ -18,55 +18,30 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
-use PHPStan\PhpDocParser\Lexer\Lexer;
-use PHPStan\PhpDocParser\Parser\ConstExprParser;
-use PHPStan\PhpDocParser\Parser\PhpDocParser;
-use PHPStan\PhpDocParser\Parser\TokenIterator;
-use PHPStan\PhpDocParser\Parser\TypeParser;
-use PHPStan\PhpDocParser\ParserConfig;
 
 /**
  * This class is used to collect type information from dockblocks, in particular
  * - regular dockblock tags: @param, @var, @return
  * - old style annotations like @Assert\Blank
- * and assign them to the piece of code the dockblock is attached to.
+ * and assign them to the piece of code the docblock is attached to.
  *
  * This allows to detect dependencies declared only in dockblocks
- *
- * Since the @throws tags does not have any corresponding code, we populate a custom node attribute in order to make it available
- * to subsequent visitors.
  */
 class DocblockTypesResolver extends NodeVisitorAbstract
 {
-    protected PhpDocParser $phpDocParser;
-
-    protected Lexer $phpDocLexer;
     private NameContext $nameContext;
 
     private bool $parseCustomAnnotations;
 
-    /**
-     * @psalm-suppress TooFewArguments
-     * @psalm-suppress InvalidArgument
-     */
+    private DocblockParser $docblockParser;
+
     public function __construct(bool $parseCustomAnnotations = true)
     {
         $this->nameContext = new NameContext(new ErrorHandler\Throwing());
+
         $this->parseCustomAnnotations = $parseCustomAnnotations;
 
-        // this if is to allow using v 1.2 or v2
-        if (class_exists(ParserConfig::class)) {
-            $parserConfig = new ParserConfig([]);
-            $constExprParser = new ConstExprParser($parserConfig);
-            $typeParser = new TypeParser($parserConfig, $constExprParser);
-            $this->phpDocParser = new PhpDocParser($parserConfig, $typeParser, $constExprParser);
-            $this->phpDocLexer = new Lexer($parserConfig);
-        } else {
-            $typeParser = new TypeParser();
-            $constExprParser = new ConstExprParser();
-            $this->phpDocParser = new PhpDocParser($typeParser, $constExprParser);
-            $this->phpDocLexer = new Lexer();
-        }
+        $this->docblockParser = DocblockParserFactory::create();
     }
 
     public function beforeTraverse(array $nodes): ?array
@@ -84,15 +59,11 @@ class DocblockTypesResolver extends NodeVisitorAbstract
         }
 
         if ($node instanceof Stmt\Use_) {
-            foreach ($node->uses as $use) {
-                $this->addAlias($use, $node->type, null);
-            }
+            $this->addAliases($node->uses, $node->type, null);
         }
 
         if ($node instanceof Stmt\GroupUse) {
-            foreach ($node->uses as $use) {
-                $this->addAlias($use, $node->type, $node->prefix);
-            }
+            $this->addAliases($node->uses, $node->type, $node->prefix);
         }
 
         $this->resolveFunctionTypes($node);
@@ -100,7 +71,7 @@ class DocblockTypesResolver extends NodeVisitorAbstract
         $this->resolveParamTypes($node);
     }
 
-    public function resolveParamTypes(Node $node): void
+    private function resolveParamTypes(Node $node): void
     {
         if (!($node instanceof Stmt\Property)) {
             return;
@@ -219,6 +190,16 @@ class DocblockTypesResolver extends NodeVisitorAbstract
     }
 
     /**
+     * @param array<Node\UseItem> $uses
+     */
+    private function addAliases(array $uses, int $type, ?Name $prefix = null): void
+    {
+        foreach ($uses as $useItem) {
+            $this->addAlias($useItem, $type, $prefix);
+        }
+    }
+
+    /**
      * @psalm-suppress PossiblyNullArgument
      * @psalm-suppress ArgumentTypeCoercion
      */
@@ -246,10 +227,7 @@ class DocblockTypesResolver extends NodeVisitorAbstract
         /** @var Doc $docComment */
         $docComment = $node->getDocComment();
 
-        $tokens = $this->phpDocLexer->tokenize($docComment->getText());
-        $tokenIterator = new TokenIterator($tokens);
-
-        return $this->phpDocParser->parse($tokenIterator);
+        return $this->docblockParser->parse($docComment->getText());
     }
 
     /**
