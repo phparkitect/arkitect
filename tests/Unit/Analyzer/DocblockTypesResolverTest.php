@@ -32,6 +32,8 @@ class DocblockTypesResolverTest extends TestCase
         use Application\MyDto;
         use Domain\ValueObject;
 
+        use Application\Model\{User, Product};
+
         class MyClass
         {
             /**
@@ -42,6 +44,14 @@ class DocblockTypesResolverTest extends TestCase
             public function __construct(string $var1, array $dtoList, $var2, array $voList)
             {
             }
+
+            /**
+             * @param User[] $users
+             * @param Product[] $products
+             */
+            public function myMethod(array $users, array $products, MyOtherClass $other): void
+            {
+            }
         }
         EOF;
 
@@ -50,8 +60,11 @@ class DocblockTypesResolverTest extends TestCase
         $cd = $parser->getClassDescriptions()[0];
         $dep = $cd->getDependencies();
 
-        self::assertCount(2, $cd->getDependencies());
+        self::assertCount(5, $cd->getDependencies());
         self::assertEquals('Application\MyDto', $dep[0]->getFQCN()->toString());
         self::assertEquals('Domain\ValueObject', $dep[1]->getFQCN()->toString());
+        self::assertEquals('Application\Model\User', $dep[2]->getFQCN()->toString());
+        self::assertEquals('Application\Model\Product', $dep[3]->getFQCN()->toString());
+        self::assertEquals('Domain\Foo\MyOtherClass', $dep[4]->getFQCN()->toString());
     }
 }
