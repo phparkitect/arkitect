@@ -12,8 +12,7 @@ use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\Parser as PhpParser;
 use PhpParser\ParserFactory;
 use PhpParser\PhpVersion;
-use Arkitect\Analyzer\DocblockTypesResolver;
-use PhpParser\NodeVisitor\NameResolver;
+
 class FileParser implements Parser
 {
     private PhpParser $parser;
