@@ -8,11 +8,11 @@ use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Rules\ParsingError;
 use PhpParser\ErrorHandler\Collecting;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\Parser as PhpParser;
 use PhpParser\ParserFactory;
 use PhpParser\PhpVersion;
-use Arkitect\Analyzer\DocblockTypesResolver;
-use PhpParser\NodeVisitor\NameResolver;
+
 class FileParser implements Parser
 {
     private PhpParser $parser;

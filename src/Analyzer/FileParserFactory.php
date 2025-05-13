@@ -6,6 +6,7 @@ namespace Arkitect\Analyzer;
 
 use Arkitect\CLI\TargetPhpVersion;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\NameResolver;
 
 class FileParserFactory
 {
@@ -14,7 +15,8 @@ class FileParserFactory
         return new FileParser(
             new NodeTraverser(),
             new FileVisitor(new ClassDescriptionBuilder()),
-            new NameResolver(null, ['parseCustomAnnotations' => $parseCustomAnnotations]),
+            new NameResolver(),
+            new DocblockTypesResolver($parseCustomAnnotations),
             $targetPhpVersion
         );
     }

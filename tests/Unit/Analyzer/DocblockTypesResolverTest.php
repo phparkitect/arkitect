@@ -7,7 +7,6 @@ namespace Arkitect\Tests\Unit\Analyzer;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Analyzer\DocblockTypesResolver;
 use Arkitect\Analyzer\FileParser;
-use Arkitect\Analyzer\FilePath;
 use Arkitect\Analyzer\FileVisitor;
 use Arkitect\CLI\TargetPhpVersion;
 use PhpParser\NodeTraverser;
@@ -48,6 +47,13 @@ class DocblockTypesResolverTest extends TestCase
 
         $parser->parse($code, 'boh');
 
-        
+        $cd = $parser->getClassDescriptions()[0];
+        $dep = $cd->getDependencies();
+
+        dump($cd);
+
+        self::assertCount(2, $cd->getDependencies());
+        self::assertEquals('Application\MyDto', $dep[0]->getFQCN()->toString());
+        self::assertEquals('Domain\ValueObject', $dep[1]->getFQCN()->toString());
     }
 }
