@@ -13,27 +13,25 @@ use Arkitect\Rules\Violations;
 
 final class IsA implements Expression
 {
-    /** @var array<class-string> */
-    private array $allowedFqcnList;
+    /** @var class-string */
+    private string $allowedFqcn;
 
     /**
-     * @param class-string ...$allowedFqcnList
+     * @param class-string $allowedFqcn
      */
-    public function __construct(string ...$allowedFqcnList)
+    public function __construct(string $allowedFqcn)
     {
-        $this->allowedFqcnList = $allowedFqcnList;
+        $this->allowedFqcn = $allowedFqcn;
     }
 
     public function describe(ClassDescription $theClass, string $because = ''): Description
     {
-        $allowedFqcnList = implode(', ', $this->allowedFqcnList);
-
-        return new Description("should inherit from one of: $allowedFqcnList", $because);
+        return new Description("should inherit from: $this->allowedFqcn", $because);
     }
 
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because = ''): void
     {
-        if (!$this->isA($theClass, ...$this->allowedFqcnList)) {
+        if (!is_a($theClass->getFQCN(), $this->allowedFqcn, true)) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
                 ViolationMessage::selfExplanatory($this->describe($theClass, $because)),
@@ -42,19 +40,5 @@ final class IsA implements Expression
 
             $violations->add($violation);
         }
-    }
-
-    /**
-     * @param class-string ...$allowedFqcnList
-     */
-    private function isA(ClassDescription $theClass, string ...$allowedFqcnList): bool
-    {
-        foreach ($allowedFqcnList as $allowedFqcn) {
-            if (is_a($theClass->getFQCN(), $allowedFqcn, true)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

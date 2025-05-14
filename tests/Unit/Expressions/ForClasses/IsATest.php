@@ -48,11 +48,10 @@ final class IsATest extends TestCase
         self::assertEquals(0, $violations->count());
     }
 
-    public function test_it_should_have_violation_if_it_doesnt_extend_nor_implement(): void
+    public function test_it_should_have_violation_if_it_doesnt_extend(): void
     {
         $interface = FruitInterface::class;
-        $class = Banana::class;
-        $isA = new IsA($class, $interface);
+        $isA = new IsA($interface);
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName(Dog::class)
@@ -63,7 +62,26 @@ final class IsATest extends TestCase
 
         self::assertEquals(1, $violations->count());
         self::assertEquals(
-            "should inherit from one of: $class, $interface",
+            "should inherit from: $interface",
+            $isA->describe($classDescription, '')->toString()
+        );
+    }
+
+    public function test_it_should_have_violation_if_it_doesnt_implement(): void
+    {
+        $class = Banana::class;
+        $isA = new IsA($class);
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName(Dog::class)
+            ->build();
+
+        $violations = new Violations();
+        $isA->evaluate($classDescription, $violations, '');
+
+        self::assertEquals(1, $violations->count());
+        self::assertEquals(
+            "should inherit from: $class",
             $isA->describe($classDescription, '')->toString()
         );
     }
