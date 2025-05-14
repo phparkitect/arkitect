@@ -133,32 +133,37 @@ class DocblockTypesResolver extends NodeVisitorAbstract
             return;
         }
 
+        $docblock = new Docblock($phpDocNode);
+
+        // extract param types from param tags
         foreach ($node->params as $param) {
-            if (!$this->isNodeOfTypeArray($param)) { // not an array, nothing to do
+            if (!$this->isTypeArray($param->type)) { // not an array, nothing to do
                 continue;
             }
 
-            foreach ($phpDocNode->getParamTagValues() as $phpDocParam) {
-                if ($param->var instanceof Expr\Variable && \is_string($param->var->name) && $phpDocParam->parameterName === ('$'.$param->var->name)) {
-                    $arrayItemType = $this->getArrayItemType($phpDocParam->type);
-
-                    if (null !== $arrayItemType) {
-                        $param->type = $this->resolveName(new Name($arrayItemType), Stmt\Use_::TYPE_NORMAL);
-                    }
-                }
+            if (!($param->var instanceof Expr\Variable) || !\is_string($param->var->name)) {
+                continue;
             }
+
+            $type = $docblock->getParamTagTypesByName('$'.$param->var->name);
+
+            if (null === $type) {
+                continue;
+            }
+
+            $param->type = $this->resolveName(new Name($type), Stmt\Use_::TYPE_NORMAL);
         }
 
-        if ($node->returnType instanceof Node\Identifier && 'array' === $node->returnType->name) {
-            $arrayItemType = null;
+        // extract return type from return tag
+        if ($this->isTypeArray($node->returnType)) {
+            $type = $docblock->getReturnTagTypes();
+            $type = array_pop($type);
 
-            foreach ($phpDocNode->getReturnTagValues() as $tagValue) {
-                $arrayItemType = $this->getArrayItemType($tagValue->type);
+            if (null === $type) {
+                return;
             }
 
-            if (null !== $arrayItemType) {
-                $node->returnType = $this->resolveName(new Name($arrayItemType), Stmt\Use_::TYPE_NORMAL);
-            }
+            $node->returnType = $this->resolveName(new Name($type), Stmt\Use_::TYPE_NORMAL);
         }
     }
 
@@ -236,6 +241,14 @@ class DocblockTypesResolver extends NodeVisitorAbstract
     private function isNodeOfTypeArray($node): bool
     {
         return null !== $node->type && isset($node->type->name) && 'array' === $node->type->name;
+    }
+
+    /**
+     * @param Node\Identifier|Name|Node\ComplexType|null $type
+     */
+    private function isTypeArray($type): bool
+    {
+        return null !== $type && isset($type->name) && 'array' === $type->name;
     }
 
     private function getArrayItemType(TypeNode $typeNode): ?string
