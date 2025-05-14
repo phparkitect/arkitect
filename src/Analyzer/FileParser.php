@@ -8,6 +8,7 @@ use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Rules\ParsingError;
 use PhpParser\ErrorHandler\Collecting;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\Parser as PhpParser;
 use PhpParser\ParserFactory;
 use PhpParser\PhpVersion;
@@ -27,6 +28,7 @@ class FileParser implements Parser
         NodeTraverser $traverser,
         FileVisitor $fileVisitor,
         NameResolver $nameResolver,
+        DocblockTypesResolver $docblockTypesResolver,
         TargetPhpVersion $targetPhpVersion
     ) {
         $this->fileVisitor = $fileVisitor;
@@ -35,6 +37,7 @@ class FileParser implements Parser
         $this->parser = (new ParserFactory())->createForVersion(PhpVersion::fromString($targetPhpVersion->get()));
         $this->traverser = $traverser;
         $this->traverser->addVisitor($nameResolver);
+        $this->traverser->addVisitor($docblockTypesResolver);
         $this->traverser->addVisitor($this->fileVisitor);
     }
 
