@@ -6,8 +6,10 @@ namespace Arkitect\Analyzer;
 
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\VarTagValueNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 
 class Docblock
@@ -41,8 +43,37 @@ class Docblock
         return array_filter($returnTypes);
     }
 
+    public function getVarTagTypes(): array
+    {
+        $varTypes = array_map(
+            fn (VarTagValueNode $varTag) => $this->getType($varTag->type),
+            $this->phpDocNode->getVarTagValues()
+        );
+
+        // remove null values
+        return array_filter($varTypes);
+    }
+
+    public function getDoctrineLikeAnnotationTypes(): array
+    {
+        $doctrineAnnotations = [];
+
+        foreach ($this->phpDocNode->getTags() as $tag) {
+            if ('@' === $tag->name[0] && !str_contains($tag->name, '@var')) {
+                $doctrineAnnotations[] = str_replace('@', '', $tag->name);
+            }
+        }
+
+        return $doctrineAnnotations;
+    }
+
     private function getType(TypeNode $typeNode): ?string
     {
+        if ($typeNode instanceof IdentifierTypeNode) {
+            // this handles ClassName
+            return $typeNode->name;
+        }
+
         if ($typeNode instanceof GenericTypeNode) {
             // this handles list<ClassName>
             if (1 === \count($typeNode->genericTypes)) {
