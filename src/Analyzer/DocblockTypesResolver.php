@@ -14,10 +14,6 @@ use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\Stmt;
 use PhpParser\NodeAbstract;
 use PhpParser\NodeVisitorAbstract;
-use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
-use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
-use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
-use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 
 /**
  * This class is used to collect type information from dockblocks, in particular
@@ -68,51 +64,39 @@ class DocblockTypesResolver extends NodeVisitorAbstract
 
         $this->resolveFunctionTypes($node);
 
-        $this->resolveParamTypes($node);
+        $this->resolvePropertyTypes($node);
     }
 
-    private function resolveParamTypes(Node $node): void
+    private function resolvePropertyTypes(Node $node): void
     {
         if (!($node instanceof Stmt\Property)) {
             return;
         }
 
-        $phpDocNode = $this->parseDocblock($node);
+        $docblock = $this->parseDocblock($node);
 
-        if (null === $phpDocNode) {
+        if (null === $docblock) {
             return;
         }
 
-        if ($this->isNodeOfTypeArray($node)) {
-            $arrayItemType = null;
+        $arrayItemType = $docblock->getVarTagTypes();
+        $arrayItemType = array_pop($arrayItemType);
 
-            foreach ($phpDocNode->getVarTagValues() as $tagValue) {
-                $arrayItemType = $this->getArrayItemType($tagValue->type);
-            }
+        if (null !== $arrayItemType) {
+            $node->type = $this->resolveName(new Name($arrayItemType), Stmt\Use_::TYPE_NORMAL);
 
-            if (null !== $arrayItemType) {
-                $node->type = $this->resolveName(new Name($arrayItemType), Stmt\Use_::TYPE_NORMAL);
-
-                return;
-            }
-        }
-
-        foreach ($phpDocNode->getVarTagValues() as $tagValue) {
-            $type = $this->resolveName(new Name((string) $tagValue->type), Stmt\Use_::TYPE_NORMAL);
-            $node->type = $type;
-            break;
+            return;
         }
 
         if ($this->parseCustomAnnotations && !($node->type instanceof FullyQualified)) {
-            foreach ($phpDocNode->getTags() as $tagValue) {
-                if ('@' === $tagValue->name[0] && !str_contains($tagValue->name, '@var')) {
-                    $customTag = str_replace('@', '', $tagValue->name);
-                    $type = $this->resolveName(new Name($customTag), Stmt\Use_::TYPE_NORMAL);
-                    $node->type = $type;
+            $doctrineAnnotations = $docblock->getDoctrineLikeAnnotationTypes();
+            $doctrineAnnotations = array_shift($doctrineAnnotations);
 
-                    break;
-                }
+            if (null === $doctrineAnnotations) {
+                return;
             }
+
+            $node->type = $this->resolveName(new Name($doctrineAnnotations), Stmt\Use_::TYPE_NORMAL);
         }
     }
 
@@ -127,38 +111,41 @@ class DocblockTypesResolver extends NodeVisitorAbstract
             return;
         }
 
-        $phpDocNode = $this->parseDocblock($node);
+        $docblock = $this->parseDocblock($node);
 
-        if (null === $phpDocNode) { // no docblock, nothing to do
+        if (null === $docblock) { // no docblock, nothing to do
             return;
         }
 
+        // extract param types from param tags
         foreach ($node->params as $param) {
-            if (!$this->isNodeOfTypeArray($param)) { // not an array, nothing to do
+            if (!$this->isTypeArray($param->type)) { // not an array, nothing to do
                 continue;
             }
 
-            foreach ($phpDocNode->getParamTagValues() as $phpDocParam) {
-                if ($param->var instanceof Expr\Variable && \is_string($param->var->name) && $phpDocParam->parameterName === ('$'.$param->var->name)) {
-                    $arrayItemType = $this->getArrayItemType($phpDocParam->type);
-
-                    if (null !== $arrayItemType) {
-                        $param->type = $this->resolveName(new Name($arrayItemType), Stmt\Use_::TYPE_NORMAL);
-                    }
-                }
+            if (!($param->var instanceof Expr\Variable) || !\is_string($param->var->name)) {
+                continue;
             }
+
+            $type = $docblock->getParamTagTypesByName('$'.$param->var->name);
+
+            if (null === $type) {
+                continue;
+            }
+
+            $param->type = $this->resolveName(new Name($type), Stmt\Use_::TYPE_NORMAL);
         }
 
-        if ($node->returnType instanceof Node\Identifier && 'array' === $node->returnType->name) {
-            $arrayItemType = null;
+        // extract return type from return tag
+        if ($this->isTypeArray($node->returnType)) {
+            $type = $docblock->getReturnTagTypes();
+            $type = array_pop($type);
 
-            foreach ($phpDocNode->getReturnTagValues() as $tagValue) {
-                $arrayItemType = $this->getArrayItemType($tagValue->type);
+            if (null === $type) {
+                return;
             }
 
-            if (null !== $arrayItemType) {
-                $node->returnType = $this->resolveName(new Name($arrayItemType), Stmt\Use_::TYPE_NORMAL);
-            }
+            $node->returnType = $this->resolveName(new Name($type), Stmt\Use_::TYPE_NORMAL);
         }
     }
 
@@ -177,14 +164,6 @@ class DocblockTypesResolver extends NodeVisitorAbstract
         if (null !== $resolvedName) {
             return $resolvedName;
         }
-
-        // unqualified names inside a namespace cannot be resolved at compile-time
-        // add the namespaced version of the name as an attribute
-        $name->setAttribute('namespacedName', FullyQualified::concat(
-            $this->nameContext->getNamespace(),
-            $name,
-            $name->getAttributes()
-        ));
 
         return $name;
     }
@@ -218,7 +197,7 @@ class DocblockTypesResolver extends NodeVisitorAbstract
         );
     }
 
-    private function parseDocblock(NodeAbstract $node): ?PhpDocNode
+    private function parseDocblock(NodeAbstract $node): ?Docblock
     {
         if (null === $node->getDocComment()) {
             return null;
@@ -231,38 +210,10 @@ class DocblockTypesResolver extends NodeVisitorAbstract
     }
 
     /**
-     * @param Node\Param|Stmt\Property $node
+     * @param Node\Identifier|Name|Node\ComplexType|null $type
      */
-    private function isNodeOfTypeArray($node): bool
+    private function isTypeArray($type): bool
     {
-        return null !== $node->type && isset($node->type->name) && 'array' === $node->type->name;
-    }
-
-    private function getArrayItemType(TypeNode $typeNode): ?string
-    {
-        $arrayItemType = null;
-
-        if ($typeNode instanceof GenericTypeNode) {
-            if (1 === \count($typeNode->genericTypes)) {
-                // this handles list<ClassName>
-                $arrayItemType = (string) $typeNode->genericTypes[0];
-            } elseif (2 === \count($typeNode->genericTypes)) {
-                // this handles array<int, ClassName>
-                $arrayItemType = (string) $typeNode->genericTypes[1];
-            }
-        }
-
-        if ($typeNode instanceof ArrayTypeNode) {
-            // this handles ClassName[]
-            $arrayItemType = (string) $typeNode->type;
-        }
-
-        $validFqcn = '/^[a-zA-Z_\x7f-\xff\\\\][a-zA-Z0-9_\x7f-\xff\\\\]*[a-zA-Z0-9_\x7f-\xff]$/';
-
-        if (null !== $arrayItemType && !(bool) preg_match($validFqcn, $arrayItemType)) {
-            return null;
-        }
-
-        return $arrayItemType;
+        return null !== $type && isset($type->name) && 'array' === $type->name;
     }
 }

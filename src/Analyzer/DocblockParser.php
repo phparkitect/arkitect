@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
 
-use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPStan\PhpDocParser\Parser\TokenIterator;
@@ -20,11 +19,11 @@ class DocblockParser
         $this->innerLexer = $innerLexer;
     }
 
-    public function parse(string $docblock): PhpDocNode
+    public function parse(string $docblock): Docblock
     {
         $tokens = $this->innerLexer->tokenize($docblock);
         $tokenIterator = new TokenIterator($tokens);
 
-        return $this->innerParser->parse($tokenIterator);
+        return new Docblock($this->innerParser->parse($tokenIterator));
     }
 }
