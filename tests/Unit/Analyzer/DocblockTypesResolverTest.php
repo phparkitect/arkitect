@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 class DocblockTypesResolverTest extends TestCase
 {
-    public function test_it_should_boh(): void
+    public function test_it_should_collect_dependencies_defined_in_docblock(): void
     {
         $parser = new FileParser(
             new NodeTraverser(),
@@ -36,6 +36,13 @@ class DocblockTypesResolverTest extends TestCase
 
         class MyClass
         {
+            /** @var array<int, int|string> */
+            public array $myArray;
+
+            /** @var array<int, User> */
+            public array $users;
+
+
             /**
              * @param MyDto[] $dtoList
              * @param int $var2
@@ -52,19 +59,30 @@ class DocblockTypesResolverTest extends TestCase
             public function myMethod(array $users, array $products, MyOtherClass $other): void
             {
             }
+
+            /**
+             *
+             * @param array<int, int|string> $aParam
+             * @param array<int, User> $users
+             *
+             * @return array<int, int|string>
+             */
+            public function myMethod2(array $aParam, array $users): array
         }
         EOF;
 
-        $parser->parse($code, 'boh');
+        $parser->parse($code, 'src/path/file.php');
 
         $cd = $parser->getClassDescriptions()[0];
         $dep = $cd->getDependencies();
 
-        self::assertCount(5, $cd->getDependencies());
-        self::assertEquals('Application\MyDto', $dep[0]->getFQCN()->toString());
-        self::assertEquals('Domain\ValueObject', $dep[1]->getFQCN()->toString());
-        self::assertEquals('Application\Model\User', $dep[2]->getFQCN()->toString());
-        self::assertEquals('Application\Model\Product', $dep[3]->getFQCN()->toString());
-        self::assertEquals('Domain\Foo\MyOtherClass', $dep[4]->getFQCN()->toString());
+        self::assertCount(7, $cd->getDependencies());
+        self::assertEquals('Application\Model\User', $dep[0]->getFQCN()->toString());
+        self::assertEquals('Application\MyDto', $dep[1]->getFQCN()->toString());
+        self::assertEquals('Domain\ValueObject', $dep[2]->getFQCN()->toString());
+        self::assertEquals('Application\Model\User', $dep[3]->getFQCN()->toString());
+        self::assertEquals('Application\Model\Product', $dep[4]->getFQCN()->toString());
+        self::assertEquals('Domain\Foo\MyOtherClass', $dep[5]->getFQCN()->toString());
+        self::assertEquals('Application\Model\User', $dep[6]->getFQCN()->toString());
     }
 }
