@@ -22,6 +22,8 @@ class DocblockParserTest extends TestCase
              * @param array<User> $user
              * @param int $aValue
              * @param MyPlainDto $plainDto
+             * @param array<int, int|string> $unionType
+             * @param array<int, array<int, int|string>> $nestedUnionType
              */
         PHP;
 
@@ -34,6 +36,8 @@ class DocblockParserTest extends TestCase
 
         self::assertEquals('int', $db->getParamTagTypesByName('$aValue'));
         self::assertEquals('MyPlainDto', $db->getParamTagTypesByName('$plainDto'));
+        self::assertEquals('(int | string)', $db->getParamTagTypesByName('$unionType'));
+        self::assertEquals('array<int, (int | string)>', $db->getParamTagTypesByName('$nestedUnionType'));
     }
 
     public function test_it_should_extract_return_type_from_return_tag(): void
@@ -48,19 +52,21 @@ class DocblockParserTest extends TestCase
              * @return array<User>
              * @return int
              * @return MyPlainDto
+             * @return array<int, int|string>
              */
         PHP;
 
         $db = $parser->parse($code);
 
         $returnTypes = $db->getReturnTagTypes();
-        self::assertCount(6, $returnTypes);
+        self::assertCount(7, $returnTypes);
         self::assertEquals('MyDto', $returnTypes[0]);
         self::assertEquals('MyOtherDto', $returnTypes[1]);
         self::assertEquals('ValueObject', $returnTypes[2]);
         self::assertEquals('User', $returnTypes[3]);
         self::assertEquals('int', $returnTypes[4]);
         self::assertEquals('MyPlainDto', $returnTypes[5]);
+        self::assertEquals('(int | string)', $returnTypes[6]);
     }
 
     public function test_it_should_extract_types_from_var_tag(): void
@@ -75,19 +81,21 @@ class DocblockParserTest extends TestCase
              * @var array<User> $user
              * @var int $aValue
              * @var MyPlainDto $plainDto
+             * @var array<int, int|string> $unionType
              */
         PHP;
 
         $db = $parser->parse($code);
 
         $varTags = $db->getVarTagTypes();
-        self::assertCount(6, $varTags);
+        self::assertCount(7, $varTags);
         self::assertEquals('MyDto', $varTags[0]);
         self::assertEquals('MyOtherDto', $varTags[1]);
         self::assertEquals('ValueObject', $varTags[2]);
         self::assertEquals('User', $varTags[3]);
         self::assertEquals('int', $varTags[4]);
         self::assertEquals('MyPlainDto', $varTags[5]);
+        self::assertEquals('(int | string)', $varTags[6]);
     }
 
     public function test_it_should_extract_doctrine_like_annotations(): void

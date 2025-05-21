@@ -82,7 +82,7 @@ class DocblockTypesResolver extends NodeVisitorAbstract
         $arrayItemType = $docblock->getVarTagTypes();
         $arrayItemType = array_pop($arrayItemType);
 
-        if (null !== $arrayItemType) {
+        if ($this->isTypeClass($arrayItemType)) {
             $node->type = $this->resolveName(new Name($arrayItemType), Stmt\Use_::TYPE_NORMAL);
 
             return;
@@ -129,7 +129,8 @@ class DocblockTypesResolver extends NodeVisitorAbstract
 
             $type = $docblock->getParamTagTypesByName('$'.$param->var->name);
 
-            if (null === $type) {
+            // we ignore any type which is not a class
+            if (!$this->isTypeClass($type)) {
                 continue;
             }
 
@@ -141,7 +142,8 @@ class DocblockTypesResolver extends NodeVisitorAbstract
             $type = $docblock->getReturnTagTypes();
             $type = array_pop($type);
 
-            if (null === $type) {
+            // we ignore any type which is not a class
+            if (!$this->isTypeClass($type)) {
                 return;
             }
 
@@ -215,5 +217,19 @@ class DocblockTypesResolver extends NodeVisitorAbstract
     private function isTypeArray($type): bool
     {
         return null !== $type && isset($type->name) && 'array' === $type->name;
+    }
+
+    /**
+     * @psalm-assert-if-true string $fqcn
+     */
+    private function isTypeClass(?string $fqcn): bool
+    {
+        if (null === $fqcn) {
+            return false;
+        }
+
+        $validFqcn = '/^[a-zA-Z0-9_\x7f-\xff\\\\]*[a-zA-Z0-9_\x7f-\xff]$/';
+
+        return (bool) preg_match($validFqcn, $fqcn);
     }
 }
