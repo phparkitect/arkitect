@@ -249,6 +249,10 @@ class FileVisitor extends NodeVisitorAbstract
                 return;
             }
 
+            if (FullyQualifiedClassName::isNotAValidFqcn($type->toString())) {
+                return;
+            }
+
             try {
                 $this->classDescriptionBuilder
                     ->addDependency(new ClassDependency($type->toString(), $node->getLine()));
@@ -309,10 +313,17 @@ class FileVisitor extends NodeVisitorAbstract
     {
         if ($node instanceof Node\Stmt\ClassMethod) {
             $returnType = $node->returnType;
-            if ($returnType instanceof Node\Name\FullyQualified) {
-                $this->classDescriptionBuilder
-                    ->addDependency(new ClassDependency($returnType->toString(), $returnType->getLine()));
+
+            if (!$returnType instanceof Node\Name\FullyQualified) {
+                return;
             }
+
+            if (FullyQualifiedClassName::isNotAValidFqcn($returnType->toString())) {
+                return;
+            }
+
+            $this->classDescriptionBuilder
+                ->addDependency(new ClassDependency($returnType->toString(), $returnType->getLine()));
         }
     }
 
@@ -321,10 +332,16 @@ class FileVisitor extends NodeVisitorAbstract
         if ($node instanceof Node\Attribute) {
             $nodeName = $node->name;
 
-            if ($nodeName instanceof Node\Name\FullyQualified) {
-                $this->classDescriptionBuilder
-                    ->addAttribute($node->name->toString(), $node->getLine());
+            if (!$nodeName instanceof Node\Name\FullyQualified) {
+                return;
             }
+
+            if (FullyQualifiedClassName::isNotAValidFqcn($nodeName->toString())) {
+                return;
+            }
+
+            $this->classDescriptionBuilder
+                ->addAttribute($nodeName->toString(), $node->getLine());
         }
     }
 
@@ -355,6 +372,10 @@ class FileVisitor extends NodeVisitorAbstract
         }
 
         if ($this->isBuiltInType($type->toString())) {
+            return;
+        }
+
+        if (FullyQualifiedClassName::isNotAValidFqcn($type->toString())) {
             return;
         }
 
