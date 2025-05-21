@@ -51,6 +51,33 @@ class CanParseClassTest extends TestCase
         self::assertEquals('path/to/class.php', $violations->get(1)->getFilePath());
     }
 
+    public function test_should_parse_instanceof(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+
+        class Foo
+        {
+            public function bar($a, $b)
+            {
+                $is_var = $a instanceof $b;
+
+                $is_myclass = $a instanceof \Foo\Bar\MyClass;
+
+                $is_another = $a instanceof self;
+            }
+        }
+        EOF;
+
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
+        $fp->parse($code, 'relativePathName');
+        $cd = $fp->getClassDescriptions();
+
+        self::assertCount(1, $cd);
+        self::assertCount(1, $cd[0]->getDependencies());
+        self::assertEquals('Foo\Bar\MyClass', $cd[0]->getDependencies()[0]->getFQCN()->toString());
+    }
+
     public function test_should_create_a_class_description(): void
     {
         $code = <<< 'EOF'
@@ -275,6 +302,8 @@ class CanParseClassTest extends TestCase
             {
                 $collection = new Collection($request);
                 $static = StaticClass::foo();
+
+                $self_static = self::foo();
             }
         }
         EOF;

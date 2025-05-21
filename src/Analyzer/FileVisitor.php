@@ -185,10 +185,6 @@ class FileVisitor extends NodeVisitorAbstract
             return;
         }
 
-        if ($node->class->isSpecialClassName()) {
-            return;
-        }
-
         $this->classDescriptionBuilder
             ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
     }
@@ -200,10 +196,6 @@ class FileVisitor extends NodeVisitorAbstract
         }
 
         if (!($node->class instanceof Node\Name\FullyQualified)) {
-            return;
-        }
-
-        if ($node->class->isSpecialClassName()) {
             return;
         }
 
@@ -221,10 +213,6 @@ class FileVisitor extends NodeVisitorAbstract
             return;
         }
 
-        if ($node->class->isSpecialClassName()) {
-            return;
-        }
-
         $this->classDescriptionBuilder
             ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
     }
@@ -236,10 +224,6 @@ class FileVisitor extends NodeVisitorAbstract
         }
 
         if (!($node->class instanceof Node\Name\FullyQualified)) {
-            return;
-        }
-
-        if ($node->class->isSpecialClassName()) {
             return;
         }
 
