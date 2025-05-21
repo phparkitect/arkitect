@@ -132,6 +132,47 @@ class CanParseClassTest extends TestCase
         self::assertEquals($expectedInterfaces, $cd[0]->getDependencies());
     }
 
+    public function test_should_parse_anonymous_class_extends(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+
+        namespace Root\Namespace1;
+
+        use Root\Namespace2\D;
+
+        class Dog implements AnInterface, InterfaceTwo
+        {
+            public function foo()
+            {
+                $projector2 = new class() extends Another\ForbiddenExtend {};
+
+            }
+        }
+
+        class Cat implements AnInterface
+        {
+
+        }
+        EOF;
+
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
+        $fp->parse($code, 'relativePathName');
+        $cd = $fp->getClassDescriptions();
+
+        self::assertCount(2, $cd);
+        self::assertInstanceOf(ClassDescription::class, $cd[0]);
+        self::assertInstanceOf(ClassDescription::class, $cd[1]);
+
+        $expectedInterfaces = [
+            new ClassDependency('Root\Namespace1\AnInterface', 7),
+            new ClassDependency('Root\Namespace1\InterfaceTwo', 7),
+            new ClassDependency('Root\Namespace1\Another\ForbiddenExtend', 11),
+        ];
+
+        self::assertEquals($expectedInterfaces, $cd[0]->getDependencies());
+    }
+
     public function test_it_should_parse_extends_class(): void
     {
         $code = <<< 'EOF'

@@ -29,6 +29,8 @@ class FileVisitor extends NodeVisitorAbstract
     {
         $this->handleClassNode($node);
 
+        $this->handleAnonClassNode($node);
+
         $this->handleEnumNode($node);
 
         $this->handleStaticClassConstantNode($node);
@@ -95,7 +97,11 @@ class FileVisitor extends NodeVisitorAbstract
             return;
         }
 
-        if (!$node->isAnonymous() && null !== $node->namespacedName) {
+        if ($node->isAnonymous()) {
+            return;
+        }
+
+        if (null !== $node->namespacedName) {
             $this->classDescriptionBuilder->setClassName($node->namespacedName->toCodeString());
         }
 
@@ -104,21 +110,36 @@ class FileVisitor extends NodeVisitorAbstract
                 ->addInterface($interface->toString(), $interface->getLine());
         }
 
-        if (!$node->isAnonymous() && null !== $node->extends) {
+        if (null !== $node->extends) {
             $this->classDescriptionBuilder
                 ->addExtends($node->extends->toString(), $node->getLine());
         }
 
-        if (!$node->isAnonymous()) {
-            $this->classDescriptionBuilder->setFinal($node->isFinal());
+        $this->classDescriptionBuilder->setFinal($node->isFinal());
+
+        $this->classDescriptionBuilder->setReadonly($node->isReadonly());
+
+        $this->classDescriptionBuilder->setAbstract($node->isAbstract());
+    }
+
+    private function handleAnonClassNode(Node $node): void
+    {
+        if (!($node instanceof Node\Stmt\Class_)) {
+            return;
         }
 
         if (!$node->isAnonymous()) {
-            $this->classDescriptionBuilder->setReadonly($node->isReadonly());
+            return;
         }
 
-        if (!$node->isAnonymous()) {
-            $this->classDescriptionBuilder->setAbstract($node->isAbstract());
+        foreach ($node->implements as $interface) {
+            $this->classDescriptionBuilder
+                ->addDependency(new ClassDependency($interface->toString(), $interface->getLine()));
+        }
+
+        if (null !== $node->extends) {
+            $this->classDescriptionBuilder
+                ->addDependency(new ClassDependency($node->extends->toString(), $node->getLine()));
         }
     }
 
