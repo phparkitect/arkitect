@@ -23,6 +23,7 @@ class DocblockParserTest extends TestCase
              * @param int $aValue
              * @param MyPlainDto $plainDto
              * @param array<int, int|string> $unionType
+             * @param array<int, array<int, int|string>> $nestedUnionType
              */
         PHP;
 
@@ -36,6 +37,7 @@ class DocblockParserTest extends TestCase
         self::assertEquals('int', $db->getParamTagTypesByName('$aValue'));
         self::assertEquals('MyPlainDto', $db->getParamTagTypesByName('$plainDto'));
         self::assertEquals('(int | string)', $db->getParamTagTypesByName('$unionType'));
+        self::assertEquals('array<int, (int | string)>', $db->getParamTagTypesByName('$nestedUnionType'));
     }
 
     public function test_it_should_extract_return_type_from_return_tag(): void
