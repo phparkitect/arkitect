@@ -29,9 +29,17 @@ class FileVisitor extends NodeVisitorAbstract
     {
         $this->handleClassNode($node);
 
+        // handles anonymous class definition like new class() {}
         $this->handleAnonClassNode($node);
 
+        // handles enum definition
         $this->handleEnumNode($node);
+
+        // handles interface definition like interface MyInterface {}
+        $this->handleInterfaceNode($node);
+
+        // handles trait definition like trait MyTrait {}
+        $this->handleTraitNode($node);
 
         // handles code like $constantValue = StaticClass::constant;
         $this->handleStaticClassConstantNode($node);
@@ -39,6 +47,7 @@ class FileVisitor extends NodeVisitorAbstract
         // handles code like $static = StaticClass::foo();
         $this->handleStaticClassCallsNode($node);
 
+        // handles code lik $a instanceof MyClass
         $this->handleInstanceOf($node);
 
         $this->handleNewExpression($node);
@@ -49,12 +58,9 @@ class FileVisitor extends NodeVisitorAbstract
 
         $this->handleParamDependency($node);
 
-        $this->handleInterfaceNode($node);
-
-        $this->handleTraitNode($node);
-
         $this->handleReturnTypeDependency($node);
 
+        // handles attribute definition like #[MyAttribute]
         $this->handleAttributeNode($node);
     }
 
@@ -248,7 +254,7 @@ class FileVisitor extends NodeVisitorAbstract
 
         $type = $node->type instanceof NullableType ? $node->type->type : $node->type;
 
-        if (!method_exists($type, 'toString')) {
+        if (!($type instanceof Node\Name\FullyQualified)) {
             return;
         }
 
@@ -349,18 +355,13 @@ class FileVisitor extends NodeVisitorAbstract
             return;
         }
 
-        $type = $node->type;
-        if ($type instanceof NullableType) {
-            /** @var NullableType * */
-            $nullableType = $type;
-            $type = $nullableType->type;
-        }
+        $type = $node->type instanceof NullableType ? $node->type->type : $node->type;
 
-        if (method_exists($type, 'isSpecialClassName') && true === $type->isSpecialClassName()) {
+        if (!($type instanceof Node\Name\FullyQualified)) {
             return;
         }
 
-        if (!method_exists($type, 'toString')) {
+        if ($type->isSpecialClassName()) {
             return;
         }
 
@@ -374,6 +375,24 @@ class FileVisitor extends NodeVisitorAbstract
 
     private function isBuiltInType(string $typeName): bool
     {
-        return \in_array($typeName, ['bool', 'int', 'float', 'string', 'array', 'resource', 'object', 'null']);
+        $builtInTypes = [
+            'bool',
+            'int',
+            'float',
+            'string',
+            'array',
+            'object',
+            'resource',
+            'never',
+            'void',
+            'false',
+            'true',
+            'null',
+            'callable',
+            'mixed',
+            'iterable',
+        ];
+
+        return \in_array($typeName, $builtInTypes);
     }
 }
