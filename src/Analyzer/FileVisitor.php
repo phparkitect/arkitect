@@ -50,14 +50,19 @@ class FileVisitor extends NodeVisitorAbstract
         // handles code lik $a instanceof MyClass
         $this->handleInstanceOf($node);
 
+        // handles code like $a = new MyClass();
         $this->handleNewExpression($node);
 
+        // handles code like public MyClass $myClass;
         $this->handleTypedProperty($node);
 
+        // handles docblock like /** @var MyClass $myClass */
         $this->handleDocComment($node);
 
+        // handles code like public function myMethod(MyClass $myClass) {}
         $this->handleParamDependency($node);
 
+        // handles code like public function myMethod(): MyClass {}
         $this->handleReturnTypeDependency($node);
 
         // handles attribute definition like #[MyAttribute]
