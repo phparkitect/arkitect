@@ -247,10 +247,6 @@ class FileVisitor extends NodeVisitorAbstract
             return;
         }
 
-        if ($this->isBuiltInType($type->toString())) {
-            return;
-        }
-
         $this->classDescriptionBuilder
             ->addDependency(new ClassDependency($type->toString(), $node->getLine()));
     }
@@ -350,38 +346,7 @@ class FileVisitor extends NodeVisitorAbstract
             return;
         }
 
-        if ($type->isSpecialClassName()) {
-            return;
-        }
-
-        if ($this->isBuiltInType($type->toString())) {
-            return;
-        }
-
         $this->classDescriptionBuilder
             ->addDependency(new ClassDependency($type->toString(), $node->getLine()));
-    }
-
-    private function isBuiltInType(string $typeName): bool
-    {
-        $builtInTypes = [
-            'bool',
-            'int',
-            'float',
-            'string',
-            'array',
-            'object',
-            'resource',
-            'never',
-            'void',
-            'false',
-            'true',
-            'null',
-            'callable',
-            'mixed',
-            'iterable',
-        ];
-
-        return \in_array($typeName, $builtInTypes);
     }
 }
