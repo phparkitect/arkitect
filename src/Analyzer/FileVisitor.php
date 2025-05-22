@@ -29,30 +29,43 @@ class FileVisitor extends NodeVisitorAbstract
     {
         $this->handleClassNode($node);
 
+        // handles anonymous class definition like new class() {}
         $this->handleAnonClassNode($node);
 
+        // handles enum definition
         $this->handleEnumNode($node);
 
-        $this->handleStaticClassConstantNode($node);
-
-        $this->handleStaticClassCallsNode($node);
-
-        $this->handleInstanceOf($node);
-
-        $this->handleNewExpression($node);
-
-        $this->handleTypedProperty($node);
-
-        $this->handleDocComment($node);
-
-        $this->handleParamDependency($node);
-
+        // handles interface definition like interface MyInterface {}
         $this->handleInterfaceNode($node);
 
+        // handles trait definition like trait MyTrait {}
         $this->handleTraitNode($node);
 
+        // handles code like $constantValue = StaticClass::constant;
+        $this->handleStaticClassConstantNode($node);
+
+        // handles code like $static = StaticClass::foo();
+        $this->handleStaticClassCallsNode($node);
+
+        // handles code lik $a instanceof MyClass
+        $this->handleInstanceOf($node);
+
+        // handles code like $a = new MyClass();
+        $this->handleNewExpression($node);
+
+        // handles code like public MyClass $myClass;
+        $this->handleTypedProperty($node);
+
+        // handles docblock like /** @var MyClass $myClass */
+        $this->handleDocComment($node);
+
+        // handles code like public function myMethod(MyClass $myClass) {}
+        $this->handleParamDependency($node);
+
+        // handles code like public function myMethod(): MyClass {}
         $this->handleReturnTypeDependency($node);
 
+        // handles attribute definition like #[MyAttribute]
         $this->handleAttributeNode($node);
     }
 
@@ -145,117 +158,97 @@ class FileVisitor extends NodeVisitorAbstract
 
     private function handleEnumNode(Node $node): void
     {
-        if ($node instanceof Node\Stmt\Enum_ && null !== $node->namespacedName) {
-            $this->classDescriptionBuilder->setClassName($node->namespacedName->toCodeString());
-            $this->classDescriptionBuilder->setEnum(true);
+        if (!($node instanceof Node\Stmt\Enum_)) {
+            return;
+        }
 
-            foreach ($node->implements as $interface) {
-                $this->classDescriptionBuilder
-                    ->addInterface($interface->toString(), $interface->getLine());
-            }
+        if (null == $node->namespacedName) {
+            return;
+        }
+
+        $this->classDescriptionBuilder->setClassName($node->namespacedName->toCodeString());
+        $this->classDescriptionBuilder->setEnum(true);
+
+        foreach ($node->implements as $interface) {
+            $this->classDescriptionBuilder
+                ->addInterface($interface->toString(), $interface->getLine());
         }
     }
 
     private function handleStaticClassConstantNode(Node $node): void
     {
-        /**
-         * adding static classes as dependencies
-         * $constantValue = StaticClass::constant;.
-         *
-         * @see FileVisitorTest::test_it_should_return_errors_for_const_outside_namespace
-         */
-        if (
-            $node instanceof Node\Expr\ClassConstFetch
-            && method_exists($node->class, 'toString')
-        ) {
-            if ($this->isSelfOrStaticOrParent($node->class->toString())) {
-                return;
-            }
-
-            $this->classDescriptionBuilder
-                ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
+        if (!($node instanceof Node\Expr\ClassConstFetch)) {
+            return;
         }
+
+        if (!($node->class instanceof Node\Name\FullyQualified)) {
+            return;
+        }
+
+        $this->classDescriptionBuilder
+            ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
     }
 
     private function handleStaticClassCallsNode(Node $node): void
     {
-        /**
-         * adding static function classes as dependencies
-         * $static = StaticClass::foo();.
-         *
-         * @see FileVisitorTest::test_should_returns_all_dependencies
-         */
-        if (
-            $node instanceof Node\Expr\StaticCall
-            && method_exists($node->class, 'toString')
-        ) {
-            if ($this->isSelfOrStaticOrParent($node->class->toString())) {
-                return;
-            }
-
-            $this->classDescriptionBuilder
-                ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
+        if (!($node instanceof Node\Expr\StaticCall)) {
+            return;
         }
+
+        if (!($node->class instanceof Node\Name\FullyQualified)) {
+            return;
+        }
+
+        $this->classDescriptionBuilder
+            ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
     }
 
     private function handleInstanceOf(Node $node): void
     {
-        if (
-            $node instanceof Node\Expr\Instanceof_
-            && method_exists($node->class, 'toString')
-        ) {
-            if ($this->isSelfOrStaticOrParent($node->class->toString())) {
-                return;
-            }
-            $this->classDescriptionBuilder
-                ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
+        if (!($node instanceof Node\Expr\Instanceof_)) {
+            return;
         }
+
+        if (!($node->class instanceof Node\Name\FullyQualified)) {
+            return;
+        }
+
+        $this->classDescriptionBuilder
+            ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
     }
 
     private function handleNewExpression(Node $node): void
     {
-        if (
-            $node instanceof Node\Expr\New_
-            && !($node->class instanceof Node\Expr\Variable)
-        ) {
-            if ((method_exists($node->class, 'isAnonymous') && true === $node->class->isAnonymous())
-                || !method_exists($node->class, 'toString')
-            ) {
-                return;
-            }
-
-            if ($this->isSelfOrStaticOrParent($node->class->toString())) {
-                return;
-            }
-
-            $this->classDescriptionBuilder
-                ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
+        if (!($node instanceof Node\Expr\New_)) {
+            return;
         }
+
+        if (!($node->class instanceof Node\Name\FullyQualified)) {
+            return;
+        }
+
+        $this->classDescriptionBuilder
+            ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
     }
 
     private function handleTypedProperty(Node $node): void
     {
-        if ($node instanceof Node\Stmt\Property) {
-            if (null === $node->type) {
-                return;
-            }
-
-            $type = $node->type;
-            if ($type instanceof NullableType) {
-                $type = $type->type;
-            }
-
-            if (!method_exists($type, 'toString') || $this->isBuiltInType($type->toString())) {
-                return;
-            }
-
-            try {
-                $this->classDescriptionBuilder
-                    ->addDependency(new ClassDependency($type->toString(), $node->getLine()));
-            } catch (\Exception $e) {
-                // Silently ignore
-            }
+        if (!($node instanceof Node\Stmt\Property)) {
+            return;
         }
+
+        if (null === $node->type) {
+            return;
+        }
+
+        $type = $node->type instanceof NullableType ? $node->type->type : $node->type;
+
+        if (!($type instanceof Node\Name\FullyQualified)) {
+            return;
+        }
+
+        $this->classDescriptionBuilder
+            ->addDependency(new ClassDependency($type->toString(), $node->getLine()));
     }
 
     private function handleDocComment(Node $node): void
@@ -278,59 +271,67 @@ class FileVisitor extends NodeVisitorAbstract
 
     private function handleInterfaceNode(Node $node): void
     {
-        if ($node instanceof Node\Stmt\Interface_) {
-            if (null === $node->namespacedName) {
-                return;
-            }
+        if (!($node instanceof Node\Stmt\Interface_)) {
+            return;
+        }
 
-            $this->classDescriptionBuilder->setClassName($node->namespacedName->toCodeString());
-            $this->classDescriptionBuilder->setInterface(true);
+        if (null === $node->namespacedName) {
+            return;
+        }
 
-            foreach ($node->extends as $interface) {
-                $this->classDescriptionBuilder
-                    ->addExtends($interface->toString(), $interface->getLine());
-            }
+        $this->classDescriptionBuilder->setClassName($node->namespacedName->toCodeString());
+        $this->classDescriptionBuilder->setInterface(true);
+
+        foreach ($node->extends as $interface) {
+            $this->classDescriptionBuilder
+                ->addExtends($interface->toString(), $interface->getLine());
         }
     }
 
     private function handleTraitNode(Node $node): void
     {
-        if ($node instanceof Node\Stmt\Trait_) {
-            if (null === $node->namespacedName) {
-                return;
-            }
-
-            $this->classDescriptionBuilder->setClassName($node->namespacedName->toCodeString());
-            $this->classDescriptionBuilder->setTrait(true);
+        if (!($node instanceof Node\Stmt\Trait_)) {
+            return;
         }
+
+        if (null === $node->namespacedName) {
+            return;
+        }
+
+        $this->classDescriptionBuilder->setClassName($node->namespacedName->toCodeString());
+        $this->classDescriptionBuilder->setTrait(true);
     }
 
     private function handleReturnTypeDependency(Node $node): void
     {
-        if ($node instanceof Node\Stmt\ClassMethod) {
-            $returnType = $node->returnType;
-            if ($returnType instanceof Node\Name\FullyQualified) {
-                $this->classDescriptionBuilder
-                    ->addDependency(new ClassDependency($returnType->toString(), $returnType->getLine()));
-            }
+        if (!($node instanceof Node\Stmt\ClassMethod)) {
+            return;
         }
+
+        $returnType = $node->returnType;
+
+        if (!($returnType instanceof Node\Name\FullyQualified)) {
+            return;
+        }
+
+        $this->classDescriptionBuilder
+            ->addDependency(new ClassDependency($returnType->toString(), $returnType->getLine()));
     }
 
     private function handleAttributeNode(Node $node): void
     {
-        if ($node instanceof Node\Attribute) {
-            $nodeName = $node->name;
-
-            if ($nodeName instanceof Node\Name\FullyQualified) {
-                $this->classDescriptionBuilder
-                    ->addAttribute($node->name->toString(), $node->getLine());
-            }
+        if (!($node instanceof Node\Attribute)) {
+            return;
         }
-    }
 
-    private function isSelfOrStaticOrParent(string $dependencyClass): bool
-    {
-        return 'self' === $dependencyClass || 'static' === $dependencyClass || 'parent' === $dependencyClass;
+        $nodeName = $node->name;
+
+        if (!($nodeName instanceof Node\Name\FullyQualified)) {
+            return;
+        }
+
+        $this->classDescriptionBuilder
+            ->addAttribute($node->name->toString(), $node->getLine());
     }
 
     private function addParamDependency(Node\Param $node): void
@@ -339,31 +340,13 @@ class FileVisitor extends NodeVisitorAbstract
             return;
         }
 
-        $type = $node->type;
-        if ($type instanceof NullableType) {
-            /** @var NullableType * */
-            $nullableType = $type;
-            $type = $nullableType->type;
-        }
+        $type = $node->type instanceof NullableType ? $node->type->type : $node->type;
 
-        if (method_exists($type, 'isSpecialClassName') && true === $type->isSpecialClassName()) {
-            return;
-        }
-
-        if (!method_exists($type, 'toString')) {
-            return;
-        }
-
-        if ($this->isBuiltInType($type->toString())) {
+        if (!($type instanceof Node\Name\FullyQualified)) {
             return;
         }
 
         $this->classDescriptionBuilder
             ->addDependency(new ClassDependency($type->toString(), $node->getLine()));
-    }
-
-    private function isBuiltInType(string $typeName): bool
-    {
-        return \in_array($typeName, ['bool', 'int', 'float', 'string', 'array', 'resource', 'object', 'null']);
     }
 }

@@ -38,7 +38,7 @@ csfix: ## it launches cs fix
 	PHP_CS_FIXER_IGNORE_ENV=1 bin/php-cs-fixer fix -v
 
 psalm: ## it launches psalm
-	bin/psalm.phar
+	bin/psalm.phar --no-cache
 
 build: ## it launches all the build
 	composer install

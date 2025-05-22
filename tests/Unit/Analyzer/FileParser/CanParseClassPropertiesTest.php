@@ -51,6 +51,10 @@ class CanParseClassPropertiesTest extends TestCase
         class ApplicationLevelDto
         {
             public ?NotBlank $foo;
+
+            public ?string $bar;
+
+            public self $baz;
         }
         EOF;
 
@@ -59,12 +63,11 @@ class CanParseClassPropertiesTest extends TestCase
 
         $cd = $fp->getClassDescriptions();
 
-        $violations = new Violations();
+        $cd = $fp->getClassDescriptions();
+        $dep = $cd[0]->getDependencies();
 
-        $notHaveDependencyOutsideNamespace = new DependsOnlyOnTheseNamespaces(['MyProject\AppBundle\Application']);
-        $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
-
-        self::assertCount(1, $violations);
+        self::assertCount(1, $dep);
+        self::assertEquals('Symfony\Component\Validator\Constraints\NotBlank', $dep[0]->getFQCN()->toString());
     }
 
     public function test_it_parse_scalar_typed_property(): void
@@ -87,13 +90,9 @@ class CanParseClassPropertiesTest extends TestCase
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
+        $dep = $cd[0]->getDependencies();
 
-        $violations = new Violations();
-
-        $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('MyProject\AppBundle\Application');
-        $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
-
-        self::assertCount(0, $violations);
+        self::assertCount(0, $dep);
     }
 
     public function test_it_parse_nullable_scalar_typed_property(): void
@@ -137,9 +136,11 @@ class CanParseClassPropertiesTest extends TestCase
         class MyClass
         {
             private array $field1;
-            public function __construct(array $field1)
+            public function __construct(array $field1, int $field2, self $field3)
             {
                 $this->field1 = $field1;
+                $this->field2 = $field2;
+                $this->field3 = $field3;
             }
         }
         EOF;
@@ -148,12 +149,8 @@ class CanParseClassPropertiesTest extends TestCase
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
+        $dep = $cd[0]->getDependencies();
 
-        $violations = new Violations();
-
-        $notHaveDependenciesOutside = new NotHaveDependencyOutsideNamespace('App\Domain');
-        $notHaveDependenciesOutside->evaluate($cd[0], $violations, 'we want to add this rule for our software');
-
-        self::assertCount(0, $violations);
+        self::assertCount(0, $dep);
     }
 }
