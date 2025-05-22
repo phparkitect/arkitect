@@ -119,6 +119,18 @@ class DocblockTypesResolver extends NodeVisitorAbstract
             return;
         }
 
+        $this->resolveParamTypes($node, $docblock);
+
+        $this->resolveReturnValueType($node, $docblock);
+
+        $this->resolveThrowsValueType($node, $docblock);
+    }
+
+    /**
+     * @param Stmt\ClassMethod|Stmt\Function_|Expr\Closure|Expr\ArrowFunction $node
+     */
+    private function resolveParamTypes(Node $node, Docblock $docblock): void
+    {
         // extract param types from param tags
         foreach ($node->params as $param) {
             if (!$this->isTypeArray($param->type)) { // not an array, nothing to do
@@ -138,10 +150,6 @@ class DocblockTypesResolver extends NodeVisitorAbstract
 
             $param->type = $this->resolveName(new Name($type), Stmt\Use_::TYPE_NORMAL);
         }
-
-        $this->resolveReturnValueType($node, $docblock);
-
-        $this->resolveThrowsValueType($node, $docblock);
     }
 
     /**
