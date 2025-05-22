@@ -25,6 +25,8 @@ use PhpParser\NodeVisitorAbstract;
  */
 class DocblockTypesResolver extends NodeVisitorAbstract
 {
+    public const THROWS_TYPES_ATTRIBUTE = 'docblock_throws_types';
+
     private NameContext $nameContext;
 
     private bool $parseCustomAnnotations;
@@ -137,18 +139,62 @@ class DocblockTypesResolver extends NodeVisitorAbstract
             $param->type = $this->resolveName(new Name($type), Stmt\Use_::TYPE_NORMAL);
         }
 
-        // extract return type from return tag
-        if ($this->isTypeArray($node->returnType)) {
-            $type = $docblock->getReturnTagTypes();
-            $type = array_pop($type);
+        $this->resolveReturnValueType($node, $docblock);
 
-            // we ignore any type which is not a class
-            if (!$this->isTypeClass($type)) {
-                return;
+        $this->resolveThrowsValueType($node, $docblock);
+    }
+
+    /**
+     * @param Stmt\ClassMethod|Stmt\Function_|Expr\Closure|Expr\ArrowFunction $node
+     */
+    private function resolveReturnValueType(Node $node, Docblock $docblock): void
+    {
+        if (null === $node->returnType) {
+            return;
+        }
+
+        if (!$this->isTypeArray($node->returnType)) {
+            return;
+        }
+
+        $type = $docblock->getReturnTagTypes();
+        $type = array_pop($type);
+
+        // we ignore any type which is not a class
+        if (!$this->isTypeClass($type)) {
+            return;
+        }
+
+        $node->returnType = $this->resolveName(new Name($type), Stmt\Use_::TYPE_NORMAL);
+    }
+
+    /**
+     * @param Stmt\ClassMethod|Stmt\Function_|Expr\Closure|Expr\ArrowFunction $node
+     */
+    private function resolveThrowsValueType(Node $node, Docblock $docblock): void
+    {
+        // extract throw types from throw tag
+        $throwValues = $docblock->getThrowTagsTypes();
+
+        if (empty($throwValues)) {
+            return;
+        }
+
+        $throwsTypesResolved = [];
+
+        foreach ($throwValues as $throwValue) {
+            if (str_starts_with($throwValue, '\\')) {
+                $name = new FullyQualified(substr($throwValue, 1));
+            } else {
+                $name = $this->resolveName(new Name($throwValue), Stmt\Use_::TYPE_NORMAL);
             }
 
-            $node->returnType = $this->resolveName(new Name($type), Stmt\Use_::TYPE_NORMAL);
+            $name->setAttribute('startLine', $node->getStartLine());
+
+            $throwsTypesResolved[] = $name;
         }
+
+        $node->setAttribute(self::THROWS_TYPES_ATTRIBUTE, $throwsTypesResolved);
     }
 
     /**
