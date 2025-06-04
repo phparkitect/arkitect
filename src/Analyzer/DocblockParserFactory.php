@@ -22,7 +22,7 @@ class DocblockParserFactory
 
         // this if is to allow using v 1.2 or v2
         if (class_exists(ParserConfig::class)) {
-            $parserConfig = new ParserConfig([]);
+            $parserConfig = new ParserConfig(['lines' => true]);
             $constExprParser = new ConstExprParser($parserConfig);
             $typeParser = new TypeParser($parserConfig, $constExprParser);
             $phpDocParser = new PhpDocParser($parserConfig, $typeParser, $constExprParser);
