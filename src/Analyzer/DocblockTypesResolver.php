@@ -92,7 +92,7 @@ class DocblockTypesResolver extends NodeVisitorAbstract
             $doctrineAnnotations = $docblock->getDoctrineLikeAnnotationTypes();
             $doctrineAnnotations = array_shift($doctrineAnnotations);
 
-            if (null === $doctrineAnnotations) {
+            if (!$this->isTypeClass($doctrineAnnotations)) {
                 return;
             }
 
