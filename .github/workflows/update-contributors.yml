@@ -13,7 +13,7 @@ jobs:
           CONTRIB_REPOSITORY: 'phparkitect/arkitect'
           CONTRIB_OUTPUT_FILE: 'CONTRIBUTORS.md'
       - name: Commit changes
-        uses: test-room-7/action-update-file@v1
+        uses: test-room-7/action-update-file@v2
         with:
           file-path: 'CONTRIBUTORS.md'
           commit-msg: Update Contributors
