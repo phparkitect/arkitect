@@ -13,6 +13,7 @@ Shout out to our top contributors!
 - [JulienRAVIA](https://api.github.com/users/JulienRAVIA)
 - [helyakin](https://api.github.com/users/helyakin)
 - [hgraca](https://api.github.com/users/hgraca)
+- [dependabot[bot]](https://api.github.com/users/dependabot%5Bbot%5D)
 - [ben-challis](https://api.github.com/users/ben-challis)
 - [raffaelecarelle](https://api.github.com/users/raffaelecarelle)
 - [LuigiCardamone](https://api.github.com/users/LuigiCardamone)
@@ -31,4 +32,3 @@ Shout out to our top contributors!
 - [mloru](https://api.github.com/users/mloru)
 - [nikow13](https://api.github.com/users/nikow13)
 - [OskarStark](https://api.github.com/users/OskarStark)
-- [philipp-yoummday](https://api.github.com/users/philipp-yoummday)
