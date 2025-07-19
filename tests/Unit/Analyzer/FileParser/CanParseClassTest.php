@@ -38,13 +38,10 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
-        $fp->parse($code, 'path/to/class.php');
-
-        $violations = new Violations();
+        $classDescriptions = $this->parseCode($code, 'path/to/class.php');
 
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['Foo']);
-        $dependsOnTheseNamespaces->evaluate($fp->getClassDescriptions()[0], $violations, 'because');
+        $violations = $this->evaluateRule($dependsOnTheseNamespaces, $classDescriptions[0], 'because');
 
         self::assertCount(2, $violations);
         self::assertEquals('path/to/class.php', $violations->get(0)->getFilePath());
@@ -69,9 +66,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
-        $fp->parse($code, 'relativePathName');
-        $cd = $fp->getClassDescriptions();
+        $cd = $this->parseCode($code);
 
         self::assertCount(1, $cd);
         self::assertCount(1, $cd[0]->getDependencies());
@@ -97,9 +92,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
-        $fp->parse($code, 'relativePathName');
-        $cd = $fp->getClassDescriptions();
+        $cd = $this->parseCode($code);
 
         self::assertCount(2, $cd);
         self::assertInstanceOf(ClassDescription::class, $cd[0]);
@@ -141,9 +134,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
-        $fp->parse($code, 'relativePathName');
-        $cd = $fp->getClassDescriptions();
+        $cd = $this->parseCode($code);
 
         self::assertCount(2, $cd);
         self::assertInstanceOf(ClassDescription::class, $cd[0]);
@@ -183,9 +174,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
-        $fp->parse($code, 'relativePathName');
-        $cd = $fp->getClassDescriptions();
+        $cd = $this->parseCode($code);
 
         self::assertCount(2, $cd);
         self::assertInstanceOf(ClassDescription::class, $cd[0]);
@@ -217,10 +206,8 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
-        $fp->parse($code, 'relativePathName');
-
-        $cd = $fp->getClassDescriptions()[1];
+        $cd = $this->parseCode($code);
+        $cd = $cd[1];
 
         self::assertEquals('Root\Animals\Animal', $cd->getExtends()[0]->toString());
     }
@@ -245,10 +232,8 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
-        $fp->parse($code, 'relativePathName');
-
-        $cd = $fp->getClassDescriptions()[1];
+        $cd = $this->parseCode($code);
+        $cd = $cd[1];
 
         self::assertEquals('Root\Animals\Animal', $cd->getExtends()[0]->toString());
     }
@@ -272,14 +257,10 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
-        $fp->parse($code, 'relativePathName');
-        $cd = $fp->getClassDescriptions();
-
-        $violations = new Violations();
+        $cd = $this->parseCode($code);
 
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['Foo', 'Symfony', 'Doctrine']);
-        $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+        $violations = $this->evaluateRule($dependsOnTheseNamespaces, $cd[0], 'we want to add this rule for our software');
 
         self::assertCount(0, $violations);
     }
@@ -308,9 +289,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
-        $fp->parse($code, 'relativePathName');
-        $cd = $fp->getClassDescriptions();
+        $cd = $this->parseCode($code);
 
         $expectedDependencies = [
             new ClassDependency('Foo\Baz\Baz', 10),
@@ -340,15 +319,10 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
-        $fp->parse($code, 'relativePathName');
-
-        $cd = $fp->getClassDescriptions();
-
-        $violations = new Violations();
+        $cd = $this->parseCode($code);
 
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['Foo', 'Symfony', 'Doctrine']);
-        $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+        $violations = $this->evaluateRule($dependsOnTheseNamespaces, $cd[0], 'we want to add this rule for our software');
 
         self::assertCount(0, $violations);
     }
@@ -379,15 +353,10 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
-        $fp->parse($code, 'relativePathName');
-
-        $cd = $fp->getClassDescriptions();
-
-        $violations = new Violations();
+        $cd = $this->parseCode($code);
 
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('Root\Animals');
-        $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+        $violations = $this->evaluateRule($notHaveDependencyOutsideNamespace, $cd[0], 'we want to add this rule for our software');
 
         self::assertCount(0, $violations);
     }
@@ -411,15 +380,10 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
-        $fp->parse($code, 'relativePathName');
-
-        $cd = $fp->getClassDescriptions();
-
-        $violations = new Violations();
+        $cd = $this->parseCode($code);
 
         $dependsOnlyOnTheseNamespaces = new DependsOnlyOnTheseNamespaces();
-        $dependsOnlyOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+        $violations = $this->evaluateRule($dependsOnlyOnTheseNamespaces, $cd[0], 'we want to add this rule for our software');
 
         self::assertCount(1, $violations);
     }
@@ -452,15 +416,10 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
-        $fp->parse($code, 'relativePathName');
-
-        $cd = $fp->getClassDescriptions();
-
-        $violations = new Violations();
+        $cd = $this->parseCode($code);
 
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('Root\Cars');
-        $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+        $violations = $this->evaluateRule($notHaveDependencyOutsideNamespace, $cd[0], 'we want to add this rule for our software');
 
         self::assertCount(1, $violations);
     }
@@ -484,15 +443,11 @@ class CanParseClassTest extends TestCase
 
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
-        $fp->parse($code, 'relativePathName');
-
-        $cd = $fp->getClassDescriptions()[2]; // class Test
-
-        $violations = new Violations();
+        $cd = $this->parseCode($code, 'relativePathName', TargetPhpVersion::PHP_8_1);
+        $cd = $cd[2]; // class Test
 
         $implement = new Implement('Foo\Order');
-        $implement->evaluate($cd, $violations, 'we want to add this rule for our software');
+        $violations = $this->evaluateRule($implement, $cd, 'we want to add this rule for our software');
 
         self::assertCount(0, $violations);
     }
@@ -512,15 +467,10 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
-        $fp->parse($code, 'relativePathName');
-
-        $cd = $fp->getClassDescriptions();
-
-        $violations = new Violations();
+        $cd = $this->parseCode($code, 'relativePathName', TargetPhpVersion::PHP_8_1);
 
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['MyProject\AppBundle\Application']);
-        $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+        $violations = $this->evaluateRule($dependsOnTheseNamespaces, $cd[0], 'we want to add this rule for our software');
 
         self::assertCount(1, $violations);
     }
@@ -549,10 +499,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
-        $fp->parse($code, 'relativePathName');
-
-        $cd = $fp->getClassDescriptions();
+        $cd = $this->parseCode($code, 'relativePathName', TargetPhpVersion::PHP_8_1);
 
         self::assertCount(3, $cd);
         self::assertEquals('MyProject\AppBundle\Application\FooAble', $cd[2]->getExtends()[0]->toString());
@@ -583,14 +530,10 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
-        $fp->parse($code, 'relativePathName');
-        $cd = $fp->getClassDescriptions();
-
-        $violations = new Violations();
+        $cd = $this->parseCode($code);
 
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['Foo', 'Symfony', 'Doctrine']);
-        $dependsOnTheseNamespaces->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+        $violations = $this->evaluateRule($dependsOnTheseNamespaces, $cd[0], 'we want to add this rule for our software');
 
         self::assertCount(0, $violations);
     }
@@ -608,13 +551,9 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_4);
-        $fp->parse($code, 'relativePathName');
-
-        $cd = $fp->getClassDescriptions();
-        $violations = new Violations();
+        $cd = $this->parseCode($code, 'relativePathName', TargetPhpVersion::PHP_8_4);
         $isFinal = new IsFinal();
-        $isFinal->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+        $violations = $this->evaluateRule($isFinal, $cd[0], 'we want to add this rule for our software');
 
         self::assertCount(0, $violations);
     }
@@ -634,13 +573,9 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_4);
-        $fp->parse($code, 'relativePathName');
-
-        $cd = $fp->getClassDescriptions();
-        $violations = new Violations();
+        $cd = $this->parseCode($code, 'relativePathName', TargetPhpVersion::PHP_8_4);
         $isAbstract = new IsAbstract();
-        $isAbstract->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+        $violations = $this->evaluateRule($isAbstract, $cd[0], 'we want to add this rule for our software');
 
         self::assertCount(0, $violations);
     }
@@ -658,14 +593,26 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_4);
-        $fp->parse($code, 'relativePathName');
-
-        $cd = $fp->getClassDescriptions();
-        $violations = new Violations();
+        $cd = $this->parseCode($code, 'relativePathName', TargetPhpVersion::PHP_8_4);
         $isReadOnly = new IsReadonly();
-        $isReadOnly->evaluate($cd[0], $violations, 'we want to add this rule for our software');
+        $violations = $this->evaluateRule($isReadOnly, $cd[0], 'we want to add this rule for our software');
 
         self::assertCount(0, $violations);
+    }
+
+    private function parseCode(string $code, string $filePath = 'relativePathName', ?string $version = null): array
+    {
+        $fp = FileParserFactory::forPhpVersion($version ?? TargetPhpVersion::PHP_7_4);
+        $fp->parse($code, $filePath);
+
+        return $fp->getClassDescriptions();
+    }
+
+    private function evaluateRule($rule, ClassDescription $classDescription, string $reason = 'test reason'): Violations
+    {
+        $violations = new Violations();
+        $rule->evaluate($classDescription, $violations, $reason);
+
+        return $violations;
     }
 }
