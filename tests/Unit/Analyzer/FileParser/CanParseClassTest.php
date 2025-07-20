@@ -41,7 +41,7 @@ class CanParseClassTest extends TestCase
         $classDescriptions = $this->parseCode($code);
 
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['Foo']);
-        $violations = $this->evaluateRule($dependsOnTheseNamespaces, $classDescriptions[0], 'because');
+        $violations = $this->evaluateRule($dependsOnTheseNamespaces, $classDescriptions[0]);
 
         self::assertCount(2, $violations);
         self::assertEquals('relativePathName', $violations->get(0)->getFilePath());
@@ -260,7 +260,7 @@ class CanParseClassTest extends TestCase
         $cd = $this->parseCode($code);
 
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['Foo', 'Symfony', 'Doctrine']);
-        $violations = $this->evaluateRule($dependsOnTheseNamespaces, $cd[0], 'we want to add this rule for our software');
+        $violations = $this->evaluateRule($dependsOnTheseNamespaces, $cd[0]);
 
         self::assertCount(0, $violations);
     }
@@ -322,7 +322,7 @@ class CanParseClassTest extends TestCase
         $cd = $this->parseCode($code);
 
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['Foo', 'Symfony', 'Doctrine']);
-        $violations = $this->evaluateRule($dependsOnTheseNamespaces, $cd[0], 'we want to add this rule for our software');
+        $violations = $this->evaluateRule($dependsOnTheseNamespaces, $cd[0]);
 
         self::assertCount(0, $violations);
     }
@@ -356,7 +356,7 @@ class CanParseClassTest extends TestCase
         $cd = $this->parseCode($code);
 
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('Root\Animals');
-        $violations = $this->evaluateRule($notHaveDependencyOutsideNamespace, $cd[0], 'we want to add this rule for our software');
+        $violations = $this->evaluateRule($notHaveDependencyOutsideNamespace, $cd[0]);
 
         self::assertCount(0, $violations);
     }
@@ -383,7 +383,7 @@ class CanParseClassTest extends TestCase
         $cd = $this->parseCode($code);
 
         $dependsOnlyOnTheseNamespaces = new DependsOnlyOnTheseNamespaces();
-        $violations = $this->evaluateRule($dependsOnlyOnTheseNamespaces, $cd[0], 'we want to add this rule for our software');
+        $violations = $this->evaluateRule($dependsOnlyOnTheseNamespaces, $cd[0]);
 
         self::assertCount(1, $violations);
     }
@@ -419,7 +419,7 @@ class CanParseClassTest extends TestCase
         $cd = $this->parseCode($code);
 
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('Root\Cars');
-        $violations = $this->evaluateRule($notHaveDependencyOutsideNamespace, $cd[0], 'we want to add this rule for our software');
+        $violations = $this->evaluateRule($notHaveDependencyOutsideNamespace, $cd[0]);
 
         self::assertCount(1, $violations);
     }
@@ -447,7 +447,7 @@ class CanParseClassTest extends TestCase
         $cd = $cd[2]; // class Test
 
         $implement = new Implement('Foo\Order');
-        $violations = $this->evaluateRule($implement, $cd, 'we want to add this rule for our software');
+        $violations = $this->evaluateRule($implement, $cd);
 
         self::assertCount(0, $violations);
     }
@@ -470,7 +470,7 @@ class CanParseClassTest extends TestCase
         $cd = $this->parseCode($code, TargetPhpVersion::PHP_8_1);
 
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['MyProject\AppBundle\Application']);
-        $violations = $this->evaluateRule($dependsOnTheseNamespaces, $cd[0], 'we want to add this rule for our software');
+        $violations = $this->evaluateRule($dependsOnTheseNamespaces, $cd[0]);
 
         self::assertCount(1, $violations);
     }
@@ -533,7 +533,7 @@ class CanParseClassTest extends TestCase
         $cd = $this->parseCode($code);
 
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['Foo', 'Symfony', 'Doctrine']);
-        $violations = $this->evaluateRule($dependsOnTheseNamespaces, $cd[0], 'we want to add this rule for our software');
+        $violations = $this->evaluateRule($dependsOnTheseNamespaces, $cd[0]);
 
         self::assertCount(0, $violations);
     }
@@ -553,7 +553,7 @@ class CanParseClassTest extends TestCase
 
         $cd = $this->parseCode($code, TargetPhpVersion::PHP_8_4);
         $isFinal = new IsFinal();
-        $violations = $this->evaluateRule($isFinal, $cd[0], 'we want to add this rule for our software');
+        $violations = $this->evaluateRule($isFinal, $cd[0]);
 
         self::assertCount(0, $violations);
     }
@@ -575,7 +575,7 @@ class CanParseClassTest extends TestCase
 
         $cd = $this->parseCode($code, TargetPhpVersion::PHP_8_4);
         $isAbstract = new IsAbstract();
-        $violations = $this->evaluateRule($isAbstract, $cd[0], 'we want to add this rule for our software');
+        $violations = $this->evaluateRule($isAbstract, $cd[0]);
 
         self::assertCount(0, $violations);
     }
@@ -595,7 +595,7 @@ class CanParseClassTest extends TestCase
 
         $cd = $this->parseCode($code, TargetPhpVersion::PHP_8_4);
         $isReadOnly = new IsReadonly();
-        $violations = $this->evaluateRule($isReadOnly, $cd[0], 'we want to add this rule for our software');
+        $violations = $this->evaluateRule($isReadOnly, $cd[0]);
 
         self::assertCount(0, $violations);
     }
@@ -608,10 +608,10 @@ class CanParseClassTest extends TestCase
         return $fp->getClassDescriptions();
     }
 
-    private function evaluateRule($rule, ClassDescription $classDescription, string $reason = 'test reason'): Violations
+    private function evaluateRule($rule, ClassDescription $classDescription): Violations
     {
         $violations = new Violations();
-        $rule->evaluate($classDescription, $violations, $reason);
+        $rule->evaluate($classDescription, $violations, 'we want to add this rule for our software');
 
         return $violations;
     }
