@@ -43,7 +43,7 @@ jobs:
       run: composer install --prefer-dist
 
     - name: Coding Standard Checks
-      if: ${{ matrix.php-versions  == '7.4' }}
+      if: ${{ matrix.php-versions  == '8.4' }}
       run: PHP_CS_FIXER_IGNORE_ENV=1 ./bin/php-cs-fixer fix --dry-run -v
 
     - name: Static Analysis
@@ -84,7 +84,7 @@ jobs:
 
       - name: "Rename phar to avoid conflicts"
         run: mv ./phparkitect.phar phparkitect-${{ github.sha }}.phar
-      
+
       - name: "Upload phar file artifact"
         uses: actions/upload-artifact@v4
         with:
@@ -127,7 +127,7 @@ jobs:
         with:
           # will download phar in project root
           name: phar-artifact
-      
+
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v6
         with:
@@ -135,10 +135,10 @@ jobs:
           passphrase: ${{ secrets.GPG_KEY_47CD54B6398FE21B3709D0A4D9C905CED1932CA2_PASSPHRASE }}
 
       - name: Rename phar
-        run: mv ./phparkitect-${{ github.sha }}.phar phparkitect.phar 
+        run: mv ./phparkitect-${{ github.sha }}.phar phparkitect.phar
 
       - name: Sign the PHAR
-        run: |  
+        run: |
           gpg --local-user 47CD54B6398FE21B3709D0A4D9C905CED1932CA2 \
           --batch \
           --yes \
@@ -146,8 +146,8 @@ jobs:
           --detach-sign \
           --output ./phparkitect.phar.asc \
           ./phparkitect.phar
-      
-      - name: Add phar to the release 
+
+      - name: Add phar to the release
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
