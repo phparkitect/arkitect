@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Tests\Unit\Analyzer;
+namespace Arkitect\Tests\Unit\Analyzer\FileParser;
 
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
@@ -38,14 +38,14 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $classDescriptions = $this->parseCode($code, 'path/to/class.php');
+        $classDescriptions = $this->parseCode($code);
 
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['Foo']);
         $violations = $this->evaluateRule($dependsOnTheseNamespaces, $classDescriptions[0], 'because');
 
         self::assertCount(2, $violations);
-        self::assertEquals('path/to/class.php', $violations->get(0)->getFilePath());
-        self::assertEquals('path/to/class.php', $violations->get(1)->getFilePath());
+        self::assertEquals('relativePathName', $violations->get(0)->getFilePath());
+        self::assertEquals('relativePathName', $violations->get(1)->getFilePath());
     }
 
     public function test_should_parse_instanceof(): void
@@ -443,7 +443,7 @@ class CanParseClassTest extends TestCase
 
         EOF;
 
-        $cd = $this->parseCode($code, 'relativePathName', TargetPhpVersion::PHP_8_1);
+        $cd = $this->parseCode($code, TargetPhpVersion::PHP_8_1);
         $cd = $cd[2]; // class Test
 
         $implement = new Implement('Foo\Order');
@@ -467,7 +467,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $cd = $this->parseCode($code, 'relativePathName', TargetPhpVersion::PHP_8_1);
+        $cd = $this->parseCode($code, TargetPhpVersion::PHP_8_1);
 
         $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['MyProject\AppBundle\Application']);
         $violations = $this->evaluateRule($dependsOnTheseNamespaces, $cd[0], 'we want to add this rule for our software');
@@ -499,7 +499,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $cd = $this->parseCode($code, 'relativePathName', TargetPhpVersion::PHP_8_1);
+        $cd = $this->parseCode($code, TargetPhpVersion::PHP_8_1);
 
         self::assertCount(3, $cd);
         self::assertEquals('MyProject\AppBundle\Application\FooAble', $cd[2]->getExtends()[0]->toString());
@@ -551,7 +551,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $cd = $this->parseCode($code, 'relativePathName', TargetPhpVersion::PHP_8_4);
+        $cd = $this->parseCode($code, TargetPhpVersion::PHP_8_4);
         $isFinal = new IsFinal();
         $violations = $this->evaluateRule($isFinal, $cd[0], 'we want to add this rule for our software');
 
@@ -573,7 +573,7 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $cd = $this->parseCode($code, 'relativePathName', TargetPhpVersion::PHP_8_4);
+        $cd = $this->parseCode($code, TargetPhpVersion::PHP_8_4);
         $isAbstract = new IsAbstract();
         $violations = $this->evaluateRule($isAbstract, $cd[0], 'we want to add this rule for our software');
 
@@ -593,17 +593,17 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $cd = $this->parseCode($code, 'relativePathName', TargetPhpVersion::PHP_8_4);
+        $cd = $this->parseCode($code, TargetPhpVersion::PHP_8_4);
         $isReadOnly = new IsReadonly();
         $violations = $this->evaluateRule($isReadOnly, $cd[0], 'we want to add this rule for our software');
 
         self::assertCount(0, $violations);
     }
 
-    private function parseCode(string $code, string $filePath = 'relativePathName', ?string $version = null): array
+    private function parseCode(string $code, ?string $version = null): array
     {
         $fp = FileParserFactory::forPhpVersion($version ?? TargetPhpVersion::PHP_7_4);
-        $fp->parse($code, $filePath);
+        $fp->parse($code, 'relativePathName');
 
         return $fp->getClassDescriptions();
     }
