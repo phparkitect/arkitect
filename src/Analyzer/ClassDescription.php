@@ -57,7 +57,7 @@ class ClassDescription
         bool $enum,
         array $docBlock,
         array $attributes,
-        string $filePath,
+        string $filePath
     ) {
         $this->FQCN = $FQCN;
         $this->filePath = $filePath;
