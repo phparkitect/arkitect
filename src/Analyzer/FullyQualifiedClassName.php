@@ -27,7 +27,7 @@ class FullyQualifiedClassName
 
     public function classMatches(string $pattern): bool
     {
-        if ($this->isNotAValidPattern($pattern)) {
+        if (self::isNotAValidFqcn($pattern)) {
             throw new InvalidPatternException("'$pattern' is not a valid class or namespace pattern. Regex are not allowed, only * and ? wildcard.");
         }
 
@@ -36,7 +36,7 @@ class FullyQualifiedClassName
 
     public function matches(string $pattern): bool
     {
-        if ($this->isNotAValidPattern($pattern)) {
+        if (self::isNotAValidFqcn($pattern)) {
             throw new InvalidPatternException("'$pattern' is not a valid class or namespace pattern. Regex are not allowed, only * and ? wildcard.");
         }
 
@@ -69,12 +69,12 @@ class FullyQualifiedClassName
         return new self(new PatternString($fqcn), new PatternString($namespace), new PatternString($className));
     }
 
-    public function isNotAValidPattern(string $pattern): bool
+    public static function isNotAValidFqcn(string $fqcn): bool
     {
         $validClassNameCharacters = '[a-zA-Z0-9_\x80-\xff]';
         $or = '|';
         $backslash = '\\\\';
 
-        return 0 === preg_match('/^('.$validClassNameCharacters.$or.$backslash.$or.'\*'.$or.'\?)*$/', $pattern);
+        return 0 === preg_match('/^('.$validClassNameCharacters.$or.$backslash.$or.'\*'.$or.'\?)*$/', $fqcn);
     }
 }
