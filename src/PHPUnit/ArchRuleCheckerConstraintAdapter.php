@@ -60,7 +60,7 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
     }
 
     protected function matches(
-        /** @var $rule ArchRule */
+        /** @var ArchRule $rule */
         $other
     ): bool {
         $this->runner->check(
