@@ -34,7 +34,7 @@
         "ondram/ci-detector": "^4.2"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.75",
+        "friendsofphp/php-cs-fixer": "^3.90",
         "mikey179/vfsstream": "^1.6",
         "phpspec/prophecy": "^1.10",
         "phpspec/prophecy-phpunit": "^2.4",
