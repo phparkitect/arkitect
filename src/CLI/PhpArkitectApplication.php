@@ -21,9 +21,14 @@ class PhpArkitectApplication extends \Symfony\Component\Console\Application
     public function __construct()
     {
         parent::__construct('PHPArkitect', Version::get());
-        $this->add(new Check());
-        $this->add(new Init());
-        $this->add(new DebugExpression());
+
+        // Symfony 8 removed add() in favor of addCommand()
+        // addCommand() was introduced in Symfony 7.4
+        $addMethod = method_exists($this, 'addCommand') ? 'addCommand' : 'add';
+
+        $this->$addMethod(new Check());
+        $this->$addMethod(new Init());
+        $this->$addMethod(new DebugExpression());
     }
 
     public function getLongVersion(): string
