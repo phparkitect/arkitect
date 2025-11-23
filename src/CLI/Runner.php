@@ -10,6 +10,7 @@ use Arkitect\Analyzer\Parser;
 use Arkitect\ClassSetRules;
 use Arkitect\CLI\Progress\Progress;
 use Arkitect\Exceptions\FailOnFirstViolationException;
+use Arkitect\Expression\ForClasses\BeUsedOnlyBy;
 use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violations;
 use Symfony\Component\Finder\SplFileInfo;
@@ -88,6 +89,24 @@ class Runner
             $config->isParseCustomAnnotationsEnabled()
         );
 
+        // Clear the usage map before each run
+        BeUsedOnlyBy::clearUsageMap();
+
+        // First pass: collect all class dependencies for BeUsedOnlyBy
+        /** @var ClassSetRules $classSetRule */
+        foreach ($config->getClassSetRules() as $classSetRule) {
+            /** @var SplFileInfo $file */
+            foreach ($classSetRule->getClassSet() as $file) {
+                $fileParser->parse($file->getContents(), $file->getRelativePathname());
+
+                /** @var ClassDescription $classDescription */
+                foreach ($fileParser->getClassDescriptions() as $classDescription) {
+                    BeUsedOnlyBy::registerClassDependencies($classDescription);
+                }
+            }
+        }
+
+        // Second pass: evaluate rules
         /** @var ClassSetRules $classSetRule */
         foreach ($config->getClassSetRules() as $classSetRule) {
             $progress->startFileSetAnalysis($classSetRule->getClassSet());
