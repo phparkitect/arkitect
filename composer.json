@@ -28,7 +28,7 @@
         "symfony/console": "^3.0|^4.0|^5.0|^6.0|^7.0",
         "symfony/polyfill-php80": "^1.33",
         "nikic/php-parser": "~5",
-        "webmozart/assert": "^1.9",
+        "webmozart/assert": "^1.12",
         "ext-json": "*",
         "phpstan/phpdoc-parser": "^1.2|^2.0",
         "ondram/ci-detector": "^4.2"
