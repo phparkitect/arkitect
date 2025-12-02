@@ -25,19 +25,19 @@
         "php": "^7.4|^8",
         "ext-json": "*",
         "nikic/php-parser": "~5",
-        "ondram/ci-detector": "^4.1",
+        "ondram/ci-detector": "^4.2",
         "phpstan/phpdoc-parser": "^1.2|^2.0",
         "symfony/console": "^3.0|^4.0|^5.0|^6.0|^7.0|^8.0",
         "symfony/event-dispatcher": "^3.0|^4.0|^5.0|^6.0|^7.0|^8.0",
         "symfony/finder": "^3.0|^4.0|^5.0|^6.0|^7.0|^8.0",
-        "symfony/polyfill-php80": "^1.20",
+        "symfony/polyfill-php80": "^1.33",
         "webmozart/assert": "^1.9"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.75",
+        "friendsofphp/php-cs-fixer": "^3.90",
         "mikey179/vfsstream": "^1.6",
         "phpspec/prophecy": "^1.10",
-        "phpspec/prophecy-phpunit": "^2.3",
+        "phpspec/prophecy-phpunit": "^2.4",
         "phpunit/phpunit": "^7.5|^9.0|^10.0",
         "roave/security-advisories": "dev-master",
         "symfony/var-dumper": "^3.0|^4.0|^5.0|^6.0|^7.0|^8.0"
