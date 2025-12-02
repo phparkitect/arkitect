@@ -67,6 +67,9 @@ class FileVisitor extends NodeVisitorAbstract
 
         // handles attribute definition like #[MyAttribute]
         $this->handleAttributeNode($node);
+
+        // handles property hooks like public string $name { get => ...; set { ... } }
+        $this->handlePropertyHookNode($node);
     }
 
     public function getClassDescriptions(): array
@@ -348,5 +351,17 @@ class FileVisitor extends NodeVisitorAbstract
 
         $this->classDescriptionBuilder
             ->addDependency(new ClassDependency($type->toString(), $node->getLine()));
+    }
+
+    private function handlePropertyHookNode(Node $node): void
+    {
+        if (!($node instanceof Node\PropertyHook)) {
+            return;
+        }
+
+        // Handle parameters in set hooks (e.g., set(MyClass $value) { ... })
+        foreach ($node->params as $param) {
+            $this->addParamDependency($param);
+        }
     }
 }
