@@ -47,7 +47,7 @@ jobs:
       run: PHP_CS_FIXER_IGNORE_ENV=1 ./bin/php-cs-fixer fix --dry-run --diff
 
     - name: Static Analysis
-      if: ${{ matrix.php-versions  == '8.0' }}
+      if: ${{ matrix.php-versions  == '8.3' }}
       run: ./bin/psalm.phar --no-cache
 
     - name: Test
