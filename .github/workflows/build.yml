@@ -23,6 +23,7 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ matrix.php-versions }}
+        coverage: ${{ matrix.coverage-driver }}
         tools: composer:v2.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
