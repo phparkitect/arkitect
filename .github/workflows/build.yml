@@ -51,8 +51,13 @@ jobs:
       if: ${{ matrix.php-versions  == '8.0' }}
       run: ./bin/psalm.phar --no-cache
 
-    - name: Test
+    - name: Test with coverage
+      if: ${{ matrix.php-versions  == '8.0' }}
       run: ./bin/phpunit -d memory_limit=-1 --coverage-clover clover.xml
+
+    - name: Test without coverage
+      if: ${{ matrix.php-versions  != '8.0' }}
+      run: ./bin/phpunit -d memory_limit=-1
 
     - name: Upload coverage to Codecov
       if: ${{ matrix.php-versions  == '8.0' }}
