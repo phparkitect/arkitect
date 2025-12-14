@@ -26,9 +26,9 @@ class TargetPhpVersionTest extends TestCase
 
     public function test_it_should_ignore_extra_information(): void
     {
-        $targetPhpVersion = TargetPhpVersion::create('7.4.10-14+ubuntu22.04.1+deb.sury.org+1');
+        $targetPhpVersion = TargetPhpVersion::create('8.0.10-14+ubuntu22.04.1+deb.sury.org+1');
 
-        self::assertEquals('7.4', $targetPhpVersion->get());
+        self::assertEquals('8.0', $targetPhpVersion->get());
     }
 
     public function test_it_should_throw_exception_if_not_valid_php_version(): void
