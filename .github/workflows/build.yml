@@ -14,7 +14,6 @@ jobs:
       fail-fast: false
       matrix:
         php-versions: [ '8.0', '8.1', '8.2', '8.3', '8.4', '8.5' ]
-        coverage-driver: [ 'pcov' ]
 
     steps:
     - uses: actions/checkout@v5
@@ -23,7 +22,7 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ matrix.php-versions }}
-        coverage: ${{ matrix.coverage-driver }}
+        coverage: pcov
         tools: composer:v2.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
