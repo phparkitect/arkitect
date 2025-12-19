@@ -86,7 +86,7 @@ jobs:
         run: mv ./phparkitect.phar phparkitect-${{ github.sha }}.phar
 
       - name: "Upload phar file artifact"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: phar-artifact
           path: ./phparkitect-${{ github.sha }}.phar
