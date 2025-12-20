@@ -54,9 +54,7 @@ class ClassSetTest extends TestCase
             'View/UserView.php',
         ];
 
-        $actual = array_values(array_map(function ($item) {
-            return $item->getRelativePathname();
-        }, iterator_to_array($set)));
+        $actual = array_values(array_map(fn ($item) => $item->getRelativePathname(), iterator_to_array($set)));
 
         self::assertEquals($expected, $actual);
     }
@@ -83,9 +81,7 @@ class ClassSetTest extends TestCase
             'View/UserView.php',
         ];
 
-        $actual = array_values(array_map(function ($item) {
-            return $item->getRelativePathname();
-        }, iterator_to_array($set)));
+        $actual = array_values(array_map(fn ($item) => $item->getRelativePathname(), iterator_to_array($set)));
 
         self::assertEquals($expected, $actual);
     }
