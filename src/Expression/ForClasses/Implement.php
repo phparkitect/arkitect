@@ -40,9 +40,7 @@ class Implement implements Expression
 
         $interface = $this->interface;
         $interfaces = $theClass->getInterfaces();
-        $implements = function (FullyQualifiedClassName $FQCN) use ($interface): bool {
-            return $FQCN->matches($interface);
-        };
+        $implements = fn (FullyQualifiedClassName $FQCN): bool => $FQCN->matches($interface);
 
         if (0 === \count(array_filter($interfaces, $implements))) {
             $violation = Violation::create(
