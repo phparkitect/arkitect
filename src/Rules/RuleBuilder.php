@@ -30,6 +30,12 @@ class RuleBuilder
         $this->runOnlyThis = false;
     }
 
+    public function __clone()
+    {
+        $this->thats = clone $this->thats;
+        $this->shoulds = clone $this->shoulds;
+    }
+
     public function addThat(Expression $that): self
     {
         $this->thats->add($that);
