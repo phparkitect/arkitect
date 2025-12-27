@@ -30,6 +30,9 @@ class ClassDescriptionBuilder
     /** @var list<FullyQualifiedClassName> */
     private array $attributes = [];
 
+    /** @var list<FullyQualifiedClassName> */
+    private array $traits = [];
+
     private bool $interface = false;
 
     private bool $trait = false;
@@ -49,6 +52,7 @@ class ClassDescriptionBuilder
         $this->abstract = false;
         $this->docBlock = [];
         $this->attributes = [];
+        $this->traits = [];
         $this->interface = false;
         $this->trait = false;
         $this->enum = false;
@@ -152,6 +156,14 @@ class ClassDescriptionBuilder
         return $this;
     }
 
+    public function addTrait(string $FQCN, int $line): self
+    {
+        $this->addDependency(new ClassDependency($FQCN, $line));
+        $this->traits[] = FullyQualifiedClassName::fromString($FQCN);
+
+        return $this;
+    }
+
     public function build(): ClassDescription
     {
         Assert::notNull($this->FQCN, 'You must set an FQCN');
@@ -170,6 +182,7 @@ class ClassDescriptionBuilder
             $this->enum,
             $this->docBlock,
             $this->attributes,
+            $this->traits,
             $this->filePath
         );
     }
