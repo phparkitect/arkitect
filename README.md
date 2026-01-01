@@ -591,17 +591,18 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run Arkitect
-        uses: phparkitect/arkitect-github-actions@v1
+        uses: docker://phparkitect/arkitect-github-actions
+        env:
+          PHP_VERSION: '8.2'
         with:
-          php_version: '8.2'
-          arkitect_version: 'latest'
+          args: check
 ```
 
 **Resources:**
 - [GitHub Action Repository](https://github.com/phparkitect/arkitect-github-actions)
 - [GitHub Marketplace](https://github.com/marketplace/actions/phparkitect-arkitect)
 
-The action supports multiple PHP versions and allows you to specify which PHPArkitect version to use.
+The action supports multiple PHP versions through the `PHP_VERSION` environment variable.
 
 ## Laravel
 
