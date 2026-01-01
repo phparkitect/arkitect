@@ -44,9 +44,9 @@ class ClassDescription
      * @param list<ClassDependency>         $dependencies
      * @param list<FullyQualifiedClassName> $interfaces
      * @param list<FullyQualifiedClassName> $extends
+     * @param list<string>                  $docBlock
      * @param list<FullyQualifiedClassName> $attributes
      * @param list<FullyQualifiedClassName> $traits
-     * @param list<string>                  $docBlock
      */
     public function __construct(
         FullyQualifiedClassName $FQCN,
