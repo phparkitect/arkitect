@@ -13,7 +13,7 @@
 
 # Introduction
 
-PHPArkitect helps you to keep your PHP codebase coherent and solid, by permitting to add some architectural constraint check to your workflow.
+PHPArkitect helps you to keep your PHP codebase coherent and solid, by allowing you to add architectural constraint checks to your workflow.
 You can express the constraint that you want to enforce, in simple and readable PHP code, for example:
 
 ```php
@@ -51,7 +51,7 @@ To use this tool you need to launch a command via Bash:
 phparkitect check
 ```
 
-With this command `phparkitect` will search all rules in the root of your project the default config file called `phparkitect.php`.
+With this command `phparkitect` will search for the default config file called `phparkitect.php` in the root of your project.
 You can also specify your configuration file using `--config` option like this:
 
 ```
@@ -77,7 +77,7 @@ phparkitect check --generate-baseline=my-baseline.json
 
 It will produce a json file with the current list of violations.  
 
-If is present a baseline file with the default name will be used automatically.
+If a baseline file with the default name is present, it will be used automatically.
 
 To use a different baseline file, run the `check` command with the `use-baseline` parameter as follows:
 
@@ -139,7 +139,7 @@ return static function (Config $config): void {
     $rules[] = Rule::allClasses()
         ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
         ->should(new NotHaveDependencyOutsideNamespace('App\Domain'))
-        ->because('we want protect our domain');
+        ->because('we want to protect our domain');
 
     $config
         ->add($mvcClassSet, ...$rules);
@@ -195,9 +195,9 @@ $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
     ->should(new Extend('App\Controller\AbstractController'))
     ->because('we want to be sure that all controllers extend AbstractController');
-
-You can add multiple parameters, the violation will happen when none of them match
 ```
+
+*Note: You can add multiple parameters; the violation will happen when none of them match.*
 
 ### Has an attribute (requires PHP >= 8.0)
 
@@ -359,9 +359,9 @@ $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller\Admin'))
     ->should(new NotExtend('App\Controller\AbstractController'))
     ->because('we want to be sure that all admin controllers not extend AbstractController for security reasons');
-
-You can add multiple parameters, the violation will happen when one of them match
 ```
+
+*Note: You can add multiple parameters; the violation will happen when one of them matches.*
 
 ### Don't have dependency outside a namespace
 
@@ -369,7 +369,7 @@ You can add multiple parameters, the violation will happen when one of them matc
 $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
     ->should(new NotHaveDependencyOutsideNamespace('App\Domain', ['Ramsey\Uuid']))
-    ->because('we want protect our domain except for Ramsey\Uuid');
+    ->because('we want to protect our domain except for Ramsey\Uuid');
 ```
 
 Note: PHP core classes (e.g., `DateTime`, `Exception`, `PDO`) are automatically excluded from dependency checks.
