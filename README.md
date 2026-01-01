@@ -568,5 +568,41 @@ $rules[] = Rule::allClasses()
 
 # Integrations
 
+## GitHub Actions
+
+You can easily integrate PHPArkitect into your CI/CD pipeline using the official GitHub Action.
+
+Add this to your `.github/workflows/arkitect.yml`:
+
+```yaml
+name: Arkitect
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  arkitect:
+    runs-on: ubuntu-latest
+    name: Arkitect
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Arkitect
+        uses: phparkitect/arkitect-github-actions@v1
+        with:
+          php_version: '8.2'
+          arkitect_version: 'latest'
+```
+
+**Resources:**
+- [GitHub Action Repository](https://github.com/phparkitect/arkitect-github-actions)
+- [GitHub Marketplace](https://github.com/marketplace/actions/phparkitect-arkitect)
+
+The action supports multiple PHP versions and allows you to specify which PHPArkitect version to use.
+
 ## Laravel
+
 If you plan to use Arkitect with Laravel, [smortexa](https://github.com/smortexa) wrote a nice wrapper with some predefined rules for laravel: https://github.com/smortexa/laravel-arkitect
