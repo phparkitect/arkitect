@@ -22,6 +22,17 @@ Rule::allClasses()
     ->should(new HaveNameMatching('*Controller'))
     ->because('it\'s a symfony naming convention');
 ```
+
+Since selecting classes by namespace is very common, there's a convenient shortcut:
+
+```php
+Rule::namespace('App\Controller')
+    ->should(new HaveNameMatching('*Controller'))
+    ->because('it\'s a symfony naming convention');
+```
+
+You can also specify multiple namespaces: `Rule::namespace('App\Controller', 'App\Service')`.
+
 # Installation
 
 ## Using Composer
