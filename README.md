@@ -228,6 +228,17 @@ $rules[] = Rule::allClasses()
     ->because('we want uniform naming for services');
 ```
 
+### Match one of these names
+
+```php
+$rules[] = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
+    ->should(new MatchOneOfTheseNames(['*Controller', '*Action']))
+    ->because('we want controllers to match one of these naming patterns');
+```
+
+*Note: Similar to HaveNameMatching, but accepts an array of patterns. The rule passes if the class name matches any of the provided patterns.*
+
 ### Implements an interface
 
 ```php
@@ -245,6 +256,17 @@ $rules[] = Rule::allClasses()
     ->should(new NotImplement('ContainerAwareInterface'))
     ->because('all public controllers should not be container aware');
 ```
+
+### Is a (inherits from or implements)
+
+```php
+$rules[] = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Domain\Event'))
+    ->should(new IsA('App\Domain\DomainEvent'))
+    ->because('all events should inherit from or implement DomainEvent');
+```
+
+*Note: This rule checks if a class inherits from or implements a given class/interface using PHP's `is_a()` function.*
 
 ### Is abstract
 
