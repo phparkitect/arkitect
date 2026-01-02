@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
-use Arkitect\Analyzer\FullyQualifiedClassName;
+use Arkitect\Exceptions\InvalidPatternException;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Rules\Violation;
@@ -38,19 +38,42 @@ class Implement implements Expression
             return;
         }
 
-        $interface = $this->interface;
-        $interfaces = $theClass->getInterfaces();
-        $implements = function (FullyQualifiedClassName $FQCN) use ($interface): bool {
-            return $FQCN->matches($interface);
-        };
+        $this->validatePattern($this->interface);
 
-        if (0 === \count(array_filter($interfaces, $implements))) {
+        $hasInterface = false;
+
+        // If interface contains wildcards, use pattern matching on direct interfaces only
+        if (str_contains($this->interface, '*') || str_contains($this->interface, '?')) {
+            $interfaces = $theClass->getInterfaces();
+            foreach ($interfaces as $interface) {
+                if ($interface->matches($this->interface)) {
+                    $hasInterface = true;
+                    break;
+                }
+            }
+        } else {
+            // Use is_a() to check the entire inheritance chain
+            $hasInterface = is_a($theClass->getFQCN(), $this->interface, true);
+        }
+
+        if (!$hasInterface) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
                 ViolationMessage::selfExplanatory($this->describe($theClass, $because)),
                 $theClass->getFilePath()
             );
             $violations->add($violation);
+        }
+    }
+
+    private function validatePattern(string $pattern): void
+    {
+        $validClassNameCharacters = '[a-zA-Z0-9_\x80-\xff]';
+        $or = '|';
+        $backslash = '\\\\';
+
+        if (0 === preg_match('/^('.$validClassNameCharacters.$or.$backslash.$or.'\*'.$or.'\?)*$/', $pattern)) {
+            throw new InvalidPatternException("'$pattern' is not a valid class or namespace pattern. Regex are not allowed, only * and ? wildcard.");
         }
     }
 }

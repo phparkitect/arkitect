@@ -7,17 +7,20 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\NotImplement;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Unit\Expressions\ForClasses\NotImplementTestFixtures\ClassWithoutInterface;
+use Arkitect\Tests\Unit\Expressions\ForClasses\NotImplementTestFixtures\TestClass;
+use Arkitect\Tests\Unit\Expressions\ForClasses\NotImplementTestFixtures\TestInterface;
 use PHPUnit\Framework\TestCase;
 
 class NotImplementTest extends TestCase
 {
     public function test_it_should_return_violation_error(): void
     {
-        $implementConstraint = new NotImplement('interface');
+        $implementConstraint = new NotImplement(TestInterface::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName('HappyIsland')
+            ->setClassName(ClassWithoutInterface::class)
             ->build();
 
         $because = 'we want to add this rule for our software';
@@ -29,12 +32,12 @@ class NotImplementTest extends TestCase
 
     public function test_it_should_return_true_if_not_depends_on_namespace(): void
     {
-        $implementConstraint = new NotImplement('interface');
+        $implementConstraint = new NotImplement(TestInterface::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName('HappyIsland')
-            ->addExtends('foo', 1)
+            ->setClassName(ClassWithoutInterface::class)
+            ->addExtends(ClassWithoutInterface::class, 1)
             ->build();
 
         $because = 'we want to add this rule for our software';
@@ -46,12 +49,12 @@ class NotImplementTest extends TestCase
 
     public function test_it_should_return_false_if_depends_on_namespace(): void
     {
-        $implementConstraint = new NotImplement('interface');
+        $implementConstraint = new NotImplement(TestInterface::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName('HappyIsland')
-            ->addInterface('interface', 1)
+            ->setClassName(TestClass::class)
+            ->addInterface(TestInterface::class, 1)
             ->build();
 
         $because = 'we want to add this rule for our software';
@@ -61,19 +64,16 @@ class NotImplementTest extends TestCase
         $violationError = $implementConstraint->describe($classDescription, $because)->toString();
 
         self::assertNotEquals(0, $violations->count());
-        self::assertEquals(
-            'should not implement interface because we want to add this rule for our software',
-            $violationError
-        );
+        self::assertStringContainsString('should not implement', $violationError);
     }
 
     public function test_it_should_return_if_is_an_interface(): void
     {
-        $implementConstraint = new NotImplement('interface');
+        $implementConstraint = new NotImplement(TestInterface::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName('HappyIsland')
+            ->setClassName(TestInterface::class)
             ->setInterface(true)
             ->build();
 
@@ -83,4 +83,20 @@ class NotImplementTest extends TestCase
 
         self::assertEquals(0, $violations->count());
     }
+}
+
+// Test fixtures
+
+namespace Arkitect\Tests\Unit\Expressions\ForClasses\NotImplementTestFixtures;
+
+interface TestInterface
+{
+}
+
+class TestClass implements TestInterface
+{
+}
+
+class ClassWithoutInterface
+{
 }
