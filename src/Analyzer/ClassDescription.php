@@ -103,6 +103,11 @@ class ClassDescription
         return $this->FQCN->matches($pattern);
     }
 
+    public function namespaceMatchesExactly(string $namespace): bool
+    {
+        return $this->FQCN->namespace() === $namespace;
+    }
+
     public function namespaceMatchesOneOfTheseNamespaces(array $classesToBeExcluded): bool
     {
         foreach ($classesToBeExcluded as $classToBeExcluded) {
