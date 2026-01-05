@@ -5,6 +5,7 @@
 
 
 1. [Introduction](#introduction)
+1. [Quick Start](#quick-start)
 1. [Installation](#installation)
 1. [Usage](#usage)
 1. [Available rules](#available-rules)
@@ -13,14 +14,32 @@
 
 # Introduction
 
-PHPArkitect helps you to keep your PHP codebase coherent and solid, by allowing you to add architectural constraint checks to your workflow.
-You can express the constraint that you want to enforce, in simple and readable PHP code, for example:
+**PHPArkitect** is a tool to enforce architectural constraints in your PHP codebase. It helps you maintain clean architecture by preventing violations of your design rules during development and in CI/CD pipelines.
+
+## Why PHPArkitect?
+
+As projects grow, maintaining architectural consistency becomes challenging. PHPArkitect helps you:
+
+- **Prevent architectural drift**: Ensure your Domain layer doesn't depend on Infrastructure code
+- **Enforce naming conventions**: Make sure all Controllers end with "Controller", all Services with "Service", etc.
+- **Maintain layered architecture**: Keep your application, domain, and infrastructure layers properly separated
+- **Catch violations early**: Get immediate feedback in your IDE or CI pipeline before code review
+- **Document architecture as code**: Your architectural rules become executable and self-documenting
+
+## Example
+
+You can express architectural constraints in simple, readable PHP code:
 
 ```php
 Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
     ->should(new HaveNameMatching('*Controller'))
     ->because('it\'s a symfony naming convention');
+
+Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
+    ->should(new NotHaveDependencyOutsideNamespace('App\Domain'))
+    ->because('we want to protect our domain from external dependencies');
 ```
 
 Since selecting classes by namespace is very common, there's a convenient shortcut:
@@ -33,6 +52,53 @@ Rule::namespace('App\Controller')
 
 You can also specify multiple namespaces: `Rule::namespace('App\Controller', 'App\Service')`.
 
+# Quick Start
+
+Get started with PHPArkitect in 3 simple steps:
+
+## 1. Install via Composer
+
+```bash
+composer require --dev phparkitect/phparkitect
+```
+
+## 2. Create a configuration file
+
+Create a `phparkitect.php` file in your project root:
+
+```php
+<?php
+declare(strict_types=1);
+
+use Arkitect\ClassSet;
+use Arkitect\CLI\Config;
+use Arkitect\Expression\ForClasses\HaveNameMatching;
+use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
+use Arkitect\Rules\Rule;
+
+return static function (Config $config): void {
+    $classSet = ClassSet::fromDir(__DIR__.'/src');
+
+    $rules = [];
+
+    $rules[] = Rule::allClasses()
+        ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
+        ->should(new HaveNameMatching('*Controller'))
+        ->because('we want uniform naming for controllers');
+
+    $config->add($classSet, ...$rules);
+};
+```
+
+## 3. Run the check
+
+```bash
+vendor/bin/phparkitect check
+```
+
+That's it! PHPArkitect will analyze your code and report any architectural violations.
+
+**Next steps**: Check out the [Available rules](#available-rules) section to explore all the constraints you can enforce.
 # Installation
 
 ## Using Composer
@@ -524,5 +590,15 @@ $rules[] = Rule::allClasses()
 
 # Integrations
 
+## GitHub Actions
+
+You can easily integrate PHPArkitect into your CI/CD pipeline using the official GitHub Action.
+
+For setup instructions and usage examples, please refer to the official documentation:
+
+- [GitHub Action Repository](https://github.com/phparkitect/arkitect-github-actions) - Complete setup guide and examples
+- [GitHub Marketplace](https://github.com/marketplace/actions/phparkitect-arkitect) - Action listing
+
 ## Laravel
+
 If you plan to use Arkitect with Laravel, [smortexa](https://github.com/smortexa) wrote a nice wrapper with some predefined rules for laravel: https://github.com/smortexa/laravel-arkitect
