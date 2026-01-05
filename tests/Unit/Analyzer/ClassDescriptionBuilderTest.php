@@ -125,6 +125,22 @@ class ClassDescriptionBuilderTest extends TestCase
         );
     }
 
+    public function test_it_should_add_traits(): void
+    {
+        $FQCN = 'HappyIsland';
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName($FQCN)
+            ->addTrait('TraitClass', 15)
+            ->build();
+
+        self::assertEquals(
+            [FullyQualifiedClassName::fromString('TraitClass')],
+            $classDescription->getTraits()
+        );
+    }
+
     public function test_it_should_create_interface(): void
     {
         $FQCN = 'HappyIsland';

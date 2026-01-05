@@ -41,6 +41,9 @@ class FileVisitor extends NodeVisitorAbstract
         // handles trait definition like trait MyTrait {}
         $this->handleTraitNode($node);
 
+        // handles trait usage like use MyTrait;
+        $this->handleTraitUseNode($node);
+
         // handles code like $constantValue = StaticClass::constant;
         $this->handleStaticClassConstantNode($node);
 
@@ -303,6 +306,18 @@ class FileVisitor extends NodeVisitorAbstract
 
         $this->classDescriptionBuilder->setClassName($node->namespacedName->toCodeString());
         $this->classDescriptionBuilder->setTrait(true);
+    }
+
+    private function handleTraitUseNode(Node $node): void
+    {
+        if (!($node instanceof Node\Stmt\TraitUse)) {
+            return;
+        }
+
+        foreach ($node->traits as $trait) {
+            $this->classDescriptionBuilder
+                ->addTrait($trait->toString(), $trait->getLine());
+        }
     }
 
     private function handleReturnTypeDependency(Node $node): void
