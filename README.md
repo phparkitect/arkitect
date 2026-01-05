@@ -400,6 +400,36 @@ $rules[] = Rule::allClasses()
     ->because('we want to be sure that all events not reside in wrong layers');
 ```
 
+### Reside in a namespace exactly
+
+This rule checks that classes reside **exactly** in one of the specified namespaces, without matching child namespaces. Unlike `ResideInOneOfTheseNamespaces` which matches recursively, this rule only matches classes directly in the namespace.
+
+```php
+$rules[] = Rule::allClasses()
+    ->that(new HaveNameMatching('*Entity'))
+    ->should(new ResideInOneOfTheseNamespacesExactly('App\Domain\Entity'))
+    ->because('we want entity classes only in the root Entity namespace, not in subdirectories');
+```
+
+For example, with namespace `App\Domain\Entity`:
+- `App\Domain\Entity\User` ✅ matches (same namespace)
+- `App\Domain\Entity\ValueObject\Email` ❌ does not match (child namespace)
+
+### Not reside in a namespace exactly
+
+This rule checks that classes do **not** reside exactly in one of the specified namespaces. Classes in child namespaces are allowed.
+
+```php
+$rules[] = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Legacy'))
+    ->should(new NotResideInOneOfTheseNamespacesExactly('App\Legacy'))
+    ->because('we want to avoid classes directly in the Legacy namespace root');
+```
+
+For example, with namespace `App\Legacy`:
+- `App\Legacy\OldCode` ❌ violation (exact match)
+- `App\Legacy\Module\OldCode` ✅ allowed (child namespace)
+
 You can also define components and ensure that a component:
 - should not depend on any component
 - may depend on specific components
