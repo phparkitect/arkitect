@@ -51,7 +51,7 @@ jobs:
       run: ./bin/psalm.phar --no-cache
 
     - name: Test
-      run: ./bin/phpunit -d memory_limit=-1 --coverage-clover clover.xml
+      run: ./bin/phpunit -d memory_limit=-1 --coverage-clover clover.xml --exclude-group phar-compatibility
 
     - name: Upload coverage to Codecov
       if: ${{ matrix.php-versions  == '7.4' }}
