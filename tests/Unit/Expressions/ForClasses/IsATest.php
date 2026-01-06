@@ -85,6 +85,47 @@ final class IsATest extends TestCase
             $isA->describe($classDescription, '')->toString()
         );
     }
+
+    public function test_it_should_work_with_transitive_inheritance_extends(): void
+    {
+        // DwarfCavendishBanana extends CavendishBanana extends Banana
+        // Should detect that DwarfCavendishBanana is-a Banana (grandparent)
+        $grandparentClass = Banana::class;
+        $isA = new IsA($grandparentClass);
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName(DwarfCavendishBanana::class)
+            ->addExtends(CavendishBanana::class, 10)
+            ->addExtends(Banana::class, 10) // Transitive extends should be included
+            ->build();
+
+        $violations = new Violations();
+        $isA->evaluate($classDescription, $violations, '');
+
+        self::assertEquals(0, $violations->count());
+    }
+
+    public function test_it_should_work_with_transitive_inheritance_interface(): void
+    {
+        // DwarfCavendishBanana extends CavendishBanana extends Banana implements FruitInterface
+        // Should detect that DwarfCavendishBanana is-a FruitInterface (implemented by grandparent)
+        $interface = FruitInterface::class;
+        $isA = new IsA($interface);
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName(DwarfCavendishBanana::class)
+            ->addExtends(CavendishBanana::class, 10)
+            ->addExtends(Banana::class, 10) // Banana is the grandparent
+            ->addInterface($interface, 10) // FruitInterface is transitively inherited
+            ->build();
+
+        $violations = new Violations();
+        $isA->evaluate($classDescription, $violations, '');
+
+        self::assertEquals(0, $violations->count());
+    }
 }
 
 namespace Arkitect\Tests\Unit\Expressions\ForClasses\IsOneOfTest\Animal;
