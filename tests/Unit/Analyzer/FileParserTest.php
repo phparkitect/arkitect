@@ -37,7 +37,7 @@ class FileParserTest extends TestCase
             $fileVisitor->reveal(),
             $nameResolver->reveal(),
             $docblockResolver->reveal(),
-            TargetPhpVersion::create('7.4')
+            TargetPhpVersion::create('8.0')
         );
 
         $content = '<?php
@@ -67,7 +67,7 @@ class FileParserTest extends TestCase
             $fileVisitor->reveal(),
             $nameResolver->reveal(),
             $docblockResolver->reveal(),
-            TargetPhpVersion::create('7.4')
+            TargetPhpVersion::create('8.0')
         );
 
         $content = '<?php

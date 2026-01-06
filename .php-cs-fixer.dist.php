@@ -12,7 +12,7 @@ return (new PhpCsFixer\Config())
         '@PER-CS' => true,
         '@Symfony' => true,
         '@Symfony:risky' => true,
-        '@PHP71Migration:risky' => true,
+        '@PHP80Migration:risky' => true,
         '@PSR2' => true,
         '@DoctrineAnnotation' => true,
         'array_syntax' => ['syntax' => 'short'],
@@ -24,7 +24,7 @@ return (new PhpCsFixer\Config())
         'modernize_types_casting' => true, // Replaces intval, floatval, doubleval, strval and boolval function calls with according type casting operator.
         'multiline_whitespace_before_semicolons' => true, // Forbid multi-line whitespace before the closing semicolon or move the semicolon to the new line for chained calls.
         'no_unreachable_default_argument_value' => true, // In function arguments there must not be arguments with default values before non-default ones.
-        'no_superfluous_phpdoc_tags' => ['allow_mixed' => true], // To avoid problems of compatibility with the old php-cs-fixer version used on PHP 7.3
+        'no_superfluous_phpdoc_tags' => ['allow_mixed' => true],
         'no_useless_else' => true,
         'no_useless_return' => true,
         'ordered_class_elements' => true, // Orders the elements of classes/interfaces/traits.
