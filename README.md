@@ -5,6 +5,7 @@
 
 
 1. [Introduction](#introduction)
+1. [Quick Start](#quick-start)
 1. [Installation](#installation)
 1. [Usage](#usage)
 1. [Available rules](#available-rules)
@@ -13,15 +14,91 @@
 
 # Introduction
 
-PHPArkitect helps you to keep your PHP codebase coherent and solid, by permitting to add some architectural constraint check to your workflow.
-You can express the constraint that you want to enforce, in simple and readable PHP code, for example:
+**PHPArkitect** is a tool to enforce architectural constraints in your PHP codebase. It helps you maintain clean architecture by preventing violations of your design rules during development and in CI/CD pipelines.
+
+## Why PHPArkitect?
+
+As projects grow, maintaining architectural consistency becomes challenging. PHPArkitect helps you:
+
+- **Prevent architectural drift**: Ensure your Domain layer doesn't depend on Infrastructure code
+- **Enforce naming conventions**: Make sure all Controllers end with "Controller", all Services with "Service", etc.
+- **Maintain layered architecture**: Keep your application, domain, and infrastructure layers properly separated
+- **Catch violations early**: Get immediate feedback in your IDE or CI pipeline before code review
+- **Document architecture as code**: Your architectural rules become executable and self-documenting
+
+## Example
+
+You can express architectural constraints in simple, readable PHP code:
 
 ```php
 Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
     ->should(new HaveNameMatching('*Controller'))
     ->because('it\'s a symfony naming convention');
+
+Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
+    ->should(new NotHaveDependencyOutsideNamespace('App\Domain'))
+    ->because('we want to protect our domain from external dependencies');
 ```
+
+Since selecting classes by namespace is very common, there's a convenient shortcut:
+
+```php
+Rule::namespace('App\Controller')
+    ->should(new HaveNameMatching('*Controller'))
+    ->because('it\'s a symfony naming convention');
+```
+
+You can also specify multiple namespaces: `Rule::namespace('App\Controller', 'App\Service')`.
+
+# Quick Start
+
+Get started with PHPArkitect in 3 simple steps:
+
+## 1. Install via Composer
+
+```bash
+composer require --dev phparkitect/phparkitect
+```
+
+## 2. Create a configuration file
+
+Create a `phparkitect.php` file in your project root:
+
+```php
+<?php
+declare(strict_types=1);
+
+use Arkitect\ClassSet;
+use Arkitect\CLI\Config;
+use Arkitect\Expression\ForClasses\HaveNameMatching;
+use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
+use Arkitect\Rules\Rule;
+
+return static function (Config $config): void {
+    $classSet = ClassSet::fromDir(__DIR__.'/src');
+
+    $rules = [];
+
+    $rules[] = Rule::allClasses()
+        ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
+        ->should(new HaveNameMatching('*Controller'))
+        ->because('we want uniform naming for controllers');
+
+    $config->add($classSet, ...$rules);
+};
+```
+
+## 3. Run the check
+
+```bash
+vendor/bin/phparkitect check
+```
+
+That's it! PHPArkitect will analyze your code and report any architectural violations.
+
+**Next steps**: Check out the [Available rules](#available-rules) section to explore all the constraints you can enforce.
 # Installation
 
 ## Using Composer
@@ -51,7 +128,7 @@ To use this tool you need to launch a command via Bash:
 phparkitect check
 ```
 
-With this command `phparkitect` will search all rules in the root of your project the default config file called `phparkitect.php`.
+With this command `phparkitect` will search for the default config file called `phparkitect.php` in the root of your project.
 You can also specify your configuration file using `--config` option like this:
 
 ```
@@ -77,7 +154,7 @@ phparkitect check --generate-baseline=my-baseline.json
 
 It will produce a json file with the current list of violations.  
 
-If is present a baseline file with the default name will be used automatically.
+If a baseline file with the default name is present, it will be used automatically.
 
 To use a different baseline file, run the `check` command with the `use-baseline` parameter as follows:
 
@@ -139,7 +216,7 @@ return static function (Config $config): void {
     $rules[] = Rule::allClasses()
         ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
         ->should(new NotHaveDependencyOutsideNamespace('App\Domain'))
-        ->because('we want protect our domain');
+        ->because('we want to protect our domain');
 
     $config
         ->add($mvcClassSet, ...$rules);
@@ -195,9 +272,9 @@ $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
     ->should(new Extend('App\Controller\AbstractController'))
     ->because('we want to be sure that all controllers extend AbstractController');
-
-You can add multiple parameters, the violation will happen when none of them match
 ```
+
+*Note: You can add multiple parameters; the violation will happen when none of them match.*
 
 ### Has an attribute (requires PHP >= 8.0)
 
@@ -217,6 +294,17 @@ $rules[] = Rule::allClasses()
     ->because('we want uniform naming for services');
 ```
 
+### Match one of these names
+
+```php
+$rules[] = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
+    ->should(new MatchOneOfTheseNames(['*Controller', '*Action']))
+    ->because('we want controllers to match one of these naming patterns');
+```
+
+*Note: Similar to HaveNameMatching, but accepts an array of patterns. The rule passes if the class name matches any of the provided patterns.*
+
 ### Implements an interface
 
 ```php
@@ -234,6 +322,17 @@ $rules[] = Rule::allClasses()
     ->should(new NotImplement('ContainerAwareInterface'))
     ->because('all public controllers should not be container aware');
 ```
+
+### Is a (inherits from or implements)
+
+```php
+$rules[] = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Domain\Event'))
+    ->should(new IsA('App\Domain\DomainEvent'))
+    ->because('all events should inherit from or implement DomainEvent');
+```
+
+*Note: This rule checks if a class inherits from or implements a given class/interface using PHP's `is_a()` function.*
 
 ### Is abstract
 
@@ -359,9 +458,9 @@ $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller\Admin'))
     ->should(new NotExtend('App\Controller\AbstractController'))
     ->because('we want to be sure that all admin controllers not extend AbstractController for security reasons');
-
-You can add multiple parameters, the violation will happen when one of them match
 ```
+
+*Note: You can add multiple parameters; the violation will happen when one of them matches.*
 
 ### Don't have dependency outside a namespace
 
@@ -369,7 +468,7 @@ You can add multiple parameters, the violation will happen when one of them matc
 $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
     ->should(new NotHaveDependencyOutsideNamespace('App\Domain', ['Ramsey\Uuid'], true))
-    ->because('we want protect our domain except for Ramsey\Uuid');
+    ->because('we want to protect our domain except for Ramsey\Uuid');
 ```
 
 ### Not have a name matching a pattern
@@ -491,5 +590,15 @@ $rules[] = Rule::allClasses()
 
 # Integrations
 
+## GitHub Actions
+
+You can easily integrate PHPArkitect into your CI/CD pipeline using the official GitHub Action.
+
+For setup instructions and usage examples, please refer to the official documentation:
+
+- [GitHub Action Repository](https://github.com/phparkitect/arkitect-github-actions) - Complete setup guide and examples
+- [GitHub Marketplace](https://github.com/marketplace/actions/phparkitect-arkitect) - Action listing
+
 ## Laravel
+
 If you plan to use Arkitect with Laravel, [smortexa](https://github.com/smortexa) wrote a nice wrapper with some predefined rules for laravel: https://github.com/smortexa/laravel-arkitect

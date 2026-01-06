@@ -19,15 +19,17 @@ class AndThatShould implements AndThatShouldParser
 
     public function andThat(Expression $expression): AndThatShouldParser
     {
-        $this->ruleBuilder->addThat($expression);
+        $ruleBuilder = clone $this->ruleBuilder;
+        $ruleBuilder->addThat($expression);
 
-        return $this;
+        return new self($ruleBuilder);
     }
 
     public function should(Expression $expression): BecauseParser
     {
-        $this->ruleBuilder->addShould($expression);
+        $ruleBuilder = clone $this->ruleBuilder;
+        $ruleBuilder->addShould($expression);
 
-        return new Because($this->ruleBuilder);
+        return new Because($ruleBuilder);
     }
 }
