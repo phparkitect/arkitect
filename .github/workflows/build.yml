@@ -115,8 +115,34 @@ jobs:
       - name: "Smoke test phar"
         run: php ./phparkitect-${{ github.sha }}.phar
 
+  test-phar-compatibility:
+    needs: phar
+    runs-on: "ubuntu-22.04"
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+          tools: composer:v2.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install test dependencies
+        run: composer install --prefer-dist
+
+      - name: "Download phar ./phparkitect-${{ github.sha }}.phar"
+        uses: actions/download-artifact@v7
+        with:
+          name: phar-artifact
+
+      - name: "Run PHAR compatibility tests"
+        run: ./bin/phpunit --group phar-compatibility
+        continue-on-error: false
+
   publish_phar:
-    needs: [build, smoke-test-phar]
+    needs: [build, smoke-test-phar, test-phar-compatibility]
     runs-on: "ubuntu-22.04"
     if: github.event_name == 'release'
     permissions:
@@ -156,7 +182,7 @@ jobs:
             phparkitect.phar.asc
 
   publish_docker_images:
-    needs: [build, smoke-test-phar]
+    needs: [build, smoke-test-phar, test-phar-compatibility]
     runs-on: "ubuntu-22.04"
 
     if: github.ref == 'refs/heads/main' || github.event_name == 'release'

@@ -31,29 +31,14 @@ final class IsA implements Expression
 
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because = ''): void
     {
-        // Check if the class extends the required class (using parsed AST info)
-        $extends = $theClass->getExtends();
-        foreach ($extends as $extend) {
-            if ($extend->matches($this->allowedFqcn)) {
-                return;
-            }
+        if (!is_a($theClass->getFQCN(), $this->allowedFqcn, true)) {
+            $violation = Violation::create(
+                $theClass->getFQCN(),
+                ViolationMessage::selfExplanatory($this->describe($theClass, $because)),
+                $theClass->getFilePath()
+            );
+
+            $violations->add($violation);
         }
-
-        // Check if the class implements the required interface (using parsed AST info)
-        $interfaces = $theClass->getInterfaces();
-        foreach ($interfaces as $interface) {
-            if ($interface->matches($this->allowedFqcn)) {
-                return;
-            }
-        }
-
-        // No match found - create violation
-        $violation = Violation::create(
-            $theClass->getFQCN(),
-            ViolationMessage::selfExplanatory($this->describe($theClass, $because)),
-            $theClass->getFilePath()
-        );
-
-        $violations->add($violation);
     }
 }

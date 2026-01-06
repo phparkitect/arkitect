@@ -18,6 +18,9 @@ use PHPUnit\Framework\TestCase;
  *
  * The solution: IsA should use the parsed AST information from ClassDescription
  * (getExtends() and getInterfaces()) instead of is_a(), like Extend and Implement do.
+ *
+ * @group autoloader-dependent
+ * @group phar-compatibility
  */
 final class IsAWithoutAutoloadTest extends TestCase
 {
