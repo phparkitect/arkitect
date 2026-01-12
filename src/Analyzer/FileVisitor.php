@@ -250,6 +250,10 @@ class FileVisitor extends NodeVisitorAbstract
             return;
         }
 
+        if (FullyQualifiedClassName::isNotAValidFqcn($type->toString())) {
+            return;
+        }
+
         $this->classDescriptionBuilder
             ->addDependency(new ClassDependency($type->toString(), $node->getLine()));
     }
@@ -317,6 +321,10 @@ class FileVisitor extends NodeVisitorAbstract
             return;
         }
 
+        if (FullyQualifiedClassName::isNotAValidFqcn($returnType->toString())) {
+            return;
+        }
+
         $this->classDescriptionBuilder
             ->addDependency(new ClassDependency($returnType->toString(), $returnType->getLine()));
     }
@@ -333,6 +341,10 @@ class FileVisitor extends NodeVisitorAbstract
             return;
         }
 
+        if (FullyQualifiedClassName::isNotAValidFqcn($nodeName->toString())) {
+            return;
+        }
+
         $this->classDescriptionBuilder
             ->addAttribute($node->name->toString(), $node->getLine());
     }
@@ -346,6 +358,10 @@ class FileVisitor extends NodeVisitorAbstract
         $type = $node->type instanceof NullableType ? $node->type->type : $node->type;
 
         if (!($type instanceof Node\Name\FullyQualified)) {
+            return;
+        }
+
+        if (FullyQualifiedClassName::isNotAValidFqcn($type->toString())) {
             return;
         }
 
