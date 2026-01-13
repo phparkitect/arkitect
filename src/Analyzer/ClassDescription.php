@@ -57,7 +57,7 @@ class ClassDescription
         bool $enum,
         array $docBlock,
         array $attributes,
-        string $filePath
+        string $filePath,
     ) {
         $this->FQCN = $FQCN;
         $this->filePath = $filePath;
@@ -201,9 +201,7 @@ class ClassDescription
     {
         return array_reduce(
             $this->attributes,
-            static function (bool $carry, FullyQualifiedClassName $attribute) use ($pattern): bool {
-                return $carry || $attribute->matches($pattern);
-            },
+            static fn (bool $carry, FullyQualifiedClassName $attribute): bool => $carry || $attribute->matches($pattern),
             false
         );
     }
