@@ -467,9 +467,11 @@ $rules[] = Rule::allClasses()
 ```php
 $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
-    ->should(new NotHaveDependencyOutsideNamespace('App\Domain', ['Ramsey\Uuid'], true))
+    ->should(new NotHaveDependencyOutsideNamespace('App\Domain', ['Ramsey\Uuid']))
     ->because('we want to protect our domain except for Ramsey\Uuid');
 ```
+
+Note: PHP core classes (e.g., `DateTime`, `Exception`, `PDO`) are automatically excluded from dependency checks.
 
 ### Not have a name matching a pattern
 

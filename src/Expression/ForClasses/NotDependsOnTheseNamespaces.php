@@ -39,10 +39,6 @@ class NotDependsOnTheseNamespaces implements Expression
 
         /** @var ClassDependency $dependency */
         foreach ($dependencies as $dependency) {
-            if ('' === $dependency->getFQCN()->namespace()) {
-                continue; // skip root namespace
-            }
-
             if ($dependency->matchesOneOf(...$this->exclude)) {
                 continue; // skip excluded namespaces
             }
