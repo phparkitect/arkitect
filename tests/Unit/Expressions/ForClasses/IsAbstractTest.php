@@ -95,7 +95,7 @@ class IsAbstractTest extends TestCase
         self::assertFalse($isNotAbstract->appliesTo($classDescription));
     }
 
-    public function test_final_classes_can_not_be_abstract_and_should_be_ignored(): void
+    public function test_final_classes_should_not_be_ignored(): void
     {
         $isAbstract = new IsAbstract();
         $isNotAbstract = new IsNotAbstract();
@@ -106,7 +106,7 @@ class IsAbstractTest extends TestCase
             ->setFinal(true)
             ->build();
 
-        self::assertFalse($isAbstract->appliesTo($classDescription));
-        self::assertFalse($isNotAbstract->appliesTo($classDescription));
+        self::assertTrue($isAbstract->appliesTo($classDescription));
+        self::assertTrue($isNotAbstract->appliesTo($classDescription));
     }
 }
