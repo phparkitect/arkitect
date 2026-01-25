@@ -44,7 +44,7 @@ class Runner
         Parser $fileParser,
         Violations $violations,
         ParsingErrors $parsingErrors,
-        bool $stopOnFailure,
+        bool $stopOnFailure
     ): void {
         /** @var SplFileInfo $file */
         foreach ($classSetRule->getClassSet() as $file) {
