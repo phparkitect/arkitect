@@ -69,7 +69,7 @@ class DocblockTypesResolver extends NodeVisitorAbstract
 
     private function resolvePropertyTypes(Node $node): void
     {
-        if (!($node instanceof Stmt\Property)) {
+        if (!$node instanceof Stmt\Property) {
             return;
         }
 

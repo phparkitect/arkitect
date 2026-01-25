@@ -269,7 +269,7 @@ class CheckCommandTest extends TestCase
         bool $skipBaseline = false,
         bool $ignoreBaselineNumbers = false,
         string $format = 'text',
-        ?string $autoloadFilePath = null
+        ?string $autoloadFilePath = null,
     ): ApplicationTester {
         $input = ['check'];
 

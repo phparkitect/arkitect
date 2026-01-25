@@ -40,7 +40,7 @@ class Implement implements Expression
 
         $interface = $this->interface;
         $interfaces = $theClass->getInterfaces();
-        $implements = function (FullyQualifiedClassName $FQCN) use ($interface): bool {
+        $implements = static function (FullyQualifiedClassName $FQCN) use ($interface): bool {
             return $FQCN->matches($interface);
         };
 
