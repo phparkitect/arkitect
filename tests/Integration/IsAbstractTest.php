@@ -126,6 +126,15 @@ class IsAbstractTest extends TestCase
 
                     // Normal class - should NOT generate violation (normal is non-abstract)
                     'NormalService.php' => '<?php namespace App\Service; class NormalService {} ',
+
+                    // Interface - should NOT generate violation (isAbstract() returns false)
+                    'ServiceInterface.php' => '<?php namespace App\Service; interface ServiceInterface {} ',
+
+                    // Trait - should NOT generate violation (isAbstract() returns false)
+                    'ServiceTrait.php' => '<?php namespace App\Service; trait ServiceTrait {} ',
+
+                    // Enum - should NOT generate violation (isAbstract() returns false)
+                    'ServiceEnum.php' => '<?php namespace App\Service; enum ServiceEnum {} ',
                 ],
             ],
         ];
@@ -143,8 +152,10 @@ class IsAbstractTest extends TestCase
         $runner->run(vfsStream::setup('root', null, $structure)->url(), $rule);
 
         // Should find violation only for: AbstractService
-        // Should NOT violate: FinalService, NormalService (both are non-abstract)
-        // This test verifies that final classes are correctly recognized as non-abstract
+        // Should NOT violate: FinalService, NormalService, ServiceInterface, ServiceTrait, ServiceEnum
+        // This test verifies that:
+        // 1. Final classes are correctly recognized as non-abstract
+        // 2. Interface/trait/enum don't trigger violations (isAbstract() = false for them)
         self::assertCount(1, $runner->getViolations());
         self::assertEquals('App\Service\AbstractService', $runner->getViolations()->get(0)->getFqcn());
         self::assertCount(0, $runner->getParsingErrors());
