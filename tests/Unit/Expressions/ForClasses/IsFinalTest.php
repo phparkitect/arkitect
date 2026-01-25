@@ -45,7 +45,7 @@ class IsFinalTest extends TestCase
         self::assertEquals(0, $violations->count());
     }
 
-    public function test_abstract_classes_can_not_be_final_and_should_be_ignored(): void
+    public function test_abstract_classes_can_be_checked_for_final(): void
     {
         $isFinal = new IsFinal();
         $isNotFinal = new IsNotFinal();
@@ -56,8 +56,10 @@ class IsFinalTest extends TestCase
             ->setAbstract(true)
             ->build();
 
-        self::assertFalse($isFinal->appliesTo($classDescription));
-        self::assertFalse($isNotFinal->appliesTo($classDescription));
+        // Abstract classes should be applicable for final checks
+        // (even though they can never be final by definition)
+        self::assertTrue($isFinal->appliesTo($classDescription));
+        self::assertTrue($isNotFinal->appliesTo($classDescription));
     }
 
     public function test_interfaces_can_not_be_final_and_should_be_ignored(): void
