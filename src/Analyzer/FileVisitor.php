@@ -109,7 +109,7 @@ class FileVisitor extends NodeVisitorAbstract
 
     private function handleClassNode(Node $node): void
     {
-        if (!$node instanceof Node\Stmt\Class_) {
+        if (!($node instanceof Node\Stmt\Class_)) {
             return;
         }
 
@@ -140,7 +140,7 @@ class FileVisitor extends NodeVisitorAbstract
 
     private function handleAnonClassNode(Node $node): void
     {
-        if (!$node instanceof Node\Stmt\Class_) {
+        if (!($node instanceof Node\Stmt\Class_)) {
             return;
         }
 
@@ -161,7 +161,7 @@ class FileVisitor extends NodeVisitorAbstract
 
     private function handleEnumNode(Node $node): void
     {
-        if (!$node instanceof Node\Stmt\Enum_) {
+        if (!($node instanceof Node\Stmt\Enum_)) {
             return;
         }
 
@@ -180,11 +180,11 @@ class FileVisitor extends NodeVisitorAbstract
 
     private function handleStaticClassConstantNode(Node $node): void
     {
-        if (!$node instanceof Node\Expr\ClassConstFetch) {
+        if (!($node instanceof Node\Expr\ClassConstFetch)) {
             return;
         }
 
-        if (!$node->class instanceof Node\Name\FullyQualified) {
+        if (!($node->class instanceof Node\Name\FullyQualified)) {
             return;
         }
 
@@ -194,11 +194,11 @@ class FileVisitor extends NodeVisitorAbstract
 
     private function handleStaticClassCallsNode(Node $node): void
     {
-        if (!$node instanceof Node\Expr\StaticCall) {
+        if (!($node instanceof Node\Expr\StaticCall)) {
             return;
         }
 
-        if (!$node->class instanceof Node\Name\FullyQualified) {
+        if (!($node->class instanceof Node\Name\FullyQualified)) {
             return;
         }
 
@@ -208,11 +208,11 @@ class FileVisitor extends NodeVisitorAbstract
 
     private function handleInstanceOf(Node $node): void
     {
-        if (!$node instanceof Node\Expr\Instanceof_) {
+        if (!($node instanceof Node\Expr\Instanceof_)) {
             return;
         }
 
-        if (!$node->class instanceof Node\Name\FullyQualified) {
+        if (!($node->class instanceof Node\Name\FullyQualified)) {
             return;
         }
 
@@ -222,11 +222,11 @@ class FileVisitor extends NodeVisitorAbstract
 
     private function handleNewExpression(Node $node): void
     {
-        if (!$node instanceof Node\Expr\New_) {
+        if (!($node instanceof Node\Expr\New_)) {
             return;
         }
 
-        if (!$node->class instanceof Node\Name\FullyQualified) {
+        if (!($node->class instanceof Node\Name\FullyQualified)) {
             return;
         }
 
@@ -236,7 +236,7 @@ class FileVisitor extends NodeVisitorAbstract
 
     private function handleTypedProperty(Node $node): void
     {
-        if (!$node instanceof Node\Stmt\Property) {
+        if (!($node instanceof Node\Stmt\Property)) {
             return;
         }
 
@@ -246,7 +246,7 @@ class FileVisitor extends NodeVisitorAbstract
 
         $type = $node->type instanceof NullableType ? $node->type->type : $node->type;
 
-        if (!$type instanceof Node\Name\FullyQualified) {
+        if (!($type instanceof Node\Name\FullyQualified)) {
             return;
         }
 
@@ -274,7 +274,7 @@ class FileVisitor extends NodeVisitorAbstract
 
     private function handleInterfaceNode(Node $node): void
     {
-        if (!$node instanceof Node\Stmt\Interface_) {
+        if (!($node instanceof Node\Stmt\Interface_)) {
             return;
         }
 
@@ -293,7 +293,7 @@ class FileVisitor extends NodeVisitorAbstract
 
     private function handleTraitNode(Node $node): void
     {
-        if (!$node instanceof Node\Stmt\Trait_) {
+        if (!($node instanceof Node\Stmt\Trait_)) {
             return;
         }
 
@@ -307,13 +307,13 @@ class FileVisitor extends NodeVisitorAbstract
 
     private function handleReturnTypeDependency(Node $node): void
     {
-        if (!$node instanceof Node\Stmt\ClassMethod) {
+        if (!($node instanceof Node\Stmt\ClassMethod)) {
             return;
         }
 
         $returnType = $node->returnType;
 
-        if (!$returnType instanceof Node\Name\FullyQualified) {
+        if (!($returnType instanceof Node\Name\FullyQualified)) {
             return;
         }
 
@@ -323,13 +323,13 @@ class FileVisitor extends NodeVisitorAbstract
 
     private function handleAttributeNode(Node $node): void
     {
-        if (!$node instanceof Node\Attribute) {
+        if (!($node instanceof Node\Attribute)) {
             return;
         }
 
         $nodeName = $node->name;
 
-        if (!$nodeName instanceof Node\Name\FullyQualified) {
+        if (!($nodeName instanceof Node\Name\FullyQualified)) {
             return;
         }
 
@@ -345,7 +345,7 @@ class FileVisitor extends NodeVisitorAbstract
 
         $type = $node->type instanceof NullableType ? $node->type->type : $node->type;
 
-        if (!$type instanceof Node\Name\FullyQualified) {
+        if (!($type instanceof Node\Name\FullyQualified)) {
             return;
         }
 
@@ -355,7 +355,7 @@ class FileVisitor extends NodeVisitorAbstract
 
     private function handlePropertyHookNode(Node $node): void
     {
-        if (!$node instanceof Node\PropertyHook) {
+        if (!($node instanceof Node\PropertyHook)) {
             return;
         }
 

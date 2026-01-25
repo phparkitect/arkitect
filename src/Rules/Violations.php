@@ -27,7 +27,7 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
 
         $instance = new self();
 
-        $instance->violations = array_map(static function (array $json): Violation {
+        $instance->violations = array_map(function (array $json): Violation {
             return Violation::fromJson($json);
         }, $json['violations']);
 
@@ -67,7 +67,7 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
 
     public function groupedByFqcn(): array
     {
-        return array_reduce($this->violations, static function (array $accumulator, Violation $element) {
+        return array_reduce($this->violations, function (array $accumulator, Violation $element) {
             $accumulator[$element->getFqcn()][] = $element;
 
             return $accumulator;
