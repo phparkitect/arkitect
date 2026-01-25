@@ -72,6 +72,47 @@ class IsAbstractTest extends TestCase
         self::assertEquals('App\MyAbstract', $runner->getViolations()->get(0)->getFqcn());
     }
 
+    public function test_is_not_abstract_in_that_should_include_final_classes(): void
+    {
+        $structure = [
+            'App' => [
+                'Test' => [
+                    // Final class with correct name - should pass
+                    'GoodEndToEndTest.php' => '<?php namespace App\Test; final class GoodEndToEndTest {} ',
+
+                    // Abstract class - should be filtered out by IsNotAbstract
+                    'AbstractTestCase.php' => '<?php namespace App\Test; abstract class AbstractTestCase {} ',
+
+                    // Final class with wrong name - should generate violation
+                    'BadE2ETest.php' => '<?php namespace App\Test; final class BadE2ETest {} ',
+
+                    // Normal class with wrong name - should also generate violation
+                    'AnotherBadTest.php' => '<?php namespace App\Test; class AnotherBadTest {} ',
+                ],
+            ],
+        ];
+
+        $runner = TestRunner::create('8.4');
+
+        // This replicates the use case from PR 560:
+        // Filter for non-abstract classes (including final), then check naming convention
+        $rule = Rule::allClasses()
+            ->that(new ResideInOneOfTheseNamespaces('App\Test'))
+            ->andThat(new IsNotAbstract())
+            ->should(new HaveNameMatching('*EndToEndTest'))
+            ->because('all E2E tests must follow naming convention');
+
+        $runner->run(vfsStream::setup('root', null, $structure)->url(), $rule);
+
+        // Should find 2 violations: BadE2ETest and AnotherBadTest
+        // AbstractTestCase should be filtered out by IsNotAbstract
+        // GoodEndToEndTest should pass
+        self::assertCount(2, $runner->getViolations());
+        self::assertEquals('App\Test\AnotherBadTest', $runner->getViolations()->get(0)->getFqcn());
+        self::assertEquals('App\Test\BadE2ETest', $runner->getViolations()->get(1)->getFqcn());
+        self::assertCount(0, $runner->getParsingErrors());
+    }
+
     public function test_it_can_check_multiple_class_properties(): void
     {
         $structure = [
