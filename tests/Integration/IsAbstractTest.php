@@ -113,6 +113,43 @@ class IsAbstractTest extends TestCase
         self::assertCount(0, $runner->getParsingErrors());
     }
 
+    public function test_is_not_abstract_in_should_validates_final_classes_correctly(): void
+    {
+        $structure = [
+            'App' => [
+                'Service' => [
+                    // Abstract class - should generate violation
+                    'AbstractService.php' => '<?php namespace App\Service; abstract class AbstractService {} ',
+
+                    // Final class - should NOT generate violation (final is non-abstract)
+                    'FinalService.php' => '<?php namespace App\Service; final class FinalService {} ',
+
+                    // Normal class - should NOT generate violation (normal is non-abstract)
+                    'NormalService.php' => '<?php namespace App\Service; class NormalService {} ',
+                ],
+            ],
+        ];
+
+        $runner = TestRunner::create('8.4');
+
+        // When IsNotAbstract is used in should() (not that()), it validates ALL classes
+        // In PHP, isAbstract() returns true only for classes with 'abstract' keyword
+        // It does NOT return true for interface/trait/enum
+        $rule = Rule::allClasses()
+            ->that(new ResideInOneOfTheseNamespaces('App\Service'))
+            ->should(new IsNotAbstract())
+            ->because('services should be concrete implementations');
+
+        $runner->run(vfsStream::setup('root', null, $structure)->url(), $rule);
+
+        // Should find violation only for: AbstractService
+        // Should NOT violate: FinalService, NormalService (both are non-abstract)
+        // This test verifies that final classes are correctly recognized as non-abstract
+        self::assertCount(1, $runner->getViolations());
+        self::assertEquals('App\Service\AbstractService', $runner->getViolations()->get(0)->getFqcn());
+        self::assertCount(0, $runner->getParsingErrors());
+    }
+
     public function test_it_can_check_multiple_class_properties(): void
     {
         $structure = [
