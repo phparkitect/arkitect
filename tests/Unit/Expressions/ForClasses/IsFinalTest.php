@@ -45,7 +45,7 @@ class IsFinalTest extends TestCase
         self::assertEquals(0, $violations->count());
     }
 
-    public function test_abstract_classes_can_not_be_final_and_should_be_ignored(): void
+    public function test_abstract_classes_can_be_checked_for_final(): void
     {
         $isFinal = new IsFinal();
         $isNotFinal = new IsNotFinal();
@@ -56,8 +56,20 @@ class IsFinalTest extends TestCase
             ->setAbstract(true)
             ->build();
 
-        self::assertFalse($isFinal->appliesTo($classDescription));
-        self::assertFalse($isNotFinal->appliesTo($classDescription));
+        // Abstract classes should be applicable for final checks
+        // appliesTo() returns true (makes sense to check if abstract is final)
+        self::assertTrue($isFinal->appliesTo($classDescription));
+        self::assertTrue($isNotFinal->appliesTo($classDescription));
+
+        // When evaluated, IsFinal generates violation (abstract is not final)
+        $violations = new Violations();
+        $isFinal->evaluate($classDescription, $violations, 'test');
+        self::assertEquals(1, $violations->count(), 'IsFinal should generate violation for abstract class');
+
+        // When evaluated, IsNotFinal does NOT generate violation (abstract is not final)
+        $violations = new Violations();
+        $isNotFinal->evaluate($classDescription, $violations, 'test');
+        self::assertEquals(0, $violations->count(), 'IsNotFinal should not generate violation for abstract class');
     }
 
     public function test_interfaces_can_not_be_final_and_should_be_ignored(): void

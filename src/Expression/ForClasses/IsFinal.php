@@ -20,7 +20,7 @@ class IsFinal implements Expression
 
     public function appliesTo(ClassDescription $theClass): bool
     {
-        return !($theClass->isInterface() || $theClass->isTrait() || $theClass->isEnum() || $theClass->isAbstract());
+        return !($theClass->isInterface() || $theClass->isTrait() || $theClass->isEnum());
     }
 
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
