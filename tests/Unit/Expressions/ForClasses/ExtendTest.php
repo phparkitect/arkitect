@@ -109,4 +109,55 @@ class ExtendTest extends TestCase
 
         self::assertEquals(0, $violations->count());
     }
+
+    public function test_traits_can_not_extend_and_should_be_ignored(): void
+    {
+        $extend = new Extend('My\BaseClass');
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland\MyTrait')
+            ->setTrait(true)
+            ->build();
+
+        self::assertFalse($extend->appliesTo($classDescription));
+    }
+
+    public function test_enums_can_not_extend_and_should_be_ignored(): void
+    {
+        $extend = new Extend('My\BaseClass');
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland\MyEnum')
+            ->setEnum(true)
+            ->build();
+
+        self::assertFalse($extend->appliesTo($classDescription));
+    }
+
+    public function test_classes_should_be_checked_for_extend(): void
+    {
+        $extend = new Extend('My\BaseClass');
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland\MyClass')
+            ->build();
+
+        self::assertTrue($extend->appliesTo($classDescription));
+    }
+
+    public function test_interfaces_should_be_checked_for_extend(): void
+    {
+        $extend = new Extend('My\BaseInterface');
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland\MyInterface')
+            ->setInterface(true)
+            ->build();
+
+        self::assertTrue($extend->appliesTo($classDescription));
+    }
 }

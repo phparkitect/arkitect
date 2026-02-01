@@ -68,4 +68,55 @@ class NotExtendTest extends TestCase
         self::assertEquals(1, $violations->count());
         self::assertEquals('should not extend one of these classes: My\FirstExtend, My\SecondExtend because we want to add this rule for our software', $violationError);
     }
+
+    public function test_traits_can_not_extend_and_should_be_ignored(): void
+    {
+        $notExtend = new NotExtend('My\BaseClass');
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland\MyTrait')
+            ->setTrait(true)
+            ->build();
+
+        self::assertFalse($notExtend->appliesTo($classDescription));
+    }
+
+    public function test_enums_can_not_extend_and_should_be_ignored(): void
+    {
+        $notExtend = new NotExtend('My\BaseClass');
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland\MyEnum')
+            ->setEnum(true)
+            ->build();
+
+        self::assertFalse($notExtend->appliesTo($classDescription));
+    }
+
+    public function test_classes_should_be_checked_for_not_extend(): void
+    {
+        $notExtend = new NotExtend('My\BaseClass');
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland\MyClass')
+            ->build();
+
+        self::assertTrue($notExtend->appliesTo($classDescription));
+    }
+
+    public function test_interfaces_should_be_checked_for_not_extend(): void
+    {
+        $notExtend = new NotExtend('My\BaseInterface');
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland\MyInterface')
+            ->setInterface(true)
+            ->build();
+
+        self::assertTrue($notExtend->appliesTo($classDescription));
+    }
 }

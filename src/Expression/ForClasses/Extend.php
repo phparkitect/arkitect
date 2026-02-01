@@ -28,6 +28,11 @@ class Extend implements Expression
         return new Description("should extend one of these classes: {$desc}", $because);
     }
 
+    public function appliesTo(ClassDescription $theClass): bool
+    {
+        return !($theClass->isTrait() || $theClass->isEnum());
+    }
+
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
         $extends = $theClass->getExtends();
