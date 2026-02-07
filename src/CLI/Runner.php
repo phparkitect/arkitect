@@ -11,6 +11,7 @@ use Arkitect\ClassSetRules;
 use Arkitect\CLI\Progress\Progress;
 use Arkitect\Exceptions\FailOnFirstViolationException;
 use Arkitect\Rules\ParsingErrors;
+use Arkitect\Rules\UnusedRules;
 use Arkitect\Rules\Violations;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -18,23 +19,25 @@ class Runner
 {
     public function run(Config $config, Baseline $baseline, Progress $progress): AnalysisResult
     {
-        [$violations, $parsingErrors] = $this->doRun($config, $progress);
+        [$violations, $parsingErrors, $unusedRules] = $this->doRun($config, $progress);
 
         $baseline->applyTo($violations, $config->isIgnoreBaselineLinenumbers());
 
         return new AnalysisResult(
             $violations,
             $parsingErrors,
+            $unusedRules,
         );
     }
 
     public function baseline(Config $config, Progress $progress): AnalysisResult
     {
-        [$violations, $parsingErrors] = $this->doRun($config, $progress);
+        [$violations, $parsingErrors, $unusedRules] = $this->doRun($config, $progress);
 
         return new AnalysisResult(
             $violations,
             $parsingErrors,
+            $unusedRules,
         );
     }
 
@@ -82,6 +85,7 @@ class Runner
     {
         $violations = new Violations();
         $parsingErrors = new ParsingErrors();
+        $unusedRules = new UnusedRules();
 
         $fileParser = FileParserFactory::createFileParser(
             $config->getTargetPhpVersion(),
@@ -99,10 +103,16 @@ class Runner
             } finally {
                 $progress->endFileSetAnalysis($classSetRule->getClassSet());
             }
+
+            foreach ($classSetRule->getRules() as $rule) {
+                if (0 === $rule->getMatchCount()) {
+                    $unusedRules->add($rule);
+                }
+            }
         }
 
         $violations->sort();
 
-        return [$violations, $parsingErrors];
+        return [$violations, $parsingErrors, $unusedRules];
     }
 }

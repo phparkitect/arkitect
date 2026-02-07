@@ -13,4 +13,8 @@ interface ArchRule
     public function isRunOnlyThis(): bool;
 
     public function runOnlyThis(): self;
+
+    public function getMatchCount(): int;
+
+    public function describe(): string;
 }

@@ -31,6 +31,8 @@ class Config
 
     private TargetPhpVersion $targetPhpVersion;
 
+    private bool $failOnUnusedRules;
+
     public function __construct()
     {
         $this->classSetRules = [];
@@ -43,6 +45,7 @@ class Config
         $this->format = PrinterFactory::default();
         $this->autoloadFilePath = null;
         $this->targetPhpVersion = TargetPhpVersion::latest();
+        $this->failOnUnusedRules = false;
     }
 
     public function add(ClassSet $classSet, ArchRule ...$rules): self
@@ -166,5 +169,17 @@ class Config
     public function getAutoloadFilePath(): ?string
     {
         return $this->autoloadFilePath;
+    }
+
+    public function failOnUnusedRules(bool $failOnUnusedRules): self
+    {
+        $this->failOnUnusedRules = $failOnUnusedRules;
+
+        return $this;
+    }
+
+    public function isFailOnUnusedRules(): bool
+    {
+        return $this->failOnUnusedRules;
     }
 }

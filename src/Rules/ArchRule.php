@@ -23,6 +23,9 @@ class ArchRule implements DSL\ArchRule
     /** @var bool */
     private $runOnlyThis;
 
+    /** @var int */
+    private $matchCount = 0;
+
     public function __construct(
         Specs $specs,
         Constraints $constraints,
@@ -47,6 +50,8 @@ class ArchRule implements DSL\ArchRule
             return;
         }
 
+        ++$this->matchCount;
+
         $this->shoulds->checkAll($classDescription, $violations, $this->because);
     }
 
@@ -60,5 +65,21 @@ class ArchRule implements DSL\ArchRule
         $this->runOnlyThis = true;
 
         return $this;
+    }
+
+    public function getMatchCount(): int
+    {
+        return $this->matchCount;
+    }
+
+    public function describe(): string
+    {
+        $description = $this->thats->describe().' '.$this->shoulds->describe();
+
+        if ('' !== $this->because) {
+            $description .= ' because '.$this->because;
+        }
+
+        return $description;
     }
 }

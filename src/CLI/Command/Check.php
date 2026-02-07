@@ -32,6 +32,7 @@ class Check extends Command
     private const AUTOLOAD_PARAM = 'autoload';
 
     private const GENERATE_BASELINE_PARAM = 'generate-baseline';
+    private const FAIL_ON_UNUSED_RULES_PARAM = 'fail-on-unused-rules';
     private const DEFAULT_RULES_FILENAME = 'phparkitect.php';
 
     private const DEFAULT_BASELINE_FILENAME = 'phparkitect-baseline.json';
@@ -105,6 +106,12 @@ class Check extends Command
                 'a',
                 InputOption::VALUE_REQUIRED,
                 'Specify an autoload file to use',
+            )
+            ->addOption(
+                self::FAIL_ON_UNUSED_RULES_PARAM,
+                null,
+                InputOption::VALUE_NONE,
+                'Treat unused rules as errors (exit code 1)',
             );
     }
 
@@ -124,6 +131,7 @@ class Check extends Command
             $generateBaseline = $input->getOption(self::GENERATE_BASELINE_PARAM);
             $phpVersion = $input->getOption('target-php-version');
             $format = $input->getOption(self::FORMAT_PARAM);
+            $failOnUnusedRules = (bool) $input->getOption(self::FAIL_ON_UNUSED_RULES_PARAM);
 
             // we write everything on STDERR apart from the list of violations which goes on STDOUT
             // this allows to pipe the output of this command to a file while showing output on the terminal
@@ -139,7 +147,8 @@ class Check extends Command
                 ->baselineFilePath(Baseline::resolveFilePath($useBaseline, self::DEFAULT_BASELINE_FILENAME))
                 ->ignoreBaselineLinenumbers($ignoreBaselineLinenumbers)
                 ->skipBaseline($skipBaseline)
-                ->format($format);
+                ->format($format)
+                ->failOnUnusedRules($failOnUnusedRules);
 
             $this->requireAutoload($output, $config->getAutoloadFilePath());
             $printer = $this->createPrinter($output, $config->getFormat());
@@ -174,9 +183,20 @@ class Check extends Command
                 $output->writeln($result->getParsingErrors()->toString());
             }
 
-            !$result->hasErrors() && $output->writeln('✅ No violations detected');
+            if ($result->hasUnusedRules()) {
+                $unusedCount = $result->getUnusedRules()->count();
+                $output->writeln("⚠️ {$unusedCount} unused rule(s) detected (no matching classes found):");
+                foreach ($result->getUnusedRules()->describe() as $description) {
+                    $output->writeln("  - {$description}");
+                }
+            }
 
-            return $result->hasErrors() ? self::ERROR_CODE : self::SUCCESS_CODE;
+            $hasErrors = $result->hasErrors()
+                || ($config->isFailOnUnusedRules() && $result->hasUnusedRules());
+
+            !$hasErrors && $output->writeln('✅ No violations detected');
+
+            return $hasErrors ? self::ERROR_CODE : self::SUCCESS_CODE;
         } catch (\Throwable $e) {
             $output->writeln("❌ {$e->getMessage()}");
 

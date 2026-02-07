@@ -81,6 +81,16 @@ class FakeRule implements ArchRule
     {
         return $this;
     }
+
+    public function getMatchCount(): int
+    {
+        return 0;
+    }
+
+    public function describe(): string
+    {
+        return 'fake rule';
+    }
 }
 
 class FakeParser implements Parser
