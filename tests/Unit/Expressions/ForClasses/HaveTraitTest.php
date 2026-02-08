@@ -86,7 +86,7 @@ class HaveTraitTest extends TestCase
         self::assertEquals(0, $violations->count());
     }
 
-    public function test_it_should_return_no_violation_if_is_a_trait(): void
+    public function test_it_should_return_violation_if_trait_does_not_use_required_trait(): void
     {
         $expression = new HaveTrait('MyTrait');
 
@@ -94,6 +94,24 @@ class HaveTraitTest extends TestCase
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setTrait(true)
+            ->build();
+
+        $because = 'we want to add this rule for our software';
+        $violations = new Violations();
+        $expression->evaluate($classDescription, $violations, $because);
+
+        self::assertEquals(1, $violations->count());
+    }
+
+    public function test_it_should_return_no_violation_if_trait_uses_required_trait(): void
+    {
+        $expression = new HaveTrait('MyTrait');
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
+            ->setTrait(true)
+            ->addTrait('MyTrait', 1)
             ->build();
 
         $because = 'we want to add this rule for our software';
@@ -128,7 +146,7 @@ class HaveTraitTest extends TestCase
         self::assertFalse($expression->appliesTo($classDescription));
     }
 
-    public function test_applies_to_should_return_false_for_traits(): void
+    public function test_applies_to_should_return_true_for_traits(): void
     {
         $expression = new HaveTrait('MyTrait');
 
@@ -138,6 +156,6 @@ class HaveTraitTest extends TestCase
             ->setTrait(true)
             ->build();
 
-        self::assertFalse($expression->appliesTo($classDescription));
+        self::assertTrue($expression->appliesTo($classDescription));
     }
 }

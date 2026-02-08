@@ -84,7 +84,7 @@ class NotHaveTraitTest extends TestCase
         self::assertEquals(0, $violations->count());
     }
 
-    public function test_it_should_return_no_violation_if_is_a_trait(): void
+    public function test_it_should_return_no_violation_if_trait_does_not_use_prohibited_trait(): void
     {
         $traitConstraint = new NotHaveTrait('MyTrait');
 
@@ -99,6 +99,24 @@ class NotHaveTraitTest extends TestCase
         $traitConstraint->evaluate($classDescription, $violations, $because);
 
         self::assertEquals(0, $violations->count());
+    }
+
+    public function test_it_should_return_violation_if_trait_uses_prohibited_trait(): void
+    {
+        $traitConstraint = new NotHaveTrait('MyTrait');
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
+            ->setTrait(true)
+            ->addTrait('MyTrait', 1)
+            ->build();
+
+        $because = 'we want to add this rule for our software';
+        $violations = new Violations();
+        $traitConstraint->evaluate($classDescription, $violations, $because);
+
+        self::assertEquals(1, $violations->count());
     }
 
     public function test_applies_to_should_return_true_for_regular_classes(): void
@@ -126,7 +144,7 @@ class NotHaveTraitTest extends TestCase
         self::assertFalse($traitConstraint->appliesTo($classDescription));
     }
 
-    public function test_applies_to_should_return_false_for_traits(): void
+    public function test_applies_to_should_return_true_for_traits(): void
     {
         $traitConstraint = new NotHaveTrait('MyTrait');
 
@@ -136,6 +154,6 @@ class NotHaveTraitTest extends TestCase
             ->setTrait(true)
             ->build();
 
-        self::assertFalse($traitConstraint->appliesTo($classDescription));
+        self::assertTrue($traitConstraint->appliesTo($classDescription));
     }
 }

@@ -29,12 +29,12 @@ class NotHaveTrait implements Expression
 
     public function appliesTo(ClassDescription $theClass): bool
     {
-        return !($theClass->isInterface() || $theClass->isTrait());
+        return !$theClass->isInterface();
     }
 
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
-        if ($theClass->isInterface() || $theClass->isTrait()) {
+        if ($theClass->isInterface()) {
             return;
         }
 
