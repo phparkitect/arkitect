@@ -5,31 +5,17 @@ declare(strict_types=1);
 namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
-use Arkitect\Expression\Description;
-use Arkitect\Expression\Expression;
-use Arkitect\Rules\Violation;
-use Arkitect\Rules\ViolationMessage;
-use Arkitect\Rules\Violations;
+use Arkitect\Expression\BooleanClassExpression;
 
-class IsEnum implements Expression
+class IsEnum extends BooleanClassExpression
 {
-    public function describe(ClassDescription $theClass, string $because): Description
+    protected function matches(ClassDescription $theClass): bool
     {
-        return new Description("{$theClass->getName()} should be an enum", $because);
+        return $theClass->isEnum();
     }
 
-    public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
+    protected function descriptionVerb(): string
     {
-        if ($theClass->isEnum()) {
-            return;
-        }
-
-        $violation = Violation::create(
-            $theClass->getFQCN(),
-            ViolationMessage::selfExplanatory($this->describe($theClass, $because)),
-            $theClass->getFilePath()
-        );
-
-        $violations->add($violation);
+        return 'should be an enum';
     }
 }

@@ -6,13 +6,11 @@ namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
+use Arkitect\Expression\AbstractExpression;
 use Arkitect\Expression\Description;
-use Arkitect\Expression\Expression;
-use Arkitect\Rules\Violation;
-use Arkitect\Rules\ViolationMessage;
 use Arkitect\Rules\Violations;
 
-class NotHaveNameMatching implements Expression
+class NotHaveNameMatching extends AbstractExpression
 {
     /** @var string */
     private $name;
@@ -31,12 +29,7 @@ class NotHaveNameMatching implements Expression
     {
         $fqcn = FullyQualifiedClassName::fromString($theClass->getFQCN());
         if ($fqcn->classMatches($this->name)) {
-            $violation = Violation::create(
-                $theClass->getFQCN(),
-                ViolationMessage::selfExplanatory($this->describe($theClass, $because)),
-                $theClass->getFilePath()
-            );
-            $violations->add($violation);
+            $this->addViolation($theClass, $violations, $because);
         }
     }
 }

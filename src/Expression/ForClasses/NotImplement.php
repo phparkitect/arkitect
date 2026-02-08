@@ -6,13 +6,11 @@ namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
+use Arkitect\Expression\AbstractExpression;
 use Arkitect\Expression\Description;
-use Arkitect\Expression\Expression;
-use Arkitect\Rules\Violation;
-use Arkitect\Rules\ViolationMessage;
 use Arkitect\Rules\Violations;
 
-class NotImplement implements Expression
+class NotImplement extends AbstractExpression
 {
     /** @var string */
     private $interface;
@@ -45,12 +43,7 @@ class NotImplement implements Expression
         };
 
         if (\count(array_filter($interfaces, $implements)) > 0) {
-            $violation = Violation::create(
-                $theClass->getFQCN(),
-                ViolationMessage::selfExplanatory($this->describe($theClass, $because)),
-                $theClass->getFilePath()
-            );
-            $violations->add($violation);
+            $this->addViolation($theClass, $violations, $because);
         }
     }
 }

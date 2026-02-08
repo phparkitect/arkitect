@@ -6,13 +6,11 @@ namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FullyQualifiedClassName;
+use Arkitect\Expression\AbstractExpression;
 use Arkitect\Expression\Description;
-use Arkitect\Expression\Expression;
-use Arkitect\Rules\Violation;
-use Arkitect\Rules\ViolationMessage;
 use Arkitect\Rules\Violations;
 
-class MatchOneOfTheseNames implements Expression
+class MatchOneOfTheseNames extends AbstractExpression
 {
     /** @var array<string> */
     private $names;
@@ -38,12 +36,7 @@ class MatchOneOfTheseNames implements Expression
         }
 
         if (!$matches) {
-            $violation = Violation::create(
-                $theClass->getFQCN(),
-                ViolationMessage::selfExplanatory($this->describe($theClass, $because)),
-                $theClass->getFilePath()
-            );
-            $violations->add($violation);
+            $this->addViolation($theClass, $violations, $because);
         }
     }
 }

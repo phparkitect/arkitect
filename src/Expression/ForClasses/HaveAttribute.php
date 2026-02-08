@@ -4,13 +4,11 @@ declare(strict_types=1);
 namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Expression\AbstractExpression;
 use Arkitect\Expression\Description;
-use Arkitect\Expression\Expression;
-use Arkitect\Rules\Violation;
-use Arkitect\Rules\ViolationMessage;
 use Arkitect\Rules\Violations;
 
-final class HaveAttribute implements Expression
+final class HaveAttribute extends AbstractExpression
 {
     /** @var string */
     private $attribute;
@@ -27,16 +25,8 @@ final class HaveAttribute implements Expression
 
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
-        if ($theClass->hasAttribute($this->attribute)) {
-            return;
+        if (!$theClass->hasAttribute($this->attribute)) {
+            $this->addViolation($theClass, $violations, $because);
         }
-
-        $violations->add(
-            Violation::create(
-                $theClass->getFQCN(),
-                ViolationMessage::selfExplanatory($this->describe($theClass, $because)),
-                $theClass->getFilePath()
-            )
-        );
     }
 }

@@ -21,7 +21,7 @@ class Specs
     {
         /** @var Expression $spec */
         foreach ($this->expressions as $spec) {
-            // incremental way to introduce this method
+            // appliesTo is not on the Expression interface for backward compatibility
             if (method_exists($spec, 'appliesTo')) {
                 $canApply = $spec->appliesTo($classDescription);
 

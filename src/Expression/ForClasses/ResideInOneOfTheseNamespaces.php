@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Expression\AbstractExpression;
 use Arkitect\Expression\Description;
-use Arkitect\Expression\Expression;
-use Arkitect\Rules\Violation;
-use Arkitect\Rules\ViolationMessage;
 use Arkitect\Rules\Violations;
 
-class ResideInOneOfTheseNamespaces implements Expression
+class ResideInOneOfTheseNamespaces extends AbstractExpression
 {
     /** @var array<string> */
     private $namespaces;
@@ -38,12 +36,7 @@ class ResideInOneOfTheseNamespaces implements Expression
         }
 
         if (!$resideInNamespace) {
-            $violation = Violation::create(
-                $theClass->getFQCN(),
-                ViolationMessage::selfExplanatory($this->describe($theClass, $because)),
-                $theClass->getFilePath()
-            );
-            $violations->add($violation);
+            $this->addViolation($theClass, $violations, $because);
         }
     }
 }
