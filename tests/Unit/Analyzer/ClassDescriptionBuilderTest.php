@@ -194,8 +194,6 @@ class ClassDescriptionBuilderTest extends TestCase
             ->build();
 
         self::assertInstanceOf(ClassDescription::class, $classDescription);
-
-        // PHP core classes should be filtered out
         self::assertCount(0, $classDescription->getDependencies());
     }
 
@@ -210,8 +208,6 @@ class ClassDescriptionBuilderTest extends TestCase
             ->build();
 
         self::assertInstanceOf(ClassDescription::class, $classDescription);
-
-        // User-defined classes in root namespace should NOT be filtered
         self::assertCount(1, $classDescription->getDependencies());
         self::assertEquals('NonExistentUserClass', $classDescription->getDependencies()[0]->getFQCN()->toString());
     }
@@ -228,8 +224,6 @@ class ClassDescriptionBuilderTest extends TestCase
             ->build();
 
         self::assertInstanceOf(ClassDescription::class, $classDescription);
-
-        // User-defined classes with namespaces should not be filtered
         self::assertCount(2, $classDescription->getDependencies());
     }
 
@@ -240,16 +234,14 @@ class ClassDescriptionBuilderTest extends TestCase
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
-            ->addDependency(new ClassDependency('DateTime', 10)) // PHP core - filtered
-            ->addDependency(new ClassDependency('Vendor\Package\SomeClass', 15)) // Namespaced - kept
-            ->addDependency(new ClassDependency('Exception', 20)) // PHP core - filtered
-            ->addDependency(new ClassDependency('NonExistentUserClass', 25)) // User root class - kept
-            ->addDependency(new ClassDependency('PDO', 30)) // PHP core - filtered
+            ->addDependency(new ClassDependency('DateTime', 10))
+            ->addDependency(new ClassDependency('Vendor\Package\SomeClass', 15))
+            ->addDependency(new ClassDependency('Exception', 20))
+            ->addDependency(new ClassDependency('NonExistentUserClass', 25))
+            ->addDependency(new ClassDependency('PDO', 30))
             ->build();
 
         self::assertInstanceOf(ClassDescription::class, $classDescription);
-
-        // Should keep only the 2 non-PHP-core dependencies
         self::assertCount(2, $classDescription->getDependencies());
 
         $dependencies = $classDescription->getDependencies();
@@ -261,19 +253,14 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'MyClass';
 
-        // ReflectionClass is a PHP internal class in the root namespace
-        // If other internal namespaced classes exist (e.g., MongoDB\Driver\Manager),
-        // they should also be filtered. We test with ReflectionClass which is always available.
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
-            ->addDependency(new ClassDependency('ReflectionClass', 10)) // Internal root - filtered
-            ->addDependency(new ClassDependency('App\MyClass', 15)) // User namespaced - kept
+            ->addDependency(new ClassDependency('ReflectionClass', 10))
+            ->addDependency(new ClassDependency('App\MyClass', 15))
             ->build();
 
         self::assertInstanceOf(ClassDescription::class, $classDescription);
-
-        // ReflectionClass should be filtered, only App\MyClass should remain
         self::assertCount(1, $classDescription->getDependencies());
         self::assertEquals('App\MyClass', $classDescription->getDependencies()[0]->getFQCN()->toString());
     }

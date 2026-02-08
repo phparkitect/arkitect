@@ -78,7 +78,6 @@ class ClassDescriptionBuilder
 
     public function addDependency(ClassDependency $cd): self
     {
-        // Filter out PHP core classes
         if ($this->isPhpCoreClass($cd)) {
             return $this;
         }
@@ -175,11 +174,6 @@ class ClassDescriptionBuilder
         );
     }
 
-    /**
-     * Checks if a dependency is a PHP core/internal class.
-     * Uses Reflection to detect PHP built-in classes from core and extensions
-     * (e.g., DateTime, Exception, MongoDB\Driver\Manager, Swoole\Server).
-     */
     private function isPhpCoreClass(ClassDependency $dependency): bool
     {
         $fqcn = $dependency->getFQCN();
@@ -191,8 +185,6 @@ class ClassDescriptionBuilder
 
             return $reflection->isInternal();
         } catch (\ReflectionException $e) {
-            // Class doesn't exist in the current environment
-            // It's likely a user-defined class in the project being analyzed
             return false;
         }
     }

@@ -40,7 +40,7 @@ class NotDependsOnTheseNamespaces implements Expression
         /** @var ClassDependency $dependency */
         foreach ($dependencies as $dependency) {
             if ($dependency->matchesOneOf(...$this->exclude)) {
-                continue; // skip excluded namespaces
+                continue;
             }
 
             if ($dependency->matchesOneOf(...$this->namespaces)) {

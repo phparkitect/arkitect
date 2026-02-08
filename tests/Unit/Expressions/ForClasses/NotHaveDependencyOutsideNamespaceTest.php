@@ -97,8 +97,6 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
         $violations = new Violations();
         $notHaveDependencyOutsideNamespace->evaluate($classDescription, $violations, $because);
 
-        // PHP core classes are automatically filtered at the ClassDescriptionBuilder level
-        // So only 'another\class' should be reported as a violation
         self::assertEquals(1, $violations->count());
     }
 }
