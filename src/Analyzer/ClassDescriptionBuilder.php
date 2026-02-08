@@ -78,6 +78,10 @@ class ClassDescriptionBuilder
 
     public function addDependency(ClassDependency $cd): self
     {
+        if ($this->isPhpCoreClass($cd)) {
+            return $this;
+        }
+
         $this->classDependencies[] = $cd;
 
         return $this;
@@ -168,5 +172,20 @@ class ClassDescriptionBuilder
             $this->attributes,
             $this->filePath
         );
+    }
+
+    private function isPhpCoreClass(ClassDependency $dependency): bool
+    {
+        $fqcn = $dependency->getFQCN();
+
+        try {
+            /** @var class-string $className */
+            $className = $fqcn->toString();
+            $reflection = new \ReflectionClass($className);
+
+            return $reflection->isInternal();
+        } catch (\ReflectionException $e) {
+            return false;
+        }
     }
 }
