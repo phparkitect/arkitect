@@ -310,7 +310,7 @@ class FileVisitor extends NodeVisitorAbstract
 
     private function handleTraitUseNode(Node $node): void
     {
-        if (!($node instanceof Node\Stmt\TraitUse)) {
+        if (!$node instanceof Node\Stmt\TraitUse) {
             return;
         }
 

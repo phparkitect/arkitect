@@ -40,7 +40,7 @@ class NotHaveTrait implements Expression
 
         $trait = $this->trait;
         $traits = $theClass->getTraits();
-        $usesTrait = function (FullyQualifiedClassName $FQCN) use ($trait): bool {
+        $usesTrait = static function (FullyQualifiedClassName $FQCN) use ($trait): bool {
             return $FQCN->matches($trait);
         };
 
