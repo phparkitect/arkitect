@@ -72,6 +72,95 @@ class IsAbstractTest extends TestCase
         self::assertEquals('App\MyAbstract', $runner->getViolations()->get(0)->getFqcn());
     }
 
+    public function test_is_not_abstract_in_that_should_include_final_classes(): void
+    {
+        $structure = [
+            'App' => [
+                'Test' => [
+                    // Final class with correct name - should pass
+                    'GoodEndToEndTest.php' => '<?php namespace App\Test; final class GoodEndToEndTest {} ',
+
+                    // Abstract class - should be filtered out by IsNotAbstract
+                    'AbstractTestCase.php' => '<?php namespace App\Test; abstract class AbstractTestCase {} ',
+
+                    // Final class with wrong name - should generate violation
+                    'BadE2ETest.php' => '<?php namespace App\Test; final class BadE2ETest {} ',
+
+                    // Normal class with wrong name - should also generate violation
+                    'AnotherBadTest.php' => '<?php namespace App\Test; class AnotherBadTest {} ',
+                ],
+            ],
+        ];
+
+        $runner = TestRunner::create('8.4');
+
+        // This replicates the use case from PR 560:
+        // Filter for non-abstract classes (including final), then check naming convention
+        $rule = Rule::allClasses()
+            ->that(new ResideInOneOfTheseNamespaces('App\Test'))
+            ->andThat(new IsNotAbstract())
+            ->should(new HaveNameMatching('*EndToEndTest'))
+            ->because('all E2E tests must follow naming convention');
+
+        $runner->run(vfsStream::setup('root', null, $structure)->url(), $rule);
+
+        // Should find 2 violations: BadE2ETest and AnotherBadTest
+        // AbstractTestCase should be filtered out by IsNotAbstract
+        // GoodEndToEndTest should pass
+        self::assertCount(2, $runner->getViolations());
+        self::assertEquals('App\Test\AnotherBadTest', $runner->getViolations()->get(0)->getFqcn());
+        self::assertEquals('App\Test\BadE2ETest', $runner->getViolations()->get(1)->getFqcn());
+        self::assertCount(0, $runner->getParsingErrors());
+    }
+
+    public function test_is_not_abstract_in_should_validates_final_classes_correctly(): void
+    {
+        $structure = [
+            'App' => [
+                'Service' => [
+                    // Abstract class - should generate violation
+                    'AbstractService.php' => '<?php namespace App\Service; abstract class AbstractService {} ',
+
+                    // Final class - should NOT generate violation (final is non-abstract)
+                    'FinalService.php' => '<?php namespace App\Service; final class FinalService {} ',
+
+                    // Normal class - should NOT generate violation (normal is non-abstract)
+                    'NormalService.php' => '<?php namespace App\Service; class NormalService {} ',
+
+                    // Interface - should NOT generate violation (isAbstract() returns false)
+                    'ServiceInterface.php' => '<?php namespace App\Service; interface ServiceInterface {} ',
+
+                    // Trait - should NOT generate violation (isAbstract() returns false)
+                    'ServiceTrait.php' => '<?php namespace App\Service; trait ServiceTrait {} ',
+
+                    // Enum - should NOT generate violation (isAbstract() returns false)
+                    'ServiceEnum.php' => '<?php namespace App\Service; enum ServiceEnum {} ',
+                ],
+            ],
+        ];
+
+        $runner = TestRunner::create('8.4');
+
+        // When IsNotAbstract is used in should() (not that()), it validates ALL classes
+        // In PHP, isAbstract() returns true only for classes with 'abstract' keyword
+        // It does NOT return true for interface/trait/enum
+        $rule = Rule::allClasses()
+            ->that(new ResideInOneOfTheseNamespaces('App\Service'))
+            ->should(new IsNotAbstract())
+            ->because('services should be concrete implementations');
+
+        $runner->run(vfsStream::setup('root', null, $structure)->url(), $rule);
+
+        // Should find violation only for: AbstractService
+        // Should NOT violate: FinalService, NormalService, ServiceInterface, ServiceTrait, ServiceEnum
+        // This test verifies that:
+        // 1. Final classes are correctly recognized as non-abstract
+        // 2. Interface/trait/enum don't trigger violations (isAbstract() = false for them)
+        self::assertCount(1, $runner->getViolations());
+        self::assertEquals('App\Service\AbstractService', $runner->getViolations()->get(0)->getFqcn());
+        self::assertCount(0, $runner->getParsingErrors());
+    }
+
     public function test_it_can_check_multiple_class_properties(): void
     {
         $structure = [
