@@ -28,7 +28,7 @@ class ArchRule implements DSL\ArchRule
         Constraints $constraints,
         string $because,
         array $classesToBeExcluded,
-        bool $runOnlyThis,
+        bool $runOnlyThis
     ) {
         $this->thats = $specs;
         $this->shoulds = $constraints;
