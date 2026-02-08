@@ -100,4 +100,42 @@ class NotHaveTraitTest extends TestCase
 
         self::assertEquals(0, $violations->count());
     }
+
+    public function test_applies_to_should_return_true_for_regular_classes(): void
+    {
+        $traitConstraint = new NotHaveTrait('MyTrait');
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
+            ->build();
+
+        self::assertTrue($traitConstraint->appliesTo($classDescription));
+    }
+
+    public function test_applies_to_should_return_false_for_interfaces(): void
+    {
+        $traitConstraint = new NotHaveTrait('MyTrait');
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
+            ->setInterface(true)
+            ->build();
+
+        self::assertFalse($traitConstraint->appliesTo($classDescription));
+    }
+
+    public function test_applies_to_should_return_false_for_traits(): void
+    {
+        $traitConstraint = new NotHaveTrait('MyTrait');
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
+            ->setTrait(true)
+            ->build();
+
+        self::assertFalse($traitConstraint->appliesTo($classDescription));
+    }
 }

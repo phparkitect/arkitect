@@ -68,4 +68,76 @@ class HaveTraitTest extends TestCase
 
         self::assertEquals(1, $violations->count());
     }
+
+    public function test_it_should_return_no_violation_if_is_an_interface(): void
+    {
+        $expression = new HaveTrait('MyTrait');
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
+            ->setInterface(true)
+            ->build();
+
+        $because = 'we want to add this rule for our software';
+        $violations = new Violations();
+        $expression->evaluate($classDescription, $violations, $because);
+
+        self::assertEquals(0, $violations->count());
+    }
+
+    public function test_it_should_return_no_violation_if_is_a_trait(): void
+    {
+        $expression = new HaveTrait('MyTrait');
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
+            ->setTrait(true)
+            ->build();
+
+        $because = 'we want to add this rule for our software';
+        $violations = new Violations();
+        $expression->evaluate($classDescription, $violations, $because);
+
+        self::assertEquals(0, $violations->count());
+    }
+
+    public function test_applies_to_should_return_true_for_regular_classes(): void
+    {
+        $expression = new HaveTrait('MyTrait');
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
+            ->build();
+
+        self::assertTrue($expression->appliesTo($classDescription));
+    }
+
+    public function test_applies_to_should_return_false_for_interfaces(): void
+    {
+        $expression = new HaveTrait('MyTrait');
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
+            ->setInterface(true)
+            ->build();
+
+        self::assertFalse($expression->appliesTo($classDescription));
+    }
+
+    public function test_applies_to_should_return_false_for_traits(): void
+    {
+        $expression = new HaveTrait('MyTrait');
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName('HappyIsland')
+            ->setTrait(true)
+            ->build();
+
+        self::assertFalse($expression->appliesTo($classDescription));
+    }
 }

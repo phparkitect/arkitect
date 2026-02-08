@@ -62,7 +62,7 @@ class ClassDescription
         array $docBlock,
         array $attributes,
         array $traits,
-        string $filePath
+        string $filePath,
     ) {
         $this->FQCN = $FQCN;
         $this->filePath = $filePath;
