@@ -78,8 +78,14 @@ class DocblockTypesResolverTest extends TestCase
              * @param array<int, User> $users
              *
              * @return array<int, int|string>
+             *
+             * @throws \Exception
+             * @throws \Domain\Foo\FooException
+             * @throws BarException
              */
             public function myMethod2(array $aParam, array $users): array
+            {
+            }
         }
         EOF;
 
@@ -88,7 +94,8 @@ class DocblockTypesResolverTest extends TestCase
         $cd = $parser->getClassDescriptions()[0];
         $dep = $cd->getDependencies();
 
-        self::assertCount(9, $cd->getDependencies());
+        // Exception (\Exception) is filtered as a PHP core class
+        self::assertCount(11, $cd->getDependencies());
         self::assertEquals('Application\Model\User', $dep[0]->getFQCN()->toString());
         self::assertEquals('Symfony\Component\Validator\Constraints\NotBlank', $dep[1]->getFQCN()->toString());
         self::assertEquals('UuidFactoryInterface', $dep[2]->getFQCN()->toString());
@@ -97,6 +104,8 @@ class DocblockTypesResolverTest extends TestCase
         self::assertEquals('Application\Model\User', $dep[5]->getFQCN()->toString());
         self::assertEquals('Application\Model\Product', $dep[6]->getFQCN()->toString());
         self::assertEquals('Domain\Foo\MyOtherClass', $dep[7]->getFQCN()->toString());
-        self::assertEquals('Application\Model\User', $dep[8]->getFQCN()->toString());
+        self::assertEquals('Domain\Foo\FooException', $dep[8]->getFQCN()->toString());
+        self::assertEquals('Domain\Foo\BarException', $dep[9]->getFQCN()->toString());
+        self::assertEquals('Application\Model\User', $dep[10]->getFQCN()->toString());
     }
 }

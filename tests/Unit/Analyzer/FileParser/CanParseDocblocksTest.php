@@ -495,4 +495,87 @@ class CanParseDocblocksTest extends TestCase
 
         self::assertCount(1, $violations);
     }
+
+    public function test_it_collects_throws_tag_as_dependencies(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+
+        namespace Domain\Foo;
+
+        use Domain\FooException;
+        use Domain\BarException;
+
+        class MyClass
+        {
+            /**
+             * @throws FooException
+             * @throws BarException
+             */
+            public function method1()
+            {
+            }
+
+            /**
+             * @throws \Exception
+             */
+            public function method2()
+            {
+            }
+        }
+        EOF;
+
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
+        $fp->parse($code, 'relativePathName');
+
+        $cd = $fp->getClassDescriptions();
+
+        self::assertCount(1, $cd);
+        $dependencies = $cd[0]->getDependencies();
+
+        // Should have 2 dependencies from @throws: FooException, BarException
+        // \Exception is a PHP core class and is filtered out by isPhpCoreClass()
+        self::assertCount(2, $dependencies);
+
+        $fqcns = array_map(static fn ($dep) => $dep->getFQCN()->toString(), $dependencies);
+        self::assertContains('Domain\FooException', $fqcns);
+        self::assertContains('Domain\BarException', $fqcns);
+    }
+
+    public function test_it_collects_throws_tag_with_fully_qualified_names(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+
+        namespace App\Services;
+
+        class MyService
+        {
+            /**
+             * @throws \Exception
+             * @throws \Domain\FooException
+             * @throws BarException
+             */
+            public function doSomething()
+            {
+            }
+        }
+        EOF;
+
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
+        $fp->parse($code, 'relativePathName');
+
+        $cd = $fp->getClassDescriptions();
+
+        self::assertCount(1, $cd);
+        $dependencies = $cd[0]->getDependencies();
+
+        // Should have 2 dependencies from @throws
+        // \Exception is a PHP core class and is filtered out by isPhpCoreClass()
+        self::assertCount(2, $dependencies);
+
+        $fqcns = array_map(static fn ($dep) => $dep->getFQCN()->toString(), $dependencies);
+        self::assertContains('Domain\FooException', $fqcns);
+        self::assertContains('App\Services\BarException', $fqcns);
+    }
 }

@@ -25,6 +25,8 @@ use PhpParser\NodeVisitorAbstract;
  */
 class DocblockTypesResolver extends NodeVisitorAbstract
 {
+    public const THROWS_TYPES_ATTRIBUTE = 'docblock_throws_types';
+
     private NameContext $nameContext;
 
     private bool $parseCustomAnnotations;
@@ -117,6 +119,18 @@ class DocblockTypesResolver extends NodeVisitorAbstract
             return;
         }
 
+        $this->resolveParamTypes($node, $docblock);
+
+        $this->resolveReturnValueType($node, $docblock);
+
+        $this->resolveThrowsValueType($node, $docblock);
+    }
+
+    /**
+     * @param Stmt\ClassMethod|Stmt\Function_|Expr\Closure|Expr\ArrowFunction $node
+     */
+    private function resolveParamTypes(Node $node, Docblock $docblock): void
+    {
         // extract param types from param tags
         foreach ($node->params as $param) {
             if (!$this->isTypeArray($param->type)) { // not an array, nothing to do
@@ -136,19 +150,63 @@ class DocblockTypesResolver extends NodeVisitorAbstract
 
             $param->type = $this->resolveName(new Name($type), Stmt\Use_::TYPE_NORMAL);
         }
+    }
 
-        // extract return type from return tag
-        if ($this->isTypeArray($node->returnType)) {
-            $type = $docblock->getReturnTagTypes();
-            $type = array_pop($type);
+    /**
+     * @param Stmt\ClassMethod|Stmt\Function_|Expr\Closure|Expr\ArrowFunction $node
+     */
+    private function resolveReturnValueType(Node $node, Docblock $docblock): void
+    {
+        if (null === $node->returnType) {
+            return;
+        }
 
-            // we ignore any type which is not a class
-            if (!$this->isTypeClass($type)) {
-                return;
+        if (!$this->isTypeArray($node->returnType)) {
+            return;
+        }
+
+        $type = $docblock->getReturnTagTypes();
+        $type = array_pop($type);
+
+        // we ignore any type which is not a class
+        if (!$this->isTypeClass($type)) {
+            return;
+        }
+
+        $node->returnType = $this->resolveName(new Name($type), Stmt\Use_::TYPE_NORMAL);
+    }
+
+    /**
+     * @param Stmt\ClassMethod|Stmt\Function_|Expr\Closure|Expr\ArrowFunction $node
+     */
+    private function resolveThrowsValueType(Node $node, Docblock $docblock): void
+    {
+        // extract throw types from throw tag
+        $throwValues = $docblock->getThrowTagsTypes();
+
+        if (empty($throwValues)) {
+            return;
+        }
+
+        $docCommentStartLine = $node->getDocComment()->getStartLine();
+        $throwsTypesResolved = [];
+
+        foreach ($throwValues as $throwValue) {
+            if (str_starts_with($throwValue['type'], '\\')) {
+                $name = new FullyQualified(substr($throwValue['type'], 1));
+            } else {
+                $name = $this->resolveName(new Name($throwValue['type']), Stmt\Use_::TYPE_NORMAL);
             }
 
-            $node->returnType = $this->resolveName(new Name($type), Stmt\Use_::TYPE_NORMAL);
+            // Calculate absolute file line from docblock-relative line number
+            $tagLine = $throwValue['line'];
+            $absoluteLine = null !== $tagLine ? $docCommentStartLine + $tagLine - 1 : $node->getStartLine();
+            $name->setAttribute('startLine', $absoluteLine);
+
+            $throwsTypesResolved[] = $name;
         }
+
+        $node->setAttribute(self::THROWS_TYPES_ATTRIBUTE, $throwsTypesResolved);
     }
 
     /**
