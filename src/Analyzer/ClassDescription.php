@@ -25,6 +25,9 @@ class ClassDescription
     /** @var list<FullyQualifiedClassName> */
     private array $attributes;
 
+    /** @var list<FullyQualifiedClassName> */
+    private array $traits;
+
     private bool $final;
 
     private bool $readonly;
@@ -41,8 +44,9 @@ class ClassDescription
      * @param list<ClassDependency>         $dependencies
      * @param list<FullyQualifiedClassName> $interfaces
      * @param list<FullyQualifiedClassName> $extends
-     * @param list<FullyQualifiedClassName> $attributes
      * @param list<string>                  $docBlock
+     * @param list<FullyQualifiedClassName> $attributes
+     * @param list<FullyQualifiedClassName> $traits
      */
     public function __construct(
         FullyQualifiedClassName $FQCN,
@@ -57,6 +61,7 @@ class ClassDescription
         bool $enum,
         array $docBlock,
         array $attributes,
+        array $traits,
         string $filePath
     ) {
         $this->FQCN = $FQCN;
@@ -69,6 +74,7 @@ class ClassDescription
         $this->abstract = $abstract;
         $this->docBlock = $docBlock;
         $this->attributes = $attributes;
+        $this->traits = $traits;
         $this->interface = $interface;
         $this->trait = $trait;
         $this->enum = $enum;
@@ -203,6 +209,25 @@ class ClassDescription
             $this->attributes,
             static function (bool $carry, FullyQualifiedClassName $attribute) use ($pattern): bool {
                 return $carry || $attribute->matches($pattern);
+            },
+            false
+        );
+    }
+
+    /**
+     * @return list<FullyQualifiedClassName>
+     */
+    public function getTraits(): array
+    {
+        return $this->traits;
+    }
+
+    public function hasTrait(string $pattern): bool
+    {
+        return array_reduce(
+            $this->traits,
+            static function (bool $carry, FullyQualifiedClassName $trait) use ($pattern): bool {
+                return $carry || $trait->matches($pattern);
             },
             false
         );

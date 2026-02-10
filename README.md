@@ -305,6 +305,15 @@ $rules[] = Rule::allClasses()
 
 *Note: Similar to HaveNameMatching, but accepts an array of patterns. The rule passes if the class name matches any of the provided patterns.*
 
+### Use a trait
+
+```php
+$rules[] = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('Tests\Feature'))
+    ->should(new HaveTrait('Illuminate\Foundation\Testing\DatabaseTransactions'))
+    ->because('we want all Feature tests to run transactions');
+```
+
 ### Implements an interface
 
 ```php
@@ -321,6 +330,15 @@ $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Infrastructure\RestApi\Public'))
     ->should(new NotImplement('ContainerAwareInterface'))
     ->because('all public controllers should not be container aware');
+```
+
+### Not use a trait
+
+```php
+$rules[] = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('Tests\Feature'))
+    ->should(new NotHaveTrait('Illuminate\Foundation\Testing\RefreshDatabase'))
+    ->because('we want all Feature tests to never refresh the database for performance reasons');
 ```
 
 ### Is a (inherits from or implements)
