@@ -40,7 +40,7 @@ class NotImplement implements Expression
 
         $interface = $this->interface;
         $interfaces = $theClass->getInterfaces();
-        $implements = fn (FullyQualifiedClassName $FQCN): bool => $FQCN->matches($interface);
+        $implements = static fn (FullyQualifiedClassName $FQCN): bool => $FQCN->matches($interface);
 
         if (\count(array_filter($interfaces, $implements)) > 0) {
             $violation = Violation::create(

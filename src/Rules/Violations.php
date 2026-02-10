@@ -27,7 +27,7 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
 
         $instance = new self();
 
-        $instance->violations = array_map(fn (array $json): Violation => Violation::fromJson($json), $json['violations']);
+        $instance->violations = array_map(static fn (array $json): Violation => Violation::fromJson($json), $json['violations']);
 
         return $instance;
     }

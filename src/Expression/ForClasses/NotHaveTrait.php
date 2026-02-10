@@ -40,9 +40,7 @@ class NotHaveTrait implements Expression
 
         $trait = $this->trait;
         $traits = $theClass->getTraits();
-        $usesTrait = static function (FullyQualifiedClassName $FQCN) use ($trait): bool {
-            return $FQCN->matches($trait);
-        };
+        $usesTrait = static fn (FullyQualifiedClassName $FQCN): bool => $FQCN->matches($trait);
 
         if (\count(array_filter($traits, $usesTrait)) > 0) {
             $violation = Violation::create(

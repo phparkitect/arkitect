@@ -224,9 +224,7 @@ class ClassDescription
     {
         return array_reduce(
             $this->traits,
-            static function (bool $carry, FullyQualifiedClassName $trait) use ($pattern): bool {
-                return $carry || $trait->matches($pattern);
-            },
+            static fn (bool $carry, FullyQualifiedClassName $trait): bool => $carry || $trait->matches($pattern),
             false
         );
     }
