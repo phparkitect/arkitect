@@ -305,6 +305,15 @@ $rules[] = Rule::allClasses()
 
 *Note: Similar to HaveNameMatching, but accepts an array of patterns. The rule passes if the class name matches any of the provided patterns.*
 
+### Use a trait
+
+```php
+$rules[] = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('Tests\Feature'))
+    ->should(new HaveTrait('Illuminate\Foundation\Testing\DatabaseTransactions'))
+    ->because('we want all Feature tests to run transactions');
+```
+
 ### Implements an interface
 
 ```php
@@ -321,6 +330,15 @@ $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Infrastructure\RestApi\Public'))
     ->should(new NotImplement('ContainerAwareInterface'))
     ->because('all public controllers should not be container aware');
+```
+
+### Not use a trait
+
+```php
+$rules[] = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('Tests\Feature'))
+    ->should(new NotHaveTrait('Illuminate\Foundation\Testing\RefreshDatabase'))
+    ->because('we want all Feature tests to never refresh the database for performance reasons');
 ```
 
 ### Is a (inherits from or implements)
@@ -467,9 +485,11 @@ $rules[] = Rule::allClasses()
 ```php
 $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
-    ->should(new NotHaveDependencyOutsideNamespace('App\Domain', ['Ramsey\Uuid'], true))
+    ->should(new NotHaveDependencyOutsideNamespace('App\Domain', ['Ramsey\Uuid']))
     ->because('we want to protect our domain except for Ramsey\Uuid');
 ```
+
+Note: PHP core classes (e.g., `DateTime`, `Exception`, `PDO`) are automatically excluded from dependency checks.
 
 ### Not have a name matching a pattern
 
@@ -498,6 +518,36 @@ $rules[] = Rule::allClasses()
     ->should(new NotResideInTheseNamespaces('App\Application', 'App\Infrastructure'))
     ->because('we want to be sure that all events not reside in wrong layers');
 ```
+
+### Reside in a namespace exactly
+
+This rule checks that classes reside **exactly** in one of the specified namespaces, without matching child namespaces. Unlike `ResideInOneOfTheseNamespaces` which matches recursively, this rule only matches classes directly in the namespace.
+
+```php
+$rules[] = Rule::allClasses()
+    ->that(new HaveNameMatching('*Entity'))
+    ->should(new ResideInOneOfTheseNamespacesExactly('App\Domain\Entity'))
+    ->because('we want entity classes only in the root Entity namespace, not in subdirectories');
+```
+
+For example, with namespace `App\Domain\Entity`:
+- `App\Domain\Entity\User` ✅ matches (same namespace)
+- `App\Domain\Entity\ValueObject\Email` ❌ does not match (child namespace)
+
+### Not reside in a namespace exactly
+
+This rule checks that classes do **not** reside exactly in one of the specified namespaces. Classes in child namespaces are allowed.
+
+```php
+$rules[] = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Legacy'))
+    ->should(new NotResideInOneOfTheseNamespacesExactly('App\Legacy'))
+    ->because('we want to avoid classes directly in the Legacy namespace root');
+```
+
+For example, with namespace `App\Legacy`:
+- `App\Legacy\OldCode` ❌ violation (exact match)
+- `App\Legacy\Module\OldCode` ✅ allowed (child namespace)
 
 You can also define components and ensure that a component:
 - should not depend on any component
@@ -589,15 +639,6 @@ $rules[] = Rule::allClasses()
 ```
 
 # Integrations
-
-## GitHub Actions
-
-You can easily integrate PHPArkitect into your CI/CD pipeline using the official GitHub Action.
-
-For setup instructions and usage examples, please refer to the official documentation:
-
-- [GitHub Action Repository](https://github.com/phparkitect/arkitect-github-actions) - Complete setup guide and examples
-- [GitHub Marketplace](https://github.com/marketplace/actions/phparkitect-arkitect) - Action listing
 
 ## Laravel
 

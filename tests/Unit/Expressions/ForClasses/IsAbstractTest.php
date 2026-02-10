@@ -95,7 +95,7 @@ class IsAbstractTest extends TestCase
         self::assertFalse($isNotAbstract->appliesTo($classDescription));
     }
 
-    public function test_final_classes_can_not_be_abstract_and_should_be_ignored(): void
+    public function test_final_classes_can_be_checked_for_abstract(): void
     {
         $isAbstract = new IsAbstract();
         $isNotAbstract = new IsNotAbstract();
@@ -106,7 +106,19 @@ class IsAbstractTest extends TestCase
             ->setFinal(true)
             ->build();
 
-        self::assertFalse($isAbstract->appliesTo($classDescription));
-        self::assertFalse($isNotAbstract->appliesTo($classDescription));
+        // Final classes should be applicable for abstract checks
+        // appliesTo() returns true (makes sense to check if final is abstract)
+        self::assertTrue($isAbstract->appliesTo($classDescription));
+        self::assertTrue($isNotAbstract->appliesTo($classDescription));
+
+        // When evaluated, IsAbstract generates violation (final is not abstract)
+        $violations = new Violations();
+        $isAbstract->evaluate($classDescription, $violations, 'test');
+        self::assertEquals(1, $violations->count(), 'IsAbstract should generate violation for final class');
+
+        // When evaluated, IsNotAbstract does NOT generate violation (final is not abstract)
+        $violations = new Violations();
+        $isNotAbstract->evaluate($classDescription, $violations, 'test');
+        self::assertEquals(0, $violations->count(), 'IsNotAbstract should not generate violation for final class');
     }
 }

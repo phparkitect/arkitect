@@ -85,4 +85,23 @@ class ClassDescriptionTest extends TestCase
 
         self::assertFalse($cd->hasAttribute('Bar'));
     }
+
+    public function test_should_return_true_if_has_trait(): void
+    {
+        $cd = $this->builder
+            ->addTrait('FooTrait', 15)
+            ->build();
+
+        self::assertTrue($cd->hasTrait('FooTrait'));
+        self::assertTrue($cd->hasTrait('Foo*'));
+    }
+
+    public function test_should_return_false_if_not_has_trait(): void
+    {
+        $cd = $this->builder
+            ->addTrait('FooTrait', 15)
+            ->build();
+
+        self::assertFalse($cd->hasTrait('Bar'));
+    }
 }

@@ -75,7 +75,7 @@ class CanParsePropertyHooksTest extends TestCase
         self::assertInstanceOf(ClassDescription::class, $cd[0]);
 
         $dependencies = $cd[0]->getDependencies();
-        $dependencyNames = array_map(fn ($dep) => $dep->getFQCN()->toString(), $dependencies);
+        $dependencyNames = array_map(static fn ($dep) => $dep->getFQCN()->toString(), $dependencies);
 
         self::assertContains('App\Services\Formatter', $dependencyNames);
         self::assertContains('App\Services\Validator', $dependencyNames);
@@ -107,7 +107,7 @@ class CanParsePropertyHooksTest extends TestCase
         self::assertInstanceOf(ClassDescription::class, $cd[0]);
 
         $dependencies = $cd[0]->getDependencies();
-        $dependencyNames = array_map(fn ($dep) => $dep->getFQCN()->toString(), $dependencies);
+        $dependencyNames = array_map(static fn ($dep) => $dep->getFQCN()->toString(), $dependencies);
 
         self::assertContains('App\ValueObjects\Name', $dependencyNames);
     }

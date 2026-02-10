@@ -27,7 +27,7 @@ class ClassSetTest extends TestCase
             $path.'/Model/Products.php',
             $path.'/Model/User.php',
         ];
-        $actual = array_values(array_map(function ($item) {
+        $actual = array_values(array_map(static function ($item) {
             /** @var \SplFileInfo $item */
             return $item->getPathname();
         }, iterator_to_array($set)));

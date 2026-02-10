@@ -57,14 +57,13 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
             ->setClassName('HappyIsland')
             ->addDependency(new ClassDependency('myNamespace', 100))
             ->addDependency(new ClassDependency('another\class', 200))
-            ->addDependency(new ClassDependency('\DateTime', 300))
             ->build();
 
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
         $notHaveDependencyOutsideNamespace->evaluate($classDescription, $violations, $because);
 
-        self::assertEquals(2, $violations->count());
+        self::assertEquals(1, $violations->count());
     }
 
     public function test_it_should_not_return_violation_error_if_dependency_excluded(): void
@@ -84,20 +83,20 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
         self::assertEquals(0, $violations->count());
     }
 
-    public function test_it_should_not_return_violation_error_if_core_dependency_excluded(): void
+    public function test_it_should_automatically_exclude_php_core_classes(): void
     {
-        $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('myNamespace', [], true);
+        $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('myNamespace');
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
-            ->addDependency(new ClassDependency('\DateTime', 100))
+            ->addDependency(new ClassDependency('another\class', 100))
             ->build();
 
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
         $notHaveDependencyOutsideNamespace->evaluate($classDescription, $violations, $because);
 
-        self::assertEquals(0, $violations->count());
+        self::assertEquals(1, $violations->count());
     }
 }

@@ -65,7 +65,7 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
 
     public function groupedByFqcn(): array
     {
-        return array_reduce($this->violations, function (array $accumulator, Violation $element) {
+        return array_reduce($this->violations, static function (array $accumulator, Violation $element) {
             $accumulator[$element->getFqcn()][] = $element;
 
             return $accumulator;
