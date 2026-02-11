@@ -29,7 +29,7 @@ class FileParser implements Parser
         FileVisitor $fileVisitor,
         NameResolver $nameResolver,
         DocblockTypesResolver $docblockTypesResolver,
-        TargetPhpVersion $targetPhpVersion
+        TargetPhpVersion $targetPhpVersion,
     ) {
         $this->fileVisitor = $fileVisitor;
         $this->parsingErrors = [];

@@ -27,9 +27,7 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
 
         $instance = new self();
 
-        $instance->violations = array_map(static function (array $json): Violation {
-            return Violation::fromJson($json);
-        }, $json['violations']);
+        $instance->violations = array_map(static fn (array $json): Violation => Violation::fromJson($json), $json['violations']);
 
         return $instance;
     }
@@ -113,9 +111,7 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
 
     public function sort(): void
     {
-        usort($this->violations, static function (Violation $v1, Violation $v2): int {
-            return $v1 <=> $v2;
-        });
+        usort($this->violations, static fn (Violation $v1, Violation $v2): int => $v1 <=> $v2);
     }
 
     public function jsonSerialize(): array

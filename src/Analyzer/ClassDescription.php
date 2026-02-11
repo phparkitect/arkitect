@@ -62,7 +62,7 @@ class ClassDescription
         array $docBlock,
         array $attributes,
         array $traits,
-        string $filePath
+        string $filePath,
     ) {
         $this->FQCN = $FQCN;
         $this->filePath = $filePath;
@@ -207,9 +207,7 @@ class ClassDescription
     {
         return array_reduce(
             $this->attributes,
-            static function (bool $carry, FullyQualifiedClassName $attribute) use ($pattern): bool {
-                return $carry || $attribute->matches($pattern);
-            },
+            static fn (bool $carry, FullyQualifiedClassName $attribute): bool => $carry || $attribute->matches($pattern),
             false
         );
     }
@@ -226,9 +224,7 @@ class ClassDescription
     {
         return array_reduce(
             $this->traits,
-            static function (bool $carry, FullyQualifiedClassName $trait) use ($pattern): bool {
-                return $carry || $trait->matches($pattern);
-            },
+            static fn (bool $carry, FullyQualifiedClassName $trait): bool => $carry || $trait->matches($pattern),
             false
         );
     }

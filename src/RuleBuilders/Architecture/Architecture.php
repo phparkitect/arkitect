@@ -90,9 +90,7 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
                 $forbiddenComponents = array_diff($layerNames, [$name], $this->allowedDependencies[$name]);
 
                 if (!empty($forbiddenComponents)) {
-                    $forbiddenSelectors = array_values(array_map(function (string $componentName): string {
-                        return $this->componentSelectors[$componentName];
-                    }, $forbiddenComponents));
+                    $forbiddenSelectors = array_values(array_map(fn (string $componentName): string => $this->componentSelectors[$componentName], $forbiddenComponents));
 
                     yield Rule::allClasses()
                         ->that(new ResideInOneOfTheseNamespaces($selector))
@@ -105,9 +103,7 @@ class Architecture implements Component, DefinedBy, Where, MayDependOnComponents
                 continue;
             }
 
-            $allowedDependencies = array_values(array_map(function (string $componentName): string {
-                return $this->componentSelectors[$componentName];
-            }, $this->componentDependsOnlyOnTheseNamespaces[$name]));
+            $allowedDependencies = array_values(array_map(fn (string $componentName): string => $this->componentSelectors[$componentName], $this->componentDependsOnlyOnTheseNamespaces[$name]));
 
             yield Rule::allClasses()
                 ->that(new ResideInOneOfTheseNamespaces($selector))

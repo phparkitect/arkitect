@@ -602,7 +602,7 @@ class CanParseClassTest extends TestCase
 
     private function parseCode(string $code, ?string $version = null): array
     {
-        $fp = FileParserFactory::forPhpVersion($version ?? TargetPhpVersion::PHP_7_4);
+        $fp = FileParserFactory::forPhpVersion($version ?? TargetPhpVersion::PHP_8_0);
         $fp->parse($code, 'relativePathName');
 
         return $fp->getClassDescriptions();

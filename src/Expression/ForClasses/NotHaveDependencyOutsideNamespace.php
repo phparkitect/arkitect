@@ -33,9 +33,7 @@ class NotHaveDependencyOutsideNamespace implements Expression
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
         $namespace = $this->namespace;
-        $depends = static function (ClassDependency $dependency) use ($namespace): bool {
-            return !$dependency->getFQCN()->matches($namespace);
-        };
+        $depends = static fn (ClassDependency $dependency): bool => !$dependency->getFQCN()->matches($namespace);
 
         $dependencies = $theClass->getDependencies();
         $externalDeps = array_filter($dependencies, $depends);
