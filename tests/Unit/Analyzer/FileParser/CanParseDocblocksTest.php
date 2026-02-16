@@ -525,7 +525,7 @@ class CanParseDocblocksTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_7_4);
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -533,13 +533,13 @@ class CanParseDocblocksTest extends TestCase
         self::assertCount(1, $cd);
         $dependencies = $cd[0]->getDependencies();
 
-        // Should have 3 dependencies from @throws: FooException, BarException, Exception
-        self::assertCount(3, $dependencies);
+        // Should have 2 dependencies from @throws: FooException, BarException
+        // \Exception is a PHP core class and is filtered out
+        self::assertCount(2, $dependencies);
 
         $fqcns = array_map(static fn ($dep) => $dep->getFQCN()->toString(), $dependencies);
         self::assertContains('Domain\FooException', $fqcns);
         self::assertContains('Domain\BarException', $fqcns);
-        self::assertContains('Exception', $fqcns);
     }
 
     public function test_it_collects_throws_tag_with_fully_qualified_names(): void
@@ -570,11 +570,11 @@ class CanParseDocblocksTest extends TestCase
         self::assertCount(1, $cd);
         $dependencies = $cd[0]->getDependencies();
 
-        // Should have 3 dependencies from @throws
-        self::assertCount(3, $dependencies);
+        // Should have 2 dependencies from @throws
+        // \Exception is a PHP core class and is filtered out
+        self::assertCount(2, $dependencies);
 
         $fqcns = array_map(static fn ($dep) => $dep->getFQCN()->toString(), $dependencies);
-        self::assertContains('Exception', $fqcns);
         self::assertContains('Domain\FooException', $fqcns);
         self::assertContains('App\Services\BarException', $fqcns);
     }
