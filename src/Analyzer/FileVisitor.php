@@ -73,7 +73,7 @@ class FileVisitor extends NodeVisitorAbstract
 
         // handles property hooks like public string $name { get => ...; set { ... } }
         $this->handlePropertyHookNode($node);
-        
+
         // handles throws types like @throws MyClass
         $this->handleThrowsTags($node);
     }
