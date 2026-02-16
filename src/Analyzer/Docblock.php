@@ -44,15 +44,21 @@ class Docblock
         return array_filter($returnTypes);
     }
 
+    /**
+     * @return array<array{type: string, line: int}>
+     */
     public function getThrowTagsTypes(): array
     {
-        $throwTypes = array_map(
-            fn (ThrowsTagValueNode $throwTag) => $this->getType($throwTag->type),
-            $this->phpDocNode->getThrowsTagValues()
-        );
+        $throwTypes = [];
 
-        // remove null values
-        return array_filter($throwTypes);
+        foreach ($this->phpDocNode->getThrowsTagValues() as $throwTag) {
+            $type = $this->getType($throwTag->type);
+            if (null !== $type) {
+                $throwTypes[] = ['type' => $type, 'line' => $throwTag->getAttribute('startLine') ?? 0];
+            }
+        }
+
+        return $throwTypes;
     }
 
     public function getVarTagTypes(): array

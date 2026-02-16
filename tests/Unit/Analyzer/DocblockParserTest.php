@@ -114,9 +114,12 @@ class DocblockParserTest extends TestCase
 
         $varTags = $db->getThrowTagsTypes();
         self::assertCount(3, $varTags);
-        self::assertEquals('\Exception', $varTags[0]);
-        self::assertEquals('\Domain\Foo\FooException', $varTags[1]);
-        self::assertEquals('BarException', $varTags[2]);
+        self::assertEquals('\Exception', $varTags[0]['type']);
+        self::assertEquals('\Domain\Foo\FooException', $varTags[1]['type']);
+        self::assertEquals('BarException', $varTags[2]['type']);
+        self::assertEquals(2, $varTags[0]['line']);
+        self::assertEquals(3, $varTags[1]['line']);
+        self::assertEquals(4, $varTags[2]['line']);
     }
 
     public function test_it_should_extract_doctrine_like_annotations(): void

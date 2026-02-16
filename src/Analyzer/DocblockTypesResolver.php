@@ -188,16 +188,18 @@ class DocblockTypesResolver extends NodeVisitorAbstract
             return;
         }
 
+        $docblockStartLine = $node->getDocComment() ? $node->getDocComment()->getStartLine() : $node->getStartLine();
+
         $throwsTypesResolved = [];
 
-        foreach ($throwValues as $throwValue) {
+        foreach ($throwValues as ['type' => $throwValue, 'line' => $relativeLine]) {
             if (str_starts_with($throwValue, '\\')) {
                 $name = new FullyQualified(substr($throwValue, 1));
             } else {
                 $name = $this->resolveName(new Name($throwValue), Stmt\Use_::TYPE_NORMAL);
             }
 
-            $name->setAttribute('startLine', $node->getStartLine());
+            $name->setAttribute('startLine', $docblockStartLine + $relativeLine - 1);
 
             $throwsTypesResolved[] = $name;
         }

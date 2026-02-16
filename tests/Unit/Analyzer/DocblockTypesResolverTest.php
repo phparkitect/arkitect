@@ -104,7 +104,9 @@ class DocblockTypesResolverTest extends TestCase
         self::assertEquals('Application\Model\Product', $dep[6]->getFQCN()->toString());
         self::assertEquals('Domain\Foo\MyOtherClass', $dep[7]->getFQCN()->toString());
         self::assertEquals('Domain\Foo\FooException', $dep[8]->getFQCN()->toString());
+        self::assertEquals(55, $dep[8]->getLine());
         self::assertEquals('Domain\Foo\BarException', $dep[9]->getFQCN()->toString());
+        self::assertEquals(56, $dep[9]->getLine());
         self::assertEquals('Application\Model\User', $dep[10]->getFQCN()->toString());
     }
 }
