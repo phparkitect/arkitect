@@ -31,8 +31,6 @@ phar: ## it creates phar
 outdated:
 	composer outdated
 
-coverage: ## it launches coverage
-	phpdbg -qrr ./bin/phpunit --coverage-html build/coverage
 
 csfix: ## it launches cs fix
 	PHP_CS_FIXER_IGNORE_ENV=1 bin/php-cs-fixer fix -v
