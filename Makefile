@@ -13,7 +13,7 @@ shell: ## it enters into the container
 	docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect bash
 
 test: ## it launches tests
-	bin/phpunit -v
+	bin/phpunit
 
 test_%: ## it launches a test
 	bin/phpunit --filter $@
