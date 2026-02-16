@@ -25,6 +25,8 @@ use PhpParser\NodeVisitorAbstract;
  */
 class DocblockTypesResolver extends NodeVisitorAbstract
 {
+    public const THROWS_TYPES_ATTRIBUTE = 'docblock_throws_types';
+
     private NameContext $nameContext;
 
     private bool $parseCustomAnnotations;
@@ -143,12 +145,45 @@ class DocblockTypesResolver extends NodeVisitorAbstract
             $type = array_pop($type);
 
             // we ignore any type which is not a class
-            if (!$this->isTypeClass($type)) {
-                return;
+            if ($this->isTypeClass($type)) {
+                $node->returnType = $this->resolveName(new Name($type), Stmt\Use_::TYPE_NORMAL);
+            }
+        }
+
+        $this->resolveThrowsValueType($node, $docblock);
+    }
+
+    /**
+     * @param Stmt\ClassMethod|Stmt\Function_|Expr\Closure|Expr\ArrowFunction $node
+     */
+    private function resolveThrowsValueType(Node $node, Docblock $docblock): void
+    {
+        // extract throw types from throw tag, with their docblock-relative line numbers
+        $throwValues = $docblock->getThrowTagsTypesWithLines();
+
+        if (empty($throwValues)) {
+            return;
+        }
+
+        $docComment = $node->getDocComment();
+        $docblockStartLine = null !== $docComment ? $docComment->getStartLine() : $node->getStartLine();
+
+        $throwsTypesResolved = [];
+
+        foreach ($throwValues as ['type' => $throwValue, 'line' => $tagDocblockLine]) {
+            if (str_starts_with($throwValue, '\\')) {
+                $name = new FullyQualified(substr($throwValue, 1));
+            } else {
+                $name = $this->resolveName(new Name($throwValue), Stmt\Use_::TYPE_NORMAL);
             }
 
-            $node->returnType = $this->resolveName(new Name($type), Stmt\Use_::TYPE_NORMAL);
+            // compute the actual file line: docblock start + tag's line within docblock - 1
+            $name->setAttribute('startLine', $docblockStartLine + $tagDocblockLine - 1);
+
+            $throwsTypesResolved[] = $name;
         }
+
+        $node->setAttribute(self::THROWS_TYPES_ATTRIBUTE, $throwsTypesResolved);
     }
 
     /**

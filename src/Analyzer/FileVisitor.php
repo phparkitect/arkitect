@@ -73,6 +73,9 @@ class FileVisitor extends NodeVisitorAbstract
 
         // handles property hooks like public string $name { get => ...; set { ... } }
         $this->handlePropertyHookNode($node);
+
+        // handles throws types like @throws MyClass
+        $this->handleThrowsTags($node);
     }
 
     public function getClassDescriptions(): array
@@ -377,6 +380,19 @@ class FileVisitor extends NodeVisitorAbstract
         // Handle parameters in set hooks (e.g., set(MyClass $value) { ... })
         foreach ($node->params as $param) {
             $this->addParamDependency($param);
+        }
+    }
+
+    private function handleThrowsTags(Node $node): void
+    {
+        if (!$node->hasAttribute(DocblockTypesResolver::THROWS_TYPES_ATTRIBUTE)) {
+            return;
+        }
+
+        /** @var Node\Name\FullyQualified $throw */
+        foreach ($node->getAttribute(DocblockTypesResolver::THROWS_TYPES_ATTRIBUTE) as $throw) {
+            $this->classDescriptionBuilder
+                ->addDependency(new ClassDependency($throw->toString(), $throw->getLine()));
         }
     }
 }

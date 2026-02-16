@@ -6,6 +6,7 @@ namespace Arkitect\Analyzer;
 
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\ThrowsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\VarTagValueNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
@@ -41,6 +42,30 @@ class Docblock
 
         // remove null values
         return array_filter($returnTypes);
+    }
+
+    /**
+     * @return array<array{type: string, line: int}>
+     */
+    public function getThrowTagsTypesWithLines(): array
+    {
+        $result = [];
+
+        foreach ($this->phpDocNode->getTags() as $tag) {
+            if (!($tag->value instanceof ThrowsTagValueNode)) {
+                continue;
+            }
+
+            $type = $this->getType($tag->value->type);
+
+            if (null === $type) {
+                continue;
+            }
+
+            $result[] = ['type' => $type, 'line' => $tag->getAttribute('startLine') ?? 1];
+        }
+
+        return $result;
     }
 
     public function getVarTagTypes(): array
