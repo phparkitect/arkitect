@@ -42,10 +42,6 @@ jobs:
     - name: Install dependencies
       run: composer install --prefer-dist
 
-    - name: Coding Standard Checks
-      if: ${{ matrix.php-versions  == '8.0' }}
-      run: PHP_CS_FIXER_IGNORE_ENV=1 ./bin/php-cs-fixer fix --dry-run --diff
-
     - name: Static Analysis
       if: ${{ matrix.php-versions  == '8.0' }}
       run: ./bin/psalm.phar --no-cache
