@@ -12,6 +12,9 @@ use PHPUnit\Framework\TestCase;
 
 class CanParseEnumsTest extends TestCase
 {
+    /**
+     * @requires PHP 8.1
+     */
     public function test_it_can_parse_enum(): void
     {
         $code = file_get_contents(__DIR__.'/Fixtures/SampleEnum.php');
