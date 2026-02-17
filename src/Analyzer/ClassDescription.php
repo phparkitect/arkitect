@@ -94,6 +94,7 @@ class ClassDescription
         return $this->FQCN->className();
     }
 
+    /** @return class-string */
     public function getFQCN(): string
     {
         return $this->FQCN->toString();
