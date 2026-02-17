@@ -9,7 +9,6 @@ use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
-use Arkitect\Expression\ForClasses\Implement;
 use Arkitect\Expression\ForClasses\IsAbstract;
 use Arkitect\Expression\ForClasses\IsFinal;
 use Arkitect\Expression\ForClasses\IsReadonly;
@@ -446,10 +445,9 @@ class CanParseClassTest extends TestCase
         $cd = $this->parseCode($code, TargetPhpVersion::PHP_8_1);
         $cd = $cd[2]; // class Test
 
-        $implement = new Implement('Foo\Order');
-        $violations = $this->evaluateRule($implement, $cd);
-
-        self::assertCount(0, $violations);
+        $interfaces = array_map(static fn ($i) => $i->toString(), $cd->getInterfaces());
+        self::assertContains('Foo\Order', $interfaces);
+        self::assertNotContains('Foo\OrderTwo', $interfaces);
     }
 
     public function test_it_parse_interfaces(): void

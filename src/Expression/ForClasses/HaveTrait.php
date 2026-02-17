@@ -39,18 +39,14 @@ final class HaveTrait implements Expression
 
         $trait = $this->trait;
 
-        try {
-            $reflection = new \ReflectionClass($theClass->getFQCN());
-            $allTraits = [];
-            $class = $reflection;
-            while ($class) {
-                foreach ($class->getTraitNames() as $traitName) {
-                    $allTraits[] = $traitName;
-                }
-                $class = $class->getParentClass() ?: null;
+        $reflection = new \ReflectionClass($theClass->getFQCN());
+        $allTraits = [];
+        $class = $reflection;
+        while ($class) {
+            foreach ($class->getTraitNames() as $traitName) {
+                $allTraits[] = $traitName;
             }
-        } catch (\ReflectionException $e) {
-            return;
+            $class = $class->getParentClass() ?: null;
         }
 
         $found = array_reduce(

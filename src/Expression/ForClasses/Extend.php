@@ -31,16 +31,12 @@ class Extend implements Expression
 
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
-        try {
-            $reflection = new \ReflectionClass($theClass->getFQCN());
-            $parents = [];
-            $parent = $reflection->getParentClass();
-            while ($parent) {
-                $parents[] = $parent->getName();
-                $parent = $parent->getParentClass();
-            }
-        } catch (\ReflectionException $e) {
-            return;
+        $reflection = new \ReflectionClass($theClass->getFQCN());
+        $parents = [];
+        $parent = $reflection->getParentClass();
+        while ($parent) {
+            $parents[] = $parent->getName();
+            $parent = $parent->getParentClass();
         }
 
         foreach ($this->classNames as $className) {
