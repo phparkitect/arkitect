@@ -98,6 +98,30 @@ class DocblockParserTest extends TestCase
         self::assertEquals('(int | string)', $varTags[6]);
     }
 
+    public function test_it_should_extract_types_from_throws_tag(): void
+    {
+        $parser = DocblockParserFactory::create();
+
+        $code = <<< 'PHP'
+            /**
+             * @throws \Exception
+             * @throws \Domain\Foo\FooException
+             * @throws BarException
+             */
+        PHP;
+
+        $db = $parser->parse($code);
+
+        $varTags = $db->getThrowTagsTypes();
+        self::assertCount(3, $varTags);
+        self::assertEquals('\Exception', $varTags[0]['type']);
+        self::assertEquals('\Domain\Foo\FooException', $varTags[1]['type']);
+        self::assertEquals('BarException', $varTags[2]['type']);
+        self::assertEquals(2, $varTags[0]['line']);
+        self::assertEquals(3, $varTags[1]['line']);
+        self::assertEquals(4, $varTags[2]['line']);
+    }
+
     public function test_it_should_extract_doctrine_like_annotations(): void
     {
         $parser = DocblockParserFactory::create();

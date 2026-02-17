@@ -43,6 +43,23 @@ class Docblock
         return array_filter($returnTypes);
     }
 
+    /**
+     * @return array<array{type: string, line: int}>
+     */
+    public function getThrowTagsTypes(): array
+    {
+        $throwTypes = [];
+
+        foreach ($this->phpDocNode->getThrowsTagValues() as $throwTag) {
+            $type = $this->getType($throwTag->type);
+            if (null !== $type) {
+                $throwTypes[] = ['type' => $type, 'line' => $throwTag->getAttribute('startLine') ?? 0];
+            }
+        }
+
+        return $throwTypes;
+    }
+
     public function getVarTagTypes(): array
     {
         $varTypes = array_map(
