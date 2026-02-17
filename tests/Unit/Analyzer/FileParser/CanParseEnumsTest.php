@@ -14,22 +14,9 @@ class CanParseEnumsTest extends TestCase
 {
     public function test_it_can_parse_enum(): void
     {
-        $code = <<< 'EOF'
-        <?php
-
-        namespace Root\Cars;
-
-        enum Enum
-        {
-            case Hearts;
-            case Diamonds;
-            case Clubs;
-            case Spades;
-        }
-        EOF;
-
+        $code = file_get_contents(__DIR__.'/Fixtures/SampleEnum.php');
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
-        $fp->parse($code, 'relativePathName');
+        $fp->parse($code, 'SampleEnum.php');
 
         $cd = $fp->getClassDescriptions();
 

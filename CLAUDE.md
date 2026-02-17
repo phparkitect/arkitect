@@ -147,7 +147,7 @@ bin/
 - **`README.md`** - User-facing documentation, installation, usage, available rules
 - **`CONTRIBUTING.md`** - How to contribute (code, tests, docs)
 - **`CONTRIBUTORS.md`** - List of project contributors
-- **`claude.md`** - This file (Claude AI context)
+- **`CLAUDE.md`** - This file (Claude AI context)
 
 ### Configuration Files
 - **`phparkitect.php`** - Example configuration file for users
@@ -288,10 +288,62 @@ make test    # Runs tests on configured PHP version
    - Mixed scenarios that could break
 5. **Test coverage:** Always add unit tests for new functionality
 
+## Reflection-based expression rules (Option B — mandatory autoloading)
+
+All `src/Expression/ForClasses/` expressions (`Implement`, `NotImplement`, `Extend`,
+`NotExtend`, `HaveTrait`, `NotHaveTrait`) use **pure reflection** with no static fallback:
+
+```php
+try {
+    $reflection = new \ReflectionClass($theClass->getFQCN());
+    // ... use reflection ...
+} catch (\ReflectionException $e) {
+    return; // class not autoloadable → skip silently
+}
+```
+
+**Consequence:** every fixture class used in tests must be autoloadable. No vfsStream,
+no inline PHP strings with fake namespaces.
+
+### Test fixture conventions
+
+- Real fixture files live in `tests/*/Fixtures/` subdirectories
+- PSR-4 namespaced fixtures → covered by `"Arkitect\\Tests\\": "tests/"` in autoload-dev
+- Global-namespace traits (e.g. `DatabaseTransactions`) → listed in `classmap` in `composer.json`
+- E2E mvc fixtures (`App\Controller\*`, etc.) → `"App\\": "tests/E2E/_fixtures/mvc/"`
+- `ContainerAwareInterface` (global namespace) → listed in `classmap`
+- After adding fixtures: run `composer dump-autoload`
+
+### composer.json autoload-dev (current state)
+
+```json
+"autoload-dev": {
+    "psr-4": {
+        "Arkitect\\Tests\\": "tests/",
+        "App\\": "tests/E2E/_fixtures/mvc/"
+    },
+    "classmap": [
+        "tests/E2E/_fixtures/mvc/ContainerAwareInterface.php",
+        "tests/Integration/PHPUnit/Fixtures/DatabaseTransactions.php",
+        "tests/Integration/PHPUnit/Fixtures/RefreshDatabase.php",
+        "tests/Integration/PHPUnit/Fixtures/HasUuid.php"
+    ]
+}
+```
+
+### phpunit.xml — fixture directories excluded from test discovery
+
+```xml
+<exclude>tests/Integration/PHPUnit/Fixtures</exclude>
+<exclude>tests/Integration/Fixtures</exclude>
+<exclude>tests/Unit/Analyzer/FileParser/Fixtures</exclude>
+<exclude>tests/Unit/Rules/Fixtures</exclude>
+```
+
 ## Testing Guidelines
 
 - Unit tests go in `tests/` mirroring the `src/` structure
-- Use PHPUnit (7.5+, 9.0+, or 10.0+)
+- Use PHPUnit (9.6+, 10.0+, 11.0+)
 - Use prophecy for mocking
 - Aim for good coverage of critical paths
 - Test both success and edge cases
