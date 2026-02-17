@@ -97,7 +97,10 @@ class ClassDescription
     /** @return class-string */
     public function getFQCN(): string
     {
-        return $this->FQCN->toString();
+        /** @var class-string $fqcn */
+        $fqcn = $this->FQCN->toString();
+
+        return $fqcn;
     }
 
     public function getFilePath(): string
