@@ -188,7 +188,8 @@ class DocblockTypesResolver extends NodeVisitorAbstract
             return;
         }
 
-        $docblockStartLine = $node->getDocComment() ? $node->getDocComment()->getStartLine() : $node->getStartLine();
+        $docComment = $node->getDocComment();
+        $docblockStartLine = $docComment ? $docComment->getStartLine() : $node->getStartLine();
 
         $throwsTypesResolved = [];
 
