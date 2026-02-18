@@ -4,7 +4,7 @@ PHPArchitect is an open-source static analysis tool for enforcing architectural 
 
 ## Project Overview
 
-- **Language:** PHP (7.4+, 8.0+) - **IMPORTANT: Must maintain PHP 7.4 compatibility!**
+- **Language:** PHP 8.0+ (minimum requirement from `composer.json`)
 - **Type Checking:** Psalm
 - **Testing:** PHPUnit
 - **Code Style:** PHP-CS-Fixer
@@ -205,77 +205,15 @@ bin/
 - **PSR-4 Autoloading:** Namespace `Arkitect\` maps to `src/`
 - **Test Namespace:** `Arkitect\Tests\` maps to `tests/`
 - **Naming:** Use descriptive names for classes and methods
-- **Type Hints:** Use proper type declarations (PHP 7.4+ compatible)
+- **Type Hints:** Use proper type declarations (PHP 8.0+ compatible)
 - **Comments:** Only add when logic is non-obvious; avoid redundant docblocks
 
-## PHP Version Compatibility (CRITICAL)
+## PHP Version Compatibility
 
-This project supports **PHP 7.4+**, which has specific limitations compared to PHP 8.0+:
+This project supports **PHP 8.0+**. The CI matrix runs PHP 8.0 through 8.4.
 
-### PHP 7.4 Limitations to Avoid
-
-❌ **NO trailing commas in function parameters/calls**
-```php
-// WRONG (PHP 8.0+ only)
-function foo(
-    string $a,
-    string $b,  // ← This comma breaks PHP 7.4
-) {}
-
-// CORRECT (PHP 7.4 compatible)
-function foo(
-    string $a,
-    string $b   // ← No trailing comma
-) {}
-```
-
-❌ **NO constructor property promotion**
-```php
-// WRONG (PHP 8.0+ only)
-public function __construct(
-    private string $name,
-    private int $age
-) {}
-
-// CORRECT (PHP 7.4 compatible)
-private string $name;
-private int $age;
-
-public function __construct(string $name, int $age)
-{
-    $this->name = $name;
-    $this->age = $age;
-}
-```
-
-❌ **NO union types (PHP 8.0+)**
-```php
-// WRONG
-public function foo(string|int $value) {}
-
-// CORRECT: Use PHPDoc
-/** @param string|int $value */
-public function foo($value) {}
-```
-
-❌ **NO named arguments** (PHP 8.0+)
-❌ **NO match expressions** (PHP 8.0+)
-❌ **NO nullsafe operator (`?->`)** (PHP 8.0+)
-❌ **NO attributes/annotations** (PHP 8.0+)
-
-### PHP 7.4 Features You CAN Use
-
-✅ Typed properties (introduced in PHP 7.4)
-✅ Arrow functions: `fn($x) => $x * 2`
-✅ Null coalescing assignment: `$var ??= 'default'`
-✅ Array spread: `[...$array1, ...$array2]`
-
-### Testing Compatibility
-
-Always test changes with PHP 7.4 to catch compatibility issues:
-```bash
-make test    # Runs tests on configured PHP version
-```
+- **Enum fixtures** require PHP 8.1+ — mark tests that load enum files with
+  `@requires PHP 8.1` to avoid `ParseError` on PHP 8.0.
 
 ## What to Avoid
 
@@ -283,27 +221,41 @@ make test    # Runs tests on configured PHP version
 2. **Unnecessary comments/docstrings:** Only document complex logic
 3. **Feature flags/backwards-compatibility shims:** Modify code directly when possible
 4. **Parsing edge cases:** When working with parser logic, test against:
-   - PHP 7.4 syntax (older code)
-   - PHP 8.0+ features (newer syntax)
+   - PHP 8.0 syntax (minimum supported)
+   - PHP 8.1+ features (enums, fibers — require `@requires PHP 8.1` in tests)
    - Mixed scenarios that could break
 5. **Test coverage:** Always add unit tests for new functionality
 
-## Reflection-based expression rules (Option B — mandatory autoloading)
+## Reflection-based expression rules — mandatory autoloading
 
 All `src/Expression/ForClasses/` expressions (`Implement`, `NotImplement`, `Extend`,
-`NotExtend`, `HaveTrait`, `NotHaveTrait`) use **pure reflection** with no static fallback:
+`NotExtend`, `HaveTrait`, `NotHaveTrait`) use **pure reflection** with no static fallback
+and **no silent skip**: if a class cannot be reflected, `ReflectionException` propagates.
 
 ```php
-try {
-    $reflection = new \ReflectionClass($theClass->getFQCN());
-    // ... use reflection ...
-} catch (\ReflectionException $e) {
-    return; // class not autoloadable → skip silently
-}
+$reflection = new \ReflectionClass($theClass->getFQCN()); // throws on missing class
 ```
 
-**Consequence:** every fixture class used in tests must be autoloadable. No vfsStream,
-no inline PHP strings with fake namespaces.
+Why reflection and not the AST parse tree:
+- Transitive inheritance — `getInterfaceNames()` / `getParentClass()` / `getTraitNames()`
+  walk the full hierarchy, the static parser only sees what is written in the file.
+- **No `catch → return`**: a `ReflectionException` means autoloading is misconfigured;
+  silently skipping it would produce false negatives (rules apparently passing when they
+  were never actually evaluated). The exception surfaces the problem immediately.
+
+`ClassDescription::getFQCN()` is annotated `@return class-string` (Psalm pseudo-type,
+not a PHP type) so that Psalm does not flag the `ReflectionClass` constructor calls.
+
+**Consequence:** every class evaluated by these expressions must be autoloadable.
+No vfsStream, no inline PHP strings with fake namespaces in tests.
+
+### What about `@throws` docblock tags?
+
+`@throws` is handled at the **dependency-collection** level (AST, not reflection).
+It adds the explicitly declared exception FQCN as a dependency of the class — a direct,
+non-transitive relationship. Reflection is not needed here: the parser already resolves
+FQCNs via `use` statements. If you want to verify that thrown exceptions extend a base
+class, write a separate rule using `Extend`, which now works transitively.
 
 ### Test fixture conventions
 
@@ -416,7 +368,7 @@ Before committing changes, ensure:
 - [ ] **Tests pass:** `make test`
 - [ ] **Code style fixed:** `make csfix`
 - [ ] **No type errors:** `make psalm`
-- [ ] **PHP 7.4 compatible:** No trailing commas, union types, or PHP 8+ syntax
+- [ ] **PHP 8.0 compatible:** CI runs on PHP 8.0–8.4; enum fixtures need `@requires PHP 8.1`
 - [ ] **Documentation updated:** If adding/changing rules, update `README.md`
 - [ ] **Tests added:** New functionality has corresponding tests
 
