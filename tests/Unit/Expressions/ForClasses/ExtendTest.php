@@ -124,7 +124,6 @@ class ExtendTest extends TestCase
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName(ChildClass::class)
-            ->addExtends(MiddleClass::class, 10)
             ->build();
 
         $violations = new Violations();

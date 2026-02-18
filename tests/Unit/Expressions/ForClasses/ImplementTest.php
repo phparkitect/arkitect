@@ -102,7 +102,6 @@ class ImplementTest extends TestCase
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName(DerivedClass::class)
-            ->addExtends(ConcreteClass::class, 1)
             ->build();
 
         $violations = new Violations();

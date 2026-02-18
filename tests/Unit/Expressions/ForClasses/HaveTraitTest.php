@@ -166,7 +166,6 @@ class HaveTraitTest extends TestCase
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName(ChildInheritingSomeTrait::class)
-            ->addExtends(ClassUsingSomeTrait::class, 1)
             ->build();
 
         $violations = new Violations();

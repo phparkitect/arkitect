@@ -83,7 +83,6 @@ class NotExtendTest extends TestCase
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName(ChildClass::class)
-            ->addExtends(MiddleClass::class, 1)
             ->build();
 
         $violations = new Violations();

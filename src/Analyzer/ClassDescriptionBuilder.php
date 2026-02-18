@@ -12,9 +12,6 @@ class ClassDescriptionBuilder
 
     private ?FullyQualifiedClassName $FQCN = null;
 
-    /** @var list<FullyQualifiedClassName> */
-    private array $extends = [];
-
     private bool $final = false;
 
     private bool $readonly = false;
@@ -42,7 +39,6 @@ class ClassDescriptionBuilder
     {
         $this->FQCN = null;
         $this->classDependencies = [];
-        $this->extends = [];
         $this->final = false;
         $this->readonly = false;
         $this->abstract = false;
@@ -75,14 +71,6 @@ class ClassDescriptionBuilder
         }
 
         $this->classDependencies[] = $cd;
-
-        return $this;
-    }
-
-    public function addExtends(string $FQCN, int $line): self
-    {
-        $this->addDependency(new ClassDependency($FQCN, $line));
-        $this->extends[] = FullyQualifiedClassName::fromString($FQCN);
 
         return $this;
     }
@@ -160,7 +148,6 @@ class ClassDescriptionBuilder
         return new ClassDescription(
             $this->FQCN,
             $this->classDependencies,
-            $this->extends,
             $this->final,
             $this->readonly,
             $this->abstract,

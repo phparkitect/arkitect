@@ -77,7 +77,6 @@ class NotImplementTest extends TestCase
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName(SubClass::class)
-            ->addExtends(BaseClass::class, 1)
             ->build();
 
         $violations = new Violations();
