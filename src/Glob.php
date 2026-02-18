@@ -8,10 +8,11 @@ class Glob
     public static function toRegex(string $glob): string
     {
         $regexp = strtr(preg_quote($glob, '/'), [
-            '\*' => '.*',
-            '\?' => '.',
-            '\[' => '[',
-            '\]' => ']',
+            '\*\*' => '.*',
+            '\*'   => '[^\/]*',
+            '\?'   => '[^\/]',
+            '\['   => '[',
+            '\]'   => ']',
             '\[\!' => '[ˆ',
         ]);
 
