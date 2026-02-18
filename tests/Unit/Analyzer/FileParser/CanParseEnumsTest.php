@@ -32,6 +32,33 @@ class CanParseEnumsTest extends TestCase
     }
 
     /**
+     * @requires PHP 8.1
+     */
+    public function test_it_records_interface_dependency_for_enum_implementing_interface(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+        namespace App\Foo;
+
+        interface Colorful {}
+
+        enum Suit: string implements Colorful
+        {
+            case Hearts = 'H';
+        }
+        EOF;
+
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
+        $fp->parse($code, 'relativePathName');
+        $cd = $fp->getClassDescriptions();
+
+        $enum = $cd[1]; // cd[0] = Colorful interface, cd[1] = Suit enum
+        self::assertTrue($enum->isEnum());
+        self::assertCount(1, $enum->getDependencies());
+        self::assertEquals('App\Foo\Colorful', $enum->getDependencies()[0]->getFQCN()->toString());
+    }
+
+    /**
      * @dataProvider provide_enums
      */
     public function test_it_parse_enums(string $code): void
