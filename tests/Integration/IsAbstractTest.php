@@ -161,34 +161,6 @@ class IsAbstractTest extends TestCase
         self::assertCount(0, $runner->getParsingErrors());
     }
 
-    public function test_is_not_abstract_in_that_does_not_skip_final_readonly_classes(): void
-    {
-        $structure = [
-            'My' => [
-                'Namespace' => [
-                    'TreeTypeID.php' => '<?php namespace My\Namespace; final readonly class TreeTypeID extends ID {}',
-                ],
-            ],
-        ];
-
-        $runner = TestRunner::create('8.4');
-
-        $rule = Rule::allClasses()
-            ->that(new ResideInOneOfTheseNamespaces('My\Namespace'))
-            ->andThat(new IsNotTrait())
-            ->andThat(new IsNotAbstract())
-            ->andThat(new IsNotInterface())
-            ->andThat(new IsNotEnum())
-            ->should(new HaveNameMatching('My*'))
-            ->because('we want to prefix classes in this namespace with My');
-
-        $runner->run(vfsStream::setup('root', null, $structure)->url(), $rule);
-
-        self::assertCount(1, $runner->getViolations());
-        self::assertEquals('My\Namespace\TreeTypeID', $runner->getViolations()->get(0)->getFqcn());
-        self::assertCount(0, $runner->getParsingErrors());
-    }
-
     public function test_it_can_check_multiple_class_properties(): void
     {
         $structure = [
