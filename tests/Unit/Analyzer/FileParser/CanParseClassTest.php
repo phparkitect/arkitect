@@ -445,9 +445,9 @@ class CanParseClassTest extends TestCase
         $cd = $this->parseCode($code, TargetPhpVersion::PHP_8_1);
         $cd = $cd[2]; // class Test
 
-        $interfaces = array_map(static fn ($i) => $i->toString(), $cd->getInterfaces());
-        self::assertContains('Foo\Order', $interfaces);
-        self::assertNotContains('Foo\OrderTwo', $interfaces);
+        $deps = array_map(static fn ($d) => $d->getFQCN()->toString(), $cd->getDependencies());
+        self::assertContains('Foo\Order', $deps);
+        self::assertNotContains('Foo\OrderTwo', $deps);
     }
 
     public function test_it_parse_interfaces(): void

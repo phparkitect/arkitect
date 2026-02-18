@@ -14,9 +14,6 @@ class ClassDescription
     private array $dependencies;
 
     /** @var list<FullyQualifiedClassName> */
-    private array $interfaces;
-
-    /** @var list<FullyQualifiedClassName> */
     private array $extends;
 
     /** @var list<string> */
@@ -42,7 +39,6 @@ class ClassDescription
 
     /**
      * @param list<ClassDependency>         $dependencies
-     * @param list<FullyQualifiedClassName> $interfaces
      * @param list<FullyQualifiedClassName> $extends
      * @param list<string>                  $docBlock
      * @param list<FullyQualifiedClassName> $attributes
@@ -51,7 +47,6 @@ class ClassDescription
     public function __construct(
         FullyQualifiedClassName $FQCN,
         array $dependencies,
-        array $interfaces,
         array $extends,
         bool $final,
         bool $readonly,
@@ -67,7 +62,6 @@ class ClassDescription
         $this->FQCN = $FQCN;
         $this->filePath = $filePath;
         $this->dependencies = $dependencies;
-        $this->interfaces = $interfaces;
         $this->extends = $extends;
         $this->final = $final;
         $this->readonly = $readonly;
@@ -135,14 +129,6 @@ class ClassDescription
     public function getDependencies(): array
     {
         return $this->dependencies;
-    }
-
-    /**
-     * @return list<FullyQualifiedClassName>
-     */
-    public function getInterfaces(): array
-    {
-        return $this->interfaces;
     }
 
     /**

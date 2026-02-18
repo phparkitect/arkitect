@@ -23,7 +23,6 @@ final class IsATest extends TestCase
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName(CavendishBanana::class)
-            ->addInterface($interface, 10)
             ->build();
 
         $violations = new Violations();
