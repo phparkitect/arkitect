@@ -11,27 +11,27 @@ use Arkitect\Rules\Violation;
 use Arkitect\Rules\ViolationMessage;
 use Arkitect\Rules\Violations;
 
-final class IsA implements Expression
+final class IsNotA implements Expression
 {
     /** @var class-string */
-    private string $allowedFqcn;
+    private string $disallowedFqcn;
 
     /**
-     * @param class-string $allowedFqcn
+     * @param class-string $disallowedFqcn
      */
-    public function __construct(string $allowedFqcn)
+    public function __construct(string $disallowedFqcn)
     {
-        $this->allowedFqcn = $allowedFqcn;
+        $this->disallowedFqcn = $disallowedFqcn;
     }
 
     public function describe(ClassDescription $theClass, string $because = ''): Description
     {
-        return new Description("{$theClass->getName()} should be a $this->allowedFqcn", $because);
+        return new Description("{$theClass->getName()} should not be a $this->disallowedFqcn", $because);
     }
 
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because = ''): void
     {
-        if (!is_a($theClass->getFQCN(), $this->allowedFqcn, true)) {
+        if (is_a($theClass->getFQCN(), $this->disallowedFqcn, true)) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
                 ViolationMessage::selfExplanatory($this->describe($theClass, $because)),
