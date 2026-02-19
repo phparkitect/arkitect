@@ -352,6 +352,17 @@ $rules[] = Rule::allClasses()
 
 *Note: This rule checks if a class inherits from or implements a given class/interface using PHP's `is_a()` function.*
 
+### Is not a (does not inherit from or implement)
+
+```php
+$rules[] = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Domain\Event'))
+    ->should(new IsNotA('App\Domain\DeprecatedEvent'))
+    ->because('no event should extend or implement the deprecated base class');
+```
+
+*Note: This is the symmetrical counterpart of `IsA`. It fails if a class inherits from or implements the given class/interface.*
+
 ### Is abstract
 
 ```php
