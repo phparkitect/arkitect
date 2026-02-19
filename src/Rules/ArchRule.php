@@ -39,7 +39,7 @@ class ArchRule implements DSL\ArchRule
 
     public function check(ClassDescription $classDescription, Violations $violations): void
     {
-        if ($classDescription->namespaceMatchesOneOfTheseNamespaces($this->classesToBeExcluded)) {
+        if ($classDescription->namespaceMatchesOneOfTheseNamespacesSplat(...$this->classesToBeExcluded)) {
             return;
         }
 
