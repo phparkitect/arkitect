@@ -7,11 +7,11 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\IsA;
 use Arkitect\Rules\Violations;
-use Arkitect\Tests\Unit\Expressions\ForClasses\IsOneOfTest\Animal\Dog;
-use Arkitect\Tests\Unit\Expressions\ForClasses\IsOneOfTest\Fruit\Banana;
-use Arkitect\Tests\Unit\Expressions\ForClasses\IsOneOfTest\Fruit\CavendishBanana;
-use Arkitect\Tests\Unit\Expressions\ForClasses\IsOneOfTest\Fruit\DwarfCavendishBanana;
-use Arkitect\Tests\Unit\Expressions\ForClasses\IsOneOfTest\Fruit\FruitInterface;
+use Arkitect\Tests\Unit\Expressions\ForClasses\IsATest\Animal\Dog;
+use Arkitect\Tests\Unit\Expressions\ForClasses\IsATest\Fruit\Banana;
+use Arkitect\Tests\Unit\Expressions\ForClasses\IsATest\Fruit\CavendishBanana;
+use Arkitect\Tests\Unit\Expressions\ForClasses\IsATest\Fruit\DwarfCavendishBanana;
+use Arkitect\Tests\Unit\Expressions\ForClasses\IsATest\Fruit\FruitInterface;
 use PHPUnit\Framework\TestCase;
 
 final class IsATest extends TestCase
@@ -48,7 +48,7 @@ final class IsATest extends TestCase
         self::assertEquals(0, $violations->count());
     }
 
-    public function test_it_should_have_violation_if_it_doesnt_extend(): void
+    public function test_it_should_have_violation_when_it_doesnt_extend(): void
     {
         $interface = FruitInterface::class;
         $isA = new IsA($interface);
@@ -62,12 +62,12 @@ final class IsATest extends TestCase
 
         self::assertEquals(1, $violations->count());
         self::assertEquals(
-            "should inherit from: $interface",
+            "Dog should be a $interface",
             $isA->describe($classDescription, '')->toString()
         );
     }
 
-    public function test_it_should_have_violation_if_it_doesnt_implement(): void
+    public function test_it_should_have_violation_when_it_doesnt_implement(): void
     {
         $class = Banana::class;
         $isA = new IsA($class);
@@ -81,19 +81,19 @@ final class IsATest extends TestCase
 
         self::assertEquals(1, $violations->count());
         self::assertEquals(
-            "should inherit from: $class",
+            "Dog should be a $class",
             $isA->describe($classDescription, '')->toString()
         );
     }
 }
 
-namespace Arkitect\Tests\Unit\Expressions\ForClasses\IsOneOfTest\Animal;
+namespace Arkitect\Tests\Unit\Expressions\ForClasses\IsATest\Animal;
 
 final class Dog
 {
 }
 
-namespace Arkitect\Tests\Unit\Expressions\ForClasses\IsOneOfTest\Fruit;
+namespace Arkitect\Tests\Unit\Expressions\ForClasses\IsATest\Fruit;
 
 interface FruitInterface
 {
