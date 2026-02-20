@@ -86,6 +86,38 @@ class ClassSetTest extends TestCase
         self::assertEquals($expected, $actual);
     }
 
+    public function test_can_exclude_using_double_wildcard_glob_pattern(): void
+    {
+        $structure = [
+            'Domain' => [
+                'Product' => [
+                    'Tests' => [
+                        'ProductTest.php' => '',
+                    ],
+                    'Product.php' => '',
+                ],
+                'User' => [
+                    'Tests' => [
+                        'UserTest.php' => '',
+                    ],
+                    'User.php' => '',
+                ],
+            ],
+        ];
+
+        $path = vfsStream::setup('root', null, $structure)->url();
+        $set = ClassSet::fromDir($path)->excludePath('**/Tests/');
+
+        $expected = [
+            'Domain/Product/Product.php',
+            'Domain/User/User.php',
+        ];
+
+        $actual = array_values(array_map(static fn ($item) => $item->getRelativePathname(), iterator_to_array($set)));
+
+        self::assertEquals($expected, $actual);
+    }
+
     protected function createMvcProjectStructure(): string
     {
         $structure = [
