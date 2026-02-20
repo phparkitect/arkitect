@@ -7,18 +7,21 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\NotExtend;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Unit\Expressions\ForClasses\NotExtendTest\Fixtures\ChildClass;
+use Arkitect\Tests\Unit\Expressions\ForClasses\NotExtendTest\Fixtures\GrandParentClass;
+use Arkitect\Tests\Unit\Expressions\ForClasses\NotExtendTest\Fixtures\MiddleClass;
+use Arkitect\Tests\Unit\Expressions\ForClasses\NotExtendTest\Fixtures\StandaloneClass;
 use PHPUnit\Framework\TestCase;
 
 class NotExtendTest extends TestCase
 {
-    public function test_it_should_return_violation_error(): void
+    public function test_it_should_return_violation_when_class_directly_extends(): void
     {
-        $notExtend = new NotExtend('My\BaseClass');
+        $notExtend = new NotExtend(MiddleClass::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName('HappyIsland')
-            ->addExtends('My\BaseClass', 1)
+            ->setClassName(ChildClass::class)
             ->build();
 
         $because = 'we want to add this rule for our software';
@@ -28,35 +31,34 @@ class NotExtendTest extends TestCase
         $notExtend->evaluate($classDescription, $violations, $because);
 
         self::assertEquals(1, $violations->count());
-        self::assertEquals('should not extend one of these classes: My\BaseClass because we want to add this rule for our software', $violationError);
+        self::assertEquals(
+            'should not extend one of these classes: '.MiddleClass::class.' because we want to add this rule for our software',
+            $violationError
+        );
     }
 
-    public function test_it_should_not_return_violation_error_if_extends_another_class(): void
+    public function test_it_should_not_return_violation_when_class_has_no_parent(): void
     {
-        $notExtend = new NotExtend('My\BaseClass');
+        $notExtend = new NotExtend(GrandParentClass::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName('HappyIsland')
-            ->addExtends('My\AnotherClass', 1)
+            ->setClassName(StandaloneClass::class)
             ->build();
 
-        $because = 'we want to add this rule for our software';
         $violations = new Violations();
-
-        $notExtend->evaluate($classDescription, $violations, $because);
+        $notExtend->evaluate($classDescription, $violations, '');
 
         self::assertEquals(0, $violations->count());
     }
 
-    public function test_it_should_return_violation_error_for_multiple_extends(): void
+    public function test_it_should_return_violation_for_one_matching_class_among_multiple(): void
     {
-        $notExtend = new NotExtend('My\FirstExtend', 'My\SecondExtend');
+        $notExtend = new NotExtend(StandaloneClass::class, MiddleClass::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName('HappyIsland')
-            ->addExtends('My\SecondExtend', 1)
+            ->setClassName(ChildClass::class)
             ->build();
 
         $because = 'we want to add this rule for our software';
@@ -66,6 +68,44 @@ class NotExtendTest extends TestCase
         $notExtend->evaluate($classDescription, $violations, $because);
 
         self::assertEquals(1, $violations->count());
-        self::assertEquals('should not extend one of these classes: My\FirstExtend, My\SecondExtend because we want to add this rule for our software', $violationError);
+        self::assertEquals(
+            'should not extend one of these classes: '.StandaloneClass::class.', '.MiddleClass::class.' because we want to add this rule for our software',
+            $violationError
+        );
     }
+
+    public function test_it_should_detect_grandparent_as_violation_via_reflection(): void
+    {
+        $notExtend = new NotExtend(GrandParentClass::class);
+
+        // ChildClass extends MiddleClass extends GrandParentClass.
+        // The ClassDescription only knows the direct parent (MiddleClass).
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName(ChildClass::class)
+            ->build();
+
+        $violations = new Violations();
+        $notExtend->evaluate($classDescription, $violations, 'because');
+
+        self::assertEquals(1, $violations->count());
+    }
+}
+
+namespace Arkitect\Tests\Unit\Expressions\ForClasses\NotExtendTest\Fixtures;
+
+abstract class GrandParentClass
+{
+}
+
+abstract class MiddleClass extends GrandParentClass
+{
+}
+
+class ChildClass extends MiddleClass
+{
+}
+
+class StandaloneClass
+{
 }

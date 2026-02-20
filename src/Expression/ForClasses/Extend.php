@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Rules\Violation;
@@ -30,23 +31,26 @@ class Extend implements Expression
 
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
-        $extends = $theClass->getExtends();
+        $reflection = new \ReflectionClass($theClass->getFQCN());
+        $parents = [];
+        $parent = $reflection->getParentClass();
+        while ($parent) {
+            $parents[] = $parent->getName();
+            $parent = $parent->getParentClass();
+        }
 
-        /** @var string $className */
         foreach ($this->classNames as $className) {
-            foreach ($extends as $extend) {
-                if ($extend->matches($className)) {
+            foreach ($parents as $parentName) {
+                if (FullyQualifiedClassName::fromString($parentName)->matches($className)) {
                     return;
                 }
             }
         }
 
-        $violation = Violation::create(
+        $violations->add(Violation::create(
             $theClass->getFQCN(),
             ViolationMessage::selfExplanatory($this->describe($theClass, $because)),
             $theClass->getFilePath()
-        );
-
-        $violations->add($violation);
+        ));
     }
 }

@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 class ClassDescriptionBuilderTest extends TestCase
 {
-    public function test_it_should_create_builder_with_dependency_and_interface(): void
+    public function test_it_should_create_builder_with_dependency(): void
     {
         $FQCN = 'HappyIsland';
 
@@ -20,7 +20,6 @@ class ClassDescriptionBuilderTest extends TestCase
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
             ->addDependency(new ClassDependency('DepClass', 10))
-            ->addInterface('InterfaceClass', 10)
             ->build();
 
         self::assertInstanceOf(ClassDescription::class, $classDescription);

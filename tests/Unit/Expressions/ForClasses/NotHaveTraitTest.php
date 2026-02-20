@@ -7,51 +7,53 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\NotHaveTrait;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Unit\Expressions\ForClasses\NotHaveTraitTest\Fixtures\ChildInheritingSomeTrait;
+use Arkitect\Tests\Unit\Expressions\ForClasses\NotHaveTraitTest\Fixtures\ClassUsingAnotherTrait;
+use Arkitect\Tests\Unit\Expressions\ForClasses\NotHaveTraitTest\Fixtures\ClassUsingSomeTrait;
+use Arkitect\Tests\Unit\Expressions\ForClasses\NotHaveTraitTest\Fixtures\SomeTrait;
+use Arkitect\Tests\Unit\Expressions\ForClasses\NotHaveTraitTest\Fixtures\TraitNotUsingSomeTrait;
+use Arkitect\Tests\Unit\Expressions\ForClasses\NotHaveTraitTest\Fixtures\TraitUsingSomeTrait;
 use PHPUnit\Framework\TestCase;
 
 class NotHaveTraitTest extends TestCase
 {
     public function test_it_should_return_no_violation_if_class_does_not_use_trait(): void
     {
-        $traitConstraint = new NotHaveTrait('MyTrait');
+        $traitConstraint = new NotHaveTrait(SomeTrait::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName('HappyIsland')
+            ->setClassName(ClassUsingAnotherTrait::class)
             ->build();
 
-        $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $traitConstraint->evaluate($classDescription, $violations, $because);
+        $traitConstraint->evaluate($classDescription, $violations, '');
 
         self::assertEquals(0, $violations->count());
     }
 
     public function test_it_should_return_no_violation_if_class_uses_different_trait(): void
     {
-        $traitConstraint = new NotHaveTrait('MyTrait');
+        $traitConstraint = new NotHaveTrait(SomeTrait::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName('HappyIsland')
-            ->addTrait('AnotherTrait', 1)
+            ->setClassName(ClassUsingAnotherTrait::class)
             ->build();
 
-        $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $traitConstraint->evaluate($classDescription, $violations, $because);
+        $traitConstraint->evaluate($classDescription, $violations, '');
 
         self::assertEquals(0, $violations->count());
     }
 
     public function test_it_should_return_violation_if_class_uses_trait(): void
     {
-        $traitConstraint = new NotHaveTrait('MyTrait');
+        $traitConstraint = new NotHaveTrait(SomeTrait::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName('HappyIsland')
-            ->addTrait('MyTrait', 1)
+            ->setClassName(ClassUsingSomeTrait::class)
             ->build();
 
         $because = 'we want to add this rule for our software';
@@ -60,16 +62,16 @@ class NotHaveTraitTest extends TestCase
 
         $violationError = $traitConstraint->describe($classDescription, $because)->toString();
 
-        self::assertNotEquals(0, $violations->count());
+        self::assertEquals(1, $violations->count());
         self::assertEquals(
-            'should not use the trait MyTrait because we want to add this rule for our software',
+            'should not use the trait '.SomeTrait::class.' because we want to add this rule for our software',
             $violationError
         );
     }
 
     public function test_it_should_return_no_violation_if_is_an_interface(): void
     {
-        $traitConstraint = new NotHaveTrait('MyTrait');
+        $traitConstraint = new NotHaveTrait(SomeTrait::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
@@ -77,51 +79,47 @@ class NotHaveTraitTest extends TestCase
             ->setInterface(true)
             ->build();
 
-        $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $traitConstraint->evaluate($classDescription, $violations, $because);
+        $traitConstraint->evaluate($classDescription, $violations, '');
 
         self::assertEquals(0, $violations->count());
     }
 
     public function test_it_should_return_no_violation_if_trait_does_not_use_prohibited_trait(): void
     {
-        $traitConstraint = new NotHaveTrait('MyTrait');
+        $traitConstraint = new NotHaveTrait(SomeTrait::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName('HappyIsland')
+            ->setClassName(TraitNotUsingSomeTrait::class)
             ->setTrait(true)
             ->build();
 
-        $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $traitConstraint->evaluate($classDescription, $violations, $because);
+        $traitConstraint->evaluate($classDescription, $violations, '');
 
         self::assertEquals(0, $violations->count());
     }
 
     public function test_it_should_return_violation_if_trait_uses_prohibited_trait(): void
     {
-        $traitConstraint = new NotHaveTrait('MyTrait');
+        $traitConstraint = new NotHaveTrait(SomeTrait::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName('HappyIsland')
+            ->setClassName(TraitUsingSomeTrait::class)
             ->setTrait(true)
-            ->addTrait('MyTrait', 1)
             ->build();
 
-        $because = 'we want to add this rule for our software';
         $violations = new Violations();
-        $traitConstraint->evaluate($classDescription, $violations, $because);
+        $traitConstraint->evaluate($classDescription, $violations, '');
 
         self::assertEquals(1, $violations->count());
     }
 
     public function test_applies_to_should_return_true_for_regular_classes(): void
     {
-        $traitConstraint = new NotHaveTrait('MyTrait');
+        $traitConstraint = new NotHaveTrait(SomeTrait::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
@@ -133,7 +131,7 @@ class NotHaveTraitTest extends TestCase
 
     public function test_applies_to_should_return_false_for_interfaces(): void
     {
-        $traitConstraint = new NotHaveTrait('MyTrait');
+        $traitConstraint = new NotHaveTrait(SomeTrait::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
@@ -146,7 +144,7 @@ class NotHaveTraitTest extends TestCase
 
     public function test_applies_to_should_return_true_for_traits(): void
     {
-        $traitConstraint = new NotHaveTrait('MyTrait');
+        $traitConstraint = new NotHaveTrait(SomeTrait::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
@@ -156,4 +154,54 @@ class NotHaveTraitTest extends TestCase
 
         self::assertTrue($traitConstraint->appliesTo($classDescription));
     }
+
+    public function test_it_should_detect_trait_inherited_from_parent_as_violation_via_reflection(): void
+    {
+        $traitConstraint = new NotHaveTrait(SomeTrait::class);
+
+        // ChildInheritingSomeTrait extends ClassUsingSomeTrait which uses SomeTrait.
+        // The ClassDescription only knows the direct parent, not the inherited trait.
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName(ChildInheritingSomeTrait::class)
+            ->build();
+
+        $violations = new Violations();
+        $traitConstraint->evaluate($classDescription, $violations, 'because');
+
+        self::assertEquals(1, $violations->count());
+    }
+}
+
+namespace Arkitect\Tests\Unit\Expressions\ForClasses\NotHaveTraitTest\Fixtures;
+
+trait SomeTrait
+{
+}
+
+trait AnotherTrait
+{
+}
+
+trait TraitUsingSomeTrait
+{
+    use SomeTrait;
+}
+
+trait TraitNotUsingSomeTrait
+{
+}
+
+class ClassUsingSomeTrait
+{
+    use SomeTrait;
+}
+
+class ClassUsingAnotherTrait
+{
+    use AnotherTrait;
+}
+
+class ChildInheritingSomeTrait extends ClassUsingSomeTrait
+{
 }

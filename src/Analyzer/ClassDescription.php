@@ -13,12 +13,6 @@ class ClassDescription
     /** @var list<ClassDependency> */
     private array $dependencies;
 
-    /** @var list<FullyQualifiedClassName> */
-    private array $interfaces;
-
-    /** @var list<FullyQualifiedClassName> */
-    private array $extends;
-
     /** @var list<string> */
     private array $docBlock;
 
@@ -42,8 +36,6 @@ class ClassDescription
 
     /**
      * @param list<ClassDependency>         $dependencies
-     * @param list<FullyQualifiedClassName> $interfaces
-     * @param list<FullyQualifiedClassName> $extends
      * @param list<string>                  $docBlock
      * @param list<FullyQualifiedClassName> $attributes
      * @param list<FullyQualifiedClassName> $traits
@@ -51,8 +43,6 @@ class ClassDescription
     public function __construct(
         FullyQualifiedClassName $FQCN,
         array $dependencies,
-        array $interfaces,
-        array $extends,
         bool $final,
         bool $readonly,
         bool $abstract,
@@ -67,8 +57,6 @@ class ClassDescription
         $this->FQCN = $FQCN;
         $this->filePath = $filePath;
         $this->dependencies = $dependencies;
-        $this->interfaces = $interfaces;
-        $this->extends = $extends;
         $this->final = $final;
         $this->readonly = $readonly;
         $this->abstract = $abstract;
@@ -94,9 +82,13 @@ class ClassDescription
         return $this->FQCN->className();
     }
 
+    /** @return class-string */
     public function getFQCN(): string
     {
-        return $this->FQCN->toString();
+        /** @var class-string $fqcn */
+        $fqcn = $this->FQCN->toString();
+
+        return $fqcn;
     }
 
     public function getFilePath(): string
@@ -131,22 +123,6 @@ class ClassDescription
     public function getDependencies(): array
     {
         return $this->dependencies;
-    }
-
-    /**
-     * @return list<FullyQualifiedClassName>
-     */
-    public function getInterfaces(): array
-    {
-        return $this->interfaces;
-    }
-
-    /**
-     * @return list<FullyQualifiedClassName>
-     */
-    public function getExtends(): array
-    {
-        return $this->extends;
     }
 
     public function isFinal(): bool

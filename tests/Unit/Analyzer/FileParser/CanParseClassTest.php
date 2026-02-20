@@ -9,7 +9,6 @@ use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
-use Arkitect\Expression\ForClasses\Implement;
 use Arkitect\Expression\ForClasses\IsAbstract;
 use Arkitect\Expression\ForClasses\IsFinal;
 use Arkitect\Expression\ForClasses\IsReadonly;
@@ -209,7 +208,7 @@ class CanParseClassTest extends TestCase
         $cd = $this->parseCode($code);
         $cd = $cd[1];
 
-        self::assertEquals('Root\Animals\Animal', $cd->getExtends()[0]->toString());
+        self::assertEquals('Root\Animals\Animal', $cd->getDependencies()[0]->getFQCN()->toString());
     }
 
     public function test_it_should_not_parse_extends_from_insider_anonymousclass(): void
@@ -235,7 +234,7 @@ class CanParseClassTest extends TestCase
         $cd = $this->parseCode($code);
         $cd = $cd[1];
 
-        self::assertEquals('Root\Animals\Animal', $cd->getExtends()[0]->toString());
+        self::assertEquals('Root\Animals\Animal', $cd->getDependencies()[0]->getFQCN()->toString());
     }
 
     public function test_should_depends_on_these_namespaces(): void
@@ -446,10 +445,9 @@ class CanParseClassTest extends TestCase
         $cd = $this->parseCode($code, TargetPhpVersion::PHP_8_1);
         $cd = $cd[2]; // class Test
 
-        $implement = new Implement('Foo\Order');
-        $violations = $this->evaluateRule($implement, $cd);
-
-        self::assertCount(0, $violations);
+        $deps = array_map(static fn ($d) => $d->getFQCN()->toString(), $cd->getDependencies());
+        self::assertContains('Foo\Order', $deps);
+        self::assertNotContains('Foo\OrderTwo', $deps);
     }
 
     public function test_it_parse_interfaces(): void
@@ -502,8 +500,8 @@ class CanParseClassTest extends TestCase
         $cd = $this->parseCode($code, TargetPhpVersion::PHP_8_1);
 
         self::assertCount(3, $cd);
-        self::assertEquals('MyProject\AppBundle\Application\FooAble', $cd[2]->getExtends()[0]->toString());
-        self::assertEquals('MyProject\AppBundle\Application\BarAble', $cd[2]->getExtends()[1]->toString());
+        self::assertEquals('MyProject\AppBundle\Application\FooAble', $cd[2]->getDependencies()[0]->getFQCN()->toString());
+        self::assertEquals('MyProject\AppBundle\Application\BarAble', $cd[2]->getDependencies()[1]->getFQCN()->toString());
     }
 
     public function test_it_handles_return_types(): void

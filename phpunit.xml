@@ -15,6 +15,10 @@
     <testsuites>
         <testsuite name="default">
             <directory>tests</directory>
+            <exclude>tests/Integration/PHPUnit/Fixtures</exclude>
+            <exclude>tests/Integration/Fixtures</exclude>
+            <exclude>tests/Unit/Analyzer/FileParser/Fixtures</exclude>
+            <exclude>tests/Unit/Rules/Fixtures</exclude>
         </testsuite>
     </testsuites>
 

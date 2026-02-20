@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Arkitect\Expression\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\Expression\Description;
 use Arkitect\Expression\Expression;
 use Arkitect\Rules\Violation;
@@ -36,16 +37,32 @@ final class HaveTrait implements Expression
             return;
         }
 
-        if ($theClass->hasTrait($this->trait)) {
-            return;
+        $trait = $this->trait;
+
+        $reflection = new \ReflectionClass($theClass->getFQCN());
+        $allTraits = [];
+        $class = $reflection;
+        while ($class) {
+            foreach ($class->getTraitNames() as $traitName) {
+                $allTraits[] = $traitName;
+            }
+            $class = $class->getParentClass() ?: null;
         }
 
-        $violations->add(
-            Violation::create(
-                $theClass->getFQCN(),
-                ViolationMessage::selfExplanatory($this->describe($theClass, $because)),
-                $theClass->getFilePath()
-            )
+        $found = array_reduce(
+            $allTraits,
+            static fn (bool $carry, string $traitName): bool => $carry || FullyQualifiedClassName::fromString($traitName)->matches($trait),
+            false
         );
+
+        if (!$found) {
+            $violations->add(
+                Violation::create(
+                    $theClass->getFQCN(),
+                    ViolationMessage::selfExplanatory($this->describe($theClass, $because)),
+                    $theClass->getFilePath()
+                )
+            );
+        }
     }
 }

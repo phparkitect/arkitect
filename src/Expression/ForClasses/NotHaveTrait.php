@@ -39,16 +39,31 @@ class NotHaveTrait implements Expression
         }
 
         $trait = $this->trait;
-        $traits = $theClass->getTraits();
-        $usesTrait = static fn (FullyQualifiedClassName $FQCN): bool => $FQCN->matches($trait);
 
-        if (\count(array_filter($traits, $usesTrait)) > 0) {
-            $violation = Violation::create(
-                $theClass->getFQCN(),
-                ViolationMessage::selfExplanatory($this->describe($theClass, $because)),
-                $theClass->getFilePath()
+        $reflection = new \ReflectionClass($theClass->getFQCN());
+        $allTraits = [];
+        $class = $reflection;
+        while ($class) {
+            foreach ($class->getTraitNames() as $traitName) {
+                $allTraits[] = $traitName;
+            }
+            $class = $class->getParentClass() ?: null;
+        }
+
+        $found = array_reduce(
+            $allTraits,
+            static fn (bool $carry, string $traitName): bool => $carry || FullyQualifiedClassName::fromString($traitName)->matches($trait),
+            false
+        );
+
+        if ($found) {
+            $violations->add(
+                Violation::create(
+                    $theClass->getFQCN(),
+                    ViolationMessage::selfExplanatory($this->describe($theClass, $because)),
+                    $theClass->getFilePath()
+                )
             );
-            $violations->add($violation);
         }
     }
 }

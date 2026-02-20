@@ -129,12 +129,12 @@ class FileVisitor extends NodeVisitorAbstract
 
         foreach ($node->implements as $interface) {
             $this->classDescriptionBuilder
-                ->addInterface($interface->toString(), $interface->getLine());
+                ->addDependency(new ClassDependency($interface->toString(), $interface->getLine()));
         }
 
         if (null !== $node->extends) {
             $this->classDescriptionBuilder
-                ->addExtends($node->extends->toString(), $node->getLine());
+                ->addDependency(new ClassDependency($node->extends->toString(), $node->getLine()));
         }
 
         $this->classDescriptionBuilder->setFinal($node->isFinal());
@@ -180,7 +180,7 @@ class FileVisitor extends NodeVisitorAbstract
 
         foreach ($node->implements as $interface) {
             $this->classDescriptionBuilder
-                ->addInterface($interface->toString(), $interface->getLine());
+                ->addDependency(new ClassDependency($interface->toString(), $interface->getLine()));
         }
     }
 
@@ -293,7 +293,7 @@ class FileVisitor extends NodeVisitorAbstract
 
         foreach ($node->extends as $interface) {
             $this->classDescriptionBuilder
-                ->addExtends($interface->toString(), $interface->getLine());
+                ->addDependency(new ClassDependency($interface->toString(), $interface->getLine()));
         }
     }
 

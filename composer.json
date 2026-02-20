@@ -48,8 +48,15 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Arkitect\\Tests\\": "tests/"
-        }
+            "Arkitect\\Tests\\": "tests/",
+            "App\\": "tests/E2E/_fixtures/mvc/"
+        },
+        "classmap": [
+            "tests/E2E/_fixtures/mvc/ContainerAwareInterface.php",
+            "tests/Integration/PHPUnit/Fixtures/DatabaseTransactions.php",
+            "tests/Integration/PHPUnit/Fixtures/RefreshDatabase.php",
+            "tests/Integration/PHPUnit/Fixtures/HasUuid.php"
+        ]
     },
     "config": {
         "bin-dir": "bin",
