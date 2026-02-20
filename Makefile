@@ -45,7 +45,7 @@ build: ## it launches all the build
 	bin/phpunit
 
 sfbuild: ## it launches all the build
-	symfony php composer.phar install
+	symfony composer install
 	PHP_CS_FIXER_IGNORE_ENV=1 symfony php bin/php-cs-fixer fix -v
 	symfony php bin/psalm
 	symfony php bin/phpunit
