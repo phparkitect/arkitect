@@ -3,6 +3,9 @@ name: PHP CS Fixer
 on:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   cs-fixer:
     runs-on: ubuntu-22.04

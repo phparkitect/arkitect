@@ -3,6 +3,9 @@ name: Architectural test
 on:
     push:
 
+permissions:
+  contents: read
+
 jobs:
     phparkitect:
         name: PHPArkitect
