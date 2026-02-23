@@ -80,6 +80,26 @@ class ClassDescriptionBuilder
         return $this;
     }
 
+    /**
+     * Add an interface discovered via reflection (inherited from parent class or parent interface).
+     * Unlike addInterface(), this does not add a dependency since the interface is not directly
+     * referenced in the source file.
+     */
+    public function addReflectedInterface(string $FQCN): self
+    {
+        $fqcn = FullyQualifiedClassName::fromString($FQCN);
+
+        foreach ($this->interfaces as $existing) {
+            if ($existing->toString() === $fqcn->toString()) {
+                return $this;
+            }
+        }
+
+        $this->interfaces[] = $fqcn;
+
+        return $this;
+    }
+
     public function addDependency(ClassDependency $cd): self
     {
         if ($this->isPhpCoreClass($cd)) {
@@ -95,6 +115,26 @@ class ClassDescriptionBuilder
     {
         $this->addDependency(new ClassDependency($FQCN, $line));
         $this->extends[] = FullyQualifiedClassName::fromString($FQCN);
+
+        return $this;
+    }
+
+    /**
+     * Add a parent class discovered via reflection (ancestor beyond the direct parent).
+     * Unlike addExtends(), this does not add a dependency since the ancestor is not directly
+     * referenced in the source file.
+     */
+    public function addReflectedExtends(string $FQCN): self
+    {
+        $fqcn = FullyQualifiedClassName::fromString($FQCN);
+
+        foreach ($this->extends as $existing) {
+            if ($existing->toString() === $fqcn->toString()) {
+                return $this;
+            }
+        }
+
+        $this->extends[] = $fqcn;
 
         return $this;
     }

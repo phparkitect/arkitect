@@ -137,6 +137,8 @@ class FileVisitor extends NodeVisitorAbstract
                 ->addExtends($node->extends->toString(), $node->getLine());
         }
 
+        $this->resolveInheritedInterfacesAndExtends($node);
+
         $this->classDescriptionBuilder->setFinal($node->isFinal());
 
         $this->classDescriptionBuilder->setReadonly($node->isReadonly());
@@ -181,6 +183,11 @@ class FileVisitor extends NodeVisitorAbstract
         foreach ($node->implements as $interface) {
             $this->classDescriptionBuilder
                 ->addInterface($interface->toString(), $interface->getLine());
+        }
+
+        // Resolve inherited interfaces from directly implemented interfaces
+        foreach ($node->implements as $interface) {
+            $this->addReflectedInterfaceParents($interface->toString());
         }
     }
 
@@ -295,6 +302,11 @@ class FileVisitor extends NodeVisitorAbstract
             $this->classDescriptionBuilder
                 ->addExtends($interface->toString(), $interface->getLine());
         }
+
+        // Resolve ancestor interfaces from directly extended interfaces
+        foreach ($node->extends as $interface) {
+            $this->addReflectedExtendedInterfaceParents($interface->toString());
+        }
     }
 
     private function handleTraitNode(Node $node): void
@@ -393,6 +405,80 @@ class FileVisitor extends NodeVisitorAbstract
         // Handle parameters in set hooks (e.g., set(MyClass $value) { ... })
         foreach ($node->params as $param) {
             $this->addParamDependency($param);
+        }
+    }
+
+    /**
+     * Use reflection to resolve interfaces and parent classes from the full inheritance chain.
+     * This enriches the ClassDescription with interfaces inherited from parent classes
+     * and parent interfaces, so that rules like Implement and Extend work across
+     * the entire hierarchy.
+     */
+    private function resolveInheritedInterfacesAndExtends(Node\Stmt\Class_ $node): void
+    {
+        // Resolve inherited interfaces from directly implemented interfaces
+        foreach ($node->implements as $interface) {
+            $this->addReflectedInterfaceParents($interface->toString());
+        }
+
+        // Resolve inherited interfaces and ancestor classes from parent class
+        if (null === $node->extends) {
+            return;
+        }
+
+        $parentClassName = $node->extends->toString();
+
+        try {
+            /** @var class-string $parentClassName */
+            $reflection = new \ReflectionClass($parentClassName);
+
+            foreach ($reflection->getInterfaceNames() as $interfaceName) {
+                $this->classDescriptionBuilder->addReflectedInterface($interfaceName);
+            }
+
+            $ancestor = $reflection->getParentClass();
+            while (false !== $ancestor) {
+                $this->classDescriptionBuilder->addReflectedExtends($ancestor->getName());
+                $ancestor = $ancestor->getParentClass();
+            }
+        } catch (\ReflectionException $e) {
+            // Parent class not autoloadable, skip reflection-based resolution
+        }
+    }
+
+    /**
+     * Use reflection to discover parent interfaces of a given interface,
+     * adding them to the interfaces list (for classes and enums).
+     */
+    private function addReflectedInterfaceParents(string $interfaceName): void
+    {
+        try {
+            /** @var class-string $interfaceName */
+            $reflection = new \ReflectionClass($interfaceName);
+
+            foreach ($reflection->getInterfaceNames() as $parentInterfaceName) {
+                $this->classDescriptionBuilder->addReflectedInterface($parentInterfaceName);
+            }
+        } catch (\ReflectionException $e) {
+            // Interface not autoloadable, skip
+        }
+    }
+
+    /**
+     * Use reflection to discover parent interfaces of a given interface,
+     * adding them to the extends list (for interface definitions).
+     */
+    private function addReflectedExtendedInterfaceParents(string $interfaceName): void
+    {
+        try {
+            /** @var class-string $interfaceName */
+            $reflection = new \ReflectionClass($interfaceName);
+
+            foreach ($reflection->getInterfaceNames() as $parentInterfaceName) {
+                $this->classDescriptionBuilder->addReflectedExtends($parentInterfaceName);
+            }
+        } catch (\ReflectionException $e) {
+            // Interface not autoloadable, skip
         }
     }
 }
