@@ -68,7 +68,7 @@ class CanResolveInheritedInterfacesTest extends TestCase
         self::assertContains('Traversable', $interfaces);
     }
 
-    public function test_class_with_non_autoloadable_parent_should_still_parse(): void
+    public function test_class_with_non_autoloadable_parent_should_report_parsing_error(): void
     {
         $code = <<< 'EOF'
         <?php
@@ -79,18 +79,21 @@ class CanResolveInheritedInterfacesTest extends TestCase
         }
         EOF;
 
-        $cd = $this->parseCode($code);
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_2);
+        $fp->parse($code, 'relativePathName');
 
-        self::assertCount(1, $cd);
+        $parsingErrors = $fp->getParsingErrors();
 
-        // Should still have the direct extends, just no inherited interfaces
-        $extends = array_map(
-            static fn (FullyQualifiedClassName $fqcn): string => $fqcn->toString(),
-            $cd[0]->getExtends()
+        self::assertGreaterThan(0, \count($parsingErrors));
+
+        $errorMessages = array_map(
+            static fn ($error): string => $error->getError(),
+            $parsingErrors
         );
+        $allErrors = implode(' ', $errorMessages);
 
-        self::assertContains('App\NonExistent\ParentClass', $extends);
-        self::assertCount(0, $cd[0]->getInterfaces());
+        self::assertStringContainsString('App\NonExistent\ParentClass', $allErrors);
+        self::assertStringContainsString('autoloaded', $allErrors);
     }
 
     public function test_inherited_interfaces_should_not_duplicate_direct_interfaces(): void
@@ -118,7 +121,7 @@ class CanResolveInheritedInterfacesTest extends TestCase
         self::assertEquals(1, $countableOccurrences);
     }
 
-    public function test_inherited_interfaces_should_not_add_dependencies(): void
+    public function test_inherited_php_core_interfaces_should_be_filtered_from_dependencies(): void
     {
         $code = <<< 'EOF'
         <?php
@@ -133,7 +136,7 @@ class CanResolveInheritedInterfacesTest extends TestCase
 
         self::assertCount(1, $cd);
 
-        // Dependencies should only include direct references (ArrayObject), not inherited interfaces
+        // PHP core interfaces are filtered out by isPhpCoreClass, same as any other core dependency
         $dependencyNames = array_map(
             static fn ($dep): string => $dep->getFQCN()->toString(),
             $cd[0]->getDependencies()

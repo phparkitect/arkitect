@@ -31,6 +31,7 @@ class FileParserTest extends TestCase
 
         $fileVisitor->setFilePath('foo')->shouldBeCalled();
         $fileVisitor->clearParsedClassDescriptions()->shouldBeCalled();
+        $fileVisitor->getParsingErrors()->willReturn([]);
 
         $fileParser = new FileParser(
             $traverser->reveal(),
@@ -61,6 +62,7 @@ class FileParserTest extends TestCase
 
         $fileVisitor->setFilePath('foo')->shouldBeCalled();
         $fileVisitor->clearParsedClassDescriptions()->shouldBeCalled();
+        $fileVisitor->getParsingErrors()->willReturn([]);
 
         $fileParser = new FileParser(
             $traverser->reveal(),

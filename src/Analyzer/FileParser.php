@@ -74,6 +74,10 @@ class FileParser implements Parser
             echo 'Parse Error: ', $e->getMessage();
             print_r($e->getTraceAsString());
         }
+
+        foreach ($this->fileVisitor->getParsingErrors() as $parsingError) {
+            $this->parsingErrors[] = $parsingError;
+        }
     }
 
     public function getParsingErrors(): array

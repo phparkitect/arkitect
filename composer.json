@@ -49,7 +49,10 @@
     "autoload-dev": {
         "psr-4": {
             "Arkitect\\Tests\\": "tests/"
-        }
+        },
+        "classmap": [
+            "tests/E2E/_fixtures/mvc/"
+        ]
     },
     "config": {
         "bin-dir": "bin",

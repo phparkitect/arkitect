@@ -281,17 +281,18 @@ class ClassDescriptionBuilderTest extends TestCase
         self::assertEquals('App\MyClass', $classDescription->getDependencies()[0]->getFQCN()->toString());
     }
 
-    public function test_add_reflected_interface_should_add_to_interfaces_without_dependency(): void
+    public function test_add_reflected_interface_should_add_to_interfaces_and_dependencies(): void
     {
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('MyClass')
-            ->addReflectedInterface('Vendor\SomeInterface')
+            ->addReflectedInterface('Vendor\SomeInterface', 10)
             ->build();
 
         self::assertCount(1, $classDescription->getInterfaces());
         self::assertEquals('Vendor\SomeInterface', $classDescription->getInterfaces()[0]->toString());
-        self::assertCount(0, $classDescription->getDependencies());
+        self::assertCount(1, $classDescription->getDependencies());
+        self::assertEquals('Vendor\SomeInterface', $classDescription->getDependencies()[0]->getFQCN()->toString());
     }
 
     public function test_add_reflected_interface_should_deduplicate(): void
@@ -300,7 +301,7 @@ class ClassDescriptionBuilderTest extends TestCase
             ->setFilePath('src/Foo.php')
             ->setClassName('MyClass')
             ->addInterface('Vendor\SomeInterface', 10)
-            ->addReflectedInterface('Vendor\SomeInterface')
+            ->addReflectedInterface('Vendor\SomeInterface', 10)
             ->build();
 
         self::assertCount(1, $classDescription->getInterfaces());
@@ -313,7 +314,7 @@ class ClassDescriptionBuilderTest extends TestCase
             ->setFilePath('src/Foo.php')
             ->setClassName('MyClass')
             ->addInterface('Vendor\ChildInterface', 10)
-            ->addReflectedInterface('Vendor\ParentInterface')
+            ->addReflectedInterface('Vendor\ParentInterface', 10)
             ->build();
 
         self::assertCount(2, $classDescription->getInterfaces());
@@ -321,17 +322,18 @@ class ClassDescriptionBuilderTest extends TestCase
         self::assertEquals('Vendor\ParentInterface', $classDescription->getInterfaces()[1]->toString());
     }
 
-    public function test_add_reflected_extends_should_add_to_extends_without_dependency(): void
+    public function test_add_reflected_extends_should_add_to_extends_and_dependencies(): void
     {
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('MyClass')
-            ->addReflectedExtends('Vendor\GrandParentClass')
+            ->addReflectedExtends('Vendor\GrandParentClass', 10)
             ->build();
 
         self::assertCount(1, $classDescription->getExtends());
         self::assertEquals('Vendor\GrandParentClass', $classDescription->getExtends()[0]->toString());
-        self::assertCount(0, $classDescription->getDependencies());
+        self::assertCount(1, $classDescription->getDependencies());
+        self::assertEquals('Vendor\GrandParentClass', $classDescription->getDependencies()[0]->getFQCN()->toString());
     }
 
     public function test_add_reflected_extends_should_deduplicate(): void
@@ -340,7 +342,7 @@ class ClassDescriptionBuilderTest extends TestCase
             ->setFilePath('src/Foo.php')
             ->setClassName('MyClass')
             ->addExtends('Vendor\ParentClass', 10)
-            ->addReflectedExtends('Vendor\ParentClass')
+            ->addReflectedExtends('Vendor\ParentClass', 10)
             ->build();
 
         self::assertCount(1, $classDescription->getExtends());
@@ -353,7 +355,7 @@ class ClassDescriptionBuilderTest extends TestCase
             ->setFilePath('src/Foo.php')
             ->setClassName('MyClass')
             ->addExtends('Vendor\ParentClass', 10)
-            ->addReflectedExtends('Vendor\GrandParentClass')
+            ->addReflectedExtends('Vendor\GrandParentClass', 10)
             ->build();
 
         self::assertCount(2, $classDescription->getExtends());

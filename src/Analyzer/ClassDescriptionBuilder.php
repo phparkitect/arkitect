@@ -82,10 +82,9 @@ class ClassDescriptionBuilder
 
     /**
      * Add an interface discovered via reflection (inherited from parent class or parent interface).
-     * Unlike addInterface(), this does not add a dependency since the interface is not directly
-     * referenced in the source file.
+     * Adds both the interface and a dependency, with deduplication on the interfaces list.
      */
-    public function addReflectedInterface(string $FQCN): self
+    public function addReflectedInterface(string $FQCN, int $line): self
     {
         $fqcn = FullyQualifiedClassName::fromString($FQCN);
 
@@ -95,6 +94,7 @@ class ClassDescriptionBuilder
             }
         }
 
+        $this->addDependency(new ClassDependency($FQCN, $line));
         $this->interfaces[] = $fqcn;
 
         return $this;
@@ -121,10 +121,9 @@ class ClassDescriptionBuilder
 
     /**
      * Add a parent class discovered via reflection (ancestor beyond the direct parent).
-     * Unlike addExtends(), this does not add a dependency since the ancestor is not directly
-     * referenced in the source file.
+     * Adds both the extends entry and a dependency, with deduplication on the extends list.
      */
-    public function addReflectedExtends(string $FQCN): self
+    public function addReflectedExtends(string $FQCN, int $line): self
     {
         $fqcn = FullyQualifiedClassName::fromString($FQCN);
 
@@ -134,6 +133,7 @@ class ClassDescriptionBuilder
             }
         }
 
+        $this->addDependency(new ClassDependency($FQCN, $line));
         $this->extends[] = $fqcn;
 
         return $this;

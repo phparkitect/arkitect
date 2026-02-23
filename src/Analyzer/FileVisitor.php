@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
 
+use Arkitect\Rules\ParsingError;
 use PhpParser\Node;
 use PhpParser\Node\NullableType;
 use PhpParser\NodeVisitorAbstract;
@@ -15,6 +16,11 @@ class FileVisitor extends NodeVisitorAbstract
     /** @var array<ClassDescription> */
     private array $classDescriptions = [];
 
+    /** @var array<ParsingError> */
+    private array $parsingErrors = [];
+
+    private ?string $filePath = null;
+
     public function __construct(ClassDescriptionBuilder $classDescriptionBuilder)
     {
         $this->classDescriptionBuilder = $classDescriptionBuilder;
@@ -22,6 +28,7 @@ class FileVisitor extends NodeVisitorAbstract
 
     public function setFilePath(?string $filePath): void
     {
+        $this->filePath = $filePath;
         $this->classDescriptionBuilder->setFilePath($filePath);
     }
 
@@ -83,9 +90,18 @@ class FileVisitor extends NodeVisitorAbstract
         return $this->classDescriptions;
     }
 
+    /**
+     * @return array<ParsingError>
+     */
+    public function getParsingErrors(): array
+    {
+        return $this->parsingErrors;
+    }
+
     public function clearParsedClassDescriptions(): void
     {
         $this->classDescriptions = [];
+        $this->parsingErrors = [];
         $this->classDescriptionBuilder->setFilePath(null);
         $this->classDescriptionBuilder->clear();
     }
@@ -187,7 +203,7 @@ class FileVisitor extends NodeVisitorAbstract
 
         // Resolve inherited interfaces from directly implemented interfaces
         foreach ($node->implements as $interface) {
-            $this->addReflectedInterfaceParents($interface->toString());
+            $this->addReflectedInterfaceParents($interface->toString(), $interface->getLine());
         }
     }
 
@@ -305,7 +321,7 @@ class FileVisitor extends NodeVisitorAbstract
 
         // Resolve ancestor interfaces from directly extended interfaces
         foreach ($node->extends as $interface) {
-            $this->addReflectedExtendedInterfaceParents($interface->toString());
+            $this->addReflectedExtendedInterfaceParents($interface->toString(), $interface->getLine());
         }
     }
 
@@ -418,7 +434,7 @@ class FileVisitor extends NodeVisitorAbstract
     {
         // Resolve inherited interfaces from directly implemented interfaces
         foreach ($node->implements as $interface) {
-            $this->addReflectedInterfaceParents($interface->toString());
+            $this->addReflectedInterfaceParents($interface->toString(), $interface->getLine());
         }
 
         // Resolve inherited interfaces and ancestor classes from parent class
@@ -427,22 +443,26 @@ class FileVisitor extends NodeVisitorAbstract
         }
 
         $parentClassName = $node->extends->toString();
+        $line = $node->extends->getLine();
 
         try {
             /** @var class-string $parentClassName */
             $reflection = new \ReflectionClass($parentClassName);
 
             foreach ($reflection->getInterfaceNames() as $interfaceName) {
-                $this->classDescriptionBuilder->addReflectedInterface($interfaceName);
+                $this->classDescriptionBuilder->addReflectedInterface($interfaceName, $line);
             }
 
             $ancestor = $reflection->getParentClass();
             while (false !== $ancestor) {
-                $this->classDescriptionBuilder->addReflectedExtends($ancestor->getName());
+                $this->classDescriptionBuilder->addReflectedExtends($ancestor->getName(), $line);
                 $ancestor = $ancestor->getParentClass();
             }
         } catch (\ReflectionException $e) {
-            // Parent class not autoloadable, skip reflection-based resolution
+            $this->parsingErrors[] = ParsingError::create(
+                $this->filePath ?? '',
+                "Reflection error: {$e->getMessage()}. Ensure the class is autoloaded."
+            );
         }
     }
 
@@ -450,17 +470,20 @@ class FileVisitor extends NodeVisitorAbstract
      * Use reflection to discover parent interfaces of a given interface,
      * adding them to the interfaces list (for classes and enums).
      */
-    private function addReflectedInterfaceParents(string $interfaceName): void
+    private function addReflectedInterfaceParents(string $interfaceName, int $line): void
     {
         try {
             /** @var class-string $interfaceName */
             $reflection = new \ReflectionClass($interfaceName);
 
             foreach ($reflection->getInterfaceNames() as $parentInterfaceName) {
-                $this->classDescriptionBuilder->addReflectedInterface($parentInterfaceName);
+                $this->classDescriptionBuilder->addReflectedInterface($parentInterfaceName, $line);
             }
         } catch (\ReflectionException $e) {
-            // Interface not autoloadable, skip
+            $this->parsingErrors[] = ParsingError::create(
+                $this->filePath ?? '',
+                "Reflection error: {$e->getMessage()}. Ensure the class is autoloaded."
+            );
         }
     }
 
@@ -468,17 +491,20 @@ class FileVisitor extends NodeVisitorAbstract
      * Use reflection to discover parent interfaces of a given interface,
      * adding them to the extends list (for interface definitions).
      */
-    private function addReflectedExtendedInterfaceParents(string $interfaceName): void
+    private function addReflectedExtendedInterfaceParents(string $interfaceName, int $line): void
     {
         try {
             /** @var class-string $interfaceName */
             $reflection = new \ReflectionClass($interfaceName);
 
             foreach ($reflection->getInterfaceNames() as $parentInterfaceName) {
-                $this->classDescriptionBuilder->addReflectedExtends($parentInterfaceName);
+                $this->classDescriptionBuilder->addReflectedExtends($parentInterfaceName, $line);
             }
         } catch (\ReflectionException $e) {
-            // Interface not autoloadable, skip
+            $this->parsingErrors[] = ParsingError::create(
+                $this->filePath ?? '',
+                "Reflection error: {$e->getMessage()}. Ensure the class is autoloaded."
+            );
         }
     }
 }
