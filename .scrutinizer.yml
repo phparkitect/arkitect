@@ -1,4 +1,4 @@
 build:
     environment:
-        php: 8.5
+        php: 8.0
 
