@@ -30,7 +30,7 @@
         "symfony/console": "^5.4|^6.0|^7.0|^8.0",
         "symfony/event-dispatcher": "^5.4|^6.0|^7.0|^8.0",
         "symfony/finder": "^5.4|^6.0|^7.0|^8.0",
-        "webmozart/assert": "^1.12"
+        "webmozart/assert": "^1.12|^2.0"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.94",
