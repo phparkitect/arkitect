@@ -39,6 +39,7 @@
         "phpspec/prophecy-phpunit": "^2.5",
         "phpunit/phpunit": "^9.6|^10.0|^11.0",
         "roave/security-advisories": "dev-master",
+        "shipmonk/composer-dependency-analyser": "^1.8",
         "symfony/var-dumper": "^5.4|^6.0|^7.0|^8.0"
     },
     "autoload": {
