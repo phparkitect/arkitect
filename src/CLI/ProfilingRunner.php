@@ -6,11 +6,13 @@ namespace Arkitect\CLI;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\Parser;
+use Arkitect\Analyzer\ProfilingFileParser;
 use Arkitect\ClassSetRules;
 use Arkitect\CLI\Progress\Progress;
 use Arkitect\Exceptions\FailOnFirstViolationException;
 use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violations;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\SplFileInfo;
 
 class ProfilingRunner extends Runner
@@ -28,6 +30,8 @@ class ProfilingRunner extends Runner
     private int $totalClasses = 0;
     private int $totalRuleEvaluations = 0;
     private int $peakMemory = 0;
+
+    private ?ProfilingFileParser $profilingParser = null;
 
     public function check(
         ClassSetRules $classSetRule,
@@ -118,7 +122,36 @@ class ProfilingRunner extends Runner
         }
     }
 
-    public function printReport(\Symfony\Component\Console\Output\OutputInterface $output): void
+    protected function doRun(Config $config, Progress $progress): array
+    {
+        $violations = new Violations();
+        $parsingErrors = new ParsingErrors();
+
+        // Use ProfilingFileParser instead of the regular one
+        $this->profilingParser = new ProfilingFileParser(
+            $config->getTargetPhpVersion(),
+            $config->isParseCustomAnnotationsEnabled()
+        );
+
+        /** @var \Arkitect\ClassSetRules $classSetRule */
+        foreach ($config->getClassSetRules() as $classSetRule) {
+            $progress->startFileSetAnalysis($classSetRule->getClassSet());
+
+            try {
+                $this->check($classSetRule, $progress, $this->profilingParser, $violations, $parsingErrors, $config->isStopOnFailure());
+            } catch (FailOnFirstViolationException $e) {
+                break;
+            } finally {
+                $progress->endFileSetAnalysis($classSetRule->getClassSet());
+            }
+        }
+
+        $violations->sort();
+
+        return [$violations, $parsingErrors];
+    }
+
+    public function printReport(OutputInterface $output): void
     {
         $totalTime = $this->totalParseTime + $this->totalRuleTime;
 
@@ -133,16 +166,141 @@ class ProfilingRunner extends Runner
         $output->writeln(sprintf('  Files analyzed:       %d', $this->totalFiles));
         $output->writeln(sprintf('  Classes found:        %d', $this->totalClasses));
         $output->writeln(sprintf('  Rule evaluations:     %d', $this->totalRuleEvaluations));
+        if (null !== $this->profilingParser) {
+            $output->writeln(sprintf('  AST nodes traversed:  %d', $this->profilingParser->getTotalNodeCount()));
+        }
         $output->writeln(sprintf('  Peak memory:          %s', $this->formatBytes($this->peakMemory)));
         $output->writeln('');
 
-        // --- Time breakdown ---
-        $output->writeln('<comment>--- Time Breakdown ---</comment>');
+        // --- High-level time breakdown ---
+        $output->writeln('<comment>--- Time Breakdown (high level) ---</comment>');
         $output->writeln(sprintf('  File discovery:       %s', $this->formatTime($this->totalFileDiscoveryTime)));
-        $output->writeln(sprintf('  Parsing (AST + visit):%s  (%s%%)', $this->formatTime($this->totalParseTime), $this->percentage($this->totalParseTime, $totalTime)));
+        $output->writeln(sprintf('  Parsing (total):      %s  (%s%%)', $this->formatTime($this->totalParseTime), $this->percentage($this->totalParseTime, $totalTime)));
         $output->writeln(sprintf('  Rule evaluation:      %s  (%s%%)', $this->formatTime($this->totalRuleTime), $this->percentage($this->totalRuleTime, $totalTime)));
         $output->writeln(sprintf('  <info>Total (parse+rules):  %s</info>', $this->formatTime($totalTime)));
         $output->writeln('');
+
+        // --- Parsing sub-phase breakdown ---
+        if (null !== $this->profilingParser) {
+            $astTime = $this->profilingParser->getTotalAstTime();
+            $traversalTime = $this->profilingParser->getTotalTraversalTime();
+            $visitorTotals = $this->profilingParser->getVisitorTotals();
+
+            $output->writeln('<comment>--- Parsing Sub-Phase Breakdown ---</comment>');
+            $output->writeln(sprintf(
+                '  AST construction:     %s  (%s%% of parsing)',
+                $this->formatTime($astTime),
+                $this->percentage($astTime, $this->totalParseTime)
+            ));
+            $output->writeln(sprintf(
+                '  AST traversal:        %s  (%s%% of parsing)',
+                $this->formatTime($traversalTime),
+                $this->percentage($traversalTime, $this->totalParseTime)
+            ));
+
+            // Per-visitor breakdown
+            $output->writeln('');
+            $output->writeln('  <comment>Visitor breakdown (within traversal):</comment>');
+            arsort($visitorTotals);
+            foreach ($visitorTotals as $name => $time) {
+                $output->writeln(sprintf(
+                    '    %-25s %s  (%s%% of traversal)',
+                    $name,
+                    $this->formatTime($time),
+                    $this->percentage($time, $traversalTime)
+                ));
+            }
+
+            // Traversal overhead (time in traverser not attributable to visitors)
+            $visitorSum = array_sum($visitorTotals);
+            $traverserOverhead = $traversalTime - $visitorSum;
+            if ($traverserOverhead > 0) {
+                $output->writeln(sprintf(
+                    '    %-25s %s  (%s%% of traversal)',
+                    'Traverser overhead',
+                    $this->formatTime($traverserOverhead),
+                    $this->percentage($traverserOverhead, $traversalTime)
+                ));
+            }
+            $output->writeln('');
+
+            // --- Top 10 slowest files by AST parse vs traversal ---
+            $perFileAst = $this->profilingParser->getPerFileAstTime();
+            $perFileTraversal = $this->profilingParser->getPerFileTraversalTime();
+            $perFileVisitor = $this->profilingParser->getPerFileVisitorTime();
+            $perFileNodes = $this->profilingParser->getPerFileNodeCount();
+
+            $output->writeln('<comment>--- Top 10 Slowest Files (AST Construction) ---</comment>');
+            arsort($perFileAst);
+            $i = 0;
+            foreach ($perFileAst as $file => $time) {
+                if (++$i > 10) {
+                    break;
+                }
+                $nodes = $perFileNodes[$file] ?? 0;
+                $output->writeln(sprintf(
+                    '  %s  %s  (%d nodes)',
+                    $this->formatTime($time),
+                    $file,
+                    $nodes
+                ));
+            }
+            $output->writeln('');
+
+            $output->writeln('<comment>--- Top 10 Slowest Files (AST Traversal) ---</comment>');
+            arsort($perFileTraversal);
+            $i = 0;
+            foreach ($perFileTraversal as $file => $time) {
+                if (++$i > 10) {
+                    break;
+                }
+                $visitors = $perFileVisitor[$file] ?? [];
+                $visitorDetail = [];
+                foreach ($visitors as $vName => $vTime) {
+                    $visitorDetail[] = sprintf('%s=%s', $this->shortVisitorName($vName), $this->formatTimeCompact($vTime));
+                }
+                $output->writeln(sprintf(
+                    '  %s  %s  [%s]',
+                    $this->formatTime($time),
+                    $file,
+                    implode(', ', $visitorDetail)
+                ));
+            }
+            $output->writeln('');
+
+            // --- Node count vs parse time ---
+            $output->writeln('<comment>--- AST Node Count vs Parse Time ---</comment>');
+            $nodeBuckets = [
+                '0-50' => ['min' => 0, 'max' => 50, 'count' => 0, 'total_ast' => 0.0, 'total_trav' => 0.0],
+                '50-100' => ['min' => 50, 'max' => 100, 'count' => 0, 'total_ast' => 0.0, 'total_trav' => 0.0],
+                '100-200' => ['min' => 100, 'max' => 200, 'count' => 0, 'total_ast' => 0.0, 'total_trav' => 0.0],
+                '200-500' => ['min' => 200, 'max' => 500, 'count' => 0, 'total_ast' => 0.0, 'total_trav' => 0.0],
+                '500+' => ['min' => 500, 'max' => PHP_INT_MAX, 'count' => 0, 'total_ast' => 0.0, 'total_trav' => 0.0],
+            ];
+            foreach ($perFileNodes as $file => $nodeCount) {
+                foreach ($nodeBuckets as &$bucket) {
+                    if ($nodeCount >= $bucket['min'] && $nodeCount < $bucket['max']) {
+                        $bucket['count']++;
+                        $bucket['total_ast'] += $perFileAst[$file] ?? 0.0;
+                        $bucket['total_trav'] += $perFileTraversal[$file] ?? 0.0;
+                        break;
+                    }
+                }
+                unset($bucket);
+            }
+            foreach ($nodeBuckets as $label => $bucket) {
+                if ($bucket['count'] > 0) {
+                    $output->writeln(sprintf(
+                        '  %-10s  %3d files  avg AST: %s  avg traversal: %s',
+                        $label,
+                        $bucket['count'],
+                        $this->formatTime($bucket['total_ast'] / $bucket['count']),
+                        $this->formatTime($bucket['total_trav'] / $bucket['count'])
+                    ));
+                }
+            }
+            $output->writeln('');
+        }
 
         // --- Averages ---
         if ($this->totalFiles > 0) {
@@ -154,7 +312,7 @@ class ProfilingRunner extends Runner
         }
 
         // --- Top 10 slowest files by PARSE time ---
-        $output->writeln('<comment>--- Top 10 Slowest Files (Parsing) ---</comment>');
+        $output->writeln('<comment>--- Top 10 Slowest Files (Total Parse Time) ---</comment>');
         $byParseTime = $this->fileProfiles;
         uasort($byParseTime, static fn (array $a, array $b) => $b['parse_time'] <=> $a['parse_time']);
         $i = 0;
@@ -168,43 +326,6 @@ class ProfilingRunner extends Runner
                 $file,
                 $this->formatBytes($profile['file_size']),
                 $profile['classes_found']
-            ));
-        }
-        $output->writeln('');
-
-        // --- Top 10 slowest files by RULE time ---
-        $output->writeln('<comment>--- Top 10 Slowest Files (Rule Evaluation) ---</comment>');
-        $byRuleTime = $this->fileProfiles;
-        uasort($byRuleTime, static fn (array $a, array $b) => $b['rule_time'] <=> $a['rule_time']);
-        $i = 0;
-        foreach ($byRuleTime as $file => $profile) {
-            if (++$i > 10) {
-                break;
-            }
-            $output->writeln(sprintf(
-                '  %s  %s  (%d rules evaluated)',
-                $this->formatTime($profile['rule_time']),
-                $file,
-                $profile['rules_evaluated']
-            ));
-        }
-        $output->writeln('');
-
-        // --- Top 10 largest files ---
-        $output->writeln('<comment>--- Top 10 Largest Files ---</comment>');
-        $bySize = $this->fileProfiles;
-        uasort($bySize, static fn (array $a, array $b) => $b['file_size'] <=> $a['file_size']);
-        $i = 0;
-        foreach ($bySize as $file => $profile) {
-            if (++$i > 10) {
-                break;
-            }
-            $output->writeln(sprintf(
-                '  %s  %s  (parse: %s, rules: %s)',
-                $this->formatBytes($profile['file_size']),
-                $file,
-                $this->formatTime($profile['parse_time']),
-                $this->formatTime($profile['rule_time'])
             ));
         }
         $output->writeln('');
@@ -236,7 +357,7 @@ class ProfilingRunner extends Runner
             '50+ KB' => ['min' => 51200, 'max' => PHP_INT_MAX, 'count' => 0, 'total_parse' => 0.0],
         ];
         foreach ($this->fileProfiles as $profile) {
-            foreach ($buckets as $label => &$bucket) {
+            foreach ($buckets as &$bucket) {
                 if ($profile['file_size'] >= $bucket['min'] && $profile['file_size'] < $bucket['max']) {
                     $bucket['count']++;
                     $bucket['total_parse'] += $profile['parse_time'];
@@ -278,6 +399,11 @@ class ProfilingRunner extends Runner
         return $this->totalRuleTime;
     }
 
+    public function getProfilingParser(): ?ProfilingFileParser
+    {
+        return $this->profilingParser;
+    }
+
     private function formatTime(float $seconds): string
     {
         if ($seconds < 0.001) {
@@ -288,6 +414,18 @@ class ProfilingRunner extends Runner
         }
 
         return sprintf('%6.2f s ', $seconds);
+    }
+
+    private function formatTimeCompact(float $seconds): string
+    {
+        if ($seconds < 0.001) {
+            return sprintf('%.0fus', $seconds * 1_000_000);
+        }
+        if ($seconds < 1.0) {
+            return sprintf('%.1fms', $seconds * 1000);
+        }
+
+        return sprintf('%.2fs', $seconds);
     }
 
     private function formatBytes(int $bytes): string
@@ -314,6 +452,13 @@ class ProfilingRunner extends Runner
     private function shortClassName(string $fqcn): string
     {
         $parts = explode('\\', $fqcn);
+
+        return end($parts);
+    }
+
+    private function shortVisitorName(string $name): string
+    {
+        $parts = explode('\\', $name);
 
         return end($parts);
     }
