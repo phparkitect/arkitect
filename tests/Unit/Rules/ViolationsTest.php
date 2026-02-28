@@ -155,6 +155,88 @@ class ViolationsTest extends TestCase
         ], $violationStore->toArray());
     }
 
+    public function test_remove_violations_matches_when_rule_description_changes(): void
+    {
+        $violations = new Violations();
+        $violations->add(new Violation(
+            'App\Foo',
+            'depends on App\Bar, but should depend only on classes in one of these namespaces: App\Domain, App\Shared',
+            10
+        ));
+
+        $baseline = new Violations();
+        $baseline->add(new Violation(
+            'App\Foo',
+            'depends on App\Bar, but should depend only on classes in one of these namespaces: App\Domain',
+            10
+        ));
+
+        $violations->remove($baseline);
+
+        self::assertCount(0, $violations);
+    }
+
+    public function test_remove_violations_matches_when_rule_description_changes_ignore_linenumber(): void
+    {
+        $violations = new Violations();
+        $violations->add(new Violation(
+            'App\Foo',
+            'depends on App\Bar, but should depend only on classes in one of these namespaces: App\Domain, App\Shared',
+            15
+        ));
+
+        $baseline = new Violations();
+        $baseline->add(new Violation(
+            'App\Foo',
+            'depends on App\Bar, but should depend only on classes in one of these namespaces: App\Domain',
+            10
+        ));
+
+        $violations->remove($baseline, true);
+
+        self::assertCount(0, $violations);
+    }
+
+    public function test_remove_violations_does_not_match_different_dependency(): void
+    {
+        $violations = new Violations();
+        $violations->add(new Violation(
+            'App\Foo',
+            'depends on App\Baz, but should depend only on classes in one of these namespaces: App\Domain',
+            10
+        ));
+
+        $baseline = new Violations();
+        $baseline->add(new Violation(
+            'App\Foo',
+            'depends on App\Bar, but should depend only on classes in one of these namespaces: App\Domain',
+            10
+        ));
+
+        $violations->remove($baseline);
+
+        self::assertCount(1, $violations);
+    }
+
+    public function test_remove_violations_still_works_for_self_explanatory_messages(): void
+    {
+        $violations = new Violations();
+        $violations->add(new Violation(
+            'App\Foo',
+            'should be final because we want immutability'
+        ));
+
+        $baseline = new Violations();
+        $baseline->add(new Violation(
+            'App\Foo',
+            'should be final because we want immutability'
+        ));
+
+        $violations->remove($baseline);
+
+        self::assertCount(0, $violations);
+    }
+
     public function test_remove_violations_from_violations_ignore_linenumber(): void
     {
         $violation1 = new Violation(
