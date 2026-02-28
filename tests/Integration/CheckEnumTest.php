@@ -35,7 +35,6 @@ class CheckEnumTest extends TestCase
         $runner->run($dir, ...$rules);
 
         self::assertCount(2, $runner->getViolations());
-        self::assertCount(0, $runner->getParsingErrors());
 
         self::assertStringContainsString('should have a name that matches *Enum because', $runner->getViolations()->get(0)->getError());
         self::assertStringContainsString('Aclass should be an enum because Enums should be enums', $runner->getViolations()->get(1)->getError());

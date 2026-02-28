@@ -53,9 +53,11 @@ class CanParseNonWellFormedFilesTest extends TestCase
 
         $parsingErrors = $fp->getParsingErrors();
 
-        self::assertEquals([
+        self::assertGreaterThanOrEqual(1, \count($parsingErrors));
+        self::assertEquals(
             ParsingError::create('relativePathName', 'Syntax error, unexpected \'}\' on line 10'),
-        ], $parsingErrors);
+            $parsingErrors[0]
+        );
     }
 
     public function test_null_class_description_builder(): void

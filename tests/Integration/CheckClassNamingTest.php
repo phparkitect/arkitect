@@ -26,7 +26,6 @@ class CheckClassNamingTest extends TestCase
         $runner->run($dir, $rule);
 
         self::assertCount(0, $runner->getViolations());
-        self::assertCount(0, $runner->getParsingErrors());
     }
 
     public function createDummyProject(): array

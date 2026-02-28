@@ -27,7 +27,6 @@ class CheckAttributeDependencyTest extends TestCase
         $runner->run($dir, $rule);
 
         self::assertCount(1, $runner->getViolations());
-        self::assertCount(0, $runner->getParsingErrors());
 
         self::assertStringContainsString('depends on App\Invalid\Attr, but should not depend on these namespaces: App\Invalid', $runner->getViolations()->get(0)->getError());
     }

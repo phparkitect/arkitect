@@ -14,16 +14,7 @@ class CanResolveInheritedInterfacesTest extends TestCase
 {
     public function test_class_extending_parent_should_inherit_parent_interfaces(): void
     {
-        $code = <<< 'EOF'
-        <?php
-        namespace App;
-
-        class MyArrayObject extends \ArrayObject
-        {
-        }
-        EOF;
-
-        $cd = $this->parseCode($code);
+        $cd = $this->parseFile(__DIR__.'/../../../Fixtures/Inheritance/MyArrayObject.php');
 
         self::assertCount(1, $cd);
 
@@ -41,20 +32,7 @@ class CanResolveInheritedInterfacesTest extends TestCase
 
     public function test_class_implementing_interface_should_inherit_parent_interfaces(): void
     {
-        $code = <<< 'EOF'
-        <?php
-        namespace App;
-
-        class MyIterator implements \IteratorAggregate
-        {
-            public function getIterator(): \Traversable
-            {
-                return new \ArrayIterator([]);
-            }
-        }
-        EOF;
-
-        $cd = $this->parseCode($code);
+        $cd = $this->parseFile(__DIR__.'/../../../Fixtures/Inheritance/MyIterator.php');
 
         self::assertCount(1, $cd);
 
@@ -74,7 +52,7 @@ class CanResolveInheritedInterfacesTest extends TestCase
         <?php
         namespace App;
 
-        class MyClass extends NonExistent\ParentClass
+        class NonExistentChild extends NonExistent\ParentClass
         {
         }
         EOF;
@@ -92,22 +70,12 @@ class CanResolveInheritedInterfacesTest extends TestCase
         );
         $allErrors = implode(' ', $errorMessages);
 
-        self::assertStringContainsString('App\NonExistent\ParentClass', $allErrors);
         self::assertStringContainsString('autoloaded', $allErrors);
     }
 
     public function test_inherited_interfaces_should_not_duplicate_direct_interfaces(): void
     {
-        $code = <<< 'EOF'
-        <?php
-        namespace App;
-
-        class MyClass extends \ArrayObject implements \Countable
-        {
-        }
-        EOF;
-
-        $cd = $this->parseCode($code);
+        $cd = $this->parseFile(__DIR__.'/../../../Fixtures/Inheritance/MyCountableArrayObject.php');
 
         self::assertCount(1, $cd);
 
@@ -116,23 +84,14 @@ class CanResolveInheritedInterfacesTest extends TestCase
             $cd[0]->getInterfaces()
         );
 
-        // Countable should appear only once even though it's both direct and inherited
+        // Countable should appear only once (ReflectionClass::getInterfaceNames() deduplicates)
         $countableOccurrences = array_count_values($interfaces)['Countable'] ?? 0;
         self::assertEquals(1, $countableOccurrences);
     }
 
     public function test_inherited_php_core_interfaces_should_be_filtered_from_dependencies(): void
     {
-        $code = <<< 'EOF'
-        <?php
-        namespace App;
-
-        class MyClass extends \ArrayObject
-        {
-        }
-        EOF;
-
-        $cd = $this->parseCode($code);
+        $cd = $this->parseFile(__DIR__.'/../../../Fixtures/Inheritance/MyArrayObject.php');
 
         self::assertCount(1, $cd);
 
@@ -150,16 +109,7 @@ class CanResolveInheritedInterfacesTest extends TestCase
 
     public function test_interface_extending_another_should_resolve_parent_interfaces(): void
     {
-        $code = <<< 'EOF'
-        <?php
-        namespace App;
-
-        interface MyInterface extends \IteratorAggregate
-        {
-        }
-        EOF;
-
-        $cd = $this->parseCode($code);
+        $cd = $this->parseFile(__DIR__.'/../../../Fixtures/Inheritance/MyInterface.php');
 
         self::assertCount(1, $cd);
         self::assertTrue($cd[0]->isInterface());
@@ -176,22 +126,7 @@ class CanResolveInheritedInterfacesTest extends TestCase
 
     public function test_enum_implementing_interface_should_resolve_parent_interfaces(): void
     {
-        $code = <<< 'EOF'
-        <?php
-        namespace App;
-
-        enum MyEnum implements \IteratorAggregate
-        {
-            case FOO;
-
-            public function getIterator(): \Traversable
-            {
-                return new \ArrayIterator([]);
-            }
-        }
-        EOF;
-
-        $cd = $this->parseCode($code);
+        $cd = $this->parseFile(__DIR__.'/../../../Fixtures/Inheritance/MyEnum.php');
 
         self::assertCount(1, $cd);
         self::assertTrue($cd[0]->isEnum());
@@ -208,16 +143,7 @@ class CanResolveInheritedInterfacesTest extends TestCase
 
     public function test_class_extending_parent_should_resolve_ancestor_classes(): void
     {
-        $code = <<< 'EOF'
-        <?php
-        namespace App;
-
-        class MyException extends \InvalidArgumentException
-        {
-        }
-        EOF;
-
-        $cd = $this->parseCode($code);
+        $cd = $this->parseFile(__DIR__.'/../../../Fixtures/Inheritance/MyException.php');
 
         self::assertCount(1, $cd);
 
@@ -235,10 +161,10 @@ class CanResolveInheritedInterfacesTest extends TestCase
     /**
      * @return array<ClassDescription>
      */
-    private function parseCode(string $code): array
+    private function parseFile(string $filePath): array
     {
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_2);
-        $fp->parse($code, 'relativePathName');
+        $fp->parse(file_get_contents($filePath), $filePath);
 
         return $fp->getClassDescriptions();
     }

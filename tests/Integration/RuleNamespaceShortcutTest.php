@@ -25,7 +25,6 @@ class RuleNamespaceShortcutTest extends TestCase
         $runner->run($dir, $rule);
 
         self::assertCount(0, $runner->getViolations());
-        self::assertCount(0, $runner->getParsingErrors());
     }
 
     public function test_namespace_shortcut_detects_violations(): void

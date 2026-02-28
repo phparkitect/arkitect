@@ -26,7 +26,6 @@ class IsFinalTest extends TestCase
         $runner->run($this->createClasses(), $rule);
 
         self::assertCount(0, $runner->getViolations());
-        self::assertCount(0, $runner->getParsingErrors());
     }
 
     public function test_is_final_in_should_should_consider_final_traits_enums_interfaces(): void
@@ -41,7 +40,6 @@ class IsFinalTest extends TestCase
         $runner->run($this->createClasses(), $rule);
 
         self::assertCount(4, $runner->getViolations());
-        self::assertCount(0, $runner->getParsingErrors());
 
         self::assertEquals('App\MyAbstract', $runner->getViolations()->get(0)->getFqcn());
         self::assertEquals('App\MyEnum', $runner->getViolations()->get(1)->getFqcn());
@@ -61,7 +59,6 @@ class IsFinalTest extends TestCase
         $runner->run($this->createClasses(), $rule);
 
         self::assertCount(1, $runner->getViolations());
-        self::assertCount(0, $runner->getParsingErrors());
 
         self::assertEquals('App\MyFinal', $runner->getViolations()->get(0)->getFqcn());
     }

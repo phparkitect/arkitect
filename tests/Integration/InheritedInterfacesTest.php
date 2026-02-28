@@ -9,14 +9,13 @@ use Arkitect\Expression\ForClasses\HaveNameMatching;
 use Arkitect\Expression\ForClasses\Implement;
 use Arkitect\Rules\Rule;
 use Arkitect\Tests\Utils\TestRunner;
-use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 
 class InheritedInterfacesTest extends TestCase
 {
     public function test_implement_rule_matches_inherited_interfaces(): void
     {
-        $dir = vfsStream::setup('root', null, $this->createDirStructure())->url();
+        $fixturesDir = __DIR__.'/../Fixtures/InheritedInterfaces';
 
         $runner = TestRunner::create('8.2');
 
@@ -26,7 +25,7 @@ class InheritedInterfacesTest extends TestCase
             ->should(new HaveNameMatching('*Collection'))
             ->because('classes implementing Countable should be named *Collection');
 
-        $runner->run($dir, $rule);
+        $runner->run($fixturesDir, $rule);
 
         self::assertCount(0, $runner->getParsingErrors());
 
@@ -38,7 +37,7 @@ class InheritedInterfacesTest extends TestCase
 
     public function test_extend_rule_matches_ancestor_classes(): void
     {
-        $dir = vfsStream::setup('root', null, $this->createExtendsStructure())->url();
+        $fixturesDir = __DIR__.'/../Fixtures/InheritedInterfaces';
 
         $runner = TestRunner::create('8.2');
 
@@ -48,40 +47,9 @@ class InheritedInterfacesTest extends TestCase
             ->should(new HaveNameMatching('*Exception'))
             ->because('classes extending LogicException should be named *Exception');
 
-        $runner->run($dir, $rule);
+        $runner->run($fixturesDir, $rule);
 
         self::assertCount(0, $runner->getParsingErrors());
         self::assertCount(0, $runner->getViolations());
-    }
-
-    public function createDirStructure(): array
-    {
-        return [
-            'App' => [
-                'MyCollection.php' => '<?php
-
-                    namespace App;
-
-                    class MyCollection extends \ArrayObject {
-                        public function customMethod(): void {}
-                    }
-                    ',
-            ],
-        ];
-    }
-
-    public function createExtendsStructure(): array
-    {
-        return [
-            'App' => [
-                'MyException.php' => '<?php
-
-                    namespace App;
-
-                    class MyException extends \InvalidArgumentException {
-                    }
-                    ',
-            ],
-        ];
     }
 }

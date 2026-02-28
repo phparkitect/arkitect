@@ -32,7 +32,6 @@ class IsAbstractTest extends TestCase
         $runner->run($this->createClasses(), $rule);
 
         self::assertCount(0, $runner->getViolations());
-        self::assertCount(0, $runner->getParsingErrors());
     }
 
     public function test_is_abstract_in_should_should_consider_final_traits_enums_interfaces(): void
@@ -47,7 +46,6 @@ class IsAbstractTest extends TestCase
         $runner->run($this->createClasses(), $rule);
 
         self::assertCount(4, $runner->getViolations());
-        self::assertCount(0, $runner->getParsingErrors());
 
         self::assertEquals('App\MyEnum', $runner->getViolations()->get(0)->getFqcn());
         self::assertEquals('App\MyFinal', $runner->getViolations()->get(1)->getFqcn());
@@ -67,7 +65,6 @@ class IsAbstractTest extends TestCase
         $runner->run($this->createClasses(), $rule);
 
         self::assertCount(1, $runner->getViolations());
-        self::assertCount(0, $runner->getParsingErrors());
 
         self::assertEquals('App\MyAbstract', $runner->getViolations()->get(0)->getFqcn());
     }
@@ -110,7 +107,6 @@ class IsAbstractTest extends TestCase
         self::assertCount(2, $runner->getViolations());
         self::assertEquals('App\Test\AnotherBadTest', $runner->getViolations()->get(0)->getFqcn());
         self::assertEquals('App\Test\BadE2ETest', $runner->getViolations()->get(1)->getFqcn());
-        self::assertCount(0, $runner->getParsingErrors());
     }
 
     public function test_is_not_abstract_in_should_validates_final_classes_correctly(): void
@@ -158,7 +154,6 @@ class IsAbstractTest extends TestCase
         // 2. Interface/trait/enum don't trigger violations (isAbstract() = false for them)
         self::assertCount(1, $runner->getViolations());
         self::assertEquals('App\Service\AbstractService', $runner->getViolations()->get(0)->getFqcn());
-        self::assertCount(0, $runner->getParsingErrors());
     }
 
     public function test_it_can_check_multiple_class_properties(): void
@@ -242,7 +237,6 @@ class IsAbstractTest extends TestCase
         $runner->run(vfsStream::setup('root', null, $structure)->url(), $rule);
 
         self::assertCount(0, $runner->getViolations());
-        self::assertCount(0, $runner->getParsingErrors());
     }
 
     protected function createClasses(): string

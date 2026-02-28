@@ -51,7 +51,9 @@
             "Arkitect\\Tests\\": "tests/"
         },
         "classmap": [
-            "tests/E2E/_fixtures/mvc/"
+            "tests/E2E/_fixtures/mvc/",
+            "tests/E2E/_fixtures/DependenciesLeak/",
+            "tests/E2E/_fixtures/line_numbers/"
         ]
     },
     "config": {
