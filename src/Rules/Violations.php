@@ -98,7 +98,7 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
             foreach ($baselineViolations as $baseIdx => $baselineViolation) {
                 if (
                     $baselineViolation->getFqcn() === $violation->getFqcn()
-                    && $baselineViolation->getError() === $violation->getError()
+                    && self::extractViolationKey($baselineViolation->getError()) === self::extractViolationKey($violation->getError())
                 ) {
                     unset($this->violations[$idx], $baselineViolations[$baseIdx]);
                     continue 2;
@@ -121,21 +121,43 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
 
     /**
      * Comparison method that respects all fields in the violation.
+     *
+     * Uses the stable violation key (the part before ', but ') for comparison,
+     * so that changes to rule configuration (e.g. allowed namespaces) do not
+     * invalidate existing baseline entries.
      */
     public static function compareViolations(Violation $a, Violation $b): int
     {
-        return $a <=> $b;
+        return [
+            $a->getFqcn(),
+            $a->getLine(),
+            $a->getFilePath(),
+            self::extractViolationKey($a->getError()),
+        ] <=> [
+            $b->getFqcn(),
+            $b->getLine(),
+            $b->getFilePath(),
+            self::extractViolationKey($b->getError()),
+        ];
     }
 
     /**
-     * Comparison method that only checks the namespace and error but ignores the line number.
+     * Extracts the stable violation-specific part from an error message.
+     *
+     * ViolationMessage produces two formats:
+     * - withDescription: "$violation, but $ruleDescription" → returns $violation
+     * - selfExplanatory: "$ruleDescription" (no ", but ") → returns the full string
+     *
+     * The rule description may include configuration-dependent values (like namespace lists)
+     * that change when the rule config is updated. The violation part is always stable.
      */
-    public static function compareViolationsIgnoreLineNumber(Violation $a, Violation $b): int
+    private static function extractViolationKey(string $error): string
     {
-        if (($a->getFqcn() === $b->getFqcn()) && ($a->getError() === $b->getError())) {
-            return 0;
+        $pos = strpos($error, ', but ');
+        if (false !== $pos) {
+            return substr($error, 0, $pos);
         }
 
-        return self::compareViolations($a, $b);
+        return $error;
     }
 }
