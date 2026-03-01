@@ -142,21 +142,6 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
     }
 
     /**
-     * Comparison method that only checks the namespace and error but ignores the line number.
-     */
-    public static function compareViolationsIgnoreLineNumber(Violation $a, Violation $b): int
-    {
-        if (
-            $a->getFqcn() === $b->getFqcn()
-            && self::extractViolationKey($a->getError()) === self::extractViolationKey($b->getError())
-        ) {
-            return 0;
-        }
-
-        return self::compareViolations($a, $b);
-    }
-
-    /**
      * Extracts the stable violation-specific part from an error message.
      *
      * ViolationMessage produces two formats:
