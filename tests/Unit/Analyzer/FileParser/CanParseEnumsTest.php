@@ -12,24 +12,14 @@ use PHPUnit\Framework\TestCase;
 
 class CanParseEnumsTest extends TestCase
 {
+    /**
+     * @requires PHP 8.1
+     */
     public function test_it_can_parse_enum(): void
     {
-        $code = <<< 'EOF'
-        <?php
-
-        namespace Root\Cars;
-
-        enum Enum
-        {
-            case Hearts;
-            case Diamonds;
-            case Clubs;
-            case Spades;
-        }
-        EOF;
-
+        $code = file_get_contents(__DIR__.'/Fixtures/SampleEnum.php');
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
-        $fp->parse($code, 'relativePathName');
+        $fp->parse($code, 'SampleEnum.php');
 
         $cd = $fp->getClassDescriptions();
 
@@ -39,6 +29,33 @@ class CanParseEnumsTest extends TestCase
         $notHaveDependencyOutsideNamespace->evaluate($cd[0], $violations, 'we want to add this rule for our software');
 
         self::assertCount(1, $violations);
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function test_it_records_interface_dependency_for_enum_implementing_interface(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+        namespace App\Foo;
+
+        interface Colorful {}
+
+        enum Suit: string implements Colorful
+        {
+            case Hearts = 'H';
+        }
+        EOF;
+
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
+        $fp->parse($code, 'relativePathName');
+        $cd = $fp->getClassDescriptions();
+
+        $enum = $cd[1]; // cd[0] = Colorful interface, cd[1] = Suit enum
+        self::assertTrue($enum->isEnum());
+        self::assertCount(1, $enum->getDependencies());
+        self::assertEquals('App\Foo\Colorful', $enum->getDependencies()[0]->getFQCN()->toString());
     }
 
     /**

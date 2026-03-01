@@ -10,6 +10,7 @@ use Arkitect\Expression\ForClasses\HaveNameMatching;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\Rules\Rule;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Unit\Rules\Fixtures\MyClass;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -19,18 +20,18 @@ class RuleBuilderTest extends TestCase
 {
     public function test_reusing_that_for_multiple_should_produces_independent_rules(): void
     {
-        $classViolatingBothRules = ClassDescription::getBuilder('App\Rector\MyClass', 'src/Rector/MyClass.php')
+        $classViolatingBothRules = ClassDescription::getBuilder(MyClass::class, 'src/Rector/MyClass.php')
             ->build();
 
         $rectors = Rule::allClasses()
-            ->that(new ResideInOneOfTheseNamespaces('App\Rector'));
+            ->that(new ResideInOneOfTheseNamespaces('Arkitect\Tests\Unit\Rules\Fixtures'));
 
         $nameMatchingRule = $rectors
             ->should(new HaveNameMatching('*Rector'))
             ->because('rector classes should have Rector suffix');
 
         $extendsRule = $rectors
-            ->should(new Extend('Rector\Core\Rector\AbstractRector'))
+            ->should(new Extend('SomeAbstractRector'))
             ->because('rector classes should extend AbstractRector');
 
         $nameMatchingViolations = new Violations();
