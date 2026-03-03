@@ -133,7 +133,7 @@ jobs:
           name: phar-artifact
 
       - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v6
+        uses: crazy-max/ghaction-import-gpg@v7
         with:
           gpg_private_key: ${{ secrets.GPG_KEY_47CD54B6398FE21B3709D0A4D9C905CED1932CA2 }}
           passphrase: ${{ secrets.GPG_KEY_47CD54B6398FE21B3709D0A4D9C905CED1932CA2_PASSPHRASE }}
