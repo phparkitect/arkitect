@@ -13,7 +13,6 @@ use Arkitect\CLI\Progress\Progress;
 use Arkitect\Exceptions\FailOnFirstViolationException;
 use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violations;
-use Symfony\Component\Finder\SplFileInfo;
 
 class Runner
 {
@@ -47,10 +46,6 @@ class Runner
         ParsingErrors $parsingErrors,
         bool $stopOnFailure,
     ): void {
-        $directories = $classSetRule->getClassSet()->getDirectories();
-        $hierarchyResolver = [] !== $directories ? new ClassHierarchyResolver($directories) : null;
-
-        /** @var SplFileInfo $file */
         foreach ($classSetRule->getClassSet() as $file) {
             $fileViolations = new Violations();
 
@@ -65,9 +60,6 @@ class Runner
 
             /** @var ClassDescription $classDescription */
             foreach ($fileParser->getClassDescriptions() as $classDescription) {
-                if (null !== $hierarchyResolver) {
-                    $classDescription->setHierarchyResolver($hierarchyResolver);
-                }
                 foreach ($classSetRule->getRules() as $rule) {
                     $rule->check($classDescription, $fileViolations);
 
@@ -90,13 +82,17 @@ class Runner
         $violations = new Violations();
         $parsingErrors = new ParsingErrors();
 
-        $fileParser = FileParserFactory::createFileParser(
-            $config->getTargetPhpVersion(),
-            $config->isParseCustomAnnotationsEnabled()
-        );
-
         /** @var ClassSetRules $classSetRule */
         foreach ($config->getClassSetRules() as $classSetRule) {
+            $directories = $classSetRule->getClassSet()->getDirectories();
+            $hierarchyResolver = [] !== $directories ? new ClassHierarchyResolver($directories) : null;
+
+            $fileParser = FileParserFactory::createFileParser(
+                $config->getTargetPhpVersion(),
+                $config->isParseCustomAnnotationsEnabled(),
+                $hierarchyResolver
+            );
+
             $progress->startFileSetAnalysis($classSetRule->getClassSet());
 
             try {

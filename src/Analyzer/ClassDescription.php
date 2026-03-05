@@ -40,8 +40,6 @@ class ClassDescription
 
     private bool $enum;
 
-    private ?ClassHierarchyResolver $hierarchyResolver = null;
-
     /**
      * @param list<ClassDependency>         $dependencies
      * @param list<FullyQualifiedClassName> $interfaces
@@ -140,13 +138,6 @@ class ClassDescription
      */
     public function getInterfaces(): array
     {
-        if (null !== $this->hierarchyResolver) {
-            return array_map(
-                static fn (string $name): FullyQualifiedClassName => FullyQualifiedClassName::fromString($name),
-                $this->hierarchyResolver->getInterfaceNames($this->getFQCN())
-            );
-        }
-
         return $this->interfaces;
     }
 
@@ -155,13 +146,6 @@ class ClassDescription
      */
     public function getExtends(): array
     {
-        if (null !== $this->hierarchyResolver) {
-            return array_map(
-                static fn (string $name): FullyQualifiedClassName => FullyQualifiedClassName::fromString($name),
-                $this->hierarchyResolver->getParentClassNames($this->getFQCN())
-            );
-        }
-
         return $this->extends;
     }
 
@@ -233,27 +217,15 @@ class ClassDescription
      */
     public function getTraits(): array
     {
-        if (null !== $this->hierarchyResolver) {
-            return array_map(
-                static fn (string $name): FullyQualifiedClassName => FullyQualifiedClassName::fromString($name),
-                $this->hierarchyResolver->getTraitNames($this->getFQCN())
-            );
-        }
-
         return $this->traits;
     }
 
     public function hasTrait(string $pattern): bool
     {
         return array_reduce(
-            $this->getTraits(),
+            $this->traits,
             static fn (bool $carry, FullyQualifiedClassName $trait): bool => $carry || $trait->matches($pattern),
             false
         );
-    }
-
-    public function setHierarchyResolver(ClassHierarchyResolver $resolver): void
-    {
-        $this->hierarchyResolver = $resolver;
     }
 }

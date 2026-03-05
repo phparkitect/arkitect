@@ -41,6 +41,8 @@ class ClassDescriptionBuilder
 
     private ?string $filePath = null;
 
+    private ?ClassHierarchyResolver $hierarchyResolver = null;
+
     public function clear(): void
     {
         $this->FQCN = null;
@@ -164,16 +166,46 @@ class ClassDescriptionBuilder
         return $this;
     }
 
+    public function setHierarchyResolver(?ClassHierarchyResolver $hierarchyResolver): self
+    {
+        $this->hierarchyResolver = $hierarchyResolver;
+
+        return $this;
+    }
+
     public function build(): ClassDescription
     {
         Assert::notNull($this->FQCN, 'You must set an FQCN');
         Assert::notNull($this->filePath, 'You must set a file path');
 
+        $extends = $this->extends;
+        $interfaces = $this->interfaces;
+        $traits = $this->traits;
+
+        if (null !== $this->hierarchyResolver) {
+            $fqcn = $this->FQCN->toString();
+
+            $extends = array_map(
+                static fn (string $name): FullyQualifiedClassName => FullyQualifiedClassName::fromString($name),
+                $this->hierarchyResolver->getParentClassNames($fqcn)
+            );
+
+            $interfaces = array_map(
+                static fn (string $name): FullyQualifiedClassName => FullyQualifiedClassName::fromString($name),
+                $this->hierarchyResolver->getInterfaceNames($fqcn)
+            );
+
+            $traits = array_map(
+                static fn (string $name): FullyQualifiedClassName => FullyQualifiedClassName::fromString($name),
+                $this->hierarchyResolver->getTraitNames($fqcn)
+            );
+        }
+
         return new ClassDescription(
             $this->FQCN,
             $this->classDependencies,
-            $this->interfaces,
-            $this->extends,
+            $interfaces,
+            $extends,
             $this->final,
             $this->readonly,
             $this->abstract,
@@ -182,7 +214,7 @@ class ClassDescriptionBuilder
             $this->enum,
             $this->docBlock,
             $this->attributes,
-            $this->traits,
+            $traits,
             $this->filePath
         );
     }

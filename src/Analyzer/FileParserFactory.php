@@ -10,11 +10,17 @@ use PhpParser\NodeVisitor\NameResolver;
 
 class FileParserFactory
 {
-    public static function createFileParser(TargetPhpVersion $targetPhpVersion, bool $parseCustomAnnotations = true): FileParser
-    {
+    public static function createFileParser(
+        TargetPhpVersion $targetPhpVersion,
+        bool $parseCustomAnnotations = true,
+        ?ClassHierarchyResolver $hierarchyResolver = null,
+    ): FileParser {
+        $builder = new ClassDescriptionBuilder();
+        $builder->setHierarchyResolver($hierarchyResolver);
+
         return new FileParser(
             new NodeTraverser(),
-            new FileVisitor(new ClassDescriptionBuilder()),
+            new FileVisitor($builder),
             new NameResolver(),
             new DocblockTypesResolver($parseCustomAnnotations),
             $targetPhpVersion
