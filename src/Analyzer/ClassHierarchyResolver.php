@@ -6,7 +6,9 @@ namespace Arkitect\Analyzer;
 
 use Roave\BetterReflection\BetterReflection;
 use Roave\BetterReflection\Reflector\DefaultReflector;
+use Roave\BetterReflection\Reflector\Exception\IdentifierNotFound;
 use Roave\BetterReflection\Reflector\Reflector;
+use Roave\BetterReflection\SourceLocator\Ast\Exception\ParseToAstFailure;
 use Roave\BetterReflection\SourceLocator\Type\AggregateSourceLocator;
 use Roave\BetterReflection\SourceLocator\Type\DirectoriesSourceLocator;
 use Roave\BetterReflection\SourceLocator\Type\PhpInternalSourceLocator;
@@ -38,21 +40,22 @@ class ClassHierarchyResolver
     {
         try {
             $class = $this->reflector->reflectClass($fqcn);
-            $parents = [];
-            $parent = $class->getParentClass();
-            while (null !== $parent) {
-                $parents[] = $parent->getName();
-                try {
-                    $parent = $parent->getParentClass();
-                } catch (\Throwable $e) {
-                    break;
-                }
-            }
-
-            return $parents;
-        } catch (\Throwable $e) {
+        } catch (IdentifierNotFound | ParseToAstFailure) {
             return [];
         }
+
+        $parents = [];
+        $parent = $class->getParentClass();
+        while (null !== $parent) {
+            $parents[] = $parent->getName();
+            try {
+                $parent = $parent->getParentClass();
+            } catch (IdentifierNotFound | ParseToAstFailure) {
+                break;
+            }
+        }
+
+        return $parents;
     }
 
     /**
@@ -64,11 +67,11 @@ class ClassHierarchyResolver
     {
         try {
             $class = $this->reflector->reflectClass($fqcn);
-
-            return $class->getInterfaceNames();
-        } catch (\Throwable $e) {
+        } catch (IdentifierNotFound | ParseToAstFailure) {
             return [];
         }
+
+        return $class->getInterfaceNames();
     }
 
     /**
@@ -80,22 +83,23 @@ class ClassHierarchyResolver
     {
         try {
             $class = $this->reflector->reflectClass($fqcn);
-            $allTraits = [];
-            $current = $class;
-            while (null !== $current) {
-                foreach ($current->getTraitNames() as $traitName) {
-                    $allTraits[] = $traitName;
-                }
-                try {
-                    $current = $current->getParentClass();
-                } catch (\Throwable $e) {
-                    break;
-                }
-            }
-
-            return $allTraits;
-        } catch (\Throwable $e) {
+        } catch (IdentifierNotFound | ParseToAstFailure) {
             return [];
         }
+
+        $allTraits = [];
+        $current = $class;
+        while (null !== $current) {
+            foreach ($current->getTraitNames() as $traitName) {
+                $allTraits[] = $traitName;
+            }
+            try {
+                $current = $current->getParentClass();
+            } catch (IdentifierNotFound | ParseToAstFailure) {
+                break;
+            }
+        }
+
+        return $allTraits;
     }
 }
