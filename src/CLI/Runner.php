@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\CLI;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassHierarchyResolver;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\Analyzer\Parser;
 use Arkitect\ClassSetRules;
@@ -46,6 +47,9 @@ class Runner
         ParsingErrors $parsingErrors,
         bool $stopOnFailure,
     ): void {
+        $directories = $classSetRule->getClassSet()->getDirectories();
+        $hierarchyResolver = [] !== $directories ? new ClassHierarchyResolver($directories) : null;
+
         /** @var SplFileInfo $file */
         foreach ($classSetRule->getClassSet() as $file) {
             $fileViolations = new Violations();
@@ -61,6 +65,9 @@ class Runner
 
             /** @var ClassDescription $classDescription */
             foreach ($fileParser->getClassDescriptions() as $classDescription) {
+                if (null !== $hierarchyResolver) {
+                    $classDescription->setHierarchyResolver($hierarchyResolver);
+                }
                 foreach ($classSetRule->getRules() as $rule) {
                     $rule->check($classDescription, $fileViolations);
 

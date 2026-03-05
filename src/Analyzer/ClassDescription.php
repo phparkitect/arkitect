@@ -40,6 +40,8 @@ class ClassDescription
 
     private bool $enum;
 
+    private ?ClassHierarchyResolver $hierarchyResolver = null;
+
     /**
      * @param list<ClassDependency>         $dependencies
      * @param list<FullyQualifiedClassName> $interfaces
@@ -227,5 +229,55 @@ class ClassDescription
             static fn (bool $carry, FullyQualifiedClassName $trait): bool => $carry || $trait->matches($pattern),
             false
         );
+    }
+
+    public function setHierarchyResolver(ClassHierarchyResolver $resolver): void
+    {
+        $this->hierarchyResolver = $resolver;
+    }
+
+    /**
+     * Get all parent class names in the full inheritance hierarchy.
+     * Uses BetterReflection when a resolver is available, otherwise falls back to statically-parsed direct parents.
+     *
+     * @return list<string>
+     */
+    public function getAllParentClassNames(): array
+    {
+        if (null !== $this->hierarchyResolver) {
+            return $this->hierarchyResolver->getParentClassNames($this->getFQCN());
+        }
+
+        return array_map(static fn (FullyQualifiedClassName $fqcn): string => $fqcn->toString(), $this->extends);
+    }
+
+    /**
+     * Get all interface names including those inherited from parent classes.
+     * Uses BetterReflection when a resolver is available, otherwise falls back to statically-parsed direct interfaces.
+     *
+     * @return list<string>
+     */
+    public function getAllInterfaceNames(): array
+    {
+        if (null !== $this->hierarchyResolver) {
+            return $this->hierarchyResolver->getInterfaceNames($this->getFQCN());
+        }
+
+        return array_map(static fn (FullyQualifiedClassName $fqcn): string => $fqcn->toString(), $this->interfaces);
+    }
+
+    /**
+     * Get all trait names including those from parent classes.
+     * Uses BetterReflection when a resolver is available, otherwise falls back to statically-parsed direct traits.
+     *
+     * @return list<string>
+     */
+    public function getAllTraitNames(): array
+    {
+        if (null !== $this->hierarchyResolver) {
+            return $this->hierarchyResolver->getTraitNames($this->getFQCN());
+        }
+
+        return array_map(static fn (FullyQualifiedClassName $fqcn): string => $fqcn->toString(), $this->traits);
     }
 }

@@ -12,7 +12,7 @@ use Symfony\Component\Finder\Finder;
 class ClassSet implements \IteratorAggregate
 {
     /** @var array<string> */
-    private array $directoryList;
+    private array $directoryList = [];
 
     private array $exclude;
 
@@ -32,6 +32,14 @@ class ClassSet implements \IteratorAggregate
     public static function fromDir(string ...$directoryList): self
     {
         return new self(...$directoryList);
+    }
+
+    /**
+     * @return array<string>
+     */
+    public function getDirectories(): array
+    {
+        return $this->directoryList;
     }
 
     public function getDirsDescription(): string

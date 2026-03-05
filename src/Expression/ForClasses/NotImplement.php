@@ -39,16 +39,18 @@ class NotImplement implements Expression
         }
 
         $interface = $this->interface;
-        $interfaces = $theClass->getInterfaces();
-        $implements = static fn (FullyQualifiedClassName $FQCN): bool => $FQCN->matches($interface);
+        $allInterfaces = $theClass->getAllInterfaceNames();
+        $found = \count(array_filter(
+            $allInterfaces,
+            static fn (string $name): bool => FullyQualifiedClassName::fromString($name)->matches($interface)
+        )) > 0;
 
-        if (\count(array_filter($interfaces, $implements)) > 0) {
-            $violation = Violation::create(
+        if ($found) {
+            $violations->add(Violation::create(
                 $theClass->getFQCN(),
                 ViolationMessage::selfExplanatory($this->describe($theClass, $because)),
                 $theClass->getFilePath()
-            );
-            $violations->add($violation);
+            ));
         }
     }
 }
