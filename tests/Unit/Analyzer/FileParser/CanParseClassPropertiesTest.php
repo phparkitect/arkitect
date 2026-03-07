@@ -9,10 +9,12 @@ use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
 use Arkitect\Expression\ForClasses\NotHaveDependencyOutsideNamespace;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class CanParseClassPropertiesTest extends TestCase
 {
+    use MockHierarchyResolver;
     public function test_it_parse_typed_property(): void
     {
         $code = <<< 'EOF'
@@ -27,7 +29,7 @@ class CanParseClassPropertiesTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_1), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -58,7 +60,7 @@ class CanParseClassPropertiesTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_1), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -86,7 +88,7 @@ class CanParseClassPropertiesTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_1), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -113,7 +115,7 @@ class CanParseClassPropertiesTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_1), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -145,7 +147,7 @@ class CanParseClassPropertiesTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_1), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();

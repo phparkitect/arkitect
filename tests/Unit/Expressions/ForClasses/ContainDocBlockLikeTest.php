@@ -7,15 +7,18 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\ContainDocBlockLike;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class ContainDocBlockLikeTest extends TestCase
 {
+    use MockHierarchyResolver;
+
     public function test_it_should_return_true_if_contains_doc_block(): void
     {
         $expression = new ContainDocBlockLike('myDocBlock');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland\Myclass')
             ->addDocBlock('/**  */myDocBlock with other information')
@@ -36,7 +39,7 @@ class ContainDocBlockLikeTest extends TestCase
     {
         $expression = new ContainDocBlockLike('anotherDocBlock');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland\Myclass')
             ->addDocBlock('/**  */myDocBlock with other information')

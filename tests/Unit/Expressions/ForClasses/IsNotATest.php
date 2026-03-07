@@ -12,15 +12,18 @@ use Arkitect\Tests\Unit\Expressions\ForClasses\IsNotA\Fruit\Banana;
 use Arkitect\Tests\Unit\Expressions\ForClasses\IsNotA\Fruit\CavendishBanana;
 use Arkitect\Tests\Unit\Expressions\ForClasses\IsNotA\Fruit\DwarfCavendishBanana;
 use Arkitect\Tests\Unit\Expressions\ForClasses\IsNotA\Fruit\FruitInterface;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 final class IsNotATest extends TestCase
 {
+    use MockHierarchyResolver;
+
     public function test_it_should_have_no_violation_when_it_doesnt_extend(): void
     {
         $interface = FruitInterface::class;
         $isNotA = new IsNotA($interface);
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName(Dog::class)
             ->build();
@@ -35,7 +38,7 @@ final class IsNotATest extends TestCase
     {
         $class = Banana::class;
         $isNotA = new IsNotA($class);
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName(Dog::class)
             ->build();
@@ -50,7 +53,7 @@ final class IsNotATest extends TestCase
     {
         $interface = FruitInterface::class;
         $isNotA = new IsNotA($interface);
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName(CavendishBanana::class)
             ->addInterface($interface, 10)
@@ -70,7 +73,7 @@ final class IsNotATest extends TestCase
     {
         $class = Banana::class;
         $isNotA = new IsNotA($class);
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName(DwarfCavendishBanana::class)
             ->addExtends($class, 10)

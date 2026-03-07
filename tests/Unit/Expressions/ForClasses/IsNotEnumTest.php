@@ -6,15 +6,18 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\IsNotEnum;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class IsNotEnumTest extends TestCase
 {
+    use MockHierarchyResolver;
+
     public function test_it_should_return_violation_error(): void
     {
         $isEnum = new IsNotEnum();
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setEnum(true)
@@ -34,7 +37,7 @@ class IsNotEnumTest extends TestCase
     {
         $isEnum = new IsNotEnum();
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->build();

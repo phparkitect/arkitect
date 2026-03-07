@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI\Command;
 
+use Arkitect\Analyzer\ClassHierarchyResolver;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\ClassSet;
 use Arkitect\CLI\TargetPhpVersion;
@@ -54,9 +55,10 @@ EOT;
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $fileParser = $this->getParser($input);
+        $fromDir = $input->getOption('from-dir');
+        $fileParser = $this->getParser($input, $fromDir);
 
-        $classSet = ClassSet::fromDir($input->getOption('from-dir'));
+        $classSet = ClassSet::fromDir($fromDir);
         foreach ($classSet as $file) {
             $fileParser->parse($file->getContents(), $file->getRelativePathname());
 
@@ -90,13 +92,13 @@ EOT;
     /**
      * @throws \Arkitect\Exceptions\PhpVersionNotValidException
      */
-    private function getParser(InputInterface $input): \Arkitect\Analyzer\FileParser
+    private function getParser(InputInterface $input, string $fromDir): \Arkitect\Analyzer\FileParser
     {
         $phpVersion = $input->getOption('target-php-version');
         $targetPhpVersion = TargetPhpVersion::create($phpVersion);
-        $fileParser = FileParserFactory::createFileParser($targetPhpVersion);
+        $hierarchyResolver = new ClassHierarchyResolver([$fromDir]);
 
-        return $fileParser;
+        return FileParserFactory::createFileParser($targetPhpVersion, true, $hierarchyResolver);
     }
 
     private function showParsingErrors(\Arkitect\Analyzer\FileParser $fileParser, OutputInterface $output): void

@@ -7,15 +7,18 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\HaveTrait;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class HaveTraitTest extends TestCase
 {
+    use MockHierarchyResolver;
+
     public function test_it_should_return_true_if_class_uses_trait(): void
     {
         $expression = new HaveTrait('MyTrait');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = (new ClassDescriptionBuilder($this->createMockResolver(traits: ['MyTrait'])))
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland\Myclass')
             ->addTrait('MyTrait', 1)
@@ -36,7 +39,7 @@ class HaveTraitTest extends TestCase
     {
         $expression = new HaveTrait('MyTrait');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = (new ClassDescriptionBuilder($this->createMockResolver(traits: ['MyTrait'])))
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland\Myclass')
             ->addTrait('MyTrait', 1)
@@ -56,7 +59,7 @@ class HaveTraitTest extends TestCase
     {
         $expression = new HaveTrait('AnotherTrait');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = (new ClassDescriptionBuilder($this->createMockResolver(traits: ['MyTrait'])))
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland\Myclass')
             ->addTrait('MyTrait', 1)
@@ -73,7 +76,7 @@ class HaveTraitTest extends TestCase
     {
         $expression = new HaveTrait('MyTrait');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setInterface(true)
@@ -90,7 +93,7 @@ class HaveTraitTest extends TestCase
     {
         $expression = new HaveTrait('MyTrait');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setTrait(true)
@@ -107,7 +110,7 @@ class HaveTraitTest extends TestCase
     {
         $expression = new HaveTrait('MyTrait');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = (new ClassDescriptionBuilder($this->createMockResolver(traits: ['MyTrait'])))
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setTrait(true)
@@ -125,7 +128,7 @@ class HaveTraitTest extends TestCase
     {
         $expression = new HaveTrait('MyTrait');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->build();
@@ -137,7 +140,7 @@ class HaveTraitTest extends TestCase
     {
         $expression = new HaveTrait('MyTrait');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setInterface(true)
@@ -150,7 +153,7 @@ class HaveTraitTest extends TestCase
     {
         $expression = new HaveTrait('MyTrait');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setTrait(true)

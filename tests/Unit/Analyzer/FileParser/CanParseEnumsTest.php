@@ -8,10 +8,12 @@ use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Expression\ForClasses\Implement;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class CanParseEnumsTest extends TestCase
 {
+    use MockHierarchyResolver;
     public function test_it_can_parse_enum(): void
     {
         $code = <<< 'EOF'
@@ -28,7 +30,7 @@ class CanParseEnumsTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_1), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -46,7 +48,7 @@ class CanParseEnumsTest extends TestCase
      */
     public function test_it_parse_enums(string $code): void
     {
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_1), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
 
         foreach ($fp->getClassDescriptions() as $classDescription) {

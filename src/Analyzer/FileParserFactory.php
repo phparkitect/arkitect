@@ -12,11 +12,10 @@ class FileParserFactory
 {
     public static function createFileParser(
         TargetPhpVersion $targetPhpVersion,
-        bool $parseCustomAnnotations = true,
-        ?ClassHierarchyResolver $hierarchyResolver = null,
+        bool $parseCustomAnnotations,
+        ClassHierarchyResolver $hierarchyResolver,
     ): FileParser {
-        $builder = new ClassDescriptionBuilder();
-        $builder->setHierarchyResolver($hierarchyResolver);
+        $builder = new ClassDescriptionBuilder($hierarchyResolver);
 
         return new FileParser(
             new NodeTraverser(),
@@ -25,10 +24,5 @@ class FileParserFactory
             new DocblockTypesResolver($parseCustomAnnotations),
             $targetPhpVersion
         );
-    }
-
-    public static function forPhpVersion(string $targetPhpVersion): FileParser
-    {
-        return self::createFileParser(TargetPhpVersion::create($targetPhpVersion), true);
     }
 }

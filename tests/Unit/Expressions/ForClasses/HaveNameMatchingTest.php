@@ -6,15 +6,18 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\ForClasses\HaveNameMatching;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class HaveNameMatchingTest extends TestCase
 {
+    use MockHierarchyResolver;
+
     public function test_check_class_name_match(): void
     {
         $expression = new HaveNameMatching('*Class');
 
-        $goodClass = ClassDescription::getBuilder('\App\MyClass', 'src/Foo.php')->build();
+        $goodClass = ClassDescription::getBuilder('\App\MyClass', 'src/Foo.php', $this->createMockResolver())->build();
 
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
@@ -26,7 +29,7 @@ class HaveNameMatchingTest extends TestCase
     {
         $expression = new HaveNameMatching('*GoodName*');
 
-        $badClass = ClassDescription::getBuilder('\App\BadNameClass', 'src/Foo.php')->build();
+        $badClass = ClassDescription::getBuilder('\App\BadNameClass', 'src/Foo.php', $this->createMockResolver())->build();
 
         $because = 'we want to add this rule for our software';
         $violations = new Violations();

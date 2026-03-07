@@ -7,10 +7,12 @@ namespace Arkitect\Tests\Unit\Analyzer\FileParser;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\Analyzer\FullyQualifiedClassName;
 use Arkitect\CLI\TargetPhpVersion;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class CanParseAttributesTest extends TestCase
 {
+    use MockHierarchyResolver;
     public function test_should_parse_class_attributes(): void
     {
         $code = <<< 'EOF'
@@ -23,7 +25,7 @@ class CanParseAttributesTest extends TestCase
         class Foo {}
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_0), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -53,7 +55,7 @@ class CanParseAttributesTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_1), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -87,7 +89,7 @@ class CanParseAttributesTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_1), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -118,7 +120,7 @@ class CanParseAttributesTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_1), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();

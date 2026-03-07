@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Integration\PHPUnit;
 
+use Arkitect\Analyzer\ClassHierarchyResolver;
 use Arkitect\Expression\ForClasses\HaveTrait;
 use Arkitect\Expression\ForClasses\NotHaveTrait;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
@@ -18,7 +19,7 @@ final class CheckClassHaveTraitTest extends TestCase
     {
         $dir = vfsStream::setup('root', null, $this->createDirStructure())->url();
 
-        $runner = TestRunner::create('8.4');
+        $runner = TestRunner::create('8.4', $this->createResolver());
 
         $rule = Rule::allClasses()
             ->that(new ResideInOneOfTheseNamespaces('Tests\Feature'))
@@ -37,7 +38,7 @@ final class CheckClassHaveTraitTest extends TestCase
     {
         $dir = vfsStream::setup('root', null, $this->createDirStructure())->url();
 
-        $runner = TestRunner::create('8.4');
+        $runner = TestRunner::create('8.4', $this->createResolver());
 
         $rule = Rule::allClasses()
             ->that(new ResideInOneOfTheseNamespaces('Tests\Feature'))
@@ -56,7 +57,7 @@ final class CheckClassHaveTraitTest extends TestCase
     {
         $dir = vfsStream::setup('root', null, $this->createDirStructure())->url();
 
-        $runner = TestRunner::create('8.4');
+        $runner = TestRunner::create('8.4', $this->createResolver());
 
         $rule = Rule::allClasses()
             ->that(new ResideInOneOfTheseNamespaces('App\Models'))
@@ -67,6 +68,25 @@ final class CheckClassHaveTraitTest extends TestCase
 
         self::assertCount(0, $runner->getViolations());
         self::assertCount(0, $runner->getParsingErrors());
+    }
+
+    private function createResolver(): ClassHierarchyResolver
+    {
+        $resolver = $this->createStub(ClassHierarchyResolver::class);
+        $resolver->method('getParentClassNames')->willReturn([]);
+        $resolver->method('getInterfaceNames')->willReturn([]);
+        $resolver->method('getTraitNames')->willReturnCallback(function (string $fqcn) {
+            return match ($fqcn) {
+                'Tests\Feature\OrderFeatureTest' => ['DatabaseTransactions'],
+                'Tests\Feature\ProductFeatureTest' => ['DatabaseTransactions', 'RefreshDatabase'],
+                'Tests\Feature\UserFeatureTest' => [],
+                'App\Models\User' => ['HasUuid'],
+                'App\Models\Product' => ['HasUuid'],
+                default => [],
+            };
+        });
+
+        return $resolver;
     }
 
     public function createDirStructure(): array

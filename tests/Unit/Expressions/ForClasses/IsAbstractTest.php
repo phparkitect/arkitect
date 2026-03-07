@@ -8,15 +8,18 @@ use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\IsAbstract;
 use Arkitect\Expression\ForClasses\IsNotAbstract;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class IsAbstractTest extends TestCase
 {
+    use MockHierarchyResolver;
+
     public function test_it_should_return_violation_error(): void
     {
         $isAbstract = new IsAbstract();
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->build();
@@ -35,7 +38,7 @@ class IsAbstractTest extends TestCase
     {
         $isAbstract = new IsAbstract();
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setFinal(true)
@@ -55,7 +58,7 @@ class IsAbstractTest extends TestCase
         $isAbstract = new IsAbstract();
         $isNotAbstract = new IsNotAbstract();
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setInterface(true)
@@ -70,7 +73,7 @@ class IsAbstractTest extends TestCase
         $isAbstract = new IsAbstract();
         $isNotAbstract = new IsNotAbstract();
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setTrait(true)
@@ -85,7 +88,7 @@ class IsAbstractTest extends TestCase
         $isAbstract = new IsAbstract();
         $isNotAbstract = new IsNotAbstract();
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setEnum(true)
@@ -100,7 +103,7 @@ class IsAbstractTest extends TestCase
         $isAbstract = new IsAbstract();
         $isNotAbstract = new IsNotAbstract();
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setFinal(true)

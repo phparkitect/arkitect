@@ -80,9 +80,9 @@ class ClassDescription
         $this->enum = $enum;
     }
 
-    public static function getBuilder(string $FQCN, string $filePath): ClassDescriptionBuilder
+    public static function getBuilder(string $FQCN, string $filePath, ClassHierarchyResolver $hierarchyResolver): ClassDescriptionBuilder
     {
-        $cb = new ClassDescriptionBuilder();
+        $cb = new ClassDescriptionBuilder($hierarchyResolver);
         $cb->setClassName($FQCN);
         $cb->setFilePath($filePath);
 

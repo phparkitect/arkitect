@@ -8,17 +8,19 @@ use Arkitect\Expression\ForClasses\HaveAttribute;
 use Arkitect\Expression\ForClasses\HaveNameMatching;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\Rules\Rule;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use Arkitect\Tests\Utils\TestRunner;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 
 final class CheckClassHaveAttributeTest extends TestCase
 {
+    use MockHierarchyResolver;
     public function test_models_should_reside_in_app_model(): void
     {
         $dir = vfsStream::setup('root', null, $this->createDirStructure())->url();
 
-        $runner = TestRunner::create('8.4');
+        $runner = TestRunner::create('8.4', $this->createMockResolver());
 
         $rule = Rule::allClasses()
             ->that(new HaveAttribute('Entity'))
@@ -35,7 +37,7 @@ final class CheckClassHaveAttributeTest extends TestCase
     {
         $dir = vfsStream::setup('root', null, $this->createDirStructure())->url();
 
-        $runner = TestRunner::create('8.4');
+        $runner = TestRunner::create('8.4', $this->createMockResolver());
 
         $rule = Rule::allClasses()
             ->that(new HaveAttribute('AsController'))
@@ -54,7 +56,7 @@ final class CheckClassHaveAttributeTest extends TestCase
     {
         $dir = vfsStream::setup('root', null, $this->createDirStructure())->url();
 
-        $runner = TestRunner::create('8.4');
+        $runner = TestRunner::create('8.4', $this->createMockResolver());
 
         $rule = Rule::allClasses()
             ->that(new HaveNameMatching('*Controller'))

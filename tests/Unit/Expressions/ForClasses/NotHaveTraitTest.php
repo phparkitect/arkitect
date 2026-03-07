@@ -7,15 +7,18 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\NotHaveTrait;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class NotHaveTraitTest extends TestCase
 {
+    use MockHierarchyResolver;
+
     public function test_it_should_return_no_violation_if_class_does_not_use_trait(): void
     {
         $traitConstraint = new NotHaveTrait('MyTrait');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->build();
@@ -31,7 +34,7 @@ class NotHaveTraitTest extends TestCase
     {
         $traitConstraint = new NotHaveTrait('MyTrait');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addTrait('AnotherTrait', 1)
@@ -48,7 +51,7 @@ class NotHaveTraitTest extends TestCase
     {
         $traitConstraint = new NotHaveTrait('MyTrait');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = (new ClassDescriptionBuilder($this->createMockResolver(traits: ['MyTrait'])))
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addTrait('MyTrait', 1)
@@ -71,7 +74,7 @@ class NotHaveTraitTest extends TestCase
     {
         $traitConstraint = new NotHaveTrait('MyTrait');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setInterface(true)
@@ -88,7 +91,7 @@ class NotHaveTraitTest extends TestCase
     {
         $traitConstraint = new NotHaveTrait('MyTrait');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setTrait(true)
@@ -105,7 +108,7 @@ class NotHaveTraitTest extends TestCase
     {
         $traitConstraint = new NotHaveTrait('MyTrait');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = (new ClassDescriptionBuilder($this->createMockResolver(traits: ['MyTrait'])))
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setTrait(true)
@@ -123,7 +126,7 @@ class NotHaveTraitTest extends TestCase
     {
         $traitConstraint = new NotHaveTrait('MyTrait');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->build();
@@ -135,7 +138,7 @@ class NotHaveTraitTest extends TestCase
     {
         $traitConstraint = new NotHaveTrait('MyTrait');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setInterface(true)
@@ -148,7 +151,7 @@ class NotHaveTraitTest extends TestCase
     {
         $traitConstraint = new NotHaveTrait('MyTrait');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setTrait(true)

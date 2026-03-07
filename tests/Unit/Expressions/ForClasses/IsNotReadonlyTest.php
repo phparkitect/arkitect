@@ -7,15 +7,18 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\IsNotReadonly;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class IsNotReadonlyTest extends TestCase
 {
+    use MockHierarchyResolver;
+
     public function test_it_should_return_violation_error(): void
     {
         $isNotReadonly = new IsNotReadonly();
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setReadonly(true)
@@ -35,7 +38,7 @@ class IsNotReadonlyTest extends TestCase
     {
         $isNotReadonly = new IsNotReadonly();
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->build();

@@ -41,7 +41,9 @@ class ClassDescriptionBuilder
 
     private ?string $filePath = null;
 
-    private ?ClassHierarchyResolver $hierarchyResolver = null;
+    public function __construct(private ClassHierarchyResolver $hierarchyResolver)
+    {
+    }
 
     public function clear(): void
     {
@@ -166,40 +168,27 @@ class ClassDescriptionBuilder
         return $this;
     }
 
-    public function setHierarchyResolver(?ClassHierarchyResolver $hierarchyResolver): self
-    {
-        $this->hierarchyResolver = $hierarchyResolver;
-
-        return $this;
-    }
-
     public function build(): ClassDescription
     {
         Assert::notNull($this->FQCN, 'You must set an FQCN');
         Assert::notNull($this->filePath, 'You must set a file path');
 
-        $extends = $this->extends;
-        $interfaces = $this->interfaces;
-        $traits = $this->traits;
+        $fqcn = $this->FQCN->toString();
 
-        if (null !== $this->hierarchyResolver) {
-            $fqcn = $this->FQCN->toString();
+        $extends = array_map(
+            static fn (string $name): FullyQualifiedClassName => FullyQualifiedClassName::fromString($name),
+            $this->hierarchyResolver->getParentClassNames($fqcn)
+        );
 
-            $extends = array_map(
-                static fn (string $name): FullyQualifiedClassName => FullyQualifiedClassName::fromString($name),
-                $this->hierarchyResolver->getParentClassNames($fqcn)
-            );
+        $interfaces = array_map(
+            static fn (string $name): FullyQualifiedClassName => FullyQualifiedClassName::fromString($name),
+            $this->hierarchyResolver->getInterfaceNames($fqcn)
+        );
 
-            $interfaces = array_map(
-                static fn (string $name): FullyQualifiedClassName => FullyQualifiedClassName::fromString($name),
-                $this->hierarchyResolver->getInterfaceNames($fqcn)
-            );
-
-            $traits = array_map(
-                static fn (string $name): FullyQualifiedClassName => FullyQualifiedClassName::fromString($name),
-                $this->hierarchyResolver->getTraitNames($fqcn)
-            );
-        }
+        $traits = array_map(
+            static fn (string $name): FullyQualifiedClassName => FullyQualifiedClassName::fromString($name),
+            $this->hierarchyResolver->getTraitNames($fqcn)
+        );
 
         return new ClassDescription(
             $this->FQCN,

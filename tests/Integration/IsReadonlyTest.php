@@ -8,15 +8,17 @@ use Arkitect\Expression\ForClasses\HaveNameMatching;
 use Arkitect\Expression\ForClasses\IsNotReadonly;
 use Arkitect\Expression\ForClasses\IsReadonly;
 use Arkitect\Rules\Rule;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use Arkitect\Tests\Utils\TestRunner;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 
 class IsReadonlyTest extends TestCase
 {
+    use MockHierarchyResolver;
     public function test_is_readonly_in_that_should_not_consider_traits_enums_interfaces(): void
     {
-        $runner = TestRunner::create('8.4');
+        $runner = TestRunner::create('8.4', $this->createMockResolver());
 
         $rule = Rule::allClasses()
             ->that(new IsReadonly())
@@ -31,7 +33,7 @@ class IsReadonlyTest extends TestCase
 
     public function test_is_readonly_in_should_should_consider_traits_enums_interfaces(): void
     {
-        $runner = TestRunner::create('8.4');
+        $runner = TestRunner::create('8.4', $this->createMockResolver());
 
         $rule = Rule::allClasses()
             ->that(new HaveNameMatching('My*'))
@@ -50,7 +52,7 @@ class IsReadonlyTest extends TestCase
 
     public function test_is_not_readonly_in_should_should_consider_traits_enums_interfaces(): void
     {
-        $runner = TestRunner::create('8.4');
+        $runner = TestRunner::create('8.4', $this->createMockResolver());
 
         $rule = Rule::allClasses()
             ->that(new HaveNameMatching('My*'))

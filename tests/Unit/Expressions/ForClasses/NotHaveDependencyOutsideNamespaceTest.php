@@ -8,16 +8,19 @@ use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\NotHaveDependencyOutsideNamespace;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class NotHaveDependencyOutsideNamespaceTest extends TestCase
 {
+    use MockHierarchyResolver;
+
     public function test_it_should_return_violation_error(): void
     {
         $namespace = 'myNamespace';
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace($namespace);
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->build();
@@ -35,7 +38,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
     {
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('myNamespace');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addDependency(new ClassDependency('myNamespace', 100))
@@ -52,7 +55,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
     {
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('myNamespace');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addDependency(new ClassDependency('myNamespace', 100))
@@ -70,7 +73,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
     {
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('myNamespace', ['foo']);
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addDependency(new ClassDependency('foo', 100))
@@ -87,7 +90,7 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
     {
         $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('myNamespace');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addDependency(new ClassDependency('another\class', 100))

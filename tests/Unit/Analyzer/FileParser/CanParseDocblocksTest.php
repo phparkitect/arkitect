@@ -9,10 +9,12 @@ use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
 use Arkitect\Expression\ForClasses\NotContainDocBlockLike;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class CanParseDocblocksTest extends TestCase
 {
+    use MockHierarchyResolver;
     public function test_it_parse_docblocks(): void
     {
         $code = <<< 'EOF'
@@ -34,7 +36,7 @@ class CanParseDocblocksTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_1), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -75,7 +77,7 @@ class CanParseDocblocksTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_1), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -105,7 +107,7 @@ class CanParseDocblocksTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_0), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -134,7 +136,7 @@ class CanParseDocblocksTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_0), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -163,7 +165,7 @@ class CanParseDocblocksTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_0), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -194,7 +196,7 @@ class CanParseDocblocksTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_0), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -225,7 +227,7 @@ class CanParseDocblocksTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_0), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -256,7 +258,7 @@ class CanParseDocblocksTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_0), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -290,7 +292,7 @@ class CanParseDocblocksTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_0), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -322,7 +324,7 @@ class CanParseDocblocksTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_0), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -354,7 +356,7 @@ class CanParseDocblocksTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_0), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -386,7 +388,7 @@ class CanParseDocblocksTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_0), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
         $cd = $fp->getClassDescriptions();
 
@@ -418,7 +420,8 @@ class CanParseDocblocksTest extends TestCase
 
         $fp = FileParserFactory::createFileParser(
             TargetPhpVersion::create(TargetPhpVersion::PHP_8_1),
-            false
+            false,
+            $this->createMockResolver()
         );
         $fp->parse($code, 'relativePathName');
 
@@ -451,7 +454,7 @@ class CanParseDocblocksTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_1), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -483,7 +486,7 @@ class CanParseDocblocksTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_1), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -525,7 +528,7 @@ class CanParseDocblocksTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_0), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -562,7 +565,7 @@ class CanParseDocblocksTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_1), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();

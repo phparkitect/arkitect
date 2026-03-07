@@ -7,15 +7,18 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\NotExtend;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class NotExtendTest extends TestCase
 {
+    use MockHierarchyResolver;
+
     public function test_it_should_return_violation_error(): void
     {
         $notExtend = new NotExtend('My\BaseClass');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = (new ClassDescriptionBuilder($this->createMockResolver(parents: ['My\BaseClass'])))
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addExtends('My\BaseClass', 1)
@@ -35,7 +38,7 @@ class NotExtendTest extends TestCase
     {
         $notExtend = new NotExtend('My\BaseClass');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = (new ClassDescriptionBuilder($this->createMockResolver(parents: ['My\AnotherClass'])))
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addExtends('My\AnotherClass', 1)
@@ -53,7 +56,7 @@ class NotExtendTest extends TestCase
     {
         $notExtend = new NotExtend('My\FirstExtend', 'My\SecondExtend');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = (new ClassDescriptionBuilder($this->createMockResolver(parents: ['My\SecondExtend'])))
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addExtends('My\SecondExtend', 1)

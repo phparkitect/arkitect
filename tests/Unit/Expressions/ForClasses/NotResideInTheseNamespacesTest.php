@@ -7,15 +7,18 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\ForClasses\NotResideInTheseNamespaces;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class NotResideInTheseNamespacesTest extends TestCase
 {
+    use MockHierarchyResolver;
+
     public function test_it_should_return_true_if_not_reside_in_namespace(): void
     {
         $haveNameMatching = new NotResideInTheseNamespaces('MyNamespace');
 
-        $classDesc = ClassDescription::getBuilder('AnotherNamespace\HappyIsland', 'src/Foo.php')->build();
+        $classDesc = ClassDescription::getBuilder('AnotherNamespace\HappyIsland', 'src/Foo.php', $this->createMockResolver())->build();
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
         $haveNameMatching->evaluate($classDesc, $violations, $because);
@@ -28,7 +31,7 @@ class NotResideInTheseNamespacesTest extends TestCase
         $namespace = 'MyNamespace';
         $haveNameMatching = new NotResideInTheseNamespaces($namespace);
 
-        $classDesc = ClassDescription::getBuilder('MyNamespace\HappyIsland', 'src/Foo.php')->build();
+        $classDesc = ClassDescription::getBuilder('MyNamespace\HappyIsland', 'src/Foo.php', $this->createMockResolver())->build();
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
         $haveNameMatching->evaluate($classDesc, $violations, $because);
@@ -44,18 +47,18 @@ class NotResideInTheseNamespacesTest extends TestCase
     {
         $haveNameMatching = new NotResideInTheseNamespaces('AnotherNamespace', 'ASecondNamespace', 'AThirdNamespace');
 
-        $classDesc = ClassDescription::getBuilder('AnotherNamespace\HappyIsland', 'src/Foo.php')->build();
+        $classDesc = ClassDescription::getBuilder('AnotherNamespace\HappyIsland', 'src/Foo.php', $this->createMockResolver())->build();
         $violations = new Violations();
         $because = 'we want to add this rule for our software';
         $haveNameMatching->evaluate($classDesc, $violations, $because);
         self::assertEquals(1, $violations->count());
 
-        $classDesc = ClassDescription::getBuilder('MyNamespace\HappyIsland', 'src/Foo.php')->build();
+        $classDesc = ClassDescription::getBuilder('MyNamespace\HappyIsland', 'src/Foo.php', $this->createMockResolver())->build();
         $violations = new Violations();
         $haveNameMatching->evaluate($classDesc, $violations, $because);
         self::assertEquals(0, $violations->count());
 
-        $classDesc = ClassDescription::getBuilder('AThirdNamespace\HappyIsland', 'src/Foo.php')->build();
+        $classDesc = ClassDescription::getBuilder('AThirdNamespace\HappyIsland', 'src/Foo.php', $this->createMockResolver())->build();
         $violations = new Violations();
         $haveNameMatching->evaluate($classDesc, $violations, $because);
         self::assertEquals(1, $violations->count());

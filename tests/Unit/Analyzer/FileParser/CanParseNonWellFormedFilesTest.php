@@ -8,13 +8,15 @@ use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Rules\ParsingError;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class CanParseNonWellFormedFilesTest extends TestCase
 {
+    use MockHierarchyResolver;
     public function test_should_parse_non_php_file(): void
     {
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_0), true, $this->createMockResolver());
         $fp->parse('', 'path/to/class.php');
 
         self::assertEmpty($fp->getClassDescriptions());
@@ -26,7 +28,7 @@ class CanParseNonWellFormedFilesTest extends TestCase
         <?php
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_0), true, $this->createMockResolver());
         $fp->parse($code, 'path/to/class.php');
 
         self::assertEmpty($fp->getClassDescriptions());
@@ -48,7 +50,7 @@ class CanParseNonWellFormedFilesTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_0), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
 
         $parsingErrors = $fp->getParsingErrors();
@@ -78,7 +80,7 @@ class CanParseNonWellFormedFilesTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_0), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
 
         $violations = new Violations();

@@ -7,10 +7,12 @@ namespace Arkitect\Tests\Unit\Analyzer\FileParser;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\CLI\TargetPhpVersion;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class CanParsePropertyHooksTest extends TestCase
 {
+    use MockHierarchyResolver;
     public function test_it_parse_property_hooks(): void
     {
         $code = <<< 'EOF'
@@ -33,7 +35,7 @@ class CanParsePropertyHooksTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_4);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_4), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -67,7 +69,7 @@ class CanParsePropertyHooksTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_4);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_4), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();
@@ -99,7 +101,7 @@ class CanParsePropertyHooksTest extends TestCase
         }
         EOF;
 
-        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_4);
+        $fp = FileParserFactory::createFileParser(TargetPhpVersion::create(TargetPhpVersion::PHP_8_4), true, $this->createMockResolver());
         $fp->parse($code, 'relativePathName');
 
         $cd = $fp->getClassDescriptions();

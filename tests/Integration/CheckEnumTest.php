@@ -8,17 +8,19 @@ use Arkitect\Expression\ForClasses\HaveNameMatching;
 use Arkitect\Expression\ForClasses\IsEnum;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\Rules\Rule;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use Arkitect\Tests\Utils\TestRunner;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 
 class CheckEnumTest extends TestCase
 {
+    use MockHierarchyResolver;
     public function test_naming_is_enforced(): void
     {
         $dir = vfsStream::setup('root', null, $this->createDirStructure())->url();
 
-        $runner = TestRunner::create('8.4');
+        $runner = TestRunner::create('8.4', $this->createMockResolver());
 
         $rules = [];
 

@@ -7,15 +7,18 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\NotImplement;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class NotImplementTest extends TestCase
 {
+    use MockHierarchyResolver;
+
     public function test_it_should_return_violation_error(): void
     {
         $implementConstraint = new NotImplement('interface');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->build();
@@ -31,7 +34,7 @@ class NotImplementTest extends TestCase
     {
         $implementConstraint = new NotImplement('interface');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = (new ClassDescriptionBuilder($this->createMockResolver(parents: ['foo'])))
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addExtends('foo', 1)
@@ -48,7 +51,7 @@ class NotImplementTest extends TestCase
     {
         $implementConstraint = new NotImplement('interface');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = (new ClassDescriptionBuilder($this->createMockResolver(interfaces: ['interface'])))
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addInterface('interface', 1)
@@ -71,7 +74,7 @@ class NotImplementTest extends TestCase
     {
         $implementConstraint = new NotImplement('interface');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setInterface(true)

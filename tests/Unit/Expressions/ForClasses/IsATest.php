@@ -12,15 +12,18 @@ use Arkitect\Tests\Unit\Expressions\ForClasses\IsATest\Fruit\Banana;
 use Arkitect\Tests\Unit\Expressions\ForClasses\IsATest\Fruit\CavendishBanana;
 use Arkitect\Tests\Unit\Expressions\ForClasses\IsATest\Fruit\DwarfCavendishBanana;
 use Arkitect\Tests\Unit\Expressions\ForClasses\IsATest\Fruit\FruitInterface;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 final class IsATest extends TestCase
 {
+    use MockHierarchyResolver;
+
     public function test_it_should_have_no_violation_when_it_implements(): void
     {
         $interface = FruitInterface::class;
         $isA = new IsA($interface);
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName(CavendishBanana::class)
             ->addInterface($interface, 10)
@@ -36,7 +39,7 @@ final class IsATest extends TestCase
     {
         $class = Banana::class;
         $isA = new IsA($class);
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName(DwarfCavendishBanana::class)
             ->addExtends($class, 10)
@@ -52,7 +55,7 @@ final class IsATest extends TestCase
     {
         $interface = FruitInterface::class;
         $isA = new IsA($interface);
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName(Dog::class)
             ->build();
@@ -71,7 +74,7 @@ final class IsATest extends TestCase
     {
         $class = Banana::class;
         $isA = new IsA($class);
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName(Dog::class)
             ->build();

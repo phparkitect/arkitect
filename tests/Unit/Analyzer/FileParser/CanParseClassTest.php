@@ -6,6 +6,7 @@ namespace Arkitect\Tests\Unit\Analyzer\FileParser;
 
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassHierarchyResolver;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
@@ -15,10 +16,12 @@ use Arkitect\Expression\ForClasses\IsFinal;
 use Arkitect\Expression\ForClasses\IsReadonly;
 use Arkitect\Expression\ForClasses\NotHaveDependencyOutsideNamespace;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class CanParseClassTest extends TestCase
 {
+    use MockHierarchyResolver;
     public function test_violation_should_have_ref_to_filepath(): void
     {
         $code = <<< 'EOF'
@@ -206,7 +209,8 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $cd = $this->parseCode($code);
+        $resolver = $this->createMockResolver(parents: ['Root\Animals\Animal']);
+        $cd = $this->parseCode($code, null, $resolver);
         $cd = $cd[1];
 
         self::assertEquals('Root\Animals\Animal', $cd->getExtends()[0]->toString());
@@ -232,7 +236,8 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $cd = $this->parseCode($code);
+        $resolver = $this->createMockResolver(parents: ['Root\Animals\Animal']);
+        $cd = $this->parseCode($code, null, $resolver);
         $cd = $cd[1];
 
         self::assertEquals('Root\Animals\Animal', $cd->getExtends()[0]->toString());
@@ -443,7 +448,8 @@ class CanParseClassTest extends TestCase
 
         EOF;
 
-        $cd = $this->parseCode($code, TargetPhpVersion::PHP_8_1);
+        $resolver = $this->createMockResolver(interfaces: ['Foo\Order']);
+        $cd = $this->parseCode($code, TargetPhpVersion::PHP_8_1, $resolver);
         $cd = $cd[2]; // class Test
 
         $implement = new Implement('Foo\Order');
@@ -499,7 +505,11 @@ class CanParseClassTest extends TestCase
         }
         EOF;
 
-        $cd = $this->parseCode($code, TargetPhpVersion::PHP_8_1);
+        $resolver = $this->createMockResolver(parents: [
+            'MyProject\AppBundle\Application\FooAble',
+            'MyProject\AppBundle\Application\BarAble',
+        ]);
+        $cd = $this->parseCode($code, TargetPhpVersion::PHP_8_1, $resolver);
 
         self::assertCount(3, $cd);
         self::assertEquals('MyProject\AppBundle\Application\FooAble', $cd[2]->getExtends()[0]->toString());
@@ -600,9 +610,13 @@ class CanParseClassTest extends TestCase
         self::assertCount(0, $violations);
     }
 
-    private function parseCode(string $code, ?string $version = null): array
+    private function parseCode(string $code, ?string $version = null, ?ClassHierarchyResolver $resolver = null): array
     {
-        $fp = FileParserFactory::forPhpVersion($version ?? TargetPhpVersion::PHP_8_0);
+        $fp = FileParserFactory::createFileParser(
+            TargetPhpVersion::create($version ?? TargetPhpVersion::PHP_8_0),
+            true,
+            $resolver ?? $this->createMockResolver()
+        );
         $fp->parse($code, 'relativePathName');
 
         return $fp->getClassDescriptions();

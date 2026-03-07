@@ -8,16 +8,18 @@ use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\ForClasses\HaveNameMatching;
 use Arkitect\Rules\Specs;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class SpecsTest extends TestCase
 {
+    use MockHierarchyResolver;
     public function test_return_false_if_not_all_specs_are_matched(): void
     {
         $specStore = new Specs();
         $specStore->add(new HaveNameMatching('Foo'));
 
-        $classDescription = ClassDescription::getBuilder('MyNamespace\HappyIsland', 'src/Foo.php')->build();
+        $classDescription = ClassDescription::getBuilder('MyNamespace\HappyIsland', 'src/Foo.php', $this->createMockResolver())->build();
         $because = 'we want to add this rule for our software';
 
         self::assertFalse($specStore->allSpecsAreMatchedBy($classDescription, $because));
@@ -28,7 +30,7 @@ class SpecsTest extends TestCase
         $specStore = new Specs();
         $specStore->add(new HaveNameMatching('Happy*'));
 
-        $classDescription = ClassDescription::getBuilder('MyNamespace\HappyIsland', 'src/Foo.php')
+        $classDescription = ClassDescription::getBuilder('MyNamespace\HappyIsland', 'src/Foo.php', $this->createMockResolver())
             ->addDependency(new ClassDependency('Foo', 100))
             ->build();
         $because = 'we want to add this rule for our software';

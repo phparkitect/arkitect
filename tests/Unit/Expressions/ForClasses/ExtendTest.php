@@ -7,15 +7,18 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\Extend;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class ExtendTest extends TestCase
 {
+    use MockHierarchyResolver;
+
     public function test_it_should_return_no_violation_on_success(): void
     {
         $extend = new Extend('My\BaseClass');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = (new ClassDescriptionBuilder($this->createMockResolver(parents: ['My\BaseClass'])))
             ->setFilePath('src/Foo.php')
             ->setClassName('My\Class')
             ->addExtends('My\BaseClass', 10)
@@ -31,7 +34,7 @@ class ExtendTest extends TestCase
     {
         $extend = new Extend('My\B14*');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = (new ClassDescriptionBuilder($this->createMockResolver(parents: ['My\B14Class'])))
             ->setFilePath('src/Foo.php')
             ->setClassName('My\Class')
             ->addExtends('My\B14Class', 10)
@@ -47,7 +50,7 @@ class ExtendTest extends TestCase
     {
         $extend = new Extend('App\Providers\(Auth|Event|Route|Horizon)ServiceProvider');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = (new ClassDescriptionBuilder($this->createMockResolver(parents: ['My\BaseClass'])))
             ->setFilePath('src/Foo.php')
             ->setClassName('My\Class')
             ->addExtends('My\BaseClass', 10)
@@ -62,7 +65,7 @@ class ExtendTest extends TestCase
     {
         $extend = new Extend('My\BaseClass');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = (new ClassDescriptionBuilder($this->createMockResolver(parents: ['My\AnotherClass'])))
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addExtends('My\AnotherClass', 10)
@@ -79,7 +82,7 @@ class ExtendTest extends TestCase
     {
         $extend = new Extend('My\BaseClass');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->build();
@@ -98,7 +101,7 @@ class ExtendTest extends TestCase
     {
         $extend = new Extend('My\FirstExtend', 'My\SecondExtend');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = (new ClassDescriptionBuilder($this->createMockResolver(parents: ['My\SecondExtend'])))
             ->setFilePath('src/Foo.php')
             ->setClassName('My\Class')
             ->addExtends('My\SecondExtend', 10)

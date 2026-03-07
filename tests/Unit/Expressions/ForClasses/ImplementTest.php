@@ -7,15 +7,18 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\Implement;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class ImplementTest extends TestCase
 {
+    use MockHierarchyResolver;
+
     public function test_it_should_return_violation_error(): void
     {
         $implementConstraint = new Implement('interface');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->build();
@@ -34,7 +37,7 @@ class ImplementTest extends TestCase
     {
         $implementConstraint = new Implement('interface');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = (new ClassDescriptionBuilder($this->createMockResolver(interfaces: ['Foo'])))
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addInterface('Foo', 1)
@@ -51,7 +54,7 @@ class ImplementTest extends TestCase
     {
         $implementConstraint = new Implement('interface');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = (new ClassDescriptionBuilder($this->createMockResolver(interfaces: ['interface'])))
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addInterface('interface', 1)
@@ -69,7 +72,7 @@ class ImplementTest extends TestCase
     {
         $implementConstraint = new Implement('\Foo\Order');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = (new ClassDescriptionBuilder($this->createMockResolver(interfaces: ['\Foo\Orderable'])))
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->addInterface('\Foo\Orderable', 1)
@@ -87,7 +90,7 @@ class ImplementTest extends TestCase
 
         $implementConstraint = new Implement($interface);
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setInterface(true)

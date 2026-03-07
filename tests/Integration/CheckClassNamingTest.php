@@ -6,17 +6,19 @@ namespace Arkitect\Tests\Integration;
 use Arkitect\Expression\ForClasses\HaveNameMatching;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\Rules\Rule;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use Arkitect\Tests\Utils\TestRunner;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 
 class CheckClassNamingTest extends TestCase
 {
+    use MockHierarchyResolver;
     public function test_code_in_happy_island_should_have_name_matching_prefix(): void
     {
         $dir = vfsStream::setup('root', null, $this->createDummyProject())->url();
 
-        $runner = TestRunner::create('8.4');
+        $runner = TestRunner::create('8.4', $this->createMockResolver());
 
         $rule = Rule::allClasses()
             ->that(new ResideInOneOfTheseNamespaces('App\HappyIsland'))

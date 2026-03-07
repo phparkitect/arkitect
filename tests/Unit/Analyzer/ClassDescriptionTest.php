@@ -6,15 +6,17 @@ namespace Arkitect\Tests\Unit\Analyzer;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class ClassDescriptionTest extends TestCase
 {
+    use MockHierarchyResolver;
     private ClassDescriptionBuilder $builder;
 
     protected function setUp(): void
     {
-        $this->builder = ClassDescription::getBuilder('Fruit\Banana', 'src/Foo.php');
+        $this->builder = ClassDescription::getBuilder('Fruit\Banana', 'src/Foo.php', $this->createMockResolver());
     }
 
     public function test_should_return_file_path(): void
@@ -88,7 +90,8 @@ class ClassDescriptionTest extends TestCase
 
     public function test_should_return_true_if_has_trait(): void
     {
-        $cd = $this->builder
+        $builder = ClassDescription::getBuilder('Fruit\Banana', 'src/Foo.php', $this->createMockResolver(traits: ['FooTrait']));
+        $cd = $builder
             ->addTrait('FooTrait', 15)
             ->build();
 
@@ -98,7 +101,8 @@ class ClassDescriptionTest extends TestCase
 
     public function test_should_return_false_if_not_has_trait(): void
     {
-        $cd = $this->builder
+        $builder = ClassDescription::getBuilder('Fruit\Banana', 'src/Foo.php', $this->createMockResolver(traits: ['FooTrait']));
+        $cd = $builder
             ->addTrait('FooTrait', 15)
             ->build();
 

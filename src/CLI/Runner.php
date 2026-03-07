@@ -85,7 +85,7 @@ class Runner
         /** @var ClassSetRules $classSetRule */
         foreach ($config->getClassSetRules() as $classSetRule) {
             $directories = $classSetRule->getClassSet()->getDirectories();
-            $hierarchyResolver = [] !== $directories ? new ClassHierarchyResolver($directories) : null;
+            $hierarchyResolver = new ClassHierarchyResolver($directories);
 
             $fileParser = FileParserFactory::createFileParser(
                 $config->getTargetPhpVersion(),

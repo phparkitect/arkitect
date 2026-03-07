@@ -7,15 +7,18 @@ namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\HaveAttribute;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class HaveAttributeTest extends TestCase
 {
+    use MockHierarchyResolver;
+
     public function test_it_should_return_true_if_contains_doc_block(): void
     {
         $expression = new HaveAttribute('myAttribute');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland\Myclass')
             ->addAttribute('myAttribute', 1)
@@ -36,7 +39,7 @@ class HaveAttributeTest extends TestCase
     {
         $expression = new HaveAttribute('myAttribute');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland\Myclass')
             ->addAttribute('myAttribute', 1)
@@ -56,7 +59,7 @@ class HaveAttributeTest extends TestCase
     {
         $expression = new HaveAttribute('anotherAttribute');
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland\Myclass')
             ->addAttribute('myAttribute', 1)

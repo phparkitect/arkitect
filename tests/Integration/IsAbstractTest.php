@@ -14,15 +14,17 @@ use Arkitect\Expression\ForClasses\IsNotReadonly;
 use Arkitect\Expression\ForClasses\IsNotTrait;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\Rules\Rule;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use Arkitect\Tests\Utils\TestRunner;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 
 class IsAbstractTest extends TestCase
 {
+    use MockHierarchyResolver;
     public function test_is_abstract_in_that_should_not_consider_final_traits_enums_interfaces(): void
     {
-        $runner = TestRunner::create('8.4');
+        $runner = TestRunner::create('8.4', $this->createMockResolver());
 
         $rule = Rule::allClasses()
             ->that(new IsAbstract())
@@ -37,7 +39,7 @@ class IsAbstractTest extends TestCase
 
     public function test_is_abstract_in_should_should_consider_final_traits_enums_interfaces(): void
     {
-        $runner = TestRunner::create('8.4');
+        $runner = TestRunner::create('8.4', $this->createMockResolver());
 
         $rule = Rule::allClasses()
             ->that(new HaveNameMatching('My*'))
@@ -57,7 +59,7 @@ class IsAbstractTest extends TestCase
 
     public function test_is_not_abstract_in_should_should_consider_final_traits_enums_interfaces(): void
     {
-        $runner = TestRunner::create('8.4');
+        $runner = TestRunner::create('8.4', $this->createMockResolver());
 
         $rule = Rule::allClasses()
             ->that(new HaveNameMatching('My*'))
@@ -92,7 +94,7 @@ class IsAbstractTest extends TestCase
             ],
         ];
 
-        $runner = TestRunner::create('8.4');
+        $runner = TestRunner::create('8.4', $this->createMockResolver());
 
         // This replicates the use case from PR 560:
         // Filter for non-abstract classes (including final), then check naming convention
@@ -139,7 +141,7 @@ class IsAbstractTest extends TestCase
             ],
         ];
 
-        $runner = TestRunner::create('8.4');
+        $runner = TestRunner::create('8.4', $this->createMockResolver());
 
         // When IsNotAbstract is used in should() (not that()), it validates ALL classes
         // In PHP, isAbstract() returns true only for classes with 'abstract' keyword
@@ -226,7 +228,7 @@ class IsAbstractTest extends TestCase
             ],
         ];
 
-        $runner = TestRunner::create('8.4');
+        $runner = TestRunner::create('8.4', $this->createMockResolver());
 
         $rule = Rule::allClasses()
             ->that(new ResideInOneOfTheseNamespaces('App\BadCode'))

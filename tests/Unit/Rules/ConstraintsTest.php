@@ -7,6 +7,7 @@ namespace Arkitect\Tests\Unit\Rules;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\Description;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use Arkitect\Expression\Expression;
 use Arkitect\Rules\Constraints;
 use Arkitect\Rules\Violation;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 
 class ConstraintsTest extends TestCase
 {
+    use MockHierarchyResolver;
     public function test_it_should_not_add_to_violation_if_constraint_is_not_violated(): void
     {
         $trueExpression = new class implements Expression {
@@ -34,7 +36,7 @@ class ConstraintsTest extends TestCase
         $violations = new Violations();
         $because = 'we want to add this rule for our software';
 
-        $cb = new ClassDescriptionBuilder();
+        $cb = $this->createBuilder();
         $cb->setFilePath('src/Foo.php')
             ->setClassName('Banana');
 
@@ -72,7 +74,7 @@ class ConstraintsTest extends TestCase
         $violations = new Violations();
         $because = 'we want to add this rule for our software';
 
-        $cb = new ClassDescriptionBuilder();
+        $cb = $this->createBuilder();
         $cb->setFilePath('src/Foo.php')
             ->setClassName('Banana');
 

@@ -8,15 +8,18 @@ use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\IsFinal;
 use Arkitect\Expression\ForClasses\IsNotFinal;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class IsFinalTest extends TestCase
 {
+    use MockHierarchyResolver;
+
     public function test_it_should_return_error_description(): void
     {
         $isFinal = new IsFinal();
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->build();
@@ -31,7 +34,7 @@ class IsFinalTest extends TestCase
     {
         $isFinal = new IsFinal();
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setFinal(true)
@@ -50,7 +53,7 @@ class IsFinalTest extends TestCase
         $isFinal = new IsFinal();
         $isNotFinal = new IsNotFinal();
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setAbstract(true)
@@ -77,7 +80,7 @@ class IsFinalTest extends TestCase
         $isFinal = new IsFinal();
         $isNotFinal = new IsNotFinal();
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setInterface(true)
@@ -92,7 +95,7 @@ class IsFinalTest extends TestCase
         $isFinal = new IsFinal();
         $isNotFinal = new IsNotFinal();
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setTrait(true)
@@ -107,7 +110,7 @@ class IsFinalTest extends TestCase
         $isFinal = new IsFinal();
         $isNotFinal = new IsNotFinal();
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setEnum(true)

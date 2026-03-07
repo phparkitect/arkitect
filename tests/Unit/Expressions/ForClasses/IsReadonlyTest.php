@@ -8,15 +8,18 @@ use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\IsNotReadonly;
 use Arkitect\Expression\ForClasses\IsReadonly;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class IsReadonlyTest extends TestCase
 {
+    use MockHierarchyResolver;
+
     public function test_it_should_return_error_description(): void
     {
         $isReadonly = new IsReadonly();
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->build();
@@ -31,7 +34,7 @@ class IsReadonlyTest extends TestCase
     {
         $isReadonly = new IsReadonly();
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setReadonly(true)
@@ -49,7 +52,7 @@ class IsReadonlyTest extends TestCase
         $isReadonly = new IsReadonly();
         $isNotReadonly = new IsNotReadonly();
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setInterface(true)
@@ -64,7 +67,7 @@ class IsReadonlyTest extends TestCase
         $isReadonly = new IsReadonly();
         $isNotReadonly = new IsNotReadonly();
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setTrait(true)
@@ -79,7 +82,7 @@ class IsReadonlyTest extends TestCase
         $isReadonly = new IsReadonly();
         $isNotReadonly = new IsNotReadonly();
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName('HappyIsland')
             ->setEnum(true)

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Integration;
 
+use Arkitect\Analyzer\ClassHierarchyResolver;
 use Arkitect\Expression\ForClasses\Extend;
 use Arkitect\Expression\ForClasses\HaveNameMatching;
 use Arkitect\Rules\Rule;
@@ -17,7 +18,17 @@ class ExtendsThrowableTest extends TestCase
     {
         $dir = vfsStream::setup('root', null, $this->createDirStructure())->url();
 
-        $runner = TestRunner::create('8.2');
+        $resolver = $this->createStub(ClassHierarchyResolver::class);
+        $resolver->method('getParentClassNames')->willReturnCallback(function (string $fqcn) {
+            return match ($fqcn) {
+                'App\AnException', 'App\AThrowable' => ['Throwable'],
+                default => [],
+            };
+        });
+        $resolver->method('getInterfaceNames')->willReturn([]);
+        $resolver->method('getTraitNames')->willReturn([]);
+
+        $runner = TestRunner::create('8.2', $resolver);
 
         $rule = Rule::allClasses()
             ->that(new Extend(\Throwable::class))

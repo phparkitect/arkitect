@@ -7,17 +7,19 @@ namespace Arkitect\Tests\Integration;
 use Arkitect\Expression\ForClasses\NotDependsOnTheseNamespaces;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\Rules\Rule;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use Arkitect\Tests\Utils\TestRunner;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 
 class CheckAttributeDependencyTest extends TestCase
 {
+    use MockHierarchyResolver;
     public function test_assertion_should_fail_on_invalid_dependency(): void
     {
         $dir = vfsStream::setup('root', null, $this->createDirStructureWithAttributes())->url();
 
-        $runner = TestRunner::create('8.4');
+        $runner = TestRunner::create('8.4', $this->createMockResolver());
 
         $rule = Rule::allClasses()
             ->that(new ResideInOneOfTheseNamespaces('App'))

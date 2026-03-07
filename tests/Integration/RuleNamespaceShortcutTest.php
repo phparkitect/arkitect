@@ -6,17 +6,19 @@ namespace Arkitect\Tests\Integration;
 use Arkitect\Expression\ForClasses\HaveNameMatching;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\Rules\Rule;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use Arkitect\Tests\Utils\TestRunner;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 
 class RuleNamespaceShortcutTest extends TestCase
 {
+    use MockHierarchyResolver;
     public function test_namespace_shortcut_works_same_as_full_syntax(): void
     {
         $dir = vfsStream::setup('root', null, $this->createDummyProject())->url();
 
-        $runner = TestRunner::create('8.4');
+        $runner = TestRunner::create('8.4', $this->createMockResolver());
 
         $rule = Rule::namespace('App\HappyIsland')
             ->should(new HaveNameMatching('Happy*'))
@@ -32,7 +34,7 @@ class RuleNamespaceShortcutTest extends TestCase
     {
         $dir = vfsStream::setup('root', null, $this->createDummyProject())->url();
 
-        $runner = TestRunner::create('8.4');
+        $runner = TestRunner::create('8.4', $this->createMockResolver());
 
         $rule = Rule::namespace('App\HappyIsland')
             ->should(new HaveNameMatching('Sad*'))
@@ -47,7 +49,7 @@ class RuleNamespaceShortcutTest extends TestCase
     {
         $dir = vfsStream::setup('root', null, $this->createDummyProject())->url();
 
-        $runner = TestRunner::create('8.4');
+        $runner = TestRunner::create('8.4', $this->createMockResolver());
 
         $rule = Rule::namespace('App\HappyIsland', 'App\BadCode')
             ->should(new HaveNameMatching('*Code'))
@@ -63,7 +65,7 @@ class RuleNamespaceShortcutTest extends TestCase
     {
         $dir = vfsStream::setup('root', null, $this->createDummyProject())->url();
 
-        $runner = TestRunner::create('8.4');
+        $runner = TestRunner::create('8.4', $this->createMockResolver());
 
         // Using shortcut
         $shortcutRule = Rule::namespace('App\HappyIsland')

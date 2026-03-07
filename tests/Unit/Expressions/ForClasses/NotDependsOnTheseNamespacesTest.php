@@ -8,15 +8,18 @@ use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Expression\ForClasses\NotDependsOnTheseNamespaces;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class NotDependsOnTheseNamespacesTest extends TestCase
 {
+    use MockHierarchyResolver;
+
     public function test_it_should_return_true_if_it_has_no_dependencies(): void
     {
         $notDependOnClasses = new NotDependsOnTheseNamespaces(['myNamespace']);
 
-        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass', 'src/Foo.php')->build();
+        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass', 'src/Foo.php', $this->createMockResolver())->build();
         $because = 'we want to add this rule for our software';
         $violations = new Violations();
         $notDependOnClasses->evaluate($classDescription, $violations, $because);
@@ -28,7 +31,7 @@ class NotDependsOnTheseNamespacesTest extends TestCase
     {
         $notDependOnClasses = new NotDependsOnTheseNamespaces(['myNamespace']);
 
-        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass', 'src/Foo.php')
+        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass', 'src/Foo.php', $this->createMockResolver())
             ->addDependency(new ClassDependency('myNamespace\Banana', 0))
             ->addDependency(new ClassDependency('anotherNamespace\Banana', 1))
             ->build();
@@ -48,7 +51,7 @@ class NotDependsOnTheseNamespacesTest extends TestCase
     {
         $notDependOnClasses = new NotDependsOnTheseNamespaces(['myNamespace']);
 
-        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass', 'src/Foo.php')
+        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass', 'src/Foo.php', $this->createMockResolver())
             ->addDependency(new ClassDependency('myNamespace\Banana', 0))
             ->addDependency(new ClassDependency('\anotherNamespace\Banana', 1))
             ->addDependency(new ClassDependency('\DateTime', 10))
@@ -69,7 +72,7 @@ class NotDependsOnTheseNamespacesTest extends TestCase
     {
         $notDependOnClasses = new NotDependsOnTheseNamespaces(['myNamespace']);
 
-        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass', 'src/Foo.php')
+        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass', 'src/Foo.php', $this->createMockResolver())
             ->addDependency(new ClassDependency('myNamespace\Banana', 0))
             ->addDependency(new ClassDependency('myNamespace\Mango', 10))
             ->build();
@@ -89,7 +92,7 @@ class NotDependsOnTheseNamespacesTest extends TestCase
     {
         $notDependOnClasses = new NotDependsOnTheseNamespaces(['myNamespace'], ['myNamespace\Mango']);
 
-        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass', 'src/Foo.php')
+        $classDescription = ClassDescription::getBuilder('HappyIsland\Myclass', 'src/Foo.php', $this->createMockResolver())
             ->addDependency(new ClassDependency('myNamespace\Banana', 0))
             ->addDependency(new ClassDependency('myNamespace\Mango', 10))
             ->build();

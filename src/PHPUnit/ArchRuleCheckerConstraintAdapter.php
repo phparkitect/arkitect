@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\PHPUnit;
 
+use Arkitect\Analyzer\ClassHierarchyResolver;
 use Arkitect\Analyzer\FileParser;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\ClassSet;
@@ -46,8 +47,9 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
     public function __construct(ClassSet $classSet)
     {
         $targetPhpVersion = TargetPhpVersion::create(null);
+        $hierarchyResolver = new ClassHierarchyResolver($classSet->getDirectories());
         $this->runner = new Runner();
-        $this->fileparser = FileParserFactory::createFileParser($targetPhpVersion);
+        $this->fileparser = FileParserFactory::createFileParser($targetPhpVersion, true, $hierarchyResolver);
         $this->classSet = $classSet;
         $this->violations = new Violations();
         $this->parsingErrors = new ParsingErrors();

@@ -9,17 +9,19 @@ use Arkitect\Analyzer\DocblockTypesResolver;
 use Arkitect\Analyzer\FileParser;
 use Arkitect\Analyzer\FileVisitor;
 use Arkitect\CLI\TargetPhpVersion;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
 use PHPUnit\Framework\TestCase;
 
 class DocblockTypesResolverTest extends TestCase
 {
+    use MockHierarchyResolver;
     public function test_it_should_collect_dependencies_defined_in_docblock(): void
     {
         $parser = new FileParser(
             new NodeTraverser(),
-            new FileVisitor(new ClassDescriptionBuilder()),
+            new FileVisitor($this->createBuilder()),
             new NameResolver(),
             new DocblockTypesResolver(true),
             TargetPhpVersion::latest()

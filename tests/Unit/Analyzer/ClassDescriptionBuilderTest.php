@@ -8,15 +8,17 @@ use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Analyzer\FullyQualifiedClassName;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 class ClassDescriptionBuilderTest extends TestCase
 {
+    use MockHierarchyResolver;
     public function test_it_should_create_builder_with_dependency_and_interface(): void
     {
         $FQCN = 'HappyIsland';
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = (new ClassDescriptionBuilder($this->createMockResolver(interfaces: ['InterfaceClass'])))
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
             ->addDependency(new ClassDependency('DepClass', 10))
@@ -33,7 +35,7 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'HappyIsland';
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
             ->setFinal(true)
@@ -48,7 +50,7 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'HappyIsland';
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
             ->setFinal(false)
@@ -63,7 +65,7 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'HappyIsland';
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
             ->setAbstract(true)
@@ -78,7 +80,7 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'HappyIsland';
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
             ->setAbstract(false)
@@ -99,7 +101,7 @@ class ClassDescriptionBuilderTest extends TestCase
          */
         EOT;
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
             ->addDocBlock($docBlock)
@@ -113,7 +115,7 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'HappyIsland';
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
             ->addAttribute('AttrClass', 27)
@@ -129,7 +131,7 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'HappyIsland';
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = (new ClassDescriptionBuilder($this->createMockResolver(traits: ['TraitClass'])))
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
             ->addTrait('TraitClass', 15)
@@ -145,7 +147,7 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'HappyIsland';
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
             ->setInterface(true)
@@ -159,7 +161,7 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'HappyIsland';
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
             ->setInterface(false)
@@ -173,7 +175,7 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'HappyIsland';
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
             ->setTrait(true)
@@ -187,7 +189,7 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'HappyIsland';
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
             ->setTrait(false)
@@ -201,7 +203,7 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'MyClass';
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
             ->addDependency(new ClassDependency('DateTime', 10))
@@ -217,7 +219,7 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'MyClass';
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
             ->addDependency(new ClassDependency('NonExistentUserClass', 10))
@@ -232,7 +234,7 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'MyClass';
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
             ->addDependency(new ClassDependency('Vendor\Package\SomeClass', 10))
@@ -247,7 +249,7 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'MyClass';
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
             ->addDependency(new ClassDependency('DateTime', 10))
@@ -269,7 +271,7 @@ class ClassDescriptionBuilderTest extends TestCase
     {
         $FQCN = 'MyClass';
 
-        $classDescription = (new ClassDescriptionBuilder())
+        $classDescription = ($this->createBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName($FQCN)
             ->addDependency(new ClassDependency('ReflectionClass', 10))

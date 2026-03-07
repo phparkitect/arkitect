@@ -10,6 +10,7 @@ use Arkitect\Expression\ForClasses\HaveNameMatching;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\Rules\Rule;
 use Arkitect\Rules\Violations;
+use Arkitect\Tests\Utils\MockHierarchyResolver;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -17,9 +18,10 @@ use PHPUnit\Framework\TestCase;
  */
 class RuleBuilderTest extends TestCase
 {
+    use MockHierarchyResolver;
     public function test_reusing_that_for_multiple_should_produces_independent_rules(): void
     {
-        $classViolatingBothRules = ClassDescription::getBuilder('App\Rector\MyClass', 'src/Rector/MyClass.php')
+        $classViolatingBothRules = ClassDescription::getBuilder('App\Rector\MyClass', 'src/Rector/MyClass.php', $this->createMockResolver())
             ->build();
 
         $rectors = Rule::allClasses()
@@ -47,7 +49,7 @@ class RuleBuilderTest extends TestCase
 
     public function test_reusing_that_for_multiple_and_that_produces_independent_rules(): void
     {
-        $classInBaseNamespaceOnly = ClassDescription::getBuilder('App\Service\MyService', 'src/Service/MyService.php')
+        $classInBaseNamespaceOnly = ClassDescription::getBuilder('App\Service\MyService', 'src/Service/MyService.php', $this->createMockResolver())
             ->build();
 
         $services = Rule::allClasses()
