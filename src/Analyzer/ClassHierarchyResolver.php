@@ -45,13 +45,7 @@ class ClassHierarchyResolver
         }
 
         $parents = [];
-
-        try {
-            $parent = $class->getParentClass();
-        } catch (IdentifierNotFound | ParseToAstFailure) {
-            return $parents;
-        }
-
+        $parent = $class->getParentClass();
         while (null !== $parent) {
             $parents[] = $parent->getName();
             try {
@@ -77,11 +71,7 @@ class ClassHierarchyResolver
             return [];
         }
 
-        try {
-            return $class->getInterfaceNames();
-        } catch (IdentifierNotFound | ParseToAstFailure) {
-            return [];
-        }
+        return $class->getInterfaceNames();
     }
 
     /**
@@ -100,10 +90,10 @@ class ClassHierarchyResolver
         $allTraits = [];
         $current = $class;
         while (null !== $current) {
+            foreach ($current->getTraitNames() as $traitName) {
+                $allTraits[] = $traitName;
+            }
             try {
-                foreach ($current->getTraitNames() as $traitName) {
-                    $allTraits[] = $traitName;
-                }
                 $current = $current->getParentClass();
             } catch (IdentifierNotFound | ParseToAstFailure) {
                 break;
