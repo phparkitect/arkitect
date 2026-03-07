@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
 
+use Arkitect\Exceptions\ClassNotResolvableException;
 use Roave\BetterReflection\BetterReflection;
 use Roave\BetterReflection\Reflector\DefaultReflector;
 use Roave\BetterReflection\Reflector\Exception\IdentifierNotFound;
@@ -35,6 +36,8 @@ class ClassHierarchyResolver
      * Get all parent class names in the full inheritance hierarchy.
      *
      * @return list<string>
+     *
+     * @throws ClassNotResolvableException
      */
     public function getParentClassNames(string $fqcn): array
     {
@@ -44,24 +47,28 @@ class ClassHierarchyResolver
             return [];
         }
 
-        $parents = [];
-        $parent = $class->getParentClass();
-        while (null !== $parent) {
-            $parents[] = $parent->getName();
-            try {
+        try {
+            $parents = [];
+            $parent = $class->getParentClass();
+            while (null !== $parent) {
+                $parents[] = $parent->getName();
                 $parent = $parent->getParentClass();
-            } catch (IdentifierNotFound | ParseToAstFailure) {
-                break;
             }
-        }
 
-        return $parents;
+            return $parents;
+        } catch (IdentifierNotFound $e) {
+            throw ClassNotResolvableException::parentNotFound($fqcn, $e->getIdentifier()->getName(), $e);
+        } catch (ParseToAstFailure $e) {
+            throw ClassNotResolvableException::parentNotFound($fqcn, '', $e);
+        }
     }
 
     /**
      * Get all interface names including those inherited from parent classes.
      *
      * @return list<string>
+     *
+     * @throws ClassNotResolvableException
      */
     public function getInterfaceNames(string $fqcn): array
     {
@@ -71,13 +78,19 @@ class ClassHierarchyResolver
             return [];
         }
 
-        return $class->getInterfaceNames();
+        try {
+            return $class->getInterfaceNames();
+        } catch (IdentifierNotFound | ParseToAstFailure $e) {
+            throw ClassNotResolvableException::interfaceNotFound($fqcn, $e);
+        }
     }
 
     /**
      * Get all trait names including those from parent classes.
      *
      * @return list<string>
+     *
+     * @throws ClassNotResolvableException
      */
     public function getTraitNames(string $fqcn): array
     {
@@ -87,19 +100,19 @@ class ClassHierarchyResolver
             return [];
         }
 
-        $allTraits = [];
-        $current = $class;
-        while (null !== $current) {
-            foreach ($current->getTraitNames() as $traitName) {
-                $allTraits[] = $traitName;
-            }
-            try {
+        try {
+            $allTraits = [];
+            $current = $class;
+            while (null !== $current) {
+                foreach ($current->getTraitNames() as $traitName) {
+                    $allTraits[] = $traitName;
+                }
                 $current = $current->getParentClass();
-            } catch (IdentifierNotFound | ParseToAstFailure) {
-                break;
             }
-        }
 
-        return $allTraits;
+            return $allTraits;
+        } catch (IdentifierNotFound | ParseToAstFailure $e) {
+            throw ClassNotResolvableException::traitNotFound($fqcn, $e);
+        }
     }
 }

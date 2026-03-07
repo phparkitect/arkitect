@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Analyzer;
 
 use Arkitect\CLI\TargetPhpVersion;
+use Arkitect\Exceptions\ClassNotResolvableException;
 use Arkitect\Rules\ParsingError;
 use PhpParser\ErrorHandler\Collecting;
 use PhpParser\NodeTraverser;
@@ -70,6 +71,8 @@ class FileParser implements Parser
             }
 
             $this->traverser->traverse($stmts);
+        } catch (ClassNotResolvableException $e) {
+            $this->parsingErrors[] = ParsingError::create($filename, $e->getMessage());
         } catch (\Throwable $e) {
             echo 'Parse Error: ', $e->getMessage();
             print_r($e->getTraceAsString());
