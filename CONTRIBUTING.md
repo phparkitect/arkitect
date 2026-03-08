@@ -27,7 +27,9 @@ Some common tasks are available in the Makefile file (you still can use it to se
 To create the docker image and then enter the docker container shell:
 
 ```shell
-docker image build -t phparkitect .
+docker image build --target php_build -t phparkitect .
+# or with xdebug
+docker image build --target with_xdebug -t phparkitect .
 docker run --rm -it --entrypoint= -v "${PWD}":/arkitect phparkitect bash
 ```
 
