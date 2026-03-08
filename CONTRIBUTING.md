@@ -28,7 +28,7 @@ To create the docker image and then enter the docker container shell:
 
 ```shell
 docker image build -t phparkitect .
-docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect bash
+docker run --rm -it --entrypoint= -v "${PWD}":/arkitect phparkitect bash
 ```
 
 If you prefer use more shorter make commands (use `make` without arguments for help):
@@ -38,7 +38,7 @@ make dbi
 make shell
 ```
 
-The first time, after the docker container has been created, remember to install the packages with composer:
+The first time, after the docker container has been created, remember to install the packages with composer (from inside the container):
 
 ```shell
 composer install
