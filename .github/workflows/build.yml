@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-versions: [ '8.0', '8.1', '8.2', '8.3', '8.4', '8.5' ]
+        php-versions: [ '8.2', '8.3', '8.4', '8.5' ]
 
     steps:
     - uses: actions/checkout@v6
@@ -46,19 +46,19 @@ jobs:
       run: composer install --prefer-dist
 
     - name: Static Analysis
-      if: ${{ matrix.php-versions  == '8.0' }}
+      if: ${{ matrix.php-versions  == '8.2' }}
       run: ./bin/psalm.phar --no-cache
 
     - name: Test with coverage
-      if: ${{ matrix.php-versions  == '8.0' }}
+      if: ${{ matrix.php-versions  == '8.2' }}
       run: ./bin/phpunit -d memory_limit=-1 --coverage-clover clover.xml
 
     - name: Test without coverage
-      if: ${{ matrix.php-versions  != '8.0' }}
+      if: ${{ matrix.php-versions  != '8.2' }}
       run: ./bin/phpunit -d memory_limit=-1
 
     - name: Upload coverage to Codecov
-      if: ${{ matrix.php-versions  == '8.0' }}
+      if: ${{ matrix.php-versions  == '8.2' }}
       uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
@@ -72,7 +72,7 @@ jobs:
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.0
+          php-version: 8.2
           tools: composer:v2.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -101,7 +101,7 @@ jobs:
     runs-on: "ubuntu-22.04"
     strategy:
       matrix:
-        php-versions: [ '8.0', '8.1', '8.2', '8.3', '8.4', '8.5' ]
+        php-versions: [ '8.2', '8.3', '8.4', '8.5' ]
     steps:
       - name: Install PHP
         uses: shivammathur/setup-php@v2
