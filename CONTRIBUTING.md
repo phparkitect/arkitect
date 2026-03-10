@@ -26,32 +26,15 @@ The build must be green for the PR being merged.
 - PHP `^8.0`
 - Composer
 
-### Using Docker
+### Getting started
 
-In order to fix a bug or submit a new enhancement we suggest running the build locally or using Docker (with the Dockerfile provided).
-Some common tasks are available in the Makefile (you can still use it to see how to run things even if your system does not support make).
-
-To create the docker image and then enter the docker container shell:
-
-```shell
-docker image build -t phparkitect .
-docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect bash
-```
-
-If you prefer, you can use shorter make commands (use `make` without arguments for help):
-
-```shell
-make dbi
-make shell
-```
-
-The first time, after the docker container has been created, remember to install the packages with composer:
+Install dependencies:
 
 ```shell
 composer install
 ```
 
-### Running the build locally
+Some common tasks are available in the Makefile (run `make` without arguments for help).
 
 You can run the full build (code style fix, static analysis, and tests) with:
 
@@ -66,3 +49,23 @@ make test      # run tests
 make csfix     # run code style fixer
 make psalm     # run static analysis
 ```
+
+### Using Docker instead
+
+If you prefer not to install PHP locally, you can use the provided Dockerfile.
+
+Build the image and enter the container shell:
+
+```shell
+make dbi
+make shell
+```
+
+Or manually:
+
+```shell
+docker image build -t phparkitect .
+docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect bash
+```
+
+Once inside the container, install dependencies with `composer install` and then use the same `make` commands described above.
