@@ -24,10 +24,8 @@ ENTRYPOINT [ "phparkitect"]
 FROM php_build AS with_xdebug
 
 # compatibility chart: https://xdebug.org/docs/compat
-ARG XDEBUG_VERSION="xdebug-3.4.0"
+ARG XDEBUG_VERSION="xdebug-3.4.7"
 RUN apk add autoconf g++ linux-headers
 
-RUN pecl install ${XDEBUG_VERSION} \
-    && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.remote_enable=on" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.remote_autostart=off" >> /usr/local/etc/php/conf.d/xdebug.ini
+RUN pecl install ${XDEBUG_VERSION}
+RUN echo 'zend_extension="xdebug.so"' > /usr/local/etc/php/conf.d/xdebug.ini
