@@ -627,7 +627,7 @@ class CanParseClassTest extends TestCase
         $cd = $this->parseCode($code);
 
         $dependencies = $cd[0]->getDependencies();
-        $dependencyNames = array_map(fn (ClassDependency $d) => $d->getFQCN()->toString(), $dependencies);
+        $dependencyNames = array_map(static fn (ClassDependency $d) => $d->getFQCN()->toString(), $dependencies);
 
         self::assertContains('Foo\Baz\MyException', $dependencyNames);
         self::assertContains('Foo\Baz\AnotherException', $dependencyNames);
@@ -658,7 +658,7 @@ class CanParseClassTest extends TestCase
         $cd = $this->parseCode($code);
 
         $dependencies = $cd[0]->getDependencies();
-        $dependencyNames = array_map(fn (ClassDependency $d) => $d->getFQCN()->toString(), $dependencies);
+        $dependencyNames = array_map(static fn (ClassDependency $d) => $d->getFQCN()->toString(), $dependencies);
 
         self::assertContains('Foo\Baz\FirstException', $dependencyNames);
         self::assertContains('Foo\Baz\SecondException', $dependencyNames);
