@@ -5,11 +5,11 @@ How Can I Contribute?
 ## Reporting Bugs
 
 To report bugs you can open an issue on this repository. Please provide as much information as you can to help discover and fix the bug.
-Useful information are:
+Useful information includes:
 - Which PHP version are you running?
 - Which problem are you experiencing?
 
-If possible, a test highlihting the bug would be great.
+If possible, a test highlighting the bug would be great.
 If you are fixing a bug, create a pull request, linking the issue with bug's details (if there is any) and provide tests.
 The build must be green for the PR being merged.
 
@@ -21,25 +21,51 @@ The build must be green for the PR being merged.
 
 ## How to develop arkitect
 
-In order to fix a bug or submit a new enhancement we suggest to run the build locally or using docker (with the dockerfile provided).
-Some common tasks are available in the Makefile file (you still can use it to see how run things even your system does not support make).
+### Requirements
 
-To create the docker image and then enter the docker container shell:
+- PHP `^8.0`
+- Composer
+
+### Getting started
+
+Install dependencies:
 
 ```shell
-docker image build -t phparkitect .
-docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect bash
+composer install
 ```
 
-If you prefer use more shorter make commands (use `make` without arguments for help):
+Some common tasks are available in the Makefile (run `make` without arguments for help).
+
+You can run the full build (code style fix, static analysis, and tests) with:
+
+```shell
+make build
+```
+
+Or run individual tasks:
+
+```shell
+make test      # run tests
+make csfix     # run code style fixer
+make psalm     # run static analysis
+```
+
+### Using Docker instead
+
+If you prefer not to install PHP locally, you can use the provided Dockerfile.
+
+Build the image and enter the container shell:
 
 ```shell
 make dbi
 make shell
 ```
 
-The first time, after the docker container has been created, remember to install the packages with composer:
+Or manually:
 
 ```shell
-composer install
+docker image build -t phparkitect .
+docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect bash
 ```
+
+Once inside the container, install dependencies with `composer install` and then use the same `make` commands described above.
