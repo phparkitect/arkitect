@@ -600,6 +600,70 @@ class CanParseClassTest extends TestCase
         self::assertCount(0, $violations);
     }
 
+    public function test_should_parse_catch_types_as_dependencies(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+        namespace Foo\Bar;
+
+        use Foo\Baz\MyException;
+        use Foo\Baz\AnotherException;
+
+        class MyClass
+        {
+            public function doSomething(): void
+            {
+                try {
+                    // some code
+                } catch (MyException $e) {
+                    // handle
+                } catch (AnotherException $e) {
+                    // handle
+                }
+            }
+        }
+        EOF;
+
+        $cd = $this->parseCode($code);
+
+        $dependencies = $cd[0]->getDependencies();
+        $dependencyNames = array_map(fn (ClassDependency $d) => $d->getFQCN()->toString(), $dependencies);
+
+        self::assertContains('Foo\Baz\MyException', $dependencyNames);
+        self::assertContains('Foo\Baz\AnotherException', $dependencyNames);
+    }
+
+    public function test_should_parse_multi_catch_types_as_dependencies(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+        namespace Foo\Bar;
+
+        use Foo\Baz\FirstException;
+        use Foo\Baz\SecondException;
+
+        class MyClass
+        {
+            public function doSomething(): void
+            {
+                try {
+                    // some code
+                } catch (FirstException | SecondException $e) {
+                    // handle
+                }
+            }
+        }
+        EOF;
+
+        $cd = $this->parseCode($code);
+
+        $dependencies = $cd[0]->getDependencies();
+        $dependencyNames = array_map(fn (ClassDependency $d) => $d->getFQCN()->toString(), $dependencies);
+
+        self::assertContains('Foo\Baz\FirstException', $dependencyNames);
+        self::assertContains('Foo\Baz\SecondException', $dependencyNames);
+    }
+
     private function parseCode(string $code, ?string $version = null): array
     {
         $fp = FileParserFactory::forPhpVersion($version ?? TargetPhpVersion::PHP_8_0);

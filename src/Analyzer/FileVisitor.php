@@ -76,6 +76,9 @@ class FileVisitor extends NodeVisitorAbstract
 
         // handles throws types like @throws MyClass
         $this->handleThrowsTags($node);
+
+        // handles catch types like catch (MyException $e)
+        $this->handleCatchDependency($node);
     }
 
     public function getClassDescriptions(): array
@@ -365,6 +368,22 @@ class FileVisitor extends NodeVisitorAbstract
         foreach ($node->getAttribute(DocblockTypesResolver::THROWS_TYPES_ATTRIBUTE) as $throw) {
             $this->classDescriptionBuilder
                 ->addDependency(new ClassDependency($throw->toString(), $throw->getLine()));
+        }
+    }
+
+    private function handleCatchDependency(Node $node): void
+    {
+        if (!$node instanceof Node\Stmt\Catch_) {
+            return;
+        }
+
+        foreach ($node->types as $type) {
+            if (!$type instanceof Node\Name\FullyQualified) {
+                continue;
+            }
+
+            $this->classDescriptionBuilder
+                ->addDependency(new ClassDependency($type->toString(), $node->getLine()));
         }
     }
 
