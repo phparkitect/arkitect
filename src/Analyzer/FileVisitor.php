@@ -378,10 +378,6 @@ class FileVisitor extends NodeVisitorAbstract
         }
 
         foreach ($node->types as $type) {
-            if (!$type instanceof Node\Name\FullyQualified) {
-                continue;
-            }
-
             $this->classDescriptionBuilder
                 ->addDependency(new ClassDependency($type->toString(), $node->getLine()));
         }
