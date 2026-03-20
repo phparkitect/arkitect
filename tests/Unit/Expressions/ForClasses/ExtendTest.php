@@ -9,40 +9,16 @@ use Arkitect\Expression\ForClasses\Extend;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
-class ExtendTestBaseClass
-{
-}
-
-class ExtendTestAnotherClass
-{
-}
-
-class ExtendTestChildClass extends ExtendTestBaseClass
-{
-}
-
-class ExtendTestFirstBase
-{
-}
-
-class ExtendTestSecondBase
-{
-}
-
-class ExtendTestSecondChild extends ExtendTestSecondBase
-{
-}
-
 class ExtendTest extends TestCase
 {
     public function test_it_should_return_no_violation_on_success(): void
     {
-        $extend = new Extend(ExtendTestBaseClass::class);
+        $extend = new Extend(Animal::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName(ExtendTestChildClass::class)
-            ->addExtends(ExtendTestBaseClass::class, 10)
+            ->setClassName(Dog::class)
+            ->addExtends(Animal::class, 10)
             ->build();
 
         $violations = new Violations();
@@ -53,12 +29,12 @@ class ExtendTest extends TestCase
 
     public function test_it_should_work_with_wildcards(): void
     {
-        $extend = new Extend('Arkitect\Tests\Unit\Expressions\ForClasses\ExtendTest*');
+        $extend = new Extend('Arkitect\Tests\Unit\Expressions\ForClasses\Ani*');
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName(ExtendTestChildClass::class)
-            ->addExtends(ExtendTestBaseClass::class, 10)
+            ->setClassName(Dog::class)
+            ->addExtends(Animal::class, 10)
             ->build();
 
         $violations = new Violations();
@@ -73,8 +49,8 @@ class ExtendTest extends TestCase
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName(ExtendTestChildClass::class)
-            ->addExtends(ExtendTestBaseClass::class, 10)
+            ->setClassName(Dog::class)
+            ->addExtends(Animal::class, 10)
             ->build();
 
         $violations = new Violations();
@@ -84,12 +60,12 @@ class ExtendTest extends TestCase
 
     public function test_it_should_return_violation_error_when_class_not_extend(): void
     {
-        $extend = new Extend(ExtendTestBaseClass::class);
+        $extend = new Extend(Animal::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName(ExtendTestChildClass::class)
-            ->addExtends(ExtendTestAnotherClass::class, 10)
+            ->setClassName(Dog::class)
+            ->addExtends(Vehicle::class, 10)
             ->build();
 
         $violations = new Violations();
@@ -97,18 +73,18 @@ class ExtendTest extends TestCase
 
         self::assertEquals(1, $violations->count());
         self::assertEquals(
-            'should extend one of these classes: ' . ExtendTestBaseClass::class . ' because we want to add this rule for our software',
+            'should extend one of these classes: ' . Animal::class . ' because we want to add this rule for our software',
             $violations->get(0)->getError()
         );
     }
 
     public function test_it_should_return_violation_error_if_extend_is_null(): void
     {
-        $extend = new Extend(ExtendTestBaseClass::class);
+        $extend = new Extend(Animal::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName(ExtendTestChildClass::class)
+            ->setClassName(Dog::class)
             ->build();
 
         $because = 'we want to add this rule for our software';
@@ -119,19 +95,19 @@ class ExtendTest extends TestCase
 
         self::assertEquals(1, $violations->count());
         self::assertEquals(
-            'should extend one of these classes: ' . ExtendTestBaseClass::class . ' because we want to add this rule for our software',
+            'should extend one of these classes: ' . Animal::class . ' because we want to add this rule for our software',
             $violationError
         );
     }
 
     public function test_it_should_accept_multiple_extends(): void
     {
-        $extend = new Extend(ExtendTestFirstBase::class, ExtendTestSecondBase::class);
+        $extend = new Extend(Animal::class, Vehicle::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName(ExtendTestSecondChild::class)
-            ->addExtends(ExtendTestSecondBase::class, 10)
+            ->setClassName(Car::class)
+            ->addExtends(Vehicle::class, 10)
             ->build();
 
         $violations = new Violations();
@@ -139,4 +115,22 @@ class ExtendTest extends TestCase
 
         self::assertEquals(0, $violations->count());
     }
+}
+
+// Fixtures
+
+class Animal
+{
+}
+
+class Dog extends Animal
+{
+}
+
+class Vehicle
+{
+}
+
+class Car extends Vehicle
+{
 }

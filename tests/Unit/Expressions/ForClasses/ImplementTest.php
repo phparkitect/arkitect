@@ -9,31 +9,15 @@ use Arkitect\Expression\ForClasses\Implement;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
-interface ImplementTestInterface
-{
-}
-
-interface ImplementTestAnotherInterface
-{
-}
-
-class ImplementTestClassWithInterface implements ImplementTestInterface
-{
-}
-
-class ImplementTestClassWithoutInterface
-{
-}
-
 class ImplementTest extends TestCase
 {
     public function test_it_should_return_violation_error(): void
     {
-        $implementConstraint = new Implement(ImplementTestInterface::class);
+        $implementConstraint = new Implement(Printable::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName(ImplementTestClassWithoutInterface::class)
+            ->setClassName(PlainDocument::class)
             ->build();
 
         $because = 'we want to add this rule for our software';
@@ -44,19 +28,19 @@ class ImplementTest extends TestCase
 
         self::assertNotEquals(0, $violations->count());
         self::assertEquals(
-            'should implement ' . ImplementTestInterface::class . ' because we want to add this rule for our software',
+            'should implement ' . Printable::class . ' because we want to add this rule for our software',
             $violationError
         );
     }
 
     public function test_it_should_return_true_if_not_depends_on_namespace(): void
     {
-        $implementConstraint = new Implement(ImplementTestInterface::class);
+        $implementConstraint = new Implement(Printable::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName(ImplementTestClassWithoutInterface::class)
-            ->addInterface(ImplementTestAnotherInterface::class, 1)
+            ->setClassName(PlainDocument::class)
+            ->addInterface(Exportable::class, 1)
             ->build();
 
         $because = 'we want to add this rule for our software';
@@ -68,12 +52,12 @@ class ImplementTest extends TestCase
 
     public function test_it_should_return_false_if_depends_on_namespace(): void
     {
-        $implementConstraint = new Implement(ImplementTestInterface::class);
+        $implementConstraint = new Implement(Printable::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName(ImplementTestClassWithInterface::class)
-            ->addInterface(ImplementTestInterface::class, 1)
+            ->setClassName(PrintableDocument::class)
+            ->addInterface(Printable::class, 1)
             ->build();
 
         $because = 'we want to add this rule for our software';
@@ -86,12 +70,12 @@ class ImplementTest extends TestCase
 
     public function test_it_should_check_the_complete_fqcn(): void
     {
-        $implementConstraint = new Implement(ImplementTestInterface::class);
+        $implementConstraint = new Implement(Printable::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName(ImplementTestClassWithoutInterface::class)
-            ->addInterface(ImplementTestAnotherInterface::class, 1)
+            ->setClassName(PlainDocument::class)
+            ->addInterface(Exportable::class, 1)
             ->build();
 
         $violations = new Violations();
@@ -102,11 +86,11 @@ class ImplementTest extends TestCase
 
     public function test_it_should_return_if_is_an_interface(): void
     {
-        $implementConstraint = new Implement(ImplementTestInterface::class);
+        $implementConstraint = new Implement(Printable::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName(ImplementTestClassWithoutInterface::class)
+            ->setClassName(PlainDocument::class)
             ->setInterface(true)
             ->build();
 
@@ -117,4 +101,22 @@ class ImplementTest extends TestCase
 
         self::assertEquals(0, $violations->count());
     }
+}
+
+// Fixtures
+
+interface Printable
+{
+}
+
+interface Exportable
+{
+}
+
+class PrintableDocument implements Printable
+{
+}
+
+class PlainDocument
+{
 }
