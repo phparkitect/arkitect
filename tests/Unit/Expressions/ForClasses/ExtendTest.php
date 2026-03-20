@@ -9,16 +9,40 @@ use Arkitect\Expression\ForClasses\Extend;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
+class ExtendTestBaseClass
+{
+}
+
+class ExtendTestAnotherClass
+{
+}
+
+class ExtendTestChildClass extends ExtendTestBaseClass
+{
+}
+
+class ExtendTestFirstBase
+{
+}
+
+class ExtendTestSecondBase
+{
+}
+
+class ExtendTestSecondChild extends ExtendTestSecondBase
+{
+}
+
 class ExtendTest extends TestCase
 {
     public function test_it_should_return_no_violation_on_success(): void
     {
-        $extend = new Extend('My\BaseClass');
+        $extend = new Extend(ExtendTestBaseClass::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName('My\Class')
-            ->addExtends('My\BaseClass', 10)
+            ->setClassName(ExtendTestChildClass::class)
+            ->addExtends(ExtendTestBaseClass::class, 10)
             ->build();
 
         $violations = new Violations();
@@ -29,12 +53,12 @@ class ExtendTest extends TestCase
 
     public function test_it_should_work_with_wildcards(): void
     {
-        $extend = new Extend('My\B14*');
+        $extend = new Extend('Arkitect\Tests\Unit\Expressions\ForClasses\ExtendTest*');
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName('My\Class')
-            ->addExtends('My\B14Class', 10)
+            ->setClassName(ExtendTestChildClass::class)
+            ->addExtends(ExtendTestBaseClass::class, 10)
             ->build();
 
         $violations = new Violations();
@@ -49,8 +73,8 @@ class ExtendTest extends TestCase
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName('My\Class')
-            ->addExtends('My\BaseClass', 10)
+            ->setClassName(ExtendTestChildClass::class)
+            ->addExtends(ExtendTestBaseClass::class, 10)
             ->build();
 
         $violations = new Violations();
@@ -60,28 +84,31 @@ class ExtendTest extends TestCase
 
     public function test_it_should_return_violation_error_when_class_not_extend(): void
     {
-        $extend = new Extend('My\BaseClass');
+        $extend = new Extend(ExtendTestBaseClass::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName('HappyIsland')
-            ->addExtends('My\AnotherClass', 10)
+            ->setClassName(ExtendTestChildClass::class)
+            ->addExtends(ExtendTestAnotherClass::class, 10)
             ->build();
 
         $violations = new Violations();
         $extend->evaluate($classDescription, $violations, 'we want to add this rule for our software');
 
         self::assertEquals(1, $violations->count());
-        self::assertEquals('should extend one of these classes: My\BaseClass because we want to add this rule for our software', $violations->get(0)->getError());
+        self::assertEquals(
+            'should extend one of these classes: ' . ExtendTestBaseClass::class . ' because we want to add this rule for our software',
+            $violations->get(0)->getError()
+        );
     }
 
     public function test_it_should_return_violation_error_if_extend_is_null(): void
     {
-        $extend = new Extend('My\BaseClass');
+        $extend = new Extend(ExtendTestBaseClass::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName('HappyIsland')
+            ->setClassName(ExtendTestChildClass::class)
             ->build();
 
         $because = 'we want to add this rule for our software';
@@ -91,17 +118,20 @@ class ExtendTest extends TestCase
         $extend->evaluate($classDescription, $violations, $because);
 
         self::assertEquals(1, $violations->count());
-        self::assertEquals('should extend one of these classes: My\BaseClass because we want to add this rule for our software', $violationError);
+        self::assertEquals(
+            'should extend one of these classes: ' . ExtendTestBaseClass::class . ' because we want to add this rule for our software',
+            $violationError
+        );
     }
 
     public function test_it_should_accept_multiple_extends(): void
     {
-        $extend = new Extend('My\FirstExtend', 'My\SecondExtend');
+        $extend = new Extend(ExtendTestFirstBase::class, ExtendTestSecondBase::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName('My\Class')
-            ->addExtends('My\SecondExtend', 10)
+            ->setClassName(ExtendTestSecondChild::class)
+            ->addExtends(ExtendTestSecondBase::class, 10)
             ->build();
 
         $violations = new Violations();
