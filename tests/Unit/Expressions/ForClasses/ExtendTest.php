@@ -65,7 +65,7 @@ class ExtendTest extends TestCase
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
             ->setClassName(Dog::class)
-            ->addExtends(Vehicle::class, 10)
+            ->addExtends(Plant::class, 10)
             ->build();
 
         $violations = new Violations();
@@ -102,12 +102,12 @@ class ExtendTest extends TestCase
 
     public function test_it_should_accept_multiple_extends(): void
     {
-        $extend = new Extend(Animal::class, Vehicle::class);
+        $extend = new Extend(Plant::class, Animal::class);
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName(Car::class)
-            ->addExtends(Vehicle::class, 10)
+            ->setClassName(Cat::class)
+            ->addExtends(Animal::class, 10)
             ->build();
 
         $violations = new Violations();
@@ -127,10 +127,10 @@ class Dog extends Animal
 {
 }
 
-class Vehicle
+class Cat extends Animal
 {
 }
 
-class Car extends Vehicle
+class Plant
 {
 }

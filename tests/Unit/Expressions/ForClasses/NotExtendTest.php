@@ -40,7 +40,7 @@ class NotExtendTest extends TestCase
 
         $classDescription = (new ClassDescriptionBuilder())
             ->setFilePath('src/Foo.php')
-            ->setClassName(ProductController::class)
+            ->setClassName(ProductService::class)
             ->addExtends(AbstractService::class, 1)
             ->build();
 
