@@ -16,7 +16,16 @@ jobs:
             - name: "Checkout"
               uses: actions/checkout@v6
 
-            - name: PHPArkitect
-              uses: docker://phparkitect/arkitect-github-actions:latest
+            - name: Install PHP
+              uses: shivammathur/setup-php@v2
               with:
-                  args: check
+                  php-version: '8.2'
+                  tools: composer:v2.2
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Install dependencies
+              run: composer install --prefer-dist
+
+            - name: PHPArkitect
+              run: bin/phparkitect check
