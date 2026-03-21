@@ -28,4 +28,4 @@ jobs:
               run: composer install --prefer-dist
 
             - name: PHPArkitect
-              run: vendor/bin/phparkitect check
+              run: php bin-stub/phparkitect check
