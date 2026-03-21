@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Utils;
 
-use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FileParser;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\ClassSet;
+use Arkitect\ClassSetRules;
+use Arkitect\CLI\Progress\VoidProgress;
+use Arkitect\CLI\Runner;
 use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Rules\ArchRule;
 use Arkitect\Rules\ParsingErrors;
@@ -44,24 +46,9 @@ class TestRunner
         $this->violations = new Violations();
         $this->parsingErrors = new ParsingErrors();
 
-        $classSet = ClassSet::fromDir($srcPath);
+        $classSetRules = ClassSetRules::create(ClassSet::fromDir($srcPath), ...$rules);
 
-        foreach ($classSet as $file) {
-            $this->fileParser->parse($file->getContents(), $file->getRelativePathname());
-
-            $parsedErrors = $this->fileParser->getParsingErrors();
-
-            foreach ($parsedErrors as $parsedError) {
-                $this->parsingErrors->add($parsedError);
-            }
-
-            /** @var ClassDescription $classDescription */
-            foreach ($this->fileParser->getClassDescriptions() as $classDescription) {
-                foreach ($rules as $rule) {
-                    $rule->check($classDescription, $this->violations);
-                }
-            }
-        }
+        (new Runner())->check($classSetRules, new VoidProgress(), $this->fileParser, $this->violations, $this->parsingErrors, false);
     }
 
     public function getViolations(): Violations
