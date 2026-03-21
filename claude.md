@@ -303,12 +303,6 @@ make test    # Runs tests on configured PHP version
 make build
 ```
 
-### Docker
-```bash
-make dbi                # Build Docker image
-docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect bash
-```
-
 ### PHAR Distribution
 ```bash
 make phar              # Creates phparkitect.phar

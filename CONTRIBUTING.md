@@ -50,22 +50,3 @@ make csfix     # run code style fixer
 make psalm     # run static analysis
 ```
 
-### Using Docker instead
-
-If you prefer not to install PHP locally, you can use the provided Dockerfile.
-
-Build the image and enter the container shell:
-
-```shell
-make dbi
-make shell
-```
-
-Or manually:
-
-```shell
-docker image build -t phparkitect .
-docker run --rm -it --entrypoint= -v $(PWD):/arkitect phparkitect bash
-```
-
-Once inside the container, install dependencies with `composer install` and then use the same `make` commands described above.
