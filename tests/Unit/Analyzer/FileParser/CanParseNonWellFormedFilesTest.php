@@ -6,9 +6,9 @@ namespace Arkitect\Tests\Unit\Analyzer\FileParser;
 
 use Arkitect\Analyzer\ClassDescriptions;
 use Arkitect\Analyzer\FileParserFactory;
+use Arkitect\Analyzer\ParsingError;
+use Arkitect\Analyzer\ParsingErrors;
 use Arkitect\CLI\TargetPhpVersion;
-use Arkitect\Rules\ParsingError;
-use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 

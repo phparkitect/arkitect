@@ -6,6 +6,7 @@ namespace Arkitect\PHPUnit;
 
 use Arkitect\Analyzer\FileParser;
 use Arkitect\Analyzer\FileParserFactory;
+use Arkitect\Analyzer\ParsingErrors;
 use Arkitect\ClassSet;
 use Arkitect\ClassSetRules;
 use Arkitect\CLI\Printer\Printer;
@@ -13,7 +14,6 @@ use Arkitect\CLI\Printer\PrinterFactory;
 use Arkitect\CLI\Progress\VoidProgress;
 use Arkitect\CLI\Runner;
 use Arkitect\CLI\TargetPhpVersion;
-use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\Constraint\Constraint;
 

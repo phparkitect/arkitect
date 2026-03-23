@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI;
 
-use Arkitect\Rules\ParsingErrors;
+use Arkitect\Analyzer\ParsingErrors;
 use Arkitect\Rules\Violations;
 
 class AnalysisResult

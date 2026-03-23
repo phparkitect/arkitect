@@ -4,11 +4,11 @@ declare(strict_types=1);
 namespace Arkitect\CLI\Command;
 
 use Arkitect\Analyzer\FileParserFactory;
+use Arkitect\Analyzer\GenericError;
+use Arkitect\Analyzer\ParsingError;
+use Arkitect\Analyzer\ParsingErrors;
 use Arkitect\ClassSet;
 use Arkitect\CLI\TargetPhpVersion;
-use Arkitect\Rules\GenericError;
-use Arkitect\Rules\ParsingError;
-use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violations;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;

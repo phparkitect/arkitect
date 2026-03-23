@@ -6,13 +6,13 @@ namespace Arkitect\CLI;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FileParserFactory;
+use Arkitect\Analyzer\GenericError;
 use Arkitect\Analyzer\Parser;
+use Arkitect\Analyzer\ParsingError;
+use Arkitect\Analyzer\ParsingErrors;
 use Arkitect\ClassSetRules;
 use Arkitect\CLI\Progress\Progress;
 use Arkitect\Exceptions\FailOnFirstViolationException;
-use Arkitect\Rules\GenericError;
-use Arkitect\Rules\ParsingError;
-use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violations;
 use Symfony\Component\Finder\SplFileInfo;
 

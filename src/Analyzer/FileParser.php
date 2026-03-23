@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Arkitect\Analyzer;
 
 use Arkitect\CLI\TargetPhpVersion;
-use Arkitect\Rules\GenericError;
-use Arkitect\Rules\ParsingError;
-use Arkitect\Rules\ParsingErrors;
 use PhpParser\ErrorHandler\Collecting;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;

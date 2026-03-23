@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Rules;
 
+use Arkitect\Analyzer\ParsingError;
+use Arkitect\Analyzer\ParsingErrors;
 use Arkitect\Exceptions\IndexNotFoundException;
-use Arkitect\Rules\ParsingError;
-use Arkitect\Rules\ParsingErrors;
 use PHPUnit\Framework\TestCase;
 
 class ParsingErrorsTest extends TestCase

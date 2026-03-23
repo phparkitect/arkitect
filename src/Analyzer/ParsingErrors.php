@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Rules;
+namespace Arkitect\Analyzer;
 
 use Arkitect\Exceptions\IndexNotFoundException;
 
@@ -14,7 +14,7 @@ class ParsingErrors implements \IteratorAggregate, \Countable
     /**
      * @var array<ParsingError>
      */
-    private $parsingErrors;
+    private array $parsingErrors;
 
     public function __construct(array $parsingErrors = [])
     {

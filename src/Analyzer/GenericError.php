@@ -2,14 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Rules;
+namespace Arkitect\Analyzer;
 
 class GenericError
 {
-    /** @var string */
-    private $relativeFilePath;
+    private string $relativeFilePath;
 
-    /** @var string */
     private $error;
 
     public function __construct(string $relativeFilePath, string $error)
