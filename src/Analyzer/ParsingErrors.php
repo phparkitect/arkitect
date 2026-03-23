@@ -47,6 +47,11 @@ class ParsingErrors implements \IteratorAggregate, \Countable
         return \count($this->parsingErrors);
     }
 
+    public function merge(self $other): void
+    {
+        $this->parsingErrors = array_merge($this->parsingErrors, $other->parsingErrors);
+    }
+
     public function toString(): string
     {
         $errors = '';

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\CLI;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptions;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\Analyzer\GenericError;
 use Arkitect\Analyzer\Parser;
@@ -58,11 +59,13 @@ class Runner
 
             if ($result instanceof GenericError) {
                 $parsingErrors->add(ParsingError::create($result->getRelativeFilePath(), $result->getError()));
-            } elseif ($result instanceof ParsingErrors) {
-                foreach ($result as $parsedError) {
-                    $parsingErrors->add($parsedError);
-                }
-            } else {
+            }
+
+            if ($result instanceof ParsingErrors) {
+                $parsingErrors->merge($result);
+            }
+
+            if ($result instanceof ClassDescriptions) {
                 /** @var ClassDescription $classDescription */
                 foreach ($result as $classDescription) {
                     foreach ($classSetRule->getRules() as $rule) {
