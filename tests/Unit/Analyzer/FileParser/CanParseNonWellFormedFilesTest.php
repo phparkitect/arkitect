@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Analyzer\FileParser;
 
+use Arkitect\Analyzer\ClassDescriptions;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Rules\ParsingError;
+use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
 
@@ -15,9 +17,10 @@ class CanParseNonWellFormedFilesTest extends TestCase
     public function test_should_parse_non_php_file(): void
     {
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
-        $fp->parse('', 'path/to/class.php');
+        $result = $fp->parse('', 'path/to/class.php');
 
-        self::assertEmpty($fp->getClassDescriptions());
+        self::assertInstanceOf(ClassDescriptions::class, $result);
+        self::assertCount(0, $result);
     }
 
     public function test_should_parse_empty_file(): void
@@ -27,9 +30,10 @@ class CanParseNonWellFormedFilesTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
-        $fp->parse($code, 'path/to/class.php');
+        $result = $fp->parse($code, 'path/to/class.php');
 
-        self::assertEmpty($fp->getClassDescriptions());
+        self::assertInstanceOf(ClassDescriptions::class, $result);
+        self::assertCount(0, $result);
     }
 
     public function test_it_should_catch_parsing_errors(): void
@@ -49,13 +53,12 @@ class CanParseNonWellFormedFilesTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
-        $fp->parse($code, 'relativePathName');
+        $result = $fp->parse($code, 'relativePathName');
 
-        $parsingErrors = $fp->getParsingErrors();
-
+        self::assertInstanceOf(ParsingErrors::class, $result);
         self::assertEquals([
             ParsingError::create('relativePathName', 'Syntax error, unexpected \'}\' on line 10'),
-        ], $parsingErrors);
+        ], $result->toArray());
     }
 
     public function test_null_class_description_builder(): void

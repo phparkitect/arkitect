@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Arkitect\Analyzer;
 
 use Arkitect\CLI\TargetPhpVersion;
+use Arkitect\Rules\GenericError;
 use Arkitect\Rules\ParsingError;
+use Arkitect\Rules\ParsingErrors;
 use PhpParser\ErrorHandler\Collecting;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
@@ -21,9 +23,6 @@ class FileParser implements Parser
 
     private FileVisitor $fileVisitor;
 
-    /** @var array<ParsingError> */
-    private array $parsingErrors;
-
     public function __construct(
         NodeTraverser $traverser,
         FileVisitor $fileVisitor,
@@ -32,7 +31,6 @@ class FileParser implements Parser
         TargetPhpVersion $targetPhpVersion,
     ) {
         $this->fileVisitor = $fileVisitor;
-        $this->parsingErrors = [];
 
         $this->parser = (new ParserFactory())->createForVersion(PhpVersion::fromString($targetPhpVersion->get()));
         $this->traverser = $traverser;
@@ -41,17 +39,8 @@ class FileParser implements Parser
         $this->traverser->addVisitor($this->fileVisitor);
     }
 
-    /**
-     * @return array<ClassDescription>
-     */
-    public function getClassDescriptions(): array
+    public function parse(string $fileContent, string $filename): ClassDescriptions|ParsingErrors|GenericError
     {
-        return $this->fileVisitor->getClassDescriptions();
-    }
-
-    public function parse(string $fileContent, string $filename): void
-    {
-        $this->parsingErrors = [];
         try {
             $this->fileVisitor->clearParsedClassDescriptions();
             $this->fileVisitor->setFilePath($filename);
@@ -60,24 +49,23 @@ class FileParser implements Parser
             $stmts = $this->parser->parse($fileContent, $errorHandler);
 
             if ($errorHandler->hasErrors()) {
+                $parsingErrors = new ParsingErrors();
                 foreach ($errorHandler->getErrors() as $error) {
-                    $this->parsingErrors[] = ParsingError::create($filename, $error->getMessage());
+                    $parsingErrors->add(ParsingError::create($filename, $error->getMessage()));
                 }
+
+                return $parsingErrors;
             }
 
             if (null === $stmts) {
-                return;
+                return new ClassDescriptions();
             }
 
             $this->traverser->traverse($stmts);
-        } catch (\Throwable $e) {
-            echo 'Parse Error: ', $e->getMessage();
-            print_r($e->getTraceAsString());
-        }
-    }
 
-    public function getParsingErrors(): array
-    {
-        return $this->parsingErrors;
+            return new ClassDescriptions($this->fileVisitor->getClassDescriptions());
+        } catch (\Throwable $e) {
+            return GenericError::create($filename, $e->getMessage());
+        }
     }
 }

@@ -34,9 +34,9 @@ class CanParsePropertyHooksTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_4);
-        $fp->parse($code, 'relativePathName');
+        $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $fp->getClassDescriptions();
+        $cd = $result->toArray();
 
         self::assertInstanceOf(ClassDescription::class, $cd[0]);
     }
@@ -68,9 +68,9 @@ class CanParsePropertyHooksTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_4);
-        $fp->parse($code, 'relativePathName');
+        $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $fp->getClassDescriptions();
+        $cd = $result->toArray();
 
         self::assertInstanceOf(ClassDescription::class, $cd[0]);
 
@@ -100,9 +100,9 @@ class CanParsePropertyHooksTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_4);
-        $fp->parse($code, 'relativePathName');
+        $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $fp->getClassDescriptions();
+        $cd = $result->toArray();
 
         self::assertInstanceOf(ClassDescription::class, $cd[0]);
 

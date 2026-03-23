@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Unit\Rules;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptions;
 use Arkitect\Analyzer\Parser;
 use Arkitect\ClassSet;
 use Arkitect\ClassSetRules;
@@ -85,17 +86,8 @@ class FakeRule implements ArchRule
 
 class FakeParser implements Parser
 {
-    public function parse(string $fileContent, string $filename): void
+    public function parse(string $fileContent, string $filename): ClassDescriptions|ParsingErrors|\Arkitect\Rules\GenericError
     {
-    }
-
-    public function getClassDescriptions(): array
-    {
-        return [ClassDescription::getBuilder('uno', 'src/Foo.php')->build()];
-    }
-
-    public function getParsingErrors(): array
-    {
-        return [];
+        return new ClassDescriptions([ClassDescription::getBuilder('uno', 'src/Foo.php')->build()]);
     }
 }

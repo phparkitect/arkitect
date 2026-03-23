@@ -347,7 +347,7 @@ class CanParseClassTest extends TestCase
             {
             }
 
-            public function doSomething(self $self, static $static)
+            public function doSomething(self $self, $static)
             {
             }
         }
@@ -546,7 +546,7 @@ class CanParseClassTest extends TestCase
 
         final class User {
             public function __construct() {
-               $class = new class() extends Bundle {}
+               $class = new class() extends Bundle {};
             }
         }
         EOF;
@@ -566,10 +566,10 @@ class CanParseClassTest extends TestCase
 
         abstract class User {
             public function bar() {
-                $class = new class() extends Bundle {}
+                $class = new class() extends Bundle {};
             }
 
-            abstract public function foo() {}
+            abstract public function foo();
         }
         EOF;
 
@@ -588,7 +588,7 @@ class CanParseClassTest extends TestCase
 
          readonly class User {
             public function __construct() {
-               $class = new class() extends Bundle {}
+               $class = new class() extends Bundle {};
             }
         }
         EOF;
@@ -667,9 +667,9 @@ class CanParseClassTest extends TestCase
     private function parseCode(string $code, ?string $version = null): array
     {
         $fp = FileParserFactory::forPhpVersion($version ?? TargetPhpVersion::PHP_8_0);
-        $fp->parse($code, 'relativePathName');
+        $result = $fp->parse($code, 'relativePathName');
 
-        return $fp->getClassDescriptions();
+        return $result->toArray();
     }
 
     private function evaluateRule($rule, ClassDescription $classDescription): Violations

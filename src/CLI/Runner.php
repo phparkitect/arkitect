@@ -10,6 +10,8 @@ use Arkitect\Analyzer\Parser;
 use Arkitect\ClassSetRules;
 use Arkitect\CLI\Progress\Progress;
 use Arkitect\Exceptions\FailOnFirstViolationException;
+use Arkitect\Rules\GenericError;
+use Arkitect\Rules\ParsingError;
 use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violations;
 use Symfony\Component\Finder\SplFileInfo;
@@ -52,22 +54,25 @@ class Runner
 
             $progress->startParsingFile($file->getRelativePathname());
 
-            $fileParser->parse($file->getContents(), $file->getRelativePathname());
-            $parsedErrors = $fileParser->getParsingErrors();
+            $result = $fileParser->parse($file->getContents(), $file->getRelativePathname());
 
-            foreach ($parsedErrors as $parsedError) {
-                $parsingErrors->add($parsedError);
-            }
+            if ($result instanceof GenericError) {
+                $parsingErrors->add(ParsingError::create($result->getRelativeFilePath(), $result->getError()));
+            } elseif ($result instanceof ParsingErrors) {
+                foreach ($result as $parsedError) {
+                    $parsingErrors->add($parsedError);
+                }
+            } else {
+                /** @var ClassDescription $classDescription */
+                foreach ($result as $classDescription) {
+                    foreach ($classSetRule->getRules() as $rule) {
+                        $rule->check($classDescription, $fileViolations);
 
-            /** @var ClassDescription $classDescription */
-            foreach ($fileParser->getClassDescriptions() as $classDescription) {
-                foreach ($classSetRule->getRules() as $rule) {
-                    $rule->check($classDescription, $fileViolations);
+                        if ($stopOnFailure && $fileViolations->count() > 0) {
+                            $violations->merge($fileViolations);
 
-                    if ($stopOnFailure && $fileViolations->count() > 0) {
-                        $violations->merge($fileViolations);
-
-                        throw new FailOnFirstViolationException();
+                            throw new FailOnFirstViolationException();
+                        }
                     }
                 }
             }
