@@ -49,8 +49,8 @@ class FileParserTest extends TestCase
         $traverser->traverse(Argument::type('array'))->shouldBeCalled();
         $result = $fileParser->parse($content, 'foo');
         self::assertInstanceOf(ParserResult::class, $result);
-        self::assertCount(0, $result->getParsingErrors());
-        self::assertCount(0, $result->getClassDescriptions());
+        self::assertCount(0, $result->parsingErrors());
+        self::assertCount(0, $result->classDescriptions());
     }
 
     public function test_parse_file_with_name_match(): void
@@ -83,7 +83,7 @@ class FileParserTest extends TestCase
 
         $result = $fileParser->parse($content, 'foo');
         self::assertInstanceOf(ParserResult::class, $result);
-        self::assertGreaterThan(0, \count($result->getParsingErrors()));
+        self::assertGreaterThan(0, \count($result->parsingErrors()));
     }
 
     public function test_parse_file_returns_generic_error_on_exception(): void
@@ -116,8 +116,8 @@ class FileParserTest extends TestCase
 
         $result = $fileParser->parse($content, 'foo');
         self::assertInstanceOf(ParserResult::class, $result);
-        self::assertCount(1, $result->getParsingErrors());
-        self::assertSame('unexpected error', $result->getParsingErrors()[0]->getError());
-        self::assertSame('foo', $result->getParsingErrors()[0]->getRelativeFilePath());
+        self::assertCount(1, $result->parsingErrors());
+        self::assertSame('unexpected error', $result->parsingErrors()[0]->getError());
+        self::assertSame('foo', $result->parsingErrors()[0]->getRelativeFilePath());
     }
 }

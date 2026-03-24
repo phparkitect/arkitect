@@ -31,12 +31,12 @@ class ParserResult
         return new self(new ClassDescriptions(), $parsingErrors);
     }
 
-    public function getClassDescriptions(): ClassDescriptions
+    public function classDescriptions(): ClassDescriptions
     {
         return $this->classDescriptions;
     }
 
-    public function getParsingErrors(): ParsingErrors
+    public function parsingErrors(): ParsingErrors
     {
         return $this->parsingErrors;
     }

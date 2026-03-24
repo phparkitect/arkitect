@@ -33,7 +33,7 @@ class CanParseTraitsTest extends TestCase
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
         $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $result->getClassDescriptions();
+        $cd = $result->classDescriptions();
 
         $violations = new Violations();
 

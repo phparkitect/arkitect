@@ -22,8 +22,8 @@ class CanParseNonWellFormedFilesTest extends TestCase
         $result = $fp->parse('', 'path/to/class.php');
 
         self::assertInstanceOf(ParserResult::class, $result);
-        self::assertCount(0, $result->getClassDescriptions());
-        self::assertCount(0, $result->getParsingErrors());
+        self::assertCount(0, $result->classDescriptions());
+        self::assertCount(0, $result->parsingErrors());
     }
 
     public function test_should_parse_empty_file(): void
@@ -36,8 +36,8 @@ class CanParseNonWellFormedFilesTest extends TestCase
         $result = $fp->parse($code, 'path/to/class.php');
 
         self::assertInstanceOf(ParserResult::class, $result);
-        self::assertCount(0, $result->getClassDescriptions());
-        self::assertCount(0, $result->getParsingErrors());
+        self::assertCount(0, $result->classDescriptions());
+        self::assertCount(0, $result->parsingErrors());
     }
 
     public function test_it_should_catch_parsing_errors(): void
@@ -69,8 +69,8 @@ class CanParseNonWellFormedFilesTest extends TestCase
         );
 
         self::assertInstanceOf(ParserResult::class, $result);
-        self::assertCount(1, $result->getClassDescriptions());
-        self::assertCount(1, $result->getParsingErrors());
+        self::assertCount(1, $result->classDescriptions());
+        self::assertCount(1, $result->parsingErrors());
         self::assertEquals($expected, $result);
     }
 

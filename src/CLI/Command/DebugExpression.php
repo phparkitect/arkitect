@@ -75,9 +75,9 @@ EOT;
         foreach ($classSet as $file) {
             $result = $fileParser->parse($file->getContents(), $file->getRelativePathname());
 
-            $this->showParsingErrors($result->getParsingErrors(), $output);
+            $this->showParsingErrors($result->parsingErrors(), $output);
 
-            foreach ($result->getClassDescriptions() as $classDescription) {
+            foreach ($result->classDescriptions() as $classDescription) {
                 $violations = new Violations();
                 $rule->evaluate($classDescription, $violations, '');
                 if (0 === $violations->count()) {

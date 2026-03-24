@@ -25,7 +25,7 @@ class CanParseAttributesTest extends TestCase
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
         $result = $fp->parse($code, 'relativePathName');
-        $cd = $result->getClassDescriptions();
+        $cd = $result->classDescriptions();
 
         self::assertEquals(
             [
@@ -56,7 +56,7 @@ class CanParseAttributesTest extends TestCase
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
         $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $result->getClassDescriptions();
+        $cd = $result->classDescriptions();
 
         self::assertEquals(
             [
@@ -90,7 +90,7 @@ class CanParseAttributesTest extends TestCase
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
         $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $result->getClassDescriptions();
+        $cd = $result->classDescriptions();
 
         self::assertEquals(
             [
@@ -121,7 +121,7 @@ class CanParseAttributesTest extends TestCase
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
         $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $result->getClassDescriptions();
+        $cd = $result->classDescriptions();
 
         self::assertEquals(
             [

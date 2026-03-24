@@ -54,10 +54,10 @@ class Runner
 
             $result = $fileParser->parse($file->getContents(), $file->getRelativePathname());
 
-            $parsingErrors->merge($result->getParsingErrors());
+            $parsingErrors->merge($result->parsingErrors());
 
             /** @var ClassDescription $classDescription */
-            foreach ($result->getClassDescriptions() as $classDescription) {
+            foreach ($result->classDescriptions() as $classDescription) {
                 foreach ($classSetRule->getRules() as $rule) {
                     $rule->check($classDescription, $fileViolations);
 
