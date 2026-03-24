@@ -68,4 +68,44 @@ class ParsingErrorsTest extends TestCase
 
         self::assertEquals([$this->parsingError, $parsingError], iterator_to_array($iterable));
     }
+
+    public function test_offset_exists_returns_true_for_existing_index(): void
+    {
+        self::assertTrue(isset($this->parsingStore[0]));
+    }
+
+    public function test_offset_exists_returns_false_for_missing_index(): void
+    {
+        self::assertFalse(isset($this->parsingStore[99]));
+    }
+
+    public function test_offset_get_returns_element_at_index(): void
+    {
+        self::assertSame($this->parsingError, $this->parsingStore[0]);
+    }
+
+    public function test_offset_set_appends_when_offset_is_null(): void
+    {
+        $second = ParsingError::create('App\Controller\Bar', 'Syntax error on line 5');
+        $this->parsingStore[] = $second;
+
+        self::assertCount(2, $this->parsingStore);
+        self::assertSame($second, $this->parsingStore[1]);
+    }
+
+    public function test_offset_set_assigns_to_specific_index(): void
+    {
+        $replacement = ParsingError::create('App\Controller\Baz', 'Syntax error on line 3');
+        $this->parsingStore[0] = $replacement;
+
+        self::assertSame($replacement, $this->parsingStore[0]);
+    }
+
+    public function test_offset_unset_removes_element(): void
+    {
+        unset($this->parsingStore[0]);
+
+        self::assertFalse(isset($this->parsingStore[0]));
+        self::assertCount(0, $this->parsingStore);
+    }
 }

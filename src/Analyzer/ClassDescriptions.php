@@ -11,7 +11,7 @@ namespace Arkitect\Analyzer;
 class ClassDescriptions implements \IteratorAggregate, \Countable, \ArrayAccess
 {
     /** @var array<ClassDescription> */
-    private $classDescriptions;
+    private array $classDescriptions;
 
     /**
      * @param array<ClassDescription> $classDescriptions
@@ -19,11 +19,6 @@ class ClassDescriptions implements \IteratorAggregate, \Countable, \ArrayAccess
     public function __construct(array $classDescriptions = [])
     {
         $this->classDescriptions = $classDescriptions;
-    }
-
-    public function add(ClassDescription $classDescription): void
-    {
-        $this->classDescriptions[] = $classDescription;
     }
 
     public function getIterator(): \Traversable
@@ -36,14 +31,6 @@ class ClassDescriptions implements \IteratorAggregate, \Countable, \ArrayAccess
     public function count(): int
     {
         return \count($this->classDescriptions);
-    }
-
-    /**
-     * @return array<ClassDescription>
-     */
-    public function toArray(): array
-    {
-        return $this->classDescriptions;
     }
 
     /** @param int $offset */
