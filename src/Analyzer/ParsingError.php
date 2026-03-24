@@ -16,6 +16,11 @@ class ParsingError
         $this->relativeFilePath = $relativeFilePath;
     }
 
+    public function __toString(): string
+    {
+        return $this->error.' in file: '.$this->relativeFilePath;
+    }
+
     public static function create(string $relativeFilePath, string $error): self
     {
         return new self($relativeFilePath, $error);

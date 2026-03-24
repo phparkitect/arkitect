@@ -170,8 +170,10 @@ class Check extends Command
             }
 
             if ($result->hasParsingErrors()) {
-                $output->writeln('❌ could not parse these files:');
-                $output->writeln($result->getParsingErrors()->toString());
+                $output->writeln('❌ found parsing errors in these files:');
+                foreach ($result->getParsingErrors() as $parsingError) {
+                    $output->writeln("$parsingError");
+                }
             }
 
             !$result->hasErrors() && $output->writeln('✅ No violations detected');

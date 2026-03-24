@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Analyzer;
 
-use Arkitect\Analyzer\ClassDescriptions;
 use Arkitect\Analyzer\DocblockTypesResolver;
 use Arkitect\Analyzer\FileParser;
 use Arkitect\Analyzer\FileVisitor;
-use Arkitect\Analyzer\GenericError;
-use Arkitect\Analyzer\ParsingErrors;
+use Arkitect\Analyzer\ParserResult;
 use Arkitect\CLI\TargetPhpVersion;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
@@ -50,7 +48,9 @@ class FileParserTest extends TestCase
         $fileVisitor->getClassDescriptions()->willReturn([]);
         $traverser->traverse(Argument::type('array'))->shouldBeCalled();
         $result = $fileParser->parse($content, 'foo');
-        self::assertInstanceOf(ClassDescriptions::class, $result);
+        self::assertInstanceOf(ParserResult::class, $result);
+        self::assertCount(0, $result->getParsingErrors());
+        self::assertCount(0, $result->getClassDescriptions());
     }
 
     public function test_parse_file_with_name_match(): void
@@ -66,6 +66,8 @@ class FileParserTest extends TestCase
 
         $fileVisitor->setFilePath('foo')->shouldBeCalled();
         $fileVisitor->clearParsedClassDescriptions()->shouldBeCalled();
+        $fileVisitor->getClassDescriptions()->willReturn([]);
+        $traverser->traverse(Argument::type('array'))->shouldBeCalled();
 
         $fileParser = new FileParser(
             $traverser->reveal(),
@@ -80,7 +82,8 @@ class FileParserTest extends TestCase
         ';
 
         $result = $fileParser->parse($content, 'foo');
-        self::assertInstanceOf(ParsingErrors::class, $result);
+        self::assertInstanceOf(ParserResult::class, $result);
+        self::assertGreaterThan(0, \count($result->getParsingErrors()));
     }
 
     public function test_parse_file_returns_generic_error_on_exception(): void
@@ -112,8 +115,9 @@ class FileParserTest extends TestCase
         ';
 
         $result = $fileParser->parse($content, 'foo');
-        self::assertInstanceOf(GenericError::class, $result);
-        self::assertSame('unexpected error', $result->getError());
-        self::assertSame('foo', $result->getRelativeFilePath());
+        self::assertInstanceOf(ParserResult::class, $result);
+        self::assertCount(1, $result->getParsingErrors());
+        self::assertSame('unexpected error', $result->getParsingErrors()->get(0)->getError());
+        self::assertSame('foo', $result->getParsingErrors()->get(0)->getRelativeFilePath());
     }
 }

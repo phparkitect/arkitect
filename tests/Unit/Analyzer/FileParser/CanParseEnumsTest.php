@@ -31,7 +31,7 @@ class CanParseEnumsTest extends TestCase
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
         $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $result->toArray();
+        $cd = $result->getClassDescriptions()->toArray();
 
         $violations = new Violations();
 
@@ -49,7 +49,7 @@ class CanParseEnumsTest extends TestCase
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
         $result = $fp->parse($code, 'relativePathName');
 
-        foreach ($result as $classDescription) {
+        foreach ($result->getClassDescriptions() as $classDescription) {
             self::assertTrue($classDescription->isEnum());
         }
     }

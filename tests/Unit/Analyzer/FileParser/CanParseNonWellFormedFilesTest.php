@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Analyzer\FileParser;
 
+use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\ClassDescriptions;
 use Arkitect\Analyzer\FileParserFactory;
+use Arkitect\Analyzer\ParserResult;
 use Arkitect\Analyzer\ParsingError;
 use Arkitect\Analyzer\ParsingErrors;
 use Arkitect\CLI\TargetPhpVersion;
@@ -19,8 +21,9 @@ class CanParseNonWellFormedFilesTest extends TestCase
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
         $result = $fp->parse('', 'path/to/class.php');
 
-        self::assertInstanceOf(ClassDescriptions::class, $result);
-        self::assertCount(0, $result);
+        self::assertInstanceOf(ParserResult::class, $result);
+        self::assertCount(0, $result->getClassDescriptions());
+        self::assertCount(0, $result->getParsingErrors());
     }
 
     public function test_should_parse_empty_file(): void
@@ -32,8 +35,9 @@ class CanParseNonWellFormedFilesTest extends TestCase
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
         $result = $fp->parse($code, 'path/to/class.php');
 
-        self::assertInstanceOf(ClassDescriptions::class, $result);
-        self::assertCount(0, $result);
+        self::assertInstanceOf(ParserResult::class, $result);
+        self::assertCount(0, $result->getClassDescriptions());
+        self::assertCount(0, $result->getParsingErrors());
     }
 
     public function test_it_should_catch_parsing_errors(): void
@@ -55,10 +59,19 @@ class CanParseNonWellFormedFilesTest extends TestCase
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
         $result = $fp->parse($code, 'relativePathName');
 
-        self::assertInstanceOf(ParsingErrors::class, $result);
-        self::assertEquals([
-            ParsingError::create('relativePathName', 'Syntax error, unexpected \'}\' on line 10'),
-        ], $result->toArray());
+        $expected = ParserResult::create(
+            new ClassDescriptions([
+                ClassDescription::getBuilder('Root\Animals\Animal', 'relativePathName')->build(),
+            ]),
+            new ParsingErrors([
+                ParsingError::create('relativePathName', 'Syntax error, unexpected \'}\' on line 10'),
+            ])
+        );
+
+        self::assertInstanceOf(ParserResult::class, $result);
+        self::assertCount(1, $result->getClassDescriptions());
+        self::assertCount(1, $result->getParsingErrors());
+        self::assertEquals($expected, $result);
     }
 
     public function test_null_class_description_builder(): void

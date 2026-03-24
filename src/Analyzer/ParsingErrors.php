@@ -51,22 +51,4 @@ class ParsingErrors implements \IteratorAggregate, \Countable
     {
         $this->parsingErrors = array_merge($this->parsingErrors, $other->parsingErrors);
     }
-
-    public function toString(): string
-    {
-        $errors = '';
-
-        /** @var ParsingError $parsingError */
-        foreach ($this->parsingErrors as $parsingError) {
-            $errors .= "\n".$parsingError->getError().' in file: '.$parsingError->getRelativeFilePath();
-            $errors .= "\n";
-        }
-
-        return $errors;
-    }
-
-    public function toArray(): array
-    {
-        return $this->parsingErrors;
-    }
 }

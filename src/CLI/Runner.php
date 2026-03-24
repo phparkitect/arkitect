@@ -5,11 +5,8 @@ declare(strict_types=1);
 namespace Arkitect\CLI;
 
 use Arkitect\Analyzer\ClassDescription;
-use Arkitect\Analyzer\ClassDescriptions;
 use Arkitect\Analyzer\FileParserFactory;
-use Arkitect\Analyzer\GenericError;
 use Arkitect\Analyzer\Parser;
-use Arkitect\Analyzer\ParsingError;
 use Arkitect\Analyzer\ParsingErrors;
 use Arkitect\ClassSetRules;
 use Arkitect\CLI\Progress\Progress;
@@ -57,25 +54,17 @@ class Runner
 
             $result = $fileParser->parse($file->getContents(), $file->getRelativePathname());
 
-            if ($result instanceof GenericError) {
-                $parsingErrors->add(ParsingError::create($result->getRelativeFilePath(), $result->getError()));
-            }
+            $parsingErrors->merge($result->getParsingErrors());
 
-            if ($result instanceof ParsingErrors) {
-                $parsingErrors->merge($result);
-            }
+            /** @var ClassDescription $classDescription */
+            foreach ($result->getClassDescriptions() as $classDescription) {
+                foreach ($classSetRule->getRules() as $rule) {
+                    $rule->check($classDescription, $fileViolations);
 
-            if ($result instanceof ClassDescriptions) {
-                /** @var ClassDescription $classDescription */
-                foreach ($result as $classDescription) {
-                    foreach ($classSetRule->getRules() as $rule) {
-                        $rule->check($classDescription, $fileViolations);
+                    if ($stopOnFailure && $fileViolations->count() > 0) {
+                        $violations->merge($fileViolations);
 
-                        if ($stopOnFailure && $fileViolations->count() > 0) {
-                            $violations->merge($fileViolations);
-
-                            throw new FailOnFirstViolationException();
-                        }
+                        throw new FailOnFirstViolationException();
                     }
                 }
             }

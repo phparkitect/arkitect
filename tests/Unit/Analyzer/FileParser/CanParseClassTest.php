@@ -669,7 +669,7 @@ class CanParseClassTest extends TestCase
         $fp = FileParserFactory::forPhpVersion($version ?? TargetPhpVersion::PHP_8_0);
         $result = $fp->parse($code, 'relativePathName');
 
-        return $result->toArray();
+        return $result->getClassDescriptions()->toArray();
     }
 
     private function evaluateRule($rule, ClassDescription $classDescription): Violations

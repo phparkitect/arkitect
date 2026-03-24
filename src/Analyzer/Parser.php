@@ -6,5 +6,5 @@ namespace Arkitect\Analyzer;
 
 interface Parser
 {
-    public function parse(string $fileContent, string $filename): ClassDescriptions|ParsingErrors|GenericError;
+    public function parse(string $fileContent, string $filename): ParserResult;
 }

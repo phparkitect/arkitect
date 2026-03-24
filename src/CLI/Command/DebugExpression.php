@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Arkitect\CLI\Command;
 
 use Arkitect\Analyzer\FileParserFactory;
-use Arkitect\Analyzer\GenericError;
 use Arkitect\Analyzer\ParsingError;
 use Arkitect\Analyzer\ParsingErrors;
 use Arkitect\ClassSet;
@@ -76,19 +75,9 @@ EOT;
         foreach ($classSet as $file) {
             $result = $fileParser->parse($file->getContents(), $file->getRelativePathname());
 
-            if ($result instanceof GenericError) {
-                $output->writeln('WARNING: '.$result->getError().': '.$result->getRelativeFilePath());
+            $this->showParsingErrors($result->getParsingErrors(), $output);
 
-                continue;
-            }
-
-            if ($result instanceof ParsingErrors) {
-                $this->showParsingErrors($result, $output);
-
-                continue;
-            }
-
-            foreach ($result as $classDescription) {
+            foreach ($result->getClassDescriptions() as $classDescription) {
                 $violations = new Violations();
                 $rule->evaluate($classDescription, $violations, '');
                 if (0 === $violations->count()) {

@@ -36,33 +36,31 @@ class FileParser implements Parser
         $this->traverser->addVisitor($this->fileVisitor);
     }
 
-    public function parse(string $fileContent, string $filename): ClassDescriptions|ParsingErrors|GenericError
+    public function parse(string $fileContent, string $filename): ParserResult
     {
-        try {
-            $this->fileVisitor->clearParsedClassDescriptions();
-            $this->fileVisitor->setFilePath($filename);
+        $this->fileVisitor->clearParsedClassDescriptions();
+        $this->fileVisitor->setFilePath($filename);
 
-            $errorHandler = new Collecting();
-            $stmts = $this->parser->parse($fileContent, $errorHandler);
+        $errorHandler = new Collecting();
+        $parsingErrors = new ParsingErrors();
 
-            if ($errorHandler->hasErrors()) {
-                $parsingErrors = new ParsingErrors();
-                foreach ($errorHandler->getErrors() as $error) {
-                    $parsingErrors->add(ParsingError::create($filename, $error->getMessage()));
-                }
+        $stmts = $this->parser->parse($fileContent, $errorHandler);
 
-                return $parsingErrors;
-            }
-
-            if (null === $stmts) {
-                return new ClassDescriptions();
-            }
-
-            $this->traverser->traverse($stmts);
-
-            return new ClassDescriptions($this->fileVisitor->getClassDescriptions());
-        } catch (\Throwable $e) {
-            return GenericError::create($filename, $e->getMessage());
+        foreach ($errorHandler->getErrors() as $error) {
+            $parsingErrors->add(ParsingError::create($filename, $error->getMessage()));
         }
+
+        try {
+            $this->traverser->traverse($stmts);
+        } catch (\Throwable $e) {
+            $parsingErrors->add(ParsingError::create($filename, $e->getMessage()));
+
+            return ParserResult::withParsingErrors($parsingErrors);
+        }
+
+        return ParserResult::create(
+            new ClassDescriptions($this->fileVisitor->getClassDescriptions()),
+            $parsingErrors
+        );
     }
 }

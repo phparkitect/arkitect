@@ -30,7 +30,7 @@ class CanParseClassPropertiesTest extends TestCase
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
         $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $result->toArray();
+        $cd = $result->getClassDescriptions()->toArray();
 
         $violations = new Violations();
 
@@ -61,7 +61,7 @@ class CanParseClassPropertiesTest extends TestCase
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
         $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $result->toArray();
+        $cd = $result->getClassDescriptions()->toArray();
         $dep = $cd[0]->getDependencies();
 
         self::assertCount(1, $dep);
@@ -87,7 +87,7 @@ class CanParseClassPropertiesTest extends TestCase
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
         $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $result->toArray();
+        $cd = $result->getClassDescriptions()->toArray();
         $dep = $cd[0]->getDependencies();
 
         self::assertCount(0, $dep);
@@ -114,7 +114,7 @@ class CanParseClassPropertiesTest extends TestCase
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
         $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $result->toArray();
+        $cd = $result->getClassDescriptions()->toArray();
 
         $violations = new Violations();
 
@@ -146,7 +146,7 @@ class CanParseClassPropertiesTest extends TestCase
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
         $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $result->toArray();
+        $cd = $result->getClassDescriptions()->toArray();
         $dep = $cd[0]->getDependencies();
 
         self::assertCount(0, $dep);
