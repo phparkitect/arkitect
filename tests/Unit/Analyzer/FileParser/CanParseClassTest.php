@@ -6,6 +6,7 @@ namespace Arkitect\Tests\Unit\Analyzer\FileParser;
 
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptions;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
@@ -664,12 +665,11 @@ class CanParseClassTest extends TestCase
         self::assertContains('Foo\Baz\SecondException', $dependencyNames);
     }
 
-    private function parseCode(string $code, ?string $version = null): array
+    private function parseCode(string $code, ?string $version = null): ClassDescriptions
     {
         $fp = FileParserFactory::forPhpVersion($version ?? TargetPhpVersion::PHP_8_0);
-        $result = $fp->parse($code, 'relativePathName');
 
-        return $result->getClassDescriptions()->toArray();
+        return $fp->parse($code, 'relativePathName')->getClassDescriptions();
     }
 
     private function evaluateRule($rule, ClassDescription $classDescription): Violations

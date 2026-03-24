@@ -50,6 +50,10 @@ class FileParser implements Parser
             $parsingErrors->add(ParsingError::create($filename, $error->getMessage()));
         }
 
+        if (null === $stmts) {
+            return ParserResult::withParsingErrors($parsingErrors);
+        }
+
         try {
             $this->traverser->traverse($stmts);
         } catch (\Throwable $e) {

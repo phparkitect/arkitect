@@ -117,7 +117,7 @@ class FileParserTest extends TestCase
         $result = $fileParser->parse($content, 'foo');
         self::assertInstanceOf(ParserResult::class, $result);
         self::assertCount(1, $result->getParsingErrors());
-        self::assertSame('unexpected error', $result->getParsingErrors()->get(0)->getError());
-        self::assertSame('foo', $result->getParsingErrors()->get(0)->getRelativeFilePath());
+        self::assertSame('unexpected error', $result->getParsingErrors()[0]->getError());
+        self::assertSame('foo', $result->getParsingErrors()[0]->getRelativeFilePath());
     }
 }

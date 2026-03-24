@@ -8,8 +8,9 @@ use Arkitect\Exceptions\IndexNotFoundException;
 
 /**
  * @template-implements \IteratorAggregate<ParsingError>
+ * @template-implements \ArrayAccess<int, ParsingError>
  */
-class ParsingErrors implements \IteratorAggregate, \Countable
+class ParsingErrors implements \IteratorAggregate, \Countable, \ArrayAccess
 {
     /**
      * @var array<ParsingError>
@@ -50,5 +51,40 @@ class ParsingErrors implements \IteratorAggregate, \Countable
     public function merge(self $other): void
     {
         $this->parsingErrors = array_merge($this->parsingErrors, $other->parsingErrors);
+    }
+
+    /** @param int $offset */
+    public function offsetExists($offset): bool
+    {
+        return \array_key_exists($offset, $this->parsingErrors);
+    }
+
+    /**
+     * @param int $offset
+     *
+     * @return ParsingError
+     */
+    public function offsetGet($offset): mixed
+    {
+        return $this->parsingErrors[$offset];
+    }
+
+    /**
+     * @param int|null     $offset
+     * @param ParsingError $value
+     */
+    public function offsetSet($offset, $value): void
+    {
+        if (null === $offset) {
+            $this->parsingErrors[] = $value;
+        } else {
+            $this->parsingErrors[$offset] = $value;
+        }
+    }
+
+    /** @param int $offset */
+    public function offsetUnset($offset): void
+    {
+        unset($this->parsingErrors[$offset]);
     }
 }
