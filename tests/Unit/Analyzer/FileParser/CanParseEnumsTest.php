@@ -29,9 +29,9 @@ class CanParseEnumsTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
-        $fp->parse($code, 'relativePathName');
+        $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $fp->getClassDescriptions();
+        $cd = $result->classDescriptions();
 
         $violations = new Violations();
 
@@ -47,9 +47,9 @@ class CanParseEnumsTest extends TestCase
     public function test_it_parse_enums(string $code): void
     {
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
-        $fp->parse($code, 'relativePathName');
+        $result = $fp->parse($code, 'relativePathName');
 
-        foreach ($fp->getClassDescriptions() as $classDescription) {
+        foreach ($result->classDescriptions() as $classDescription) {
             self::assertTrue($classDescription->isEnum());
         }
     }
@@ -75,7 +75,7 @@ class CanParseEnumsTest extends TestCase
 
             enum StringEnum: string
             {
-                case BAR: 'bar';
+                case BAR = 'bar';
             }
             EOF,
         ];
@@ -87,7 +87,7 @@ class CanParseEnumsTest extends TestCase
 
             enum IntEnum: int
             {
-                case BAZ: 42;
+                case BAZ = 42;
             }
             EOF,
         ];
@@ -104,12 +104,12 @@ class CanParseEnumsTest extends TestCase
 
             enum IntEnum: int
             {
-                case BAZ: 42;
+                case BAZ = 42;
             }
 
             enum IntEnum: int
             {
-                case BAZ: 42;
+                case BAZ = 42;
             }
             EOF,
         ];

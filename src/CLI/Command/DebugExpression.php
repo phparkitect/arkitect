@@ -4,9 +4,10 @@ declare(strict_types=1);
 namespace Arkitect\CLI\Command;
 
 use Arkitect\Analyzer\FileParserFactory;
+use Arkitect\Analyzer\ParsingError;
+use Arkitect\Analyzer\ParsingErrors;
 use Arkitect\ClassSet;
 use Arkitect\CLI\TargetPhpVersion;
-use Arkitect\Rules\ParsingError;
 use Arkitect\Rules\Violations;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -57,25 +58,26 @@ EOT;
         $fileParser = $this->getParser($input);
 
         $classSet = ClassSet::fromDir($input->getOption('from-dir'));
+        $ruleName = $input->getArgument('expression');
+        /** @var class-string $ruleFQCN */
+        $ruleFQCN = 'Arkitect\Expression\ForClasses\\'.$ruleName;
+        $arguments = $input->getArgument('arguments');
+
+        $argumentError = $this->getArgumentsError($arguments, $ruleName, $ruleFQCN);
+        if (null !== $argumentError) {
+            $output->writeln($argumentError);
+
+            return 2;
+        }
+
+        $rule = new $ruleFQCN(...$arguments);
+
         foreach ($classSet as $file) {
-            $fileParser->parse($file->getContents(), $file->getRelativePathname());
+            $result = $fileParser->parse($file->getContents(), $file->getRelativePathname());
 
-            $this->showParsingErrors($fileParser, $output);
+            $this->showParsingErrors($result->parsingErrors(), $output);
 
-            $ruleName = $input->getArgument('expression');
-            /** @var class-string $ruleFQCN */
-            $ruleFQCN = 'Arkitect\Expression\ForClasses\\'.$ruleName;
-            $arguments = $input->getArgument('arguments');
-
-            $argumentError = $this->getArgumentsError($arguments, $ruleName, $ruleFQCN);
-            if (null !== $argumentError) {
-                $output->writeln($argumentError);
-
-                return 2;
-            }
-
-            $rule = new $ruleFQCN(...$arguments);
-            foreach ($fileParser->getClassDescriptions() as $classDescription) {
+            foreach ($result->classDescriptions() as $classDescription) {
                 $violations = new Violations();
                 $rule->evaluate($classDescription, $violations, '');
                 if (0 === $violations->count()) {
@@ -99,16 +101,16 @@ EOT;
         return $fileParser;
     }
 
-    private function showParsingErrors(\Arkitect\Analyzer\FileParser $fileParser, OutputInterface $output): void
+    private function showParsingErrors(ParsingErrors $parsingErrors, OutputInterface $output): void
     {
-        $parsedErrors = $fileParser->getParsingErrors();
-
-        if (\count($parsedErrors) > 0) {
+        if (\count($parsingErrors) > 0) {
             $output->writeln('WARNING: Some files could not be parsed for these errors:');
+
             /** @var ParsingError $parsedError */
-            foreach ($parsedErrors as $parsedError) {
-                $output->writeln(' - '.$parsedError->getError().': '.$parsedError->getRelativeFilePath());
+            foreach ($parsingErrors as $parsedError) {
+                $output->writeln(' - '.$parsedError);
             }
+
             $output->writeln('');
         }
     }

@@ -31,9 +31,9 @@ class CanParseTraitsTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
-        $fp->parse($code, 'relativePathName');
+        $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $fp->getClassDescriptions();
+        $cd = $result->classDescriptions();
 
         $violations = new Violations();
 

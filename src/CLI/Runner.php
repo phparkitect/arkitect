@@ -7,10 +7,10 @@ namespace Arkitect\CLI;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\Analyzer\Parser;
+use Arkitect\Analyzer\ParsingErrors;
 use Arkitect\ClassSetRules;
 use Arkitect\CLI\Progress\Progress;
 use Arkitect\Exceptions\FailOnFirstViolationException;
-use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violations;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -52,15 +52,12 @@ class Runner
 
             $progress->startParsingFile($file->getRelativePathname());
 
-            $fileParser->parse($file->getContents(), $file->getRelativePathname());
-            $parsedErrors = $fileParser->getParsingErrors();
+            $result = $fileParser->parse($file->getContents(), $file->getRelativePathname());
 
-            foreach ($parsedErrors as $parsedError) {
-                $parsingErrors->add($parsedError);
-            }
+            $parsingErrors->merge($result->parsingErrors());
 
             /** @var ClassDescription $classDescription */
-            foreach ($fileParser->getClassDescriptions() as $classDescription) {
+            foreach ($result->classDescriptions() as $classDescription) {
                 foreach ($classSetRule->getRules() as $rule) {
                     $rule->check($classDescription, $fileViolations);
 

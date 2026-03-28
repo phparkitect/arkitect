@@ -6,13 +6,13 @@ namespace Arkitect\Tests\Utils;
 
 use Arkitect\Analyzer\FileParser;
 use Arkitect\Analyzer\FileParserFactory;
+use Arkitect\Analyzer\ParsingErrors;
 use Arkitect\ClassSet;
 use Arkitect\ClassSetRules;
 use Arkitect\CLI\Progress\VoidProgress;
 use Arkitect\CLI\Runner;
 use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Rules\ArchRule;
-use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violations;
 
 class TestRunner

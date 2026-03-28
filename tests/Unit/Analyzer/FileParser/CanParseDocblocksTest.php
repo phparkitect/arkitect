@@ -35,9 +35,9 @@ class CanParseDocblocksTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
-        $fp->parse($code, 'relativePathName');
+        $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $fp->getClassDescriptions();
+        $cd = $result->classDescriptions();
 
         $violations = new Violations();
 
@@ -76,9 +76,9 @@ class CanParseDocblocksTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
-        $fp->parse($code, 'relativePathName');
+        $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $fp->getClassDescriptions();
+        $cd = $result->classDescriptions();
 
         $violations = new Violations();
 
@@ -106,8 +106,8 @@ class CanParseDocblocksTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
-        $fp->parse($code, 'relativePathName');
-        $cd = $fp->getClassDescriptions();
+        $result = $fp->parse($code, 'relativePathName');
+        $cd = $result->classDescriptions();
 
         $violations = new Violations();
 
@@ -135,8 +135,8 @@ class CanParseDocblocksTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
-        $fp->parse($code, 'relativePathName');
-        $cd = $fp->getClassDescriptions();
+        $result = $fp->parse($code, 'relativePathName');
+        $cd = $result->classDescriptions();
 
         $violations = new Violations();
 
@@ -164,8 +164,8 @@ class CanParseDocblocksTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
-        $fp->parse($code, 'relativePathName');
-        $cd = $fp->getClassDescriptions();
+        $result = $fp->parse($code, 'relativePathName');
+        $cd = $result->classDescriptions();
 
         $violations = new Violations();
 
@@ -195,8 +195,8 @@ class CanParseDocblocksTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
-        $fp->parse($code, 'relativePathName');
-        $cd = $fp->getClassDescriptions();
+        $result = $fp->parse($code, 'relativePathName');
+        $cd = $result->classDescriptions();
 
         $violations = new Violations();
 
@@ -226,8 +226,8 @@ class CanParseDocblocksTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
-        $fp->parse($code, 'relativePathName');
-        $cd = $fp->getClassDescriptions();
+        $result = $fp->parse($code, 'relativePathName');
+        $cd = $result->classDescriptions();
 
         $violations = new Violations();
 
@@ -257,8 +257,8 @@ class CanParseDocblocksTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
-        $fp->parse($code, 'relativePathName');
-        $cd = $fp->getClassDescriptions();
+        $result = $fp->parse($code, 'relativePathName');
+        $cd = $result->classDescriptions();
 
         $violations = new Violations();
 
@@ -291,8 +291,8 @@ class CanParseDocblocksTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
-        $fp->parse($code, 'relativePathName');
-        $cd = $fp->getClassDescriptions();
+        $result = $fp->parse($code, 'relativePathName');
+        $cd = $result->classDescriptions();
 
         $violations = new Violations();
 
@@ -323,8 +323,8 @@ class CanParseDocblocksTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
-        $fp->parse($code, 'relativePathName');
-        $cd = $fp->getClassDescriptions();
+        $result = $fp->parse($code, 'relativePathName');
+        $cd = $result->classDescriptions();
 
         $violations = new Violations();
 
@@ -355,8 +355,8 @@ class CanParseDocblocksTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
-        $fp->parse($code, 'relativePathName');
-        $cd = $fp->getClassDescriptions();
+        $result = $fp->parse($code, 'relativePathName');
+        $cd = $result->classDescriptions();
 
         $violations = new Violations();
 
@@ -387,8 +387,8 @@ class CanParseDocblocksTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
-        $fp->parse($code, 'relativePathName');
-        $cd = $fp->getClassDescriptions();
+        $result = $fp->parse($code, 'relativePathName');
+        $cd = $result->classDescriptions();
 
         $violations = new Violations();
 
@@ -420,9 +420,9 @@ class CanParseDocblocksTest extends TestCase
             TargetPhpVersion::create(TargetPhpVersion::PHP_8_1),
             false
         );
-        $fp->parse($code, 'relativePathName');
+        $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $fp->getClassDescriptions();
+        $cd = $result->classDescriptions();
 
         $violations = new Violations();
 
@@ -452,9 +452,9 @@ class CanParseDocblocksTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
-        $fp->parse($code, 'relativePathName');
+        $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $fp->getClassDescriptions();
+        $cd = $result->classDescriptions();
 
         $violations = new Violations();
 
@@ -484,9 +484,9 @@ class CanParseDocblocksTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
-        $fp->parse($code, 'relativePathName');
+        $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $fp->getClassDescriptions();
+        $cd = $result->classDescriptions();
 
         $violations = new Violations();
 
@@ -526,9 +526,9 @@ class CanParseDocblocksTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_0);
-        $fp->parse($code, 'relativePathName');
+        $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $fp->getClassDescriptions();
+        $cd = $result->classDescriptions();
 
         self::assertCount(1, $cd);
         $dependencies = $cd[0]->getDependencies();
@@ -563,9 +563,9 @@ class CanParseDocblocksTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
-        $fp->parse($code, 'relativePathName');
+        $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $fp->getClassDescriptions();
+        $cd = $result->classDescriptions();
 
         self::assertCount(1, $cd);
         $dependencies = $cd[0]->getDependencies();

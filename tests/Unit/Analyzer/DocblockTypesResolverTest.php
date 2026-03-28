@@ -89,9 +89,9 @@ class DocblockTypesResolverTest extends TestCase
         }
         EOF;
 
-        $parser->parse($code, 'src/path/file.php');
+        $result = $parser->parse($code, 'src/path/file.php');
 
-        $cd = $parser->getClassDescriptions()[0];
+        $cd = $result->classDescriptions()[0];
         $dep = $cd->getDependencies();
 
         self::assertCount(11, $cd->getDependencies());

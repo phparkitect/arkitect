@@ -28,9 +28,9 @@ class CanParseClassPropertiesTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
-        $fp->parse($code, 'relativePathName');
+        $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $fp->getClassDescriptions();
+        $cd = $result->classDescriptions();
 
         $violations = new Violations();
 
@@ -59,11 +59,9 @@ class CanParseClassPropertiesTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
-        $fp->parse($code, 'relativePathName');
+        $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $fp->getClassDescriptions();
-
-        $cd = $fp->getClassDescriptions();
+        $cd = $result->classDescriptions();
         $dep = $cd[0]->getDependencies();
 
         self::assertCount(1, $dep);
@@ -87,9 +85,9 @@ class CanParseClassPropertiesTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
-        $fp->parse($code, 'relativePathName');
+        $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $fp->getClassDescriptions();
+        $cd = $result->classDescriptions();
         $dep = $cd[0]->getDependencies();
 
         self::assertCount(0, $dep);
@@ -114,9 +112,9 @@ class CanParseClassPropertiesTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
-        $fp->parse($code, 'relativePathName');
+        $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $fp->getClassDescriptions();
+        $cd = $result->classDescriptions();
 
         $violations = new Violations();
 
@@ -146,9 +144,9 @@ class CanParseClassPropertiesTest extends TestCase
         EOF;
 
         $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
-        $fp->parse($code, 'relativePathName');
+        $result = $fp->parse($code, 'relativePathName');
 
-        $cd = $fp->getClassDescriptions();
+        $cd = $result->classDescriptions();
         $dep = $cd[0]->getDependencies();
 
         self::assertCount(0, $dep);

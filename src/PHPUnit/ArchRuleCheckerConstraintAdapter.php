@@ -6,6 +6,7 @@ namespace Arkitect\PHPUnit;
 
 use Arkitect\Analyzer\FileParser;
 use Arkitect\Analyzer\FileParserFactory;
+use Arkitect\Analyzer\ParsingErrors;
 use Arkitect\ClassSet;
 use Arkitect\ClassSetRules;
 use Arkitect\CLI\Printer\Printer;
@@ -13,7 +14,6 @@ use Arkitect\CLI\Printer\PrinterFactory;
 use Arkitect\CLI\Progress\VoidProgress;
 use Arkitect\CLI\Runner;
 use Arkitect\CLI\TargetPhpVersion;
-use Arkitect\Rules\ParsingErrors;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\Constraint\Constraint;
 
@@ -26,20 +26,15 @@ use PHPUnit\Framework\Constraint\Constraint;
  */
 class ArchRuleCheckerConstraintAdapter extends Constraint
 {
-    /** @var ClassSet */
-    private $classSet;
+    private ClassSet $classSet;
 
-    /** @var Violations */
-    private $violations;
+    private Violations $violations;
 
-    /** @var Runner */
-    private $runner;
+    private Runner $runner;
 
-    /** @var FileParser */
-    private $fileparser;
+    private FileParser $fileparser;
 
-    /** @var ParsingErrors */
-    private $parsingErrors;
+    private ParsingErrors $parsingErrors;
 
     private Printer $printer;
 
@@ -81,7 +76,12 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
     protected function failureDescription($other): string
     {
         if ($this->parsingErrors->count() > 0) {
-            return "\n parsing error: ".$this->parsingErrors->toString();
+            $result = "\n parsing error: ";
+            foreach ($this->parsingErrors as $parsingError) {
+                $result .= "\n$parsingError";
+            }
+
+            return $result;
         }
 
         return "\n".$this->printer->print($this->violations->groupedByFqcn());

@@ -72,11 +72,12 @@ class DebugExpressionCommandTest extends TestCase
         $errorMessage = <<<END
 ContainerAwareInterface
 WARNING: Some files could not be parsed for these errors:
- - Syntax error, unexpected T_STRING, expecting '{' on line 8: Services/CartService.php
+ - Syntax error, unexpected T_STRING, expecting '{' on line 8 in file: Services/CartService.php
 
 App\Services\UserService
 
 END;
+
         self::assertEquals($errorMessage, $appTester->getDisplay());
         self::assertEquals(0, $appTester->getStatusCode());
     }

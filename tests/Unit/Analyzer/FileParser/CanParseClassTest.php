@@ -6,6 +6,7 @@ namespace Arkitect\Tests\Unit\Analyzer\FileParser;
 
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptions;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\CLI\TargetPhpVersion;
 use Arkitect\Expression\ForClasses\DependsOnlyOnTheseNamespaces;
@@ -347,7 +348,7 @@ class CanParseClassTest extends TestCase
             {
             }
 
-            public function doSomething(self $self, static $static)
+            public function doSomething(self $self, $static)
             {
             }
         }
@@ -546,7 +547,7 @@ class CanParseClassTest extends TestCase
 
         final class User {
             public function __construct() {
-               $class = new class() extends Bundle {}
+               $class = new class() extends Bundle {};
             }
         }
         EOF;
@@ -566,10 +567,10 @@ class CanParseClassTest extends TestCase
 
         abstract class User {
             public function bar() {
-                $class = new class() extends Bundle {}
+                $class = new class() extends Bundle {};
             }
 
-            abstract public function foo() {}
+            abstract public function foo();
         }
         EOF;
 
@@ -588,7 +589,7 @@ class CanParseClassTest extends TestCase
 
          readonly class User {
             public function __construct() {
-               $class = new class() extends Bundle {}
+               $class = new class() extends Bundle {};
             }
         }
         EOF;
@@ -664,12 +665,11 @@ class CanParseClassTest extends TestCase
         self::assertContains('Foo\Baz\SecondException', $dependencyNames);
     }
 
-    private function parseCode(string $code, ?string $version = null): array
+    private function parseCode(string $code, ?string $version = null): ClassDescriptions
     {
         $fp = FileParserFactory::forPhpVersion($version ?? TargetPhpVersion::PHP_8_0);
-        $fp->parse($code, 'relativePathName');
 
-        return $fp->getClassDescriptions();
+        return $fp->parse($code, 'relativePathName')->classDescriptions();
     }
 
     private function evaluateRule($rule, ClassDescription $classDescription): Violations

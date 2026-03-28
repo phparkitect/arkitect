@@ -7,6 +7,7 @@ namespace Arkitect\Tests\Unit\Analyzer;
 use Arkitect\Analyzer\DocblockTypesResolver;
 use Arkitect\Analyzer\FileParser;
 use Arkitect\Analyzer\FileVisitor;
+use Arkitect\Analyzer\ParserResult;
 use Arkitect\CLI\TargetPhpVersion;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\NameResolver;
@@ -44,8 +45,12 @@ class FileParserTest extends TestCase
         class Foo {}
         ';
 
+        $fileVisitor->getClassDescriptions()->willReturn([]);
         $traverser->traverse(Argument::type('array'))->shouldBeCalled();
-        $fileParser->parse($content, 'foo');
+        $result = $fileParser->parse($content, 'foo');
+        self::assertInstanceOf(ParserResult::class, $result);
+        self::assertCount(0, $result->parsingErrors());
+        self::assertCount(0, $result->classDescriptions());
     }
 
     public function test_parse_file_with_name_match(): void
@@ -61,6 +66,8 @@ class FileParserTest extends TestCase
 
         $fileVisitor->setFilePath('foo')->shouldBeCalled();
         $fileVisitor->clearParsedClassDescriptions()->shouldBeCalled();
+        $fileVisitor->getClassDescriptions()->willReturn([]);
+        $traverser->traverse(Argument::type('array'))->shouldBeCalled();
 
         $fileParser = new FileParser(
             $traverser->reveal(),
@@ -74,7 +81,42 @@ class FileParserTest extends TestCase
         class Match {}
         ';
 
-        $traverser->traverse(Argument::type('array'))->shouldBeCalled();
-        $fileParser->parse($content, 'foo');
+        $result = $fileParser->parse($content, 'foo');
+        self::assertInstanceOf(ParserResult::class, $result);
+        self::assertGreaterThan(0, \count($result->parsingErrors()));
+    }
+
+    public function test_parse_file_returns_generic_error_on_exception(): void
+    {
+        $traverser = $this->prophesize(NodeTraverser::class);
+        $fileVisitor = $this->prophesize(FileVisitor::class);
+        $nameResolver = $this->prophesize(NameResolver::class);
+        $docblockResolver = $this->prophesize(DocblockTypesResolver::class);
+
+        $traverser->addVisitor($nameResolver);
+        $traverser->addVisitor($docblockResolver);
+        $traverser->addVisitor($fileVisitor);
+
+        $fileVisitor->setFilePath('foo')->shouldBeCalled();
+        $fileVisitor->clearParsedClassDescriptions()->shouldBeCalled();
+
+        $traverser->traverse(Argument::type('array'))->willThrow(new \RuntimeException('unexpected error'));
+
+        $fileParser = new FileParser(
+            $traverser->reveal(),
+            $fileVisitor->reveal(),
+            $nameResolver->reveal(),
+            $docblockResolver->reveal(),
+            TargetPhpVersion::create('8.0')
+        );
+
+        $content = '<?php
+        class Foo {}
+        ';
+
+        $result = $fileParser->parse($content, 'foo');
+        self::assertInstanceOf(ParserResult::class, $result);
+        self::assertCount(1, $result->parsingErrors());
+        self::assertSame('unexpected error in file: foo', (string) $result->parsingErrors()[0]);
     }
 }
