@@ -25,14 +25,4 @@ class ParsingError
     {
         return new self($relativeFilePath, $error);
     }
-
-    public function getError(): string
-    {
-        return $this->error;
-    }
-
-    public function getRelativeFilePath(): string
-    {
-        return $this->relativeFilePath;
-    }
 }

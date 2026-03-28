@@ -105,10 +105,12 @@ EOT;
     {
         if (\count($parsingErrors) > 0) {
             $output->writeln('WARNING: Some files could not be parsed for these errors:');
+
             /** @var ParsingError $parsedError */
             foreach ($parsingErrors as $parsedError) {
-                $output->writeln(' - '.$parsedError->getError().': '.$parsedError->getRelativeFilePath());
+                $output->writeln(' - '.$parsedError);
             }
+
             $output->writeln('');
         }
     }

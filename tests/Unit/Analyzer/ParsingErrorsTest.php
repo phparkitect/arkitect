@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Tests\Unit\Rules;
+namespace Arkitect\Tests\Unit\Analyzer;
 
 use Arkitect\Analyzer\ParsingError;
 use Arkitect\Analyzer\ParsingErrors;
