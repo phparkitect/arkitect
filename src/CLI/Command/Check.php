@@ -110,7 +110,7 @@ class Check extends Command
 
     protected function isRunningAsPhar(): bool
     {
-        return \Phar::running() !== '';
+        return '' !== \Phar::running();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
