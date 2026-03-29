@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
 
-class FileParseResultCache implements ParseResultCache
+class CachedFileParser implements Parser
 {
     /** @var array<string, array{hash: string, result: ParserResult}> */
     private array $entries = [];
@@ -13,12 +13,15 @@ class FileParseResultCache implements ParseResultCache
 
     private string $filePath;
 
-    public function __construct(string $filePath)
-    {
-        $this->filePath = $filePath;
+    private Parser $innerParser;
 
-        if (file_exists($filePath)) {
-            $data = unserialize((string) file_get_contents($filePath));
+    public function __construct(Parser $innerParser, string $cacheFilePath)
+    {
+        $this->filePath = $cacheFilePath;
+        $this->innerParser = $innerParser;
+
+        if (file_exists($cacheFilePath)) {
+            $data = unserialize((string) file_get_contents($cacheFilePath));
             if (\is_array($data)) {
                 $this->entries = $data;
             }
@@ -30,6 +33,21 @@ class FileParseResultCache implements ParseResultCache
         if ($this->dirty) {
             file_put_contents($this->filePath, serialize($this->entries));
         }
+    }
+
+    public function parse(string $fileContent, string $filename): ParserResult
+    {
+        $cachedResult = $this->get($filename, md5($fileContent));
+
+        if (null !== $cachedResult) {
+            return $cachedResult;
+        }
+
+        $result = $this->innerParser->parse($fileContent, $filename);
+
+        $this->set($filename, md5($fileContent), $result);
+
+        return $result;
     }
 
     public function get(string $filename, string $contentHash): ?ParserResult

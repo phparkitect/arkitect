@@ -48,6 +48,24 @@ class Runner
         ParsingErrors $parsingErrors,
         bool $stopOnFailure,
     ): void {
+        // first step: collect all files to parse
+        $filesToParse = $this->collectFilesToParse($classSetRule);
+
+        // second step: parse all files and collect results
+        $parsedFiles = $this->collectParsedFiles(
+            $filesToParse,
+            $fileParser,
+            $progress
+        );
+
+        // third step: check all rules on all files
+        $this->checkRulesOnParsedFiles(
+            $classSetRule,
+            $parsedFiles,
+            $violations,
+            $parsingErrors,
+            $stopOnFailure
+        );
     }
 
     public function checkRulesOnParsedFiles(
@@ -123,7 +141,8 @@ class Runner
 
         $fileParser = FileParserFactory::createFileParser(
             $config->getTargetPhpVersion(),
-            $config->isParseCustomAnnotationsEnabled()
+            $config->isParseCustomAnnotationsEnabled(),
+            $config->getCacheFilePath()
         );
 
         /** @var ClassSetRules $classSetRule */
@@ -131,20 +150,10 @@ class Runner
             $progress->startFileSetAnalysis($classSetRule->getClassSet());
 
             try {
-                // first step: collect all files to parse
-                $filesToParse = $this->collectFilesToParse($classSetRule);
-
-                // second step: parse all files and collect results
-                $parsedFiles = $this->collectParsedFiles(
-                    $filesToParse,
-                    $fileParser,
-                    $progress
-                );
-
-                // third step: check all rules on all files
-                $this->checkRulesOnParsedFiles(
+                $this->check(
                     $classSetRule,
-                    $parsedFiles,
+                    $progress,
+                    $fileParser,
                     $violations,
                     $parsingErrors,
                     $config->isStopOnFailure()

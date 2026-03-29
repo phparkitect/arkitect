@@ -92,11 +92,11 @@ EOT;
     /**
      * @throws \Arkitect\Exceptions\PhpVersionNotValidException
      */
-    private function getParser(InputInterface $input): \Arkitect\Analyzer\FileParser
+    private function getParser(InputInterface $input): \Arkitect\Analyzer\Parser
     {
         $phpVersion = $input->getOption('target-php-version');
         $targetPhpVersion = TargetPhpVersion::create($phpVersion);
-        $fileParser = FileParserFactory::createFileParser($targetPhpVersion);
+        $fileParser = FileParserFactory::createFileParser($targetPhpVersion, true, null);
 
         return $fileParser;
     }
