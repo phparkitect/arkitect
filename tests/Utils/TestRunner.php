@@ -29,7 +29,11 @@ class TestRunner
     {
         $this->violations = new Violations();
         $this->parsingErrors = new ParsingErrors();
-        $this->fileParser = FileParserFactory::createFileParser(TargetPhpVersion::create($version));
+        $this->fileParser = FileParserFactory::createFileParser(
+            TargetPhpVersion::create($version),
+            true,
+            null
+        );
     }
 
     public static function create(?string $version = null): self
