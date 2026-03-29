@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 return [
-    'prefix' => 'PhpArkitect',
+    'prefix' => '_PhpArkitect',
 
     'expose-global-constants' => true,
     'expose-global-classes' => true,
