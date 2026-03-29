@@ -19,9 +19,16 @@ class FileParseResultCache implements ParseResultCache
 
         if (file_exists($filePath)) {
             $data = unserialize((string) file_get_contents($filePath));
-            if (is_array($data)) {
+            if (\is_array($data)) {
                 $this->entries = $data;
             }
+        }
+    }
+
+    public function __destruct()
+    {
+        if ($this->dirty) {
+            file_put_contents($this->filePath, serialize($this->entries));
         }
     }
 
@@ -42,12 +49,5 @@ class FileParseResultCache implements ParseResultCache
     {
         $this->entries[$filename] = ['hash' => $contentHash, 'result' => $result];
         $this->dirty = true;
-    }
-
-    public function __destruct()
-    {
-        if ($this->dirty) {
-            file_put_contents($this->filePath, serialize($this->entries));
-        }
     }
 }

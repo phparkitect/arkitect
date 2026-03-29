@@ -8,7 +8,6 @@ use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\Analyzer\FilesToParse;
 use Arkitect\Analyzer\ParsedFiles;
-use Arkitect\Analyzer\ParseResultCache;
 use Arkitect\Analyzer\Parser;
 use Arkitect\Analyzer\ParsingErrors;
 use Arkitect\ClassSetRules;
@@ -19,12 +18,6 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class Runner
 {
-    private ?ParseResultCache $cache;
-
-    public function __construct(?ParseResultCache $cache = null)
-    {
-        $this->cache = $cache;
-    }
     public function run(Config $config, Baseline $baseline, Progress $progress): AnalysisResult
     {
         [$violations, $parsingErrors] = $this->doRun($config, $progress);
@@ -55,49 +48,48 @@ class Runner
         ParsingErrors $parsingErrors,
         bool $stopOnFailure,
     ): void {
+        // first steo: collect all files to parse
         $filesToParse = new FilesToParse();
         /** @var SplFileInfo $file */
         foreach ($classSetRule->getClassSet() as $file) {
             $filesToParse->add($file);
         }
 
+        // second step: parse all files and collect results
         $parsedFiles = new ParsedFiles();
         /** @var SplFileInfo $file */
         foreach ($filesToParse as $file) {
             $progress->startParsingFile($file->getRelativePathname());
 
-            $filename = $file->getRelativePathname();
-            $contents = $file->getContents();
-            $contentHash = md5($contents);
+            $result = $fileParser->parse($file->getContents(), $file->getRelativePathname());
 
-            $cached = $this->cache !== null ? $this->cache->get($filename, $contentHash) : null;
-
-            if ($cached !== null) {
-                $parsedFiles->add($cached);
-            } else {
-                $result = $fileParser->parse($contents, $filename);
-                if ($this->cache !== null) {
-                    $this->cache->set($filename, $contentHash, $result);
-                }
-                $parsedFiles->add($result);
-            }
+            $parsedFiles->add($file->getRelativePathname(), $result);
 
             $progress->endParsingFile($file->getRelativePathname());
         }
 
-        $parsingErrors->merge($parsedFiles->parsingErrors());
+        /** @var SplFileInfo $file */
+        foreach ($classSetRule->getClassSet() as $file) {
+            $result = $parsedFiles->get($file->getRelativePathname());
 
-        /** @var ClassDescription $classDescription */
-        foreach ($parsedFiles->classDescriptions() as $classDescription) {
+            if (null === $result) {
+                continue; // this should not happen
+            }
+
+            $parsingErrors->merge($result->parsingErrors());
+
             $fileViolations = new Violations();
 
-            foreach ($classSetRule->getRules() as $rule) {
-                $rule->check($classDescription, $fileViolations);
+            /** @var ClassDescription $classDescription */
+            foreach ($result->classDescriptions() as $classDescription) {
+                foreach ($classSetRule->getRules() as $rule) {
+                    $rule->check($classDescription, $fileViolations);
 
-                if ($stopOnFailure && $fileViolations->count() > 0) {
-                    $violations->merge($fileViolations);
+                    if ($stopOnFailure && $fileViolations->count() > 0) {
+                        $violations->merge($fileViolations);
 
-                    throw new FailOnFirstViolationException();
+                        throw new FailOnFirstViolationException();
+                    }
                 }
             }
 

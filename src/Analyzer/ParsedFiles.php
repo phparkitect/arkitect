@@ -6,32 +6,15 @@ namespace Arkitect\Analyzer;
 
 class ParsedFiles
 {
-    private ClassDescriptions $classDescriptions;
+    private array $data = [];
 
-    private ParsingErrors $parsingErrors;
-
-    public function __construct()
+    public function add(string $relativeFilePath, ParserResult $result): void
     {
-        $this->classDescriptions = new ClassDescriptions();
-        $this->parsingErrors = new ParsingErrors();
+        $this->data[$relativeFilePath] = $result;
     }
 
-    public function add(ParserResult $result): void
+    public function get(string $relativeFilePath): ?ParserResult
     {
-        foreach ($result->classDescriptions() as $classDescription) {
-            $this->classDescriptions[] = $classDescription;
-        }
-
-        $this->parsingErrors->merge($result->parsingErrors());
-    }
-
-    public function classDescriptions(): ClassDescriptions
-    {
-        return $this->classDescriptions;
-    }
-
-    public function parsingErrors(): ParsingErrors
-    {
-        return $this->parsingErrors;
+        return $this->data[$relativeFilePath] ?? null;
     }
 }
