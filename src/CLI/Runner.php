@@ -8,6 +8,7 @@ use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\Analyzer\FilesToParse;
 use Arkitect\Analyzer\ParsedFiles;
+use Arkitect\Analyzer\ParseResultCache;
 use Arkitect\Analyzer\Parser;
 use Arkitect\Analyzer\ParsingErrors;
 use Arkitect\ClassSetRules;
@@ -18,6 +19,12 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class Runner
 {
+    private ?ParseResultCache $cache;
+
+    public function __construct(?ParseResultCache $cache = null)
+    {
+        $this->cache = $cache;
+    }
     public function run(Config $config, Baseline $baseline, Progress $progress): AnalysisResult
     {
         [$violations, $parsingErrors] = $this->doRun($config, $progress);
@@ -58,7 +65,23 @@ class Runner
         /** @var SplFileInfo $file */
         foreach ($filesToParse as $file) {
             $progress->startParsingFile($file->getRelativePathname());
-            $parsedFiles->add($fileParser->parse($file->getContents(), $file->getRelativePathname()));
+
+            $filename = $file->getRelativePathname();
+            $contents = $file->getContents();
+            $contentHash = md5($contents);
+
+            $cached = $this->cache !== null ? $this->cache->get($filename, $contentHash) : null;
+
+            if ($cached !== null) {
+                $parsedFiles->add($cached);
+            } else {
+                $result = $fileParser->parse($contents, $filename);
+                if ($this->cache !== null) {
+                    $this->cache->set($filename, $contentHash, $result);
+                }
+                $parsedFiles->add($result);
+            }
+
             $progress->endParsingFile($file->getRelativePathname());
         }
 
