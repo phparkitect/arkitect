@@ -40,6 +40,22 @@ class NotResideInTheseNamespacesTest extends TestCase
         );
     }
 
+    public function test_it_should_deduplicate_namespaces(): void
+    {
+        $haveNameMatching = new NotResideInTheseNamespaces('MyNamespace', 'MyNamespace');
+
+        $classDesc = ClassDescription::getBuilder('MyNamespace\HappyIsland', 'src/Foo.php')->build();
+        $because = 'we want to add this rule for our software';
+        $violations = new Violations();
+        $haveNameMatching->evaluate($classDesc, $violations, $because);
+
+        self::assertEquals(1, $violations->count());
+        self::assertEquals(
+            'should not reside in one of these namespaces: MyNamespace because '.$because,
+            $haveNameMatching->describe($classDesc, $because)->toString()
+        );
+    }
+
     public function test_it_should_check_multiple_namespaces_in_or(): void
     {
         $haveNameMatching = new NotResideInTheseNamespaces('AnotherNamespace', 'ASecondNamespace', 'AThirdNamespace');
