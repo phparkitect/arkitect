@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Arkitect\PHPUnit;
 
-use Arkitect\Analyzer\Parser;
 use Arkitect\Analyzer\FileParserFactory;
+use Arkitect\Analyzer\Parser;
 use Arkitect\Analyzer\ParsingErrors;
 use Arkitect\ClassSet;
 use Arkitect\ClassSetRules;
