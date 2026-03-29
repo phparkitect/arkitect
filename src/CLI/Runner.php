@@ -48,26 +48,15 @@ class Runner
         ParsingErrors $parsingErrors,
         bool $stopOnFailure,
     ): void {
-        // first steo: collect all files to parse
-        $filesToParse = new FilesToParse();
-        /** @var SplFileInfo $file */
-        foreach ($classSetRule->getClassSet() as $file) {
-            $filesToParse->add($file);
-        }
+    }
 
-        // second step: parse all files and collect results
-        $parsedFiles = new ParsedFiles();
-        /** @var SplFileInfo $file */
-        foreach ($filesToParse as $file) {
-            $progress->startParsingFile($file->getRelativePathname());
-
-            $result = $fileParser->parse($file->getContents(), $file->getRelativePathname());
-
-            $parsedFiles->add($file->getRelativePathname(), $result);
-
-            $progress->endParsingFile($file->getRelativePathname());
-        }
-
+    public function checkRulesOnParsedFiles(
+        ClassSetRules $classSetRule,
+        ParsedFiles $parsedFiles,
+        Violations $violations,
+        ParsingErrors $parsingErrors,
+        bool $stopOnFailure,
+    ): void {
         /** @var SplFileInfo $file */
         foreach ($classSetRule->getClassSet() as $file) {
             $result = $parsedFiles->get($file->getRelativePathname());
@@ -97,6 +86,36 @@ class Runner
         }
     }
 
+    protected function collectFilesToParse(ClassSetRules $classSetRule): FilesToParse
+    {
+        $filesToParse = new FilesToParse();
+
+        /** @var SplFileInfo $file */
+        foreach ($classSetRule->getClassSet() as $file) {
+            $filesToParse->add($file);
+        }
+
+        return $filesToParse;
+    }
+
+    protected function collectParsedFiles(FilesToParse $filesToParse, Parser $fileParser, Progress $progress): ParsedFiles
+    {
+        $parsedFiles = new ParsedFiles();
+
+        /** @var SplFileInfo $file */
+        foreach ($filesToParse as $file) {
+            $progress->startParsingFile($file->getRelativePathname());
+
+            $result = $fileParser->parse($file->getContents(), $file->getRelativePathname());
+
+            $parsedFiles->add($file->getRelativePathname(), $result);
+
+            $progress->endParsingFile($file->getRelativePathname());
+        }
+
+        return $parsedFiles;
+    }
+
     protected function doRun(Config $config, Progress $progress): array
     {
         $violations = new Violations();
@@ -112,7 +131,24 @@ class Runner
             $progress->startFileSetAnalysis($classSetRule->getClassSet());
 
             try {
-                $this->check($classSetRule, $progress, $fileParser, $violations, $parsingErrors, $config->isStopOnFailure());
+                // first step: collect all files to parse
+                $filesToParse = $this->collectFilesToParse($classSetRule);
+
+                // second step: parse all files and collect results
+                $parsedFiles = $this->collectParsedFiles(
+                    $filesToParse,
+                    $fileParser,
+                    $progress
+                );
+
+                // third step: check all rules on all files
+                $this->checkRulesOnParsedFiles(
+                    $classSetRule,
+                    $parsedFiles,
+                    $violations,
+                    $parsingErrors,
+                    $config->isStopOnFailure()
+                );
             } catch (FailOnFirstViolationException $e) {
                 break;
             } finally {
