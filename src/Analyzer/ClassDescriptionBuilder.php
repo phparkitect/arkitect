@@ -56,7 +56,6 @@ class ClassDescriptionBuilder
         $this->interface = false;
         $this->trait = false;
         $this->enum = false;
-        $this->filePath = null;
     }
 
     public function setFilePath(?string $filePath): self
