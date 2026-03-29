@@ -6,6 +6,8 @@ namespace Arkitect\CLI;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FileParserFactory;
+use Arkitect\Analyzer\FilesToParse;
+use Arkitect\Analyzer\ParsedFiles;
 use Arkitect\Analyzer\Parser;
 use Arkitect\Analyzer\ParsingErrors;
 use Arkitect\ClassSetRules;
@@ -46,32 +48,37 @@ class Runner
         ParsingErrors $parsingErrors,
         bool $stopOnFailure,
     ): void {
+        $filesToParse = new FilesToParse();
         /** @var SplFileInfo $file */
         foreach ($classSetRule->getClassSet() as $file) {
+            $filesToParse->add($file);
+        }
+
+        $parsedFiles = new ParsedFiles();
+        /** @var SplFileInfo $file */
+        foreach ($filesToParse as $file) {
+            $progress->startParsingFile($file->getRelativePathname());
+            $parsedFiles->add($fileParser->parse($file->getContents(), $file->getRelativePathname()));
+            $progress->endParsingFile($file->getRelativePathname());
+        }
+
+        $parsingErrors->merge($parsedFiles->parsingErrors());
+
+        /** @var ClassDescription $classDescription */
+        foreach ($parsedFiles->classDescriptions() as $classDescription) {
             $fileViolations = new Violations();
 
-            $progress->startParsingFile($file->getRelativePathname());
+            foreach ($classSetRule->getRules() as $rule) {
+                $rule->check($classDescription, $fileViolations);
 
-            $result = $fileParser->parse($file->getContents(), $file->getRelativePathname());
+                if ($stopOnFailure && $fileViolations->count() > 0) {
+                    $violations->merge($fileViolations);
 
-            $parsingErrors->merge($result->parsingErrors());
-
-            /** @var ClassDescription $classDescription */
-            foreach ($result->classDescriptions() as $classDescription) {
-                foreach ($classSetRule->getRules() as $rule) {
-                    $rule->check($classDescription, $fileViolations);
-
-                    if ($stopOnFailure && $fileViolations->count() > 0) {
-                        $violations->merge($fileViolations);
-
-                        throw new FailOnFirstViolationException();
-                    }
+                    throw new FailOnFirstViolationException();
                 }
             }
 
             $violations->merge($fileViolations);
-
-            $progress->endParsingFile($file->getRelativePathname());
         }
     }
 
