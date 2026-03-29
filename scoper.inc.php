@@ -11,5 +11,6 @@ return [
 
     'exclude-namespaces' => [
         'Arkitect',
+        'Composer',
     ],
 ];
