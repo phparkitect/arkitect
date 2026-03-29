@@ -108,6 +108,11 @@ class Check extends Command
             );
     }
 
+    protected function isRunningAsPhar(): bool
+    {
+        return \Phar::running() !== '';
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         ini_set('memory_limit', '-1');
@@ -129,6 +134,12 @@ class Check extends Command
             // this allows to pipe the output of this command to a file while showing output on the terminal
             $stdOut = $output;
             $output = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
+
+            if ($this->isRunningAsPhar() && null === $input->getOption(self::AUTOLOAD_PARAM)) {
+                $output->writeln('❌ The --autoload option is required when running phparkitect as a PHAR');
+
+                return self::ERROR_CODE;
+            }
 
             $this->printHeadingLine($output);
 
