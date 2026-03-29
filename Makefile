@@ -17,7 +17,7 @@ test_%: ## it launches a test
 
 phar: ## it creates phar
 	rm -rf ${TMP_DIR} && mkdir -p ${TMP_DIR}
-	cp -R src bin-stub box.json README.md composer.json phparkitect-stub.php bin ${TMP_DIR}
+	cp -R src bin-stub box.json README.md composer.json phparkitect-stub.php bin scoper.inc.php ${TMP_DIR}
 	cd ${TMP_DIR} && composer install --prefer-source --no-dev -o
 	bin/box.phar compile -c ${TMP_DIR}/box.json
 	cp ${TMP_DIR}/phparkitect.phar .

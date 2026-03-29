@@ -12,6 +12,7 @@
   ],
   "compression": "GZ",
   "compactors": [
+    "KevinGH\\Box\\Compactor\\PhpScoper",
     "KevinGH\\Box\\Compactor\\Json"
   ],
   "main": "bin-stub/phparkitect",
