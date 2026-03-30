@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\E2E\Cli;
 
+use Arkitect\CLI\Command\Check;
 use Arkitect\CLI\PhpArkitectApplication;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
 class CheckCommandTest extends TestCase
@@ -250,6 +252,30 @@ class CheckCommandTest extends TestCase
 
         self::assertCommandWasSuccessful($cmdTester);
         self::assertJsonStringEqualsJsonString($expectedJson, $cmdTester->getDisplay());
+    }
+
+    public function test_autoload_is_required_when_running_as_phar(): void
+    {
+        $pharCheck = new class extends Check {
+            protected function isRunningAsPhar(): bool
+            {
+                return true;
+            }
+        };
+
+        $app = new Application();
+        $app->setAutoExit(false);
+        $addMethod = method_exists($app, 'addCommand') ? 'addCommand' : 'add';
+        $app->$addMethod($pharCheck);
+
+        $appTester = new ApplicationTester($app);
+        $appTester->run(
+            ['check', '--config' => __DIR__.'/../_fixtures/configMvcWithoutErrors.php'],
+            ['capture_stderr_separately' => true]
+        );
+
+        self::assertCommandExitedWithError($appTester);
+        self::assertStringContainsString('--autoload', $appTester->getErrorOutput());
     }
 
     public function test_autoload_file(): void
