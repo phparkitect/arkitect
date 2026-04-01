@@ -103,7 +103,7 @@ App\Controller\Foo has 1 violations
         $binPath = $this->phparkitect;
         $configFilePath = __DIR__.'/../_fixtures/configMvc.php';
 
-        $process = Process::fromShellCommandline("php {$binPath} check --config=$configFilePath --format=gitlab > $tmpFile");
+        $process = Process::fromShellCommandline("php {$binPath} check --config=$configFilePath --format=gitlab --no-cache > $tmpFile");
         $process->run();
 
         $fileContent = file_get_contents($tmpFile);

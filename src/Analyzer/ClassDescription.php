@@ -228,4 +228,15 @@ class ClassDescription
             false
         );
     }
+
+    public function getExtensionPoints(): array
+    {
+        $interfaces = array_map(static fn (FullyQualifiedClassName $interface) => $interface->toString(), $this->getInterfaces());
+
+        $extends = array_map(static fn (FullyQualifiedClassName $extends) => $extends->toString(), $this->getExtends());
+
+        $traits = array_map(static fn (FullyQualifiedClassName $trait) => $trait->toString(), $this->getTraits());
+
+        return array_merge($interfaces, $extends, $traits);
+    }
 }

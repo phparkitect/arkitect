@@ -7,6 +7,7 @@ namespace Arkitect\CLI;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\Analyzer\FilesToParse;
+use Arkitect\Analyzer\FQCNToFilePathResolver;
 use Arkitect\Analyzer\ParsedFiles;
 use Arkitect\Analyzer\Parser;
 use Arkitect\Analyzer\ParsingErrors;
@@ -92,6 +93,7 @@ class Runner
                 foreach ($classSetRule->getRules() as $rule) {
                     $rule->check($classDescription, $fileViolations);
 
+                    // workaround to avoid collecting all violations if we want to stop on first failure
                     if ($stopOnFailure && $fileViolations->count() > 0) {
                         $violations->merge($fileViolations);
 
@@ -119,6 +121,7 @@ class Runner
     protected function collectParsedFiles(FilesToParse $filesToParse, Parser $fileParser, Progress $progress): ParsedFiles
     {
         $parsedFiles = new ParsedFiles();
+        $resolver = FQCNToFilePathResolver::create();
 
         /** @var SplFileInfo $file */
         foreach ($filesToParse as $file) {
@@ -127,6 +130,21 @@ class Runner
             $result = $fileParser->parse($file->getContents(), $file->getRelativePathname());
 
             $parsedFiles->add($file->getRelativePathname(), $result);
+
+            // collect extension points to parse them as well
+            foreach ($result->classDescriptions() as $classDescription) {
+                $fqcnToResolve = $classDescription->getExtensionPoints();
+
+                foreach ($fqcnToResolve as $fqcn) {
+                    $fileToParse = $resolver->resolve($fqcn);
+
+                    if (null === $fileToParse) {
+                        continue; // throw an error?
+                    }
+
+                    $filesToParse->add($fileToParse);
+                }
+            }
 
             $progress->endParsingFile($file->getRelativePathname());
         }

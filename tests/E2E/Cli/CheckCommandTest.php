@@ -290,6 +290,8 @@ class CheckCommandTest extends TestCase
             $input['--ignore-baseline-linenumbers'] = true;
         }
 
+        $input['--no-cache'] = true;
+
         // false = option not set, null = option set but without value, string = option with value
         if (false !== $generateBaseline) {
             $input['--generate-baseline'] = $generateBaseline;
