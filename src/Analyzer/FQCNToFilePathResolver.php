@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
 
+use Symfony\Component\Finder\SplFileInfo;
+
 class FQCNToFilePathResolver
 {
     /**
@@ -74,7 +76,7 @@ class FQCNToFilePathResolver
         return new self($psr4Map);
     }
 
-    public function resolve(string $fqcn): ?string
+    public function resolve(string $fqcn): ?SplFileInfo
     {
         $fqcn = ltrim($fqcn, '\\');
 
@@ -90,7 +92,7 @@ class FQCNToFilePathResolver
                 $realPath = realpath($baseDir.\DIRECTORY_SEPARATOR.$relativeFile);
 
                 if (false !== $realPath) {
-                    return $realPath;
+                    return new SplFileInfo($realPath, $relativeFile, $baseDir);
                 }
             }
         }
