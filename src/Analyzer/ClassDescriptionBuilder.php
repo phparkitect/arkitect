@@ -41,6 +41,9 @@ class ClassDescriptionBuilder
 
     private ?string $filePath = null;
 
+    /** @var array<string, bool> */
+    private static array $cache = [];
+
     public function clear(): void
     {
         $this->FQCN = null;
@@ -186,9 +189,6 @@ class ClassDescriptionBuilder
             $this->filePath
         );
     }
-
-    /** @var array<string, bool> */
-    private static array $cache = [];
 
     private function isPhpCoreClass(ClassDependency $dependency): bool
     {
