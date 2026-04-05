@@ -41,6 +41,9 @@ class ClassDescriptionBuilder
 
     private ?string $filePath = null;
 
+    /** @var array<string, bool> */
+    private static array $cache = [];
+
     public function clear(): void
     {
         $this->FQCN = null;
@@ -189,16 +192,24 @@ class ClassDescriptionBuilder
 
     private function isPhpCoreClass(ClassDependency $dependency): bool
     {
-        $fqcn = $dependency->getFQCN();
+        $className = $dependency->getFQCN()->toString();
 
-        try {
-            /** @var class-string $className */
-            $className = $fqcn->toString();
-            $reflection = new \ReflectionClass($className);
+        if (!isset(self::$cache[$className])) {
+            self::$cache[$className] = $this->checkIsPhpCoreClass($className);
+        }
 
-            return $reflection->isInternal();
-        } catch (\ReflectionException $e) {
+        return self::$cache[$className];
+    }
+
+    private function checkIsPhpCoreClass(string $className): bool
+    {
+        if (!class_exists($className) && !interface_exists($className) && !trait_exists($className) && !enum_exists($className)) {
             return false;
         }
+
+        /** @var class-string $className */
+        $reflection = new \ReflectionClass($className);
+
+        return $reflection->isInternal();
     }
 }
