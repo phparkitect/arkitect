@@ -203,7 +203,7 @@ class ClassDescriptionBuilder
 
     private function checkIsPhpCoreClass(string $className): bool
     {
-        if (!class_exists($className) && !interface_exists($className)) {
+        if (!class_exists($className) && !interface_exists($className) && !trait_exists($className) && !enum_exists($className)) {
             return false;
         }
 
