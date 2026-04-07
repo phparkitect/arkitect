@@ -51,10 +51,13 @@ class Runner
         // first step: collect all files to parse
         $filesToParse = $this->collectFilesToParse($classSetRule);
 
-        // second step: parse all files, resolve extension points recursively, enrich deps
+        // second step: parse all files and collect class descriptions (and parsing errors) in an index
         $classDescriptionIndex = $this->collectParsedFiles($filesToParse, $fileParser, $progress);
 
-        // third step: check all rules on all files
+        // third step: enrich class descriptions with resolved dependencies
+        $classDescriptionIndex->enrich();
+
+        // fourth step: check all rules on all files
         $this->checkRulesOnParsedFiles(
             $classSetRule,
             $classDescriptionIndex,
@@ -111,16 +114,14 @@ class Runner
         $classDescriptionIndex = new ClassDescriptionIndex();
         $resolver = FQCNToFilePathResolver::create();
 
-        while (!$filesToParse->isEmpty()) {
-            $file = $filesToParse->shift();
-
+        while ($file = $filesToParse->next()) {
             $progress->startParsingFile($file->getRelativePathname());
 
             $result = $fileParser->parse($file->getContents(), $file->getRelativePathname());
 
             $classDescriptionIndex->add($file->getRelativePathname(), $result);
 
-            // recursively collect extension points (interfaces, traits, parent classes)
+            // collect extension points (interfaces, traits, parent classes) and add them to the queue
             foreach ($result->classDescriptions() as $classDescription) {
                 foreach ($classDescription->getExtensionPoints() as $fqcn) {
                     $fileToParse = $resolver->resolve($fqcn);
@@ -135,8 +136,6 @@ class Runner
 
             $progress->endParsingFile($file->getRelativePathname());
         }
-
-        $classDescriptionIndex->enrich();
 
         return $classDescriptionIndex;
     }

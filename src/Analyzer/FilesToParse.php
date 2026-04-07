@@ -34,13 +34,12 @@ class FilesToParse
         $this->queue->enqueue($file);
     }
 
-    public function isEmpty(): bool
+    public function next(): ?SplFileInfo
     {
-        return $this->queue->isEmpty();
-    }
+        if ($this->queue->isEmpty()) {
+            return null;
+        }
 
-    public function shift(): SplFileInfo
-    {
         return $this->queue->dequeue();
     }
 }
