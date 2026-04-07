@@ -43,5 +43,4 @@ class FilesToParse
     {
         return $this->queue->dequeue();
     }
-
 }
