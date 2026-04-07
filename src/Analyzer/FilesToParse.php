@@ -7,20 +7,39 @@ namespace Arkitect\Analyzer;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
- * @template-implements \IteratorAggregate<SplFileInfo>
+ * A deduplicated FIFO queue of files to be parsed.
  */
-class FilesToParse implements \IteratorAggregate
+class FilesToParse
 {
-    /** @var array<SplFileInfo> */
-    private array $files = [];
+    /** @var \SplQueue<SplFileInfo> */
+    private \SplQueue $queue;
+
+    /** @var array<string, true> */
+    private array $seen = [];
+
+    public function __construct()
+    {
+        $this->queue = new \SplQueue();
+    }
 
     public function add(SplFileInfo $file): void
     {
-        $this->files[] = $file;
+        $key = $file->getRealPath() ?: $file->getPathname();
+
+        if (isset($this->seen[$key])) {
+            return;
+        }
+
+        $this->seen[$key] = true;
+        $this->queue->enqueue($file);
     }
 
-    public function getIterator(): \Traversable
+    public function next(): ?SplFileInfo
     {
-        return new \ArrayIterator($this->files);
+        if ($this->queue->isEmpty()) {
+            return null;
+        }
+
+        return $this->queue->dequeue();
     }
 }

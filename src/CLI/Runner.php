@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI;
 
-use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Analyzer\ClassDescriptionIndex;
 use Arkitect\Analyzer\FileParserFactory;
 use Arkitect\Analyzer\FilesToParse;
-use Arkitect\Analyzer\ParsedFiles;
+use Arkitect\Analyzer\FQCNToFilePathResolver;
 use Arkitect\Analyzer\Parser;
 use Arkitect\Analyzer\ParsingErrors;
 use Arkitect\ClassSetRules;
@@ -51,17 +51,16 @@ class Runner
         // first step: collect all files to parse
         $filesToParse = $this->collectFilesToParse($classSetRule);
 
-        // second step: parse all files and collect results
-        $parsedFiles = $this->collectParsedFiles(
-            $filesToParse,
-            $fileParser,
-            $progress
-        );
+        // second step: parse all files and collect class descriptions (and parsing errors) in an index
+        $classDescriptionIndex = $this->collectParsedFiles($filesToParse, $fileParser, $progress);
 
-        // third step: check all rules on all files
+        // third step: enrich class descriptions with resolved dependencies
+        $classDescriptionIndex->enrich();
+
+        // fourth step: check all rules on all files
         $this->checkRulesOnParsedFiles(
             $classSetRule,
-            $parsedFiles,
+            $classDescriptionIndex,
             $violations,
             $parsingErrors,
             $stopOnFailure
@@ -70,28 +69,22 @@ class Runner
 
     public function checkRulesOnParsedFiles(
         ClassSetRules $classSetRule,
-        ParsedFiles $parsedFiles,
+        ClassDescriptionIndex $classDescriptionIndex,
         Violations $violations,
         ParsingErrors $parsingErrors,
         bool $stopOnFailure,
     ): void {
         /** @var SplFileInfo $file */
         foreach ($classSetRule->getClassSet() as $file) {
-            $result = $parsedFiles->get($file->getRelativePathname());
-
-            if (null === $result) {
-                continue; // this should not happen
-            }
-
-            $parsingErrors->merge($result->parsingErrors());
+            $parsingErrors->merge($classDescriptionIndex->getParsingErrorsFor($file->getRelativePathname()));
 
             $fileViolations = new Violations();
 
-            /** @var ClassDescription $classDescription */
-            foreach ($result->classDescriptions() as $classDescription) {
+            foreach ($classDescriptionIndex->getClassDescriptionsFor($file->getRelativePathname()) as $classDescription) {
                 foreach ($classSetRule->getRules() as $rule) {
                     $rule->check($classDescription, $fileViolations);
 
+                    // workaround to avoid collecting all violations if we want to stop on first failure
                     if ($stopOnFailure && $fileViolations->count() > 0) {
                         $violations->merge($fileViolations);
 
@@ -116,22 +109,35 @@ class Runner
         return $filesToParse;
     }
 
-    protected function collectParsedFiles(FilesToParse $filesToParse, Parser $fileParser, Progress $progress): ParsedFiles
+    protected function collectParsedFiles(FilesToParse $filesToParse, Parser $fileParser, Progress $progress): ClassDescriptionIndex
     {
-        $parsedFiles = new ParsedFiles();
+        $classDescriptionIndex = new ClassDescriptionIndex();
+        $resolver = FQCNToFilePathResolver::create();
 
-        /** @var SplFileInfo $file */
-        foreach ($filesToParse as $file) {
+        while ($file = $filesToParse->next()) {
             $progress->startParsingFile($file->getRelativePathname());
 
             $result = $fileParser->parse($file->getContents(), $file->getRelativePathname());
 
-            $parsedFiles->add($file->getRelativePathname(), $result);
+            $classDescriptionIndex->add($file->getRelativePathname(), $result);
+
+            // collect extension points (interfaces, traits, parent classes) and add them to the queue
+            foreach ($result->classDescriptions() as $classDescription) {
+                foreach ($classDescription->getExtensionPoints() as $fqcn) {
+                    $fileToParse = $resolver->resolve($fqcn);
+
+                    if (null === $fileToParse) {
+                        continue;
+                    }
+
+                    $filesToParse->add($fileToParse);
+                }
+            }
 
             $progress->endParsingFile($file->getRelativePathname());
         }
 
-        return $parsedFiles;
+        return $classDescriptionIndex;
     }
 
     protected function doRun(Config $config, Progress $progress): array

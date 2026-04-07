@@ -52,7 +52,14 @@ class TestRunner
 
         $classSetRules = ClassSetRules::create(ClassSet::fromDir($srcPath), ...$rules);
 
-        (new Runner())->check($classSetRules, new VoidProgress(), $this->fileParser, $this->violations, $this->parsingErrors, false);
+        (new Runner())->check(
+            $classSetRules,
+            new VoidProgress(),
+            $this->fileParser,
+            $this->violations,
+            $this->parsingErrors,
+            false
+        );
     }
 
     public function getViolations(): Violations
