@@ -229,6 +229,29 @@ class ClassDescription
         );
     }
 
+    /**
+     * @param list<ClassDependency> $additionalDependencies
+     */
+    public function withAdditionalDependencies(array $additionalDependencies): self
+    {
+        return new self(
+            $this->FQCN,
+            array_merge($this->dependencies, $additionalDependencies),
+            $this->interfaces,
+            $this->extends,
+            $this->final,
+            $this->readonly,
+            $this->abstract,
+            $this->interface,
+            $this->trait,
+            $this->enum,
+            $this->docBlock,
+            $this->attributes,
+            $this->traits,
+            $this->filePath
+        );
+    }
+
     public function getExtensionPoints(): array
     {
         $interfaces = array_map(static fn (FullyQualifiedClassName $interface) => $interface->toString(), $this->getInterfaces());
