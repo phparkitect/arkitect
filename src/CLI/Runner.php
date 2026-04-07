@@ -123,23 +123,22 @@ class Runner
         $parsedFiles = new ParsedFiles();
         $resolver = FQCNToFilePathResolver::create();
 
-        /** @var SplFileInfo $file */
-        foreach ($filesToParse as $file) {
+        while (!$filesToParse->isEmpty()) {
+            $file = $filesToParse->shift();
+
             $progress->startParsingFile($file->getRelativePathname());
 
             $result = $fileParser->parse($file->getContents(), $file->getRelativePathname());
 
             $parsedFiles->add($file->getRelativePathname(), $result);
 
-            // collect extension points to parse them as well
+            // recursively collect extension points (interfaces, traits, parent classes)
             foreach ($result->classDescriptions() as $classDescription) {
-                $fqcnToResolve = $classDescription->getExtensionPoints();
-
-                foreach ($fqcnToResolve as $fqcn) {
+                foreach ($classDescription->getExtensionPoints() as $fqcn) {
                     $fileToParse = $resolver->resolve($fqcn);
 
                     if (null === $fileToParse) {
-                        continue; // throw an error?
+                        continue;
                     }
 
                     $filesToParse->add($fileToParse);

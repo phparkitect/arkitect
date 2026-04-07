@@ -7,25 +7,41 @@ namespace Arkitect\Analyzer;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
- * An absolute path indexed collection of files to be parsed.
- *
- * @template-implements \IteratorAggregate<SplFileInfo>
+ * A deduplicated FIFO queue of files to be parsed.
  */
-class FilesToParse implements \IteratorAggregate
+class FilesToParse
 {
-    /** @var array<string, SplFileInfo> */
-    private array $files = [];
+    /** @var \SplQueue<SplFileInfo> */
+    private \SplQueue $queue;
+
+    /** @var array<string, true> */
+    private array $seen = [];
+
+    public function __construct()
+    {
+        $this->queue = new \SplQueue();
+    }
 
     public function add(SplFileInfo $file): void
     {
-        // for vfsStream based filesystems (the one used in tests) getRealPath returns null
         $key = $file->getRealPath() ?: $file->getPathname();
 
-        $this->files[$key] = $file;
+        if (isset($this->seen[$key])) {
+            return;
+        }
+
+        $this->seen[$key] = true;
+        $this->queue->enqueue($file);
     }
 
-    public function getIterator(): \Traversable
+    public function isEmpty(): bool
     {
-        return new \ArrayIterator($this->files);
+        return $this->queue->isEmpty();
     }
+
+    public function shift(): SplFileInfo
+    {
+        return $this->queue->dequeue();
+    }
+
 }
