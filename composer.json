@@ -32,7 +32,7 @@
         "webmozart/assert": "^1.12|^2.0"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.94",
+        "friendsofphp/php-cs-fixer": "^3.95",
         "mikey179/vfsstream": "^1.6",
         "phpspec/prophecy": "^1.10",
         "phpspec/prophecy-phpunit": "^2.5",
