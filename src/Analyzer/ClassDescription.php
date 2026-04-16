@@ -116,6 +116,11 @@ class ClassDescription
 
     public function namespaceMatchesOneOfTheseNamespaces(array $classesToBeExcluded): bool
     {
+        return $this->namespaceMatchesOneOfTheseNamespacesSplat(...$classesToBeExcluded);
+    }
+
+    public function namespaceMatchesOneOfTheseNamespacesSplat(string ...$classesToBeExcluded): bool
+    {
         foreach ($classesToBeExcluded as $classToBeExcluded) {
             if ($this->namespaceMatches($classToBeExcluded)) {
                 return true;
