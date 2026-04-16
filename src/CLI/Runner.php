@@ -6,6 +6,8 @@ namespace Arkitect\CLI;
 
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\FileParserFactory;
+use Arkitect\Analyzer\FilesToParse;
+use Arkitect\Analyzer\ParsedFiles;
 use Arkitect\Analyzer\Parser;
 use Arkitect\Analyzer\ParsingErrors;
 use Arkitect\ClassSetRules;
@@ -46,15 +48,44 @@ class Runner
         ParsingErrors $parsingErrors,
         bool $stopOnFailure,
     ): void {
+        // first step: collect all files to parse
+        $filesToParse = $this->collectFilesToParse($classSetRule);
+
+        // second step: parse all files and collect results
+        $parsedFiles = $this->collectParsedFiles(
+            $filesToParse,
+            $fileParser,
+            $progress
+        );
+
+        // third step: check all rules on all files
+        $this->checkRulesOnParsedFiles(
+            $classSetRule,
+            $parsedFiles,
+            $violations,
+            $parsingErrors,
+            $stopOnFailure
+        );
+    }
+
+    public function checkRulesOnParsedFiles(
+        ClassSetRules $classSetRule,
+        ParsedFiles $parsedFiles,
+        Violations $violations,
+        ParsingErrors $parsingErrors,
+        bool $stopOnFailure,
+    ): void {
         /** @var SplFileInfo $file */
         foreach ($classSetRule->getClassSet() as $file) {
-            $fileViolations = new Violations();
+            $result = $parsedFiles->get($file->getRelativePathname());
 
-            $progress->startParsingFile($file->getRelativePathname());
-
-            $result = $fileParser->parse($file->getContents(), $file->getRelativePathname());
+            if (null === $result) {
+                continue; // this should not happen
+            }
 
             $parsingErrors->merge($result->parsingErrors());
+
+            $fileViolations = new Violations();
 
             /** @var ClassDescription $classDescription */
             foreach ($result->classDescriptions() as $classDescription) {
@@ -70,9 +101,37 @@ class Runner
             }
 
             $violations->merge($fileViolations);
+        }
+    }
+
+    protected function collectFilesToParse(ClassSetRules $classSetRule): FilesToParse
+    {
+        $filesToParse = new FilesToParse();
+
+        /** @var SplFileInfo $file */
+        foreach ($classSetRule->getClassSet() as $file) {
+            $filesToParse->add($file);
+        }
+
+        return $filesToParse;
+    }
+
+    protected function collectParsedFiles(FilesToParse $filesToParse, Parser $fileParser, Progress $progress): ParsedFiles
+    {
+        $parsedFiles = new ParsedFiles();
+
+        /** @var SplFileInfo $file */
+        foreach ($filesToParse as $file) {
+            $progress->startParsingFile($file->getRelativePathname());
+
+            $result = $fileParser->parse($file->getContents(), $file->getRelativePathname());
+
+            $parsedFiles->add($file->getRelativePathname(), $result);
 
             $progress->endParsingFile($file->getRelativePathname());
         }
+
+        return $parsedFiles;
     }
 
     protected function doRun(Config $config, Progress $progress): array
@@ -82,7 +141,8 @@ class Runner
 
         $fileParser = FileParserFactory::createFileParser(
             $config->getTargetPhpVersion(),
-            $config->isParseCustomAnnotationsEnabled()
+            $config->isParseCustomAnnotationsEnabled(),
+            $config->getCacheFilePath()
         );
 
         /** @var ClassSetRules $classSetRule */
@@ -90,7 +150,14 @@ class Runner
             $progress->startFileSetAnalysis($classSetRule->getClassSet());
 
             try {
-                $this->check($classSetRule, $progress, $fileParser, $violations, $parsingErrors, $config->isStopOnFailure());
+                $this->check(
+                    $classSetRule,
+                    $progress,
+                    $fileParser,
+                    $violations,
+                    $parsingErrors,
+                    $config->isStopOnFailure()
+                );
             } catch (FailOnFirstViolationException $e) {
                 break;
             } finally {
