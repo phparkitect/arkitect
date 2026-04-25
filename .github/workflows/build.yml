@@ -72,10 +72,16 @@ jobs:
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.0
+          php-version: 8.2
           tools: composer:v2.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Box 4.x requires PHP 8.2+ to run, but the released PHAR must still
+      # support PHP 8.0+. Pin the resolver platform so composer installs the
+      # PHP 8.0-compatible dependency set regardless of the runner's PHP.
+      - name: "Pin composer platform to PHP 8.0 for the released PHAR"
+        run: composer config platform.php 8.0
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-dev -o
@@ -103,6 +109,8 @@ jobs:
       matrix:
         php-versions: [ '8.0', '8.1', '8.2', '8.3', '8.4', '8.5' ]
     steps:
+      - uses: actions/checkout@v6
+
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -118,6 +126,12 @@ jobs:
 
       - name: "Smoke test phar"
         run: php ./phparkitect-${{ github.sha }}.phar
+
+      - name: "End-to-end test phar: run check on fixture"
+        run: |
+          php ./phparkitect-${{ github.sha }}.phar check \
+            --config tests/E2E/_fixtures/autoload/phparkitect.php \
+            --autoload tests/E2E/_fixtures/autoload/autoload.php
 
   publish_phar:
     needs: [build, smoke-test-phar]
