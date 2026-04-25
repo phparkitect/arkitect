@@ -103,6 +103,8 @@ jobs:
       matrix:
         php-versions: [ '8.0', '8.1', '8.2', '8.3', '8.4', '8.5' ]
     steps:
+      - uses: actions/checkout@v6
+
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -118,6 +120,12 @@ jobs:
 
       - name: "Smoke test phar"
         run: php ./phparkitect-${{ github.sha }}.phar
+
+      - name: "End-to-end test phar: run check on fixture"
+        run: |
+          php ./phparkitect-${{ github.sha }}.phar check \
+            --config tests/E2E/_fixtures/autoload/phparkitect.php \
+            --autoload tests/E2E/_fixtures/autoload/autoload.php
 
   publish_phar:
     needs: [build, smoke-test-phar]
