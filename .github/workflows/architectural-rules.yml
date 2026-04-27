@@ -20,11 +20,12 @@ jobs:
               uses: shivammathur/setup-php@v2
               with:
                   php-version: '8.2'
+                  tools: composer:v2.2
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: Download phparkitect
-              run: curl -LS https://github.com/phparkitect/arkitect/releases/latest/download/phparkitect.phar -o phparkitect.phar
+            - name: Install dependencies
+              run: composer install --prefer-dist
 
             - name: PHPArkitect
-              run: php phparkitect.phar check
+              run: php bin-stub/phparkitect check
