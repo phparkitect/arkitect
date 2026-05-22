@@ -518,13 +518,18 @@ $rules[] = Rule::allClasses()
     ->because('we don\'t want to enforce immutability');
 ```
 
-### Has an attribute (requires PHP >= 8.0)
+### Has an attribute / Does not have an attribute
 
 ```php
 $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
     ->should(new HaveAttribute('Symfony\Component\HttpKernel\Attribute\AsController'))
     ->because('it configures the service container');
+
+$rules[] = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
+    ->should(new NotHaveAttribute('Deprecated'))
+    ->because('deprecated controllers should be removed, not kept in production');
 ```
 
 You can also define components and ensure that a component:
