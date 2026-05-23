@@ -597,6 +597,52 @@ $rules[] = Rule::allClasses()
 
 You can use wildcards or the exact name of a class.
 
+### Combining multiple conditions with `andThat()`
+
+By default, `that()` selects all classes matching a single expression. When you need to narrow the selection further — applying the `should()` check only to classes that satisfy **all** conditions — you can chain one or more `andThat()` calls:
+
+```php
+// Only concrete domain events (non-abstract, named *Event) must be final
+$rules[] = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
+    ->andThat(new HaveNameMatching('*Event'))
+    ->andThat(new IsNotAbstract())
+    ->should(new IsFinal())
+    ->because('concrete domain events must be immutable value objects');
+```
+
+A class is checked against `should()` only if it satisfies **every** `that()` / `andThat()` condition. A class that matches the first condition but not the second is silently skipped — no violation is raised.
+
+`andThat()` can be combined with `except()`:
+
+```php
+$rules[] = Rule::allClasses()
+    ->except('App\Controller\LegacyController')
+    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
+    ->andThat(new HaveAttribute('Symfony\Component\HttpKernel\Attribute\AsController'))
+    ->should(new IsFinal())
+    ->because('active controllers must be final');
+```
+
+You can also reuse a partially-built rule to create independent branches:
+
+```php
+$domainClasses = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Domain'));
+
+$rules[] = $domainClasses
+    ->andThat(new HaveNameMatching('*Event'))
+    ->should(new IsFinal())
+    ->because('domain events must be final');
+
+$rules[] = $domainClasses
+    ->andThat(new HaveNameMatching('*Service'))
+    ->should(new IsNotAbstract())
+    ->because('domain services must be concrete');
+```
+
+Each branch is independent — modifying one does not affect the other.
+
 ## Optional parameters and options
 You can add parameters when you launch the tool. At the moment you can add these parameters and options: 
 * `-v` : with this option you launch Arkitect with the verbose mode to see every parsed file
