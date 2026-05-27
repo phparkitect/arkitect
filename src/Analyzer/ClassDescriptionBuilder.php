@@ -205,7 +205,11 @@ class ClassDescriptionBuilder
     {
         // PHP built-ins are always pre-loaded; skip autoloading to avoid side-effects.
         // See: https://github.com/Sylius/Sylius/pull/19003
-        if (!class_exists($className, false) && !interface_exists($className, false) && !trait_exists($className, false) && !enum_exists($className, false)) {
+        // enum_exists() is PHP 8.1+; enums cannot exist on 8.0 so we skip the check there.
+        if (!class_exists($className, false)
+            && !interface_exists($className, false)
+            && !trait_exists($className, false)
+            && (\PHP_VERSION_ID < 80100 || !enum_exists($className, false))) {
             return false;
         }
 
