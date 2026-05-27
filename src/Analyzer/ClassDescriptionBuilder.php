@@ -203,12 +203,7 @@ class ClassDescriptionBuilder
 
     private function checkIsPhpCoreClass(string $className): bool
     {
-        // Use $autoload=false to avoid triggering the Composer autoloader for arbitrary class
-        // names encountered during file parsing. PHP built-in classes are always pre-loaded and
-        // do not need autoloading. Triggering the autoloader here can cause side-effects: if a
-        // class's file fails to load (e.g. because a required PHP extension is missing), PHP
-        // throws an Error that propagates out of class_exists() and gets mistakenly treated as
-        // a parsing error by FileParser. See: https://github.com/phparkitect/arkitect/issues/XXX
+        // PHP built-ins are always pre-loaded; skip autoloading to avoid side-effects.
         if (!class_exists($className, false) && !interface_exists($className, false) && !trait_exists($className, false) && !enum_exists($className, false)) {
             return false;
         }
