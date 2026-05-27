@@ -203,8 +203,6 @@ class ClassDescriptionBuilder
 
     private function checkIsPhpCoreClass(string $className): bool
     {
-        // PHP built-ins are always pre-loaded; skip autoloading to avoid side-effects.
-        // See: https://github.com/Sylius/Sylius/pull/19003
         if (!$this->isSymbolLoaded($className)) {
             return false;
         }
@@ -217,6 +215,8 @@ class ClassDescriptionBuilder
 
     private function isSymbolLoaded(string $className): bool
     {
+        // PHP built-ins are always pre-loaded; skip autoloading to avoid side-effects.
+        // See: https://github.com/Sylius/Sylius/pull/19003
         if (class_exists($className, false)) {
             return true;
         }
