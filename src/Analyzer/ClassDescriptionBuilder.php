@@ -204,6 +204,7 @@ class ClassDescriptionBuilder
     private function checkIsPhpCoreClass(string $className): bool
     {
         // PHP built-ins are always pre-loaded; skip autoloading to avoid side-effects.
+        // See: https://github.com/Sylius/Sylius/pull/19003
         if (!class_exists($className, false) && !interface_exists($className, false) && !trait_exists($className, false) && !enum_exists($className, false)) {
             return false;
         }
