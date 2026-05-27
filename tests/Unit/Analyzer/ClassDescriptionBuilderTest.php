@@ -280,4 +280,42 @@ class ClassDescriptionBuilderTest extends TestCase
         self::assertCount(1, $classDescription->getDependencies());
         self::assertEquals('App\MyClass', $classDescription->getDependencies()[0]->getFQCN()->toString());
     }
+
+    /**
+     * Regression test: addDependency() must NOT trigger the Composer autoloader.
+     *
+     * When phparkitect parses a file that references a class from an optional/uninstalled
+     * package (e.g. Doctrine\ODM\MongoDB\DocumentRepository in a Symfony services config),
+     * calling class_exists($className, $autoload=true) can cause the autoloader to load the
+     * class file. If that file in turn requires a PHP extension that is not available (e.g.
+     * the mongodb extension), PHP throws an Error which propagates out of class_exists() and
+     * gets caught by FileParser's \Throwable handler – turning a perfectly valid PHP file into
+     * a spurious "parsing error" that fails the check with exit code 1.
+     *
+     * The fix is to always pass $autoload=false: PHP built-in classes are pre-loaded and never
+     * need autoloading; any class that is not already loaded cannot be a PHP internal class.
+     */
+    public function test_adding_dependency_on_unloaded_optional_vendor_class_does_not_throw(): void
+    {
+        // This FQCN simulates a class from an optional package (e.g. Doctrine MongoDB ODM)
+        // that is NOT loaded in the current PHP process. If class_exists() is called with
+        // $autoload=true this could trigger the Composer autoloader and potentially throw.
+        $unloadedVendorClass = 'Doctrine\ODM\MongoDB\DocumentRepository';
+
+        // Pre-condition: the class must not be loaded already for this test to be meaningful.
+        self::assertFalse(class_exists($unloadedVendorClass, false), sprintf(
+            'Pre-condition failed: %s should not be loaded in the current process.',
+            $unloadedVendorClass,
+        ));
+
+        // This must not throw and must treat the class as a user-defined dependency.
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName('MyRepository')
+            ->addDependency(new ClassDependency($unloadedVendorClass, 10))
+            ->build();
+
+        self::assertCount(1, $classDescription->getDependencies());
+        self::assertEquals($unloadedVendorClass, $classDescription->getDependencies()[0]->getFQCN()->toString());
+    }
 }
