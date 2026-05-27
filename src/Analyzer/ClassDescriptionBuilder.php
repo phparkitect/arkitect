@@ -205,11 +205,7 @@ class ClassDescriptionBuilder
     {
         // PHP built-ins are always pre-loaded; skip autoloading to avoid side-effects.
         // See: https://github.com/Sylius/Sylius/pull/19003
-        // enum_exists() is PHP 8.1+; enums cannot exist on 8.0 so we skip the check there.
-        if (!class_exists($className, false)
-            && !interface_exists($className, false)
-            && !trait_exists($className, false)
-            && (\PHP_VERSION_ID < 80100 || !enum_exists($className, false))) {
+        if (!$this->isSymbolLoaded($className)) {
             return false;
         }
 
@@ -217,5 +213,24 @@ class ClassDescriptionBuilder
         $reflection = new \ReflectionClass($className);
 
         return $reflection->isInternal();
+    }
+
+    private function isSymbolLoaded(string $className): bool
+    {
+        if (class_exists($className, false)) {
+            return true;
+        }
+        if (interface_exists($className, false)) {
+            return true;
+        }
+        if (trait_exists($className, false)) {
+            return true;
+        }
+        // enum_exists() is PHP 8.1+; enums cannot exist on 8.0 so we skip the check there.
+        if (\PHP_VERSION_ID >= 80100 && enum_exists($className, false)) {
+            return true;
+        }
+
+        return false;
     }
 }
