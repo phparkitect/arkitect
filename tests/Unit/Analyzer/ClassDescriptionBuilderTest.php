@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Analyzer;
 
+// Defined at file scope so trait_exists(__NAMESPACE__.'\UserTestTrait', false) === true
+// without triggering the autoloader, exercising that branch of isSymbolLoaded().
+trait UserTestTrait
+{
+}
+
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
@@ -300,5 +306,30 @@ class ClassDescriptionBuilderTest extends TestCase
 
         self::assertCount(1, $classDescription->getDependencies());
         self::assertEquals($unloadedVendorClass, $classDescription->getDependencies()[0]->getFQCN()->toString());
+    }
+
+    public function test_it_should_filter_php_core_interfaces(): void
+    {
+        // Countable is a PHP built-in interface; it must be treated as a core symbol and filtered.
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName('MyClass')
+            ->addDependency(new ClassDependency(\Countable::class, 10))
+            ->build();
+
+        self::assertCount(0, $classDescription->getDependencies());
+    }
+
+    public function test_it_should_not_filter_already_loaded_user_traits(): void
+    {
+        // UserTestTrait is defined in this file; trait_exists($name, false) returns true,
+        // but ReflectionClass::isInternal() returns false, so it must NOT be filtered.
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName('MyClass')
+            ->addDependency(new ClassDependency(UserTestTrait::class, 10))
+            ->build();
+
+        self::assertCount(1, $classDescription->getDependencies());
     }
 }
