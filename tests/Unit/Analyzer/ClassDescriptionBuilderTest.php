@@ -287,7 +287,7 @@ class ClassDescriptionBuilderTest extends TestCase
         // a class whose required extension is absent, which FileParser catches as a parsing error.
         $unloadedVendorClass = 'Doctrine\ODM\MongoDB\DocumentRepository';
 
-        self::assertFalse(class_exists($unloadedVendorClass, false), sprintf(
+        self::assertFalse(class_exists($unloadedVendorClass, false), \sprintf(
             'Pre-condition failed: %s should not be loaded in the current process.',
             $unloadedVendorClass,
         ));
