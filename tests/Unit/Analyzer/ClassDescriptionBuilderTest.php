@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\Analyzer;
 
+// Defined at file scope so trait_exists(__NAMESPACE__.'\UserTestTrait', false) === true
+// without triggering the autoloader, exercising that branch of isSymbolLoaded().
+trait UserTestTrait
+{
+}
+
 use Arkitect\Analyzer\ClassDependency;
 use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
@@ -279,5 +285,51 @@ class ClassDescriptionBuilderTest extends TestCase
         self::assertInstanceOf(ClassDescription::class, $classDescription);
         self::assertCount(1, $classDescription->getDependencies());
         self::assertEquals('App\MyClass', $classDescription->getDependencies()[0]->getFQCN()->toString());
+    }
+
+    public function test_adding_dependency_on_unloaded_vendor_class_does_not_trigger_autoloader(): void
+    {
+        // Regression: class_exists($name, true) can cause the autoloader to throw when loading
+        // a class whose required extension is absent, which FileParser catches as a parsing error.
+        $unloadedVendorClass = 'Doctrine\ODM\MongoDB\DocumentRepository';
+
+        self::assertFalse(class_exists($unloadedVendorClass, false), \sprintf(
+            'Pre-condition failed: %s should not be loaded in the current process.',
+            $unloadedVendorClass,
+        ));
+
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName('MyRepository')
+            ->addDependency(new ClassDependency($unloadedVendorClass, 10))
+            ->build();
+
+        self::assertCount(1, $classDescription->getDependencies());
+        self::assertEquals($unloadedVendorClass, $classDescription->getDependencies()[0]->getFQCN()->toString());
+    }
+
+    public function test_it_should_filter_php_core_interfaces(): void
+    {
+        // Countable is a PHP built-in interface; it must be treated as a core symbol and filtered.
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName('MyClass')
+            ->addDependency(new ClassDependency(\Countable::class, 10))
+            ->build();
+
+        self::assertCount(0, $classDescription->getDependencies());
+    }
+
+    public function test_it_should_not_filter_already_loaded_user_traits(): void
+    {
+        // UserTestTrait is defined in this file; trait_exists($name, false) returns true,
+        // but ReflectionClass::isInternal() returns false, so it must NOT be filtered.
+        $classDescription = (new ClassDescriptionBuilder())
+            ->setFilePath('src/Foo.php')
+            ->setClassName('MyClass')
+            ->addDependency(new ClassDependency(UserTestTrait::class, 10))
+            ->build();
+
+        self::assertCount(1, $classDescription->getDependencies());
     }
 }
