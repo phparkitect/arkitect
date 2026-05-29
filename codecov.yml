@@ -17,10 +17,11 @@ coverage:
 
     # Coverage of the lines changed/added by a PR. We don't require 100% of
     # every new line to be covered, otherwise a single untested line fails.
+    # No threshold: the 80% target is a hard bar (Codecov defaults threshold
+    # to 0%), so the declared bar and the effective one stay the same.
     patch:
       default:
         target: 80%
-        threshold: 5%
 
 # Don't post a comment on every PR push; update the existing one instead.
 comment:
