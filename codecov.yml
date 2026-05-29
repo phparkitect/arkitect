@@ -5,11 +5,12 @@ coverage:
   range: "70...100"
 
   status:
-    # Coverage of the whole project. We allow a small tolerance so a single
-    # uncovered line in a PR does not turn the build (and main) red.
+    # Coverage of the whole project. We set a fixed 95% bar with a small
+    # tolerance so a single uncovered line in a PR does not turn the build
+    # (and main) red.
     project:
       default:
-        target: auto
+        target: 95%
         # Allow the project coverage to drop by up to 1% before failing.
         threshold: 1%
         # Never fail because the base commit has no coverage report yet.
