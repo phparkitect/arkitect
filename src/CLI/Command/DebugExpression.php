@@ -17,7 +17,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DebugExpression extends Command
 {
-    public static ?string $defaultDescription = <<< 'EOT'
+    /** @var string|null */
+    public static $defaultDescription = <<< 'EOT'
 Check which classes respect an expression
 EOT;
 

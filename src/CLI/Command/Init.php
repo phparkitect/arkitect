@@ -11,7 +11,8 @@ use Webmozart\Assert\Assert;
 
 class Init extends Command
 {
-    public static ?string $defaultDescription = <<< 'EOT'
+    /** @var string|null */
+    public static $defaultDescription = <<< 'EOT'
 Creates a new phparkitect.php file
 EOT;
 
