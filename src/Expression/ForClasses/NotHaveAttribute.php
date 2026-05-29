@@ -13,8 +13,7 @@ use Arkitect\Rules\Violations;
 
 final class NotHaveAttribute implements Expression
 {
-    /** @var string */
-    private $attribute;
+    private string $attribute;
 
     public function __construct(string $attribute)
     {

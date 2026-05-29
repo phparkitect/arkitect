@@ -14,8 +14,7 @@ use Arkitect\Rules\Violations;
 
 class NotHaveTrait implements Expression
 {
-    /** @var string */
-    private $trait;
+    private string $trait;
 
     public function __construct(string $trait)
     {

@@ -17,13 +17,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DebugExpression extends Command
 {
-    /** @var string|null */
-    public static $defaultDescription = <<< 'EOT'
+    public static ?string $defaultDescription = <<< 'EOT'
 Check which classes respect an expression
 EOT;
 
-    /** @var string */
-    public static $help = <<< 'EOT'
+    public static string $help = <<< 'EOT'
 Check which classes respect an expression
 EOT;
 

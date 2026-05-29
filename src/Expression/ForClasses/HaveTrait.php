@@ -12,8 +12,7 @@ use Arkitect\Rules\Violations;
 
 final class HaveTrait implements Expression
 {
-    /** @var string */
-    private $trait;
+    private string $trait;
 
     public function __construct(string $trait)
     {

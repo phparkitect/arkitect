@@ -13,8 +13,7 @@ use Arkitect\Rules\Violations;
 
 class ContainDocBlockLike implements Expression
 {
-    /** @var string */
-    private $docBlock;
+    private string $docBlock;
 
     public function __construct(string $docBlock)
     {

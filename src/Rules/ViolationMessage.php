@@ -8,10 +8,8 @@ use Arkitect\Expression\Description;
 
 class ViolationMessage
 {
-    /** @var string */
-    private $rule;
-    /** @var string|null */
-    private $violation;
+    private string $rule;
+    private ?string $violation;
 
     private function __construct(string $rule, ?string $violation)
     {
