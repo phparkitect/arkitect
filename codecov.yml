@@ -1,0 +1,42 @@
+coverage:
+  # Round and show coverage as a percentage with two decimals.
+  precision: 2
+  round: down
+  range: "70...100"
+
+  status:
+    # Coverage of the whole project. We allow a small tolerance so a single
+    # uncovered line in a PR does not turn the build (and main) red.
+    project:
+      default:
+        target: auto
+        # Allow the project coverage to drop by up to 1% before failing.
+        threshold: 1%
+        # Never fail because the base commit has no coverage report yet.
+        if_ci_failed: error
+
+    # Coverage of the lines changed/added by a PR. We don't require 100% of
+    # every new line to be covered, otherwise a single untested line fails.
+    patch:
+      default:
+        target: 80%
+        threshold: 5%
+
+# Don't post a comment on every PR push; update the existing one instead.
+comment:
+  layout: "reach, diff, flags, files"
+  behavior: default
+  require_changes: false
+
+# Wait for the (single) coverage upload before computing the status, so the
+# check doesn't run against a partial report.
+codecov:
+  require_ci_to_pass: true
+  notify:
+    wait_for_ci: true
+
+ignore:
+  - "tests"
+  - "examples"
+  - "bin"
+  - "bin-stub"
