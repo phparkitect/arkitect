@@ -9,8 +9,7 @@ use Arkitect\Expression\Expression;
 
 class Constraints
 {
-    /** @var array */
-    private $expressions = [];
+    private array $expressions = [];
 
     public function add(Expression $expression): void
     {

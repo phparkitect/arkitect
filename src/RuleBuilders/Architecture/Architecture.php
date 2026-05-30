@@ -10,14 +10,13 @@ use Arkitect\Rules\Rule;
 
 class Architecture implements Component, DefinedBy, Where, MayDependOnComponents, MayDependOnAnyComponent, ShouldNotDependOnAnyComponent, ShouldOnlyDependOnComponents, Rules
 {
-    /** @var string */
-    private $componentName;
+    private string $componentName;
     /** @var array<string, string> */
-    private $componentSelectors;
+    private array $componentSelectors;
     /** @var array<string, array<string>> */
-    private $allowedDependencies;
+    private array $allowedDependencies;
     /** @var array<string, array<string>> */
-    private $componentDependsOnlyOnTheseNamespaces;
+    private array $componentDependsOnlyOnTheseNamespaces;
 
     private function __construct()
     {

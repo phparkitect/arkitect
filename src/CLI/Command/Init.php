@@ -16,8 +16,7 @@ class Init extends Command
 Creates a new phparkitect.php file
 EOT;
 
-    /** @var string */
-    public static $help = <<< 'EOT'
+    public static string $help = <<< 'EOT'
 This command creates a new phparkitect.php in the current directory
 You can customize the directory where the file is created specifying <comment>-d /dest/path</comment>
 EOT;

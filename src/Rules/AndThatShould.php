@@ -9,8 +9,7 @@ use Arkitect\Rules\DSL\BecauseParser;
 
 class AndThatShould implements AndThatShouldParser
 {
-    /** @var RuleBuilder */
-    private $ruleBuilder;
+    private RuleBuilder $ruleBuilder;
 
     public function __construct(RuleBuilder $expressionBuilder)
     {
