@@ -61,4 +61,9 @@ class Violation implements \JsonSerializable
     {
         return new self($json['fqcn'], $json['error'], $json['line'], $json['filePath'] ?? null);
     }
+
+    public function withoutLineNumber(): self
+    {
+        return new self($this->fqcn, $this->error, null, $this->filePath);
+    }
 }

@@ -237,6 +237,42 @@ class ViolationsTest extends TestCase
         self::assertCount(0, $violations);
     }
 
+    public function test_violation_without_line_number_returns_copy_with_null_line(): void
+    {
+        $violation = new Violation('App\Foo', 'some error', 42, '/src/Foo.php');
+        $stripped = $violation->withoutLineNumber();
+
+        self::assertNull($stripped->getLine());
+        self::assertEquals('App\Foo', $stripped->getFqcn());
+        self::assertEquals('some error', $stripped->getError());
+        self::assertEquals('/src/Foo.php', $stripped->getFilePath());
+    }
+
+    public function test_without_line_numbers_strips_all_line_numbers(): void
+    {
+        $violations = new Violations();
+        $violations->add(new Violation('App\Foo', 'some error', 42, '/src/Foo.php'));
+        $violations->add(new Violation('App\Bar', 'other error', 10, '/src/Bar.php'));
+
+        $stripped = $violations->withoutLineNumbers();
+
+        self::assertCount(2, $stripped);
+        self::assertNull($stripped->get(0)->getLine());
+        self::assertNull($stripped->get(1)->getLine());
+        self::assertEquals('App\Foo', $stripped->get(0)->getFqcn());
+        self::assertEquals('App\Bar', $stripped->get(1)->getFqcn());
+    }
+
+    public function test_without_line_numbers_does_not_mutate_original(): void
+    {
+        $violations = new Violations();
+        $violations->add(new Violation('App\Foo', 'some error', 42, '/src/Foo.php'));
+
+        $violations->withoutLineNumbers();
+
+        self::assertEquals(42, $violations->get(0)->getLine());
+    }
+
     public function test_remove_violations_from_violations_ignore_linenumber(): void
     {
         $violation1 = new Violation(

@@ -109,6 +109,16 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
         $this->violations = array_values($this->violations);
     }
 
+    public function withoutLineNumbers(): self
+    {
+        $copy = new self();
+        foreach ($this->violations as $violation) {
+            $copy->add($violation->withoutLineNumber());
+        }
+
+        return $copy;
+    }
+
     public function sort(): void
     {
         usort($this->violations, static fn (Violation $v1, Violation $v2): int => $v1 <=> $v2);
