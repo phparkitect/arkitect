@@ -10,6 +10,7 @@
 1. [Usage](#usage)
 1. [Available rules](#available-rules)
 1. [Rule Builders](#rule-builders)
+1. [Configuration reference](#configuration-reference)
 1. [Integrations](#integrations)
 
 # Introduction
@@ -643,18 +644,6 @@ $rules[] = $domainClasses
 
 Each branch is independent — modifying one does not affect the other.
 
-## Optional parameters and options
-You can add parameters when you launch the tool. At the moment you can add these parameters and options: 
-* `-v` : with this option you launch Arkitect with the verbose mode to see every parsed file
-* `--config`: with this parameter, you can specify your config file instead of the default. like this:
-```
-phparkitect check --config=/project/yourConfigFile.php
-```
-* `--target-php-version`: With this parameter, you can specify which PHP version should use the parser. This can be useful to debug problems and to understand if there are problems with a different PHP version.
-Supported PHP versions are: 8.0, 8.1, 8.2, 8.3, 8.4, 8.5
- * `--stop-on-failure`: With this option the process will end immediately after the first violation.
- * `--autoload`: specify the path of an autoload file to be loaded when running phparkitect.
-
 ## Run only a specific rule
 For some reasons, you might want to run only a specific rule, you can do it using `runOnlyThis` like this:
 
@@ -666,6 +655,29 @@ $rules[] = Rule::allClasses()
     ->because('we want uniform naming')
     ->runOnlyThis();
 ```
+
+# Configuration reference
+
+Every setting lives in one of two places:
+
+- a **command-line option** of the `check` command (e.g. `phparkitect check --stop-on-failure`), each with a short alias;
+- a **method on the `Config` object** inside your `phparkitect.php` file.
+
+Most settings are available in both. When a setting is set in both places, the command-line option wins. The table below lists every setting; follow the links for the detailed explanation.
+
+| Option | Alias | Config method | Description |
+| --- | --- | --- | --- |
+| `--target-php-version` | `-t` | `targetPhpVersion()` | PHP version the parser targets: `8.0`–`8.5` (default: latest). |
+| `--stop-on-failure` | `-s` | `stopOnFailure()` | Stop at the first violation instead of collecting them all. |
+| `--format` | `-f` | `format()` | Report format: `text` (default), `json` or `gitlab`. See [Output format](#output-format). |
+| `--autoload` | `-a` | `autoloadFilePath()` | Autoload file to load first. **Required** for the PHAR with custom rules. See [Using a Phar](#using-a-phar). |
+| `--use-baseline` | `-b` | `baselineFilePath()` | Baseline file to ignore known violations. See [baseline](#using-a-baseline-file). |
+| `--skip-baseline` | `-k` | `skipBaseline()` | Ignore the default baseline even if present. See [baseline](#using-a-baseline-file). |
+| `--ignore-baseline-linenumbers` | `-i` | `ignoreBaselineLinenumbers()` | Match the baseline ignoring line numbers. See [Line numbers in baseline](#line-numbers-in-baseline). |
+| `--config` | `-c` | — | Configuration file to load (default `phparkitect.php`). See [Usage](#usage). |
+| `--generate-baseline` | `-g` | — | Write current violations to a baseline file instead of failing. See [baseline](#using-a-baseline-file). |
+| `--verbose` | `-v` | — | Print every parsed file instead of the progress bar. |
+| — | — | `skipParsingCustomAnnotations()` | Disable parsing of custom DocBlock annotations (e.g. `@Assert\NotBlank`). On by default. See [Configuration](#configuration). |
 
 # Integrations
 
