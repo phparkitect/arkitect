@@ -667,15 +667,15 @@ Most settings are available in both. When a setting is set in both places, the c
 
 | Option | Alias | Config method | Description |
 | --- | --- | --- | --- |
-| `--config` | `-c` | — | Configuration file to load (default `phparkitect.php`). See [Usage](#usage). |
 | `--target-php-version` | `-t` | `targetPhpVersion()` | PHP version the parser targets: `8.0`–`8.5` (default: latest). |
 | `--stop-on-failure` | `-s` | `stopOnFailure()` | Stop at the first violation instead of collecting them all. |
 | `--format` | `-f` | `format()` | Report format: `text` (default), `json` or `gitlab`. See [Output format](#output-format). |
 | `--autoload` | `-a` | `autoloadFilePath()` | Autoload file to load first. **Required** for the PHAR with custom rules. See [Using a Phar](#using-a-phar). |
-| `--generate-baseline` | `-g` | — | Write current violations to a baseline file instead of failing. See [baseline](#using-a-baseline-file). |
 | `--use-baseline` | `-b` | `baselineFilePath()` | Baseline file to ignore known violations. See [baseline](#using-a-baseline-file). |
 | `--skip-baseline` | `-k` | `skipBaseline()` | Ignore the default baseline even if present. See [baseline](#using-a-baseline-file). |
 | `--ignore-baseline-linenumbers` | `-i` | `ignoreBaselineLinenumbers()` | Match the baseline ignoring line numbers. See [Line numbers in baseline](#line-numbers-in-baseline). |
+| `--config` | `-c` | — | Configuration file to load (default `phparkitect.php`). See [Usage](#usage). |
+| `--generate-baseline` | `-g` | — | Write current violations to a baseline file instead of failing. See [baseline](#using-a-baseline-file). |
 | `--verbose` | `-v` | — | Print every parsed file instead of the progress bar. |
 | — | — | `skipParsingCustomAnnotations()` | Disable parsing of custom DocBlock annotations (e.g. `@Assert\NotBlank`). On by default. See [Configuration](#configuration). |
 
