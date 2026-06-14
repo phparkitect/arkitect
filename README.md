@@ -681,11 +681,10 @@ All options below apply to the `check` command, e.g. `phparkitect check --stop-o
 
 ## Configuration file methods
 
-Inside the function returned by your `phparkitect.php` file you receive a `Config` object. Besides registering your class sets and rules with `add()`, it exposes the following methods:
+Inside the function returned by your `phparkitect.php` file you receive a `Config` object. Besides registering your class sets and rules with `add()` (see [Configuration](#configuration)), it exposes the following methods:
 
 | Method | Description |
 | --- | --- |
-| `add(ClassSet $classSet, ArchRule ...$rules)` | Register a set of classes together with the rules that must hold for them. Can be called multiple times. See [Configuration](#configuration). |
 | `skipParsingCustomAnnotations()` | Disable parsing of custom DocBlock annotations (e.g. `@Assert\NotBlank`, `@Serializer\Expose`). Enabled by default. See [Configuration](#configuration). |
 | `stopOnFailure(bool)` | Equivalent of the `--stop-on-failure` option. |
 | `targetPhpVersion(TargetPhpVersion)` | Equivalent of the `--target-php-version` option. |
@@ -694,8 +693,6 @@ Inside the function returned by your `phparkitect.php` file you receive a `Confi
 | `baselineFilePath(?string)` | Equivalent of the `--use-baseline` option. |
 | `skipBaseline(bool)` | Equivalent of the `--skip-baseline` option. |
 | `ignoreBaselineLinenumbers(bool)` | Equivalent of the `--ignore-baseline-linenumbers` option. |
-
-Rules also expose a [`runOnlyThis()`](#run-only-a-specific-rule) helper to run a single rule, and an [`except()`](#excluding-classes-when-parser-run) helper to exclude classes from parsing.
 
 # Integrations
 
