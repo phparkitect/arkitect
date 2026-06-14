@@ -658,52 +658,26 @@ $rules[] = Rule::allClasses()
 
 # Configuration reference
 
-PHPArkitect can be configured in two places: through **command-line options** passed to the `check` command, and through **methods on the `Config` object** inside your `phparkitect.php` file. This section collects all of them in one place. The dedicated paragraphs linked in each description explain the behaviour in more detail.
+Every setting lives in one of two places:
 
-## Command-line options
+- a **command-line option** of the `check` command (e.g. `phparkitect check --stop-on-failure`), each with a short alias;
+- a **method on the `Config` object** inside your `phparkitect.php` file.
 
-All options below apply to the `check` command, e.g. `phparkitect check --stop-on-failure`. Each option has a short alias.
+Most settings are available in both. When a setting is set in both places, the command-line option wins. The table below lists every setting; follow the links for the detailed explanation.
 
-| Option | Alias | Value | Default | Description |
-| --- | --- | --- | --- | --- |
-| `--config` | `-c` | path | `phparkitect.php` | Path to the configuration file to load instead of the default. See [Usage](#usage). |
-| `--target-php-version` | `-t` | version | latest supported | PHP version the parser should target. Supported: `8.0`, `8.1`, `8.2`, `8.3`, `8.4`, `8.5`. Useful to reproduce issues on a specific PHP version. |
-| `--stop-on-failure` | `-s` | flag | off | Stop the analysis immediately after the first violation, instead of collecting them all. |
-| `--format` | `-f` | `text` \| `json` \| `gitlab` | `text` | Output format for the report. See [Output format](#output-format). |
-| `--autoload` | `-a` | path | none | Path to an autoload file to load before running. **Required** when running the PHAR with custom rules that need your project's classes. See [Using a Phar](#using-a-phar). |
-| `--generate-baseline` | `-g` | path (optional) | `phparkitect-baseline.json` | Generate a baseline file with the current violations instead of failing. See [Using a baseline file](#using-a-baseline-file). |
-| `--use-baseline` | `-b` | path | auto-detected | Use a specific baseline file to ignore known violations. See [Using a baseline file](#using-a-baseline-file). |
-| `--skip-baseline` | `-k` | flag | off | Do not use the default baseline file even if it exists. See [Using a baseline file](#using-a-baseline-file). |
-| `--ignore-baseline-linenumbers` | `-i` | flag | off | Ignore line numbers when matching violations against the baseline. See [Line numbers in baseline](#line-numbers-in-baseline). |
-| `--verbose` | `-v` | flag | off | Debug progress: print every parsed file instead of the progress bar. |
-
-> **Note**: most of these options have an equivalent method on the `Config` object (see below). When both are set, the command-line option wins, because it is applied on top of the loaded configuration file.
-
-## Configuration file methods
-
-Inside the function returned by your `phparkitect.php` file you receive a `Config` object. Besides registering your class sets and rules with `add()` (see [Configuration](#configuration)), it exposes the following methods.
-
-### File-only settings
-
-These settings can be configured **only** from the configuration file, they have no command-line equivalent:
-
-| Method | Description |
-| --- | --- |
-| `skipParsingCustomAnnotations()` | Disable parsing of custom DocBlock annotations (e.g. `@Assert\NotBlank`, `@Serializer\Expose`). Enabled by default. See [Configuration](#configuration). |
-
-### Settings shared with the command line
-
-These methods mirror a command-line option. When both are set, the command-line option wins (it is applied on top of the loaded configuration file):
-
-| Method | Equivalent option |
-| --- | --- |
-| `stopOnFailure(bool)` | `--stop-on-failure` |
-| `targetPhpVersion(TargetPhpVersion)` | `--target-php-version` |
-| `format(string)` | `--format` |
-| `autoloadFilePath(?string)` | `--autoload` |
-| `baselineFilePath(?string)` | `--use-baseline` |
-| `skipBaseline(bool)` | `--skip-baseline` |
-| `ignoreBaselineLinenumbers(bool)` | `--ignore-baseline-linenumbers` |
+| Option | Alias | Config method | Description |
+| --- | --- | --- | --- |
+| `--config` | `-c` | — | Configuration file to load (default `phparkitect.php`). See [Usage](#usage). |
+| `--target-php-version` | `-t` | `targetPhpVersion()` | PHP version the parser targets: `8.0`–`8.5` (default: latest). |
+| `--stop-on-failure` | `-s` | `stopOnFailure()` | Stop at the first violation instead of collecting them all. |
+| `--format` | `-f` | `format()` | Report format: `text` (default), `json` or `gitlab`. See [Output format](#output-format). |
+| `--autoload` | `-a` | `autoloadFilePath()` | Autoload file to load first. **Required** for the PHAR with custom rules. See [Using a Phar](#using-a-phar). |
+| `--generate-baseline` | `-g` | — | Write current violations to a baseline file instead of failing. See [baseline](#using-a-baseline-file). |
+| `--use-baseline` | `-b` | `baselineFilePath()` | Baseline file to ignore known violations. See [baseline](#using-a-baseline-file). |
+| `--skip-baseline` | `-k` | `skipBaseline()` | Ignore the default baseline even if present. See [baseline](#using-a-baseline-file). |
+| `--ignore-baseline-linenumbers` | `-i` | `ignoreBaselineLinenumbers()` | Match the baseline ignoring line numbers. See [Line numbers in baseline](#line-numbers-in-baseline). |
+| `--verbose` | `-v` | — | Print every parsed file instead of the progress bar. |
+| — | — | `skipParsingCustomAnnotations()` | Disable parsing of custom DocBlock annotations (e.g. `@Assert\NotBlank`). On by default. See [Configuration](#configuration). |
 
 # Integrations
 
