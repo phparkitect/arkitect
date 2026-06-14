@@ -681,18 +681,29 @@ All options below apply to the `check` command, e.g. `phparkitect check --stop-o
 
 ## Configuration file methods
 
-Inside the function returned by your `phparkitect.php` file you receive a `Config` object. Besides registering your class sets and rules with `add()` (see [Configuration](#configuration)), it exposes the following methods:
+Inside the function returned by your `phparkitect.php` file you receive a `Config` object. Besides registering your class sets and rules with `add()` (see [Configuration](#configuration)), it exposes the following methods.
+
+### File-only settings
+
+These settings can be configured **only** from the configuration file, they have no command-line equivalent:
 
 | Method | Description |
 | --- | --- |
 | `skipParsingCustomAnnotations()` | Disable parsing of custom DocBlock annotations (e.g. `@Assert\NotBlank`, `@Serializer\Expose`). Enabled by default. See [Configuration](#configuration). |
-| `stopOnFailure(bool)` | Equivalent of the `--stop-on-failure` option. |
-| `targetPhpVersion(TargetPhpVersion)` | Equivalent of the `--target-php-version` option. |
-| `format(string)` | Equivalent of the `--format` option. |
-| `autoloadFilePath(?string)` | Equivalent of the `--autoload` option. |
-| `baselineFilePath(?string)` | Equivalent of the `--use-baseline` option. |
-| `skipBaseline(bool)` | Equivalent of the `--skip-baseline` option. |
-| `ignoreBaselineLinenumbers(bool)` | Equivalent of the `--ignore-baseline-linenumbers` option. |
+
+### Settings shared with the command line
+
+These methods mirror a command-line option. When both are set, the command-line option wins (it is applied on top of the loaded configuration file):
+
+| Method | Equivalent option |
+| --- | --- |
+| `stopOnFailure(bool)` | `--stop-on-failure` |
+| `targetPhpVersion(TargetPhpVersion)` | `--target-php-version` |
+| `format(string)` | `--format` |
+| `autoloadFilePath(?string)` | `--autoload` |
+| `baselineFilePath(?string)` | `--use-baseline` |
+| `skipBaseline(bool)` | `--skip-baseline` |
+| `ignoreBaselineLinenumbers(bool)` | `--ignore-baseline-linenumbers` |
 
 # Integrations
 
