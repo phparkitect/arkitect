@@ -677,7 +677,7 @@ Most settings are available in both. When a setting is set in both places, the c
 | `--config` | `-c` | — | Configuration file to load (default `phparkitect.php`). See [Usage](#usage). |
 | `--generate-baseline` | `-g` | — | Write current violations to a baseline file instead of failing. See [baseline](#using-a-baseline-file). |
 | `--verbose` | `-v` | — | Print every parsed file instead of the progress bar. |
-| — | — | `skipParsingCustomAnnotations()` | Disable parsing of custom DocBlock annotations (e.g. `@Assert\NotBlank`). On by default. See [Configuration](#configuration). |
+| — | — | `skipParsingCustomAnnotations()` | Disable parsing of custom DocBlock annotations (e.g. `@Assert\NotBlank`); parsing is enabled by default. See [Configuration](#configuration). |
 
 # Integrations
 
