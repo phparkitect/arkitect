@@ -164,7 +164,7 @@ class Check extends Command
             if (false !== $generateBaseline) {
                 $result = $runner->baseline($config, $progress);
 
-                $baselineFilePath = Baseline::save($generateBaseline, self::DEFAULT_BASELINE_FILENAME, $result->getViolations());
+                $baselineFilePath = Baseline::save($generateBaseline, self::DEFAULT_BASELINE_FILENAME, $result->getViolations(), $ignoreBaselineLinenumbers);
 
                 $output->writeln("ℹ️ Baseline file '$baselineFilePath' created!");
 
