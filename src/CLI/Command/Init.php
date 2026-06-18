@@ -54,7 +54,7 @@ EOT;
 
             if (file_exists($destFilePath)) {
                 $output->writeln('<info>File</info> phparkitect.php <info>found in current directory, nothing to do</info>');
-                $output->writeln('<info>You are good to go, customize it and run with </info>php bin/phparkitect check');
+                $output->writeln('<info>You are good to go, customize it and run with </info>phparkitect check');
 
                 return 0;
             }
@@ -73,7 +73,7 @@ EOT;
             copy($sourceFilePath, $destFilePath);
 
             $output->writeln('<info> done</info>');
-            $output->writeln('<info>customize it and run with </info>php bin/phparkitect check');
+            $output->writeln('<info>customize it and run with </info>phparkitect check');
         } catch (\Throwable $e) {
             $output->writeln('');
             $output->writeln('<error>Ops, something went wrong: </error>');
