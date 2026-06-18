@@ -8,6 +8,7 @@
 1. [Quick Start](#quick-start)
 1. [Installation](#installation)
 1. [Usage](#usage)
+1. [Commands](#commands)
 1. [Available rules](#available-rules)
 1. [Rule Builders](#rule-builders)
 1. [Configuration reference](#configuration-reference)
@@ -90,6 +91,8 @@ return static function (Config $config): void {
     $config->add($classSet, ...$rules);
 };
 ```
+
+> 💡 Don't want to write it by hand? Run `phparkitect init` to scaffold a ready-to-edit `phparkitect.php` in the current directory. See [The `init` command](#the-init-command).
 
 ## 3. Run the check
 
@@ -229,11 +232,50 @@ If you want to disable this feature you can add this simple configuration:
 $config->skipParsingCustomAnnotations();
 ```
 
+# Commands
+
+Besides `check`, PHPArkitect ships a couple of helper commands.
+
+## The `init` command
+
+Scaffolds a new `phparkitect.php` configuration file so you don't have to write it from scratch:
+
+```
+phparkitect init
+```
+
+If a `phparkitect.php` already exists in the target directory, the command leaves it untouched.
+
+| Option | Alias | Description |
+|---|---|---|
+| `--dest-dir` | `-d` | Directory where the file is created (default: current directory). |
+
+```
+phparkitect init --dest-dir=/path/to/dir
+```
+
+## The `debug:expression` command
+
+Lists which classes in a directory satisfy a given [expression](#available-rules). It's handy to test how a rule behaves before adding it to your config:
+
+```
+phparkitect debug:expression <Expression> [arguments...]
+```
+
+For example, to see every class that resides in the `App` namespace:
+
+```
+phparkitect debug:expression ResideInOneOfTheseNamespaces App
+```
+
+`<Expression>` is the short class name of any expression under `Arkitect\Expression\ForClasses` (see [Available rules](#available-rules)); the arguments are the same you would pass to its constructor.
+
+| Option | Alias | Description |
+|---|---|---|
+| `--from-dir` | `-d` | Directory in which to search for classes (default: current directory). |
+| `--target-php-version` | `-t` | PHP version the parser targets. |
+
 # Available rules
-
-**Hint**: If you want to test how a Rule work, you can use the command like `phparkitect debug:expression <RuleName> <arguments>` to check which class satisfy the rule in your current folder.
-
-For example: `phparkitect debug:expression ResideInOneOfTheseNamespaces App`
 
 ---
 
