@@ -11,6 +11,8 @@ Rule::allClasses()
     ->because('the domain must not depend on infrastructure');
 ```
 
+> Upgrading from an older version? Check [UPGRADE.md](UPGRADE.md) for breaking changes.
+
 ## Quick Start
 
 **1. Install**
