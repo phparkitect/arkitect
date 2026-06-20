@@ -176,8 +176,3 @@ When using the Phar with custom rules that need your project's autoloader:
 
 → Full reference with code examples and rule builders: [`docs/rules.md`](docs/rules.md)
 
-## Integrations
-
-If you use Laravel, [smortexa](https://github.com/smortexa) maintains a wrapper with predefined rules: [laravel-arkitect](https://github.com/smortexa/laravel-arkitect).
-
-For a full working example, see the [arkitect-demo](https://github.com/phparkitect/arkitect-demo) project.
