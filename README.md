@@ -134,7 +134,7 @@ Every setting can be passed as a CLI option or set via the corresponding `Config
 
 | Option | Alias | Config method | Description |
 |---|---|---|---|
-| `--target-php-version` | `-t` | `targetPhpVersion()` | PHP version the parser targets: `8.0`–`8.5` (default: latest). |
+| `--target-php-version` | `-t` | `targetPhpVersion()` | PHP version the parser targets: `8.0`–`8.5` (default: current runtime version). |
 | `--stop-on-failure` | `-s` | `stopOnFailure()` | Stops at the first violation instead of collecting them all. |
 | `--format` | `-f` | `format()` | Report format: `text` (default), `json` or `gitlab`. |
 | `--autoload` | `-a` | `autoloadFilePath()` | Autoload file to load before running. Required for all Phar runs. |
