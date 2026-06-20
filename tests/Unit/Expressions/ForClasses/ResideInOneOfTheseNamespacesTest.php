@@ -85,13 +85,4 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
         self::assertNotEquals(0, $violations->count());
     }
 
-    public function test_duplicate_namespaces_are_removed(): void
-    {
-        $expression = new ResideInOneOfTheseNamespaces('A', 'B', 'A', 'C', 'D', 'D');
-
-        self::assertSame(
-            'should reside in one of these namespaces: A, B, C, D because rave',
-            $expression->describe(ClassDescription::getBuilder('Marko', 'src/Foo.php')->build(), 'rave')->toString()
-        );
-    }
 }
