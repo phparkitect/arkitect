@@ -83,7 +83,7 @@ PHPArkitect parses custom DocBlock annotations (`@Assert\NotBlank`, etc.) by def
 | Type | `IsFinal`, `IsAbstract`, `IsReadonly`, `IsInterface`, `IsEnum`, `IsTrait` … |
 | Doc blocks | `ContainDocBlockLike`, `HaveAttribute` |
 
-→ Full reference with code examples and the Component Architecture builder: [`docs/rules.md`](docs/rules.md)
+→ Full reference with code examples: [`docs/rules.md`](docs/rules.md)
 
 ## Commands
 
