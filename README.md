@@ -179,3 +179,8 @@ chmod +x phparkitect.phar
 ```
 
 The `--autoload` option is required for all Phar runs.
+
+## Contributing
+
+Found a bug or missing information? [Open an issue](https://github.com/phparkitect/arkitect/issues).
+Want to contribute? See [CONTRIBUTING.md](CONTRIBUTING.md).
