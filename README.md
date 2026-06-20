@@ -143,8 +143,9 @@ Every setting can be passed as a CLI option or set via the corresponding `Config
 | `--ignore-baseline-linenumbers` | `-i` | `ignoreBaselineLinenumbers()` | Matches baseline violations without checking line numbers. |
 | `--config` | `-c` | — | Configuration file to load (default: `phparkitect.php`). |
 | `--generate-baseline` | `-g` | — | Writes current violations to a baseline file instead of failing. |
-| `--verbose` | `-v` | — | Prints every parsed file instead of the progress bar. |
 | — | — | `skipParsingCustomAnnotations()` | Disables custom DocBlock annotation parsing (enabled by default). |
+
+Symfony Console's standard `-v` / `--verbose` flag is also supported: it prints every parsed file instead of the progress bar.
 
 ### Baseline
 

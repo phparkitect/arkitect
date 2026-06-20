@@ -1,6 +1,6 @@
 # Rules reference
 
-This page documents every built-in rule (expression) and the Component Architecture rule builder.
+This page documents every built-in rule (expression) available in PHPArkitect.
 
 ## Table of contents
 
