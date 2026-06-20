@@ -105,5 +105,4 @@ class ResideInOneOfTheseNamespacesExactlyTest extends TestCase
         $haveNameMatching->evaluate($classDesc, $violations, $because);
         self::assertNotEquals(0, $violations->count());
     }
-
 }
