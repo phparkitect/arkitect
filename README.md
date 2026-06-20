@@ -1,72 +1,52 @@
-# 📐 PHPArkitect 
-[![Latest Stable Version](https://poser.pugx.org/phparkitect/phparkitect/v/stable)](https://packagist.org/packages/phparkitect/phparkitect)  ![PHPArkitect](https://github.com/phparkitect/arkitect/actions/workflows/build.yml/badge.svg)
-[![Packagist](https://img.shields.io/packagist/dt/phparkitect/phparkitect.svg)](https://packagist.org/packages/phparkitect/phparkitect)
-[![codecov](https://codecov.io/gh/phparkitect/arkitect/branch/main/graph/badge.svg)](https://codecov.io/gh/phparkitect/arkitect)
+# 📐 PHPArkitect
 
+[![Latest Stable Version](https://poser.pugx.org/phparkitect/phparkitect/v/stable)](https://packagist.org/packages/phparkitect/phparkitect) ![PHPArkitect](https://github.com/phparkitect/arkitect/actions/workflows/build.yml/badge.svg) [![Packagist](https://img.shields.io/packagist/dt/phparkitect/phparkitect.svg)](https://packagist.org/packages/phparkitect/phparkitect) [![codecov](https://codecov.io/gh/phparkitect/arkitect/branch/main/graph/badge.svg)](https://codecov.io/gh/phparkitect/arkitect)
 
-1. [Introduction](#introduction)
-1. [Quick Start](#quick-start)
-1. [Installation](#installation)
-1. [Usage](#usage)
-1. [Commands](#commands)
-1. [Available rules](#available-rules)
-1. [Rule Builders](#rule-builders)
-1. [Configuration reference](#configuration-reference)
-1. [Integrations](#integrations)
-
-# Introduction
-
-**PHPArkitect** is a tool to enforce architectural constraints in your PHP codebase. It helps you maintain clean architecture by preventing violations of your design rules during development and in CI/CD pipelines.
-
-## Why PHPArkitect?
-
-As projects grow, maintaining architectural consistency becomes challenging. PHPArkitect helps you:
-
-- **Prevent architectural drift**: Ensure your Domain layer doesn't depend on Infrastructure code
-- **Enforce naming conventions**: Make sure all Controllers end with "Controller", all Services with "Service", etc.
-- **Maintain layered architecture**: Keep your application, domain, and infrastructure layers properly separated
-- **Catch violations early**: Get immediate feedback in your IDE or CI pipeline before code review
-- **Document architecture as code**: Your architectural rules become executable and self-documenting
-
-## Example
-
-You can express architectural constraints in simple, readable PHP code:
+**PHPArkitect** lets you write architectural rules for your PHP codebase as plain PHP code and verify them in CI. Think of it as a test suite for your architecture: if a class in `App\Domain` imports something from `App\Infrastructure`, the check fails.
 
 ```php
-Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
-    ->should(new HaveNameMatching('*Controller'))
-    ->because('it\'s a symfony naming convention');
-
 Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
     ->should(new NotHaveDependencyOutsideNamespace('App\Domain'))
-    ->because('we want to protect our domain from external dependencies');
+    ->because('the domain must not depend on infrastructure');
 ```
 
-Since selecting classes by namespace is very common, there's a convenient shortcut:
+## Quick Start
 
-```php
-Rule::namespace('App\Controller')
-    ->should(new HaveNameMatching('*Controller'))
-    ->because('it\'s a symfony naming convention');
-```
-
-You can also specify multiple namespaces: `Rule::namespace('App\Controller', 'App\Service')`.
-
-# Quick Start
-
-Get started with PHPArkitect in 3 simple steps:
-
-## 1. Install via Composer
+**1. Install**
 
 ```bash
 composer require --dev phparkitect/phparkitect
 ```
 
-## 2. Create a configuration file
+**2. Create a config file**
 
-Create a `phparkitect.php` file in your project root:
+```bash
+vendor/bin/phparkitect init
+```
+
+This scaffolds `phparkitect.php` in the current directory. Edit it to add your rules.
+
+**3. Run**
+
+```bash
+vendor/bin/phparkitect check
+```
+
+PHPArkitect reports every violation with the class name, the broken rule, and the `->because()` message you wrote.
+
+## Core concepts
+
+| Concept | What it is |
+|---|---|
+| `ClassSet` | The set of PHP files to analyse. `ClassSet::fromDir(__DIR__.'/src')` accepts one or more directories. |
+| `Rule` | A constraint: a selector (`that()`), a check (`should()`), and a reason (`because()`). The `because()` string appears verbatim in violation output. |
+| `Expression` | A single, composable condition — used in both `that()` and `should()`. |
+| `except()` | Excludes specific classes from a rule's selector. Accepts wildcards. |
+| `andThat()` | Narrows the selector with additional conditions (all must match). |
+| `runOnlyThis()` | Runs only this rule during `check`; useful for debugging. |
+
+A minimal config file:
 
 ```php
 <?php
@@ -80,8 +60,6 @@ use Arkitect\Rules\Rule;
 
 return static function (Config $config): void {
     $classSet = ClassSet::fromDir(__DIR__.'/src');
-
-    $rules = [];
 
     $rules[] = Rule::allClasses()
         ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
@@ -92,637 +70,117 @@ return static function (Config $config): void {
 };
 ```
 
-> 💡 Don't want to write it by hand? Run `phparkitect init` to scaffold a ready-to-edit `phparkitect.php` in the current directory. See [The `init` command](#the-init-command).
+PHPArkitect parses custom DocBlock annotations (`@Assert\NotBlank`, etc.) by default; call `$config->skipParsingCustomAnnotations()` to disable this.
 
-## 3. Run the check
+## Available rules
 
-```bash
-vendor/bin/phparkitect check
-```
+| Category | Examples |
+|---|---|
+| Namespace | `ResideInOneOfTheseNamespaces`, `NotHaveDependencyOutsideNamespace`, `DependsOnlyOnTheseNamespaces` |
+| Naming | `HaveNameMatching`, `NotHaveNameMatching`, `MatchOneOfTheseNames` |
+| Inheritance | `Extend`, `NotExtend`, `Implement`, `NotImplement`, `IsA`, `IsNotA` |
+| Traits | `HaveTrait`, `NotHaveTrait` |
+| Type | `IsFinal`, `IsAbstract`, `IsReadonly`, `IsInterface`, `IsEnum`, `IsTrait` … |
+| Doc blocks | `ContainDocBlockLike`, `HaveAttribute` |
 
-That's it! PHPArkitect will analyze your code and report any architectural violations.
+→ Full reference with code examples: [`docs/rules.md`](docs/rules.md)
 
-**Next steps**: Check out the [Available rules](#available-rules) section to explore all the constraints you can enforce.
-# Installation
+## Commands
 
-## Using Composer
-
-```bash
-composer require --dev phparkitect/phparkitect
-```
-
-## Using a Phar
-Sometimes your project can conflict with one or more of PHPArkitect's dependencies. In that case you may find the Phar (a self-contained PHP executable) useful.
-
-The Phar can be downloaded from GitHub:
-
-```
-wget https://github.com/phparkitect/arkitect/releases/latest/download/phparkitect.phar
-chmod +x phparkitect.phar
-./phparkitect.phar check
-```
-
- When you run phparkitect as phar and you have custom rules in need of autoloading the project classes you'll need to specify the option `--autoload=[AUTOLOAD_FILE]`. 
-
-# Usage
-
-To use this tool you need to launch a command via Bash:
+### `check`
 
 ```
 phparkitect check
 ```
 
-With this command `phparkitect` will search for the default config file called `phparkitect.php` in the root of your project.
-You can also specify your configuration file using `--config` option like this:
+Looks for `phparkitect.php` in the current directory by default. Use `--config` to point to a different file:
 
 ```
 phparkitect check --config=/project/yourConfigFile.php
 ```
 
-By default, a progress bar will show the status of the ongoing analysis.
+### `init`
 
-### Using a baseline file
-
-If there are a lot of violations in your codebase and you can't fix them now, 
-you can use the baseline feature to instruct the tool to ignore past violations.
-
-To create a baseline file, run the `check` command with the `generate-baseline` parameter as follows:
+Scaffolds a `phparkitect.php` so you don't have to write it from scratch:
 
 ```
-phparkitect check --generate-baseline
-```
-This will create a `phparkitect-baseline.json`, if you want a different file name you can do it with:
-```
-phparkitect check --generate-baseline=my-baseline.json
+phparkitect init [--dest-dir=<path>]
 ```
 
-It will produce a json file with the current list of violations.  
+If a `phparkitect.php` already exists, the command leaves it untouched.
 
-If a baseline file with the default name is present, it will be used automatically.
+### `debug:expression`
 
-To use a different baseline file, run the `check` command with the `use-baseline` parameter as follows:
-
-```
-phparkitect check --use-baseline=my-baseline.json
-```
-
-To avoid using the default baseline file, you can use the `skip-baseline` option:
-
-```
-phparkitect check --skip-baseline
-```
-
-### Line numbers in baseline
-
-By default, the baseline check also looks at line numbers of known violations.
-When a line before the offending line changes, the line numbers change and the check fails despite the baseline.
-
-With the optional flag `ignore-baseline-linenumbers`, you can ignore the line numbers of violations:
-
-```
-phparkitect check --ignore-baseline-linenumbers
-```
-
-*Warning*: When ignoring line numbers, phparkitect can no longer discover if a rule is violated additional times in the same file.
-
-## Output format
-
-Output format can be controlled using the parameter `format=[FORMAT]`. There are two available output formats
-* `text`: the default one
-* `json`: this format allows custom report using github action or another platform as Sonarqube and so on... Note that this will suppress any output apart from the violation reporting.
-* `gitlab`: this follows Gitlab's [code quality format](https://docs.gitlab.com/ci/testing/code_quality/#code-quality-report-format). Note that this will suppress any output apart from the violation reporting.
-
-## Configuration
-
-Example of configuration file `phparkitect.php`
-
-```php
-<?php
-declare(strict_types=1);
-
-use Arkitect\ClassSet;
-use Arkitect\CLI\Config;
-use Arkitect\Expression\ForClasses\HaveNameMatching;
-use Arkitect\Expression\ForClasses\NotHaveDependencyOutsideNamespace;
-use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
-use Arkitect\Rules\Rule;
-
-return static function (Config $config): void {
-    $mvcClassSet = ClassSet::fromDir(__DIR__.'/mvc', __DIR__.'/lib/my-lib/src');
-
-    $rules = [];
-
-    $rules[] = Rule::allClasses()
-        ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
-        ->should(new HaveNameMatching('*Controller'))
-        ->because('we want uniform naming');
-
-    $rules[] = Rule::allClasses()
-        ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
-        ->should(new NotHaveDependencyOutsideNamespace('App\Domain'))
-        ->because('we want to protect our domain');
-
-    $config
-        ->add($mvcClassSet, ...$rules);
-};
-```
-PHPArkitect can detect violations also on DocBlocks custom annotations (like `@Assert\NotBlank` or `@Serializer\Expose`).
-If you want to disable this feature you can add this simple configuration:
-```php
-$config->skipParsingCustomAnnotations();
-```
-
-# Commands
-
-Besides `check`, PHPArkitect ships a couple of helper commands.
-
-## The `init` command
-
-Scaffolds a new `phparkitect.php` configuration file so you don't have to write it from scratch:
-
-```
-phparkitect init
-```
-
-If a `phparkitect.php` already exists in the target directory, the command leaves it untouched.
-
-| Option | Alias | Description |
-|---|---|---|
-| `--dest-dir` | `-d` | Directory where the file is created (default: current directory). |
-
-```
-phparkitect init --dest-dir=/path/to/dir
-```
-
-## The `debug:expression` command
-
-Lists which classes in a directory satisfy a given [expression](#available-rules). It's handy to test how a rule behaves before adding it to your config:
+Lists which classes in a directory satisfy a given expression — handy for testing a rule before adding it to your config:
 
 ```
 phparkitect debug:expression <Expression> [arguments...]
 ```
 
-For example, to see every class that resides in the `App` namespace:
+`<Expression>` is the short class name of any expression under `Arkitect\Expression\ForClasses` (see [`docs/rules.md`](docs/rules.md)); arguments match its constructor. For example:
 
 ```
 phparkitect debug:expression ResideInOneOfTheseNamespaces App
 ```
 
-`<Expression>` is the short class name of any expression under `Arkitect\Expression\ForClasses` (see [Available rules](#available-rules)); the arguments are the same you would pass to its constructor.
-
 | Option | Alias | Description |
 |---|---|---|
-| `--from-dir` | `-d` | Directory in which to search for classes (default: current directory). |
+| `--from-dir` | `-d` | Directory to search for classes (default: current directory). |
 | `--target-php-version` | `-t` | PHP version the parser targets. |
 
-# Available rules
+## Configuration reference
 
----
-
-Currently, you can check if a class:
-
-## Namespace
-
-### Reside in a namespace / Not reside in a namespace
-
-```php
-// Enforce that all handlers live in the application layer
-$rules[] = Rule::allClasses()
-    ->that(new HaveNameMatching('*Handler'))
-    ->should(new ResideInOneOfTheseNamespaces('App\Application'))
-    ->because('we want to be sure that all CommandHandlers are in a specific namespace');
-
-// Ensure domain events do not leak into other layers
-$rules[] = Rule::allClasses()
-    ->that(new Extend('App\Domain\Event'))
-    ->should(new NotResideInTheseNamespaces('App\Application', 'App\Infrastructure'))
-    ->because('we want to be sure that all events not reside in wrong layers');
-```
-
-### Reside in a namespace exactly / Not reside in a namespace exactly
-
-These rules check namespace membership **without** matching child namespaces. Unlike `ResideInOneOfTheseNamespaces` which matches recursively, these rules only match classes directly in the given namespace.
-
-```php
-// Only allow entity classes at the root Entity namespace, not in subdirectories
-$rules[] = Rule::allClasses()
-    ->that(new HaveNameMatching('*Entity'))
-    ->should(new ResideInOneOfTheseNamespacesExactly('App\Domain\Entity'))
-    ->because('we want entity classes only in the root Entity namespace, not in subdirectories');
-
-// Prevent classes from sitting directly at the Legacy namespace root
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Legacy'))
-    ->should(new NotResideInOneOfTheseNamespacesExactly('App\Legacy'))
-    ->because('we want to avoid classes directly in the Legacy namespace root');
-```
-
-For example, with namespace `App\Domain\Entity`:
-- `App\Domain\Entity\User` ✅ matches `ResideInOneOfTheseNamespacesExactly`
-- `App\Domain\Entity\ValueObject\Email` ❌ does not match (child namespace)
-
-### Depends on a namespace / Not depends on a namespace
-
-```php
-// Allow only specific external dependencies in the domain
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
-    ->should(new DependsOnlyOnTheseNamespaces(['App\Domain', 'Ramsey\Uuid'], ['App\Excluded']))
-    ->because('we want to protect our domain from external dependencies except for Ramsey\Uuid');
-
-// Prevent the application layer from depending on infrastructure
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Application'))
-    ->should(new NotDependsOnTheseNamespaces(['App\Infrastructure'], ['App\Infrastructure\Repository']))
-    ->because('we want to avoid coupling between application layer and infrastructure layer');
-```
-
-### Don't have dependency outside a namespace
-
-```php
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
-    ->should(new NotHaveDependencyOutsideNamespace('App\Domain', ['Ramsey\Uuid']))
-    ->because('we want to protect our domain except for Ramsey\Uuid');
-```
-
-*Note: PHP core classes (e.g., `DateTime`, `Exception`, `PDO`) are automatically excluded from dependency checks.*
-
----
-
-## Naming
-
-### Have a name matching a pattern / Not have a name matching a pattern
-
-```php
-// Enforce a naming convention
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Service'))
-    ->should(new HaveNameMatching('*Service'))
-    ->because('we want uniform naming for services');
-
-// Forbid vague names
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App'))
-    ->should(new NotHaveNameMatching('*Manager'))
-    ->because('*Manager is too vague in naming classes');
-```
-
-### Match one of these names
-
-```php
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
-    ->should(new MatchOneOfTheseNames(['*Controller', '*Action']))
-    ->because('we want controllers to match one of these naming patterns');
-```
-
-*Note: Similar to `HaveNameMatching`, but accepts an array of patterns. The rule passes if the class name matches any of the provided patterns.*
-
----
-
-## Inheritance & Implementation
-
-### Extend another class / Not extend another class
-
-```php
-// All controllers must extend the base class
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
-    ->should(new Extend('App\Controller\AbstractController'))
-    ->because('we want to be sure that all controllers extend AbstractController');
-
-// Admin controllers must not extend the standard base for security reasons
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Controller\Admin'))
-    ->should(new NotExtend('App\Controller\AbstractController'))
-    ->because('we want to be sure that all admin controllers not extend AbstractController for security reasons');
-```
-
-*Note: `Extend` raises a violation when none of the given classes match; `NotExtend` raises a violation when any of them match.*
-
-### Implements an interface / Not implements an interface
-
-```php
-// All controllers must be container-aware
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
-    ->should(new Implement('ContainerAwareInterface'))
-    ->because('all controllers should be container aware');
-
-// Public controllers must not be container-aware
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Infrastructure\RestApi\Public'))
-    ->should(new NotImplement('ContainerAwareInterface'))
-    ->because('all public controllers should not be container aware');
-```
-
-### Is a / Is not a
-
-These rules use PHP's `is_a()` function and therefore match both inheritance and interface implementation.
-
-```php
-// All domain events must derive from the base event type
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Domain\Event'))
-    ->should(new IsA('App\Domain\DomainEvent'))
-    ->because('all events should inherit from or implement DomainEvent');
-
-// No event may extend the deprecated base class
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Domain\Event'))
-    ->should(new IsNotA('App\Domain\DeprecatedEvent'))
-    ->because('no event should extend or implement the deprecated base class');
-```
-
----
-
-## Traits
-
-### Use a trait / Not use a trait
-
-```php
-// Feature tests must use the database transaction trait
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('Tests\Feature'))
-    ->should(new HaveTrait('Illuminate\Foundation\Testing\DatabaseTransactions'))
-    ->because('we want all Feature tests to run transactions');
-
-// Feature tests must not use the refresh-database trait for performance reasons
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('Tests\Feature'))
-    ->should(new NotHaveTrait('Illuminate\Foundation\Testing\RefreshDatabase'))
-    ->because('we want all Feature tests to never refresh the database for performance reasons');
-```
-
----
-
-## Type checks
-
-### Is abstract / Is not abstract
-
-```php
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Customer\Service'))
-    ->should(new IsAbstract())
-    ->because('we want to be sure that classes are abstract in a specific namespace');
-
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
-    ->should(new IsNotAbstract())
-    ->because('we want to avoid abstract classes into our domain');
-```
-
-### Is final / Is not final
-
-```php
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Domain\Aggregates'))
-    ->should(new IsFinal())
-    ->because('we want to be sure that aggregates are final classes');
-
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Infrastructure\Doctrine'))
-    ->should(new IsNotFinal())
-    ->because('we want to be sure that our adapters are not final classes');
-```
-
-### Is readonly / Is not readonly
-
-```php
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Domain\ValueObjects'))
-    ->should(new IsReadonly())
-    ->because('we want to be sure that value objects are readonly classes');
-
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Domain\Entity'))
-    ->should(new IsNotReadonly())
-    ->because('we want to be sure that there are no readonly entities');
-```
-
-### Is trait / Is not trait
-
-```php
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Customer\Service\Traits'))
-    ->should(new IsTrait())
-    ->because('we want to be sure that there are only traits in a specific namespace');
-
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
-    ->should(new IsNotTrait())
-    ->because('we want to avoid traits in our codebase');
-```
-
-### Is interface / Is not interface
-
-```php
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Interfaces'))
-    ->should(new IsInterface())
-    ->because('we want to be sure that all interfaces are in one directory');
-
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('Tests\Integration'))
-    ->should(new IsNotInterface())
-    ->because('we want to be sure that we do not have interfaces in tests');
-```
-
-### Is enum / Is not enum
-
-```php
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Enum'))
-    ->should(new IsEnum())
-    ->because('we want to be sure that all classes are enum');
-
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
-    ->should(new IsNotEnum())
-    ->because('we want to be sure that all classes are not enum');
-```
-
----
-
-## Doc blocks & Attributes
-
-### Doc block contains a string / Doc block not contains a string
-
-```php
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Domain\Events'))
-    ->should(new ContainDocBlockLike('@psalm-immutable'))
-    ->because('we want to enforce immutability');
-
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
-    ->should(new NotContainDocBlockLike('@psalm-immutable'))
-    ->because('we don\'t want to enforce immutability');
-```
-
-### Has an attribute / Does not have an attribute
-
-```php
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
-    ->should(new HaveAttribute('Symfony\Component\HttpKernel\Attribute\AsController'))
-    ->because('it configures the service container');
-
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
-    ->should(new NotHaveAttribute('Deprecated'))
-    ->because('deprecated controllers should be removed, not kept in production');
-```
-
-You can also define components and ensure that a component:
-- should not depend on any component
-- may depend on specific components
-- may depend on any component
-
-Check out [this demo project](https://github.com/phparkitect/arkitect-demo) to get an idea on how write rules.
-
-
-# Rule Builders
-
-PHPArkitect offers some builders that enable you to implement more readable rules for specific contexts. 
-
-### Component Architecture Rule Builder
-
-Thanks to this builder you can define components and enforce dependency constraints between them in a more readable fashion.
-
-```php
-<?php
-
-declare(strict_types=1);
-
-use Arkitect\ClassSet;
-use Arkitect\CLI\Config;
-use Arkitect\Expression\ForClasses\HaveNameMatching;
-use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
-use Arkitect\RuleBuilders\Architecture\Architecture;
-use Arkitect\Rules\Rule;
-
-return static function (Config $config): void {
-    $classSet = ClassSet::fromDir(__DIR__.'/src');
-
-    $layeredArchitectureRules = Architecture::withComponents()
-        ->component('Controller')->definedBy('App\Controller\*')
-        ->component('Service')->definedBy('App\Service\*')
-        ->component('Repository')->definedBy('App\Repository\*')
-        ->component('Entity')->definedBy('App\Entity\*')
-        ->component('Domain')->definedBy('App\Domain\*')
-
-        ->where('Controller')->mayDependOnComponents('Service', 'Entity')
-        ->where('Service')->mayDependOnComponents('Repository', 'Entity')
-        ->where('Repository')->mayDependOnComponents('Entity')
-        ->where('Entity')->shouldNotDependOnAnyComponent()
-        ->where('Domain')->shouldOnlyDependOnComponents('Domain')
-
-        ->rules();
-        
-    // Other rule definitions...
-
-    $config->add($classSet, $serviceNamingRule, $repositoryNamingRule, ...$layeredArchitectureRules);
-};
-```
-
-### Excluding classes when parser run
-If you want to exclude some classes from the parser you can use the `except` function inside your config file like this:
-
-```php
-$rules[] = Rule::allClasses()
-    ->except('App\Controller\FolderController\*')
-    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
-    ->should(new HaveNameMatching('*Controller'))
-    ->because('we want uniform naming');
-```
-
-You can use wildcards or the exact name of a class.
-
-### Combining multiple conditions with `andThat()`
-
-By default, `that()` selects all classes matching a single expression. When you need to narrow the selection further — applying the `should()` check only to classes that satisfy **all** conditions — you can chain one or more `andThat()` calls:
-
-```php
-// Only concrete domain events (non-abstract, named *Event) must be final
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
-    ->andThat(new HaveNameMatching('*Event'))
-    ->andThat(new IsNotAbstract())
-    ->should(new IsFinal())
-    ->because('concrete domain events must be immutable value objects');
-```
-
-A class is checked against `should()` only if it satisfies **every** `that()` / `andThat()` condition. A class that matches the first condition but not the second is silently skipped — no violation is raised.
-
-`andThat()` can be combined with `except()`:
-
-```php
-$rules[] = Rule::allClasses()
-    ->except('App\Controller\LegacyController')
-    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
-    ->andThat(new HaveAttribute('Symfony\Component\HttpKernel\Attribute\AsController'))
-    ->should(new IsFinal())
-    ->because('active controllers must be final');
-```
-
-You can also reuse a partially-built rule to create independent branches:
-
-```php
-$domainClasses = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Domain'));
-
-$rules[] = $domainClasses
-    ->andThat(new HaveNameMatching('*Event'))
-    ->should(new IsFinal())
-    ->because('domain events must be final');
-
-$rules[] = $domainClasses
-    ->andThat(new HaveNameMatching('*Service'))
-    ->should(new IsNotAbstract())
-    ->because('domain services must be concrete');
-```
-
-Each branch is independent — modifying one does not affect the other.
-
-## Run only a specific rule
-For some reasons, you might want to run only a specific rule, you can do it using `runOnlyThis` like this:
-
-```php
-$rules[] = Rule::allClasses()
-    ->except('App\Controller\FolderController\*')
-    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
-    ->should(new HaveNameMatching('*Controller'))
-    ->because('we want uniform naming')
-    ->runOnlyThis();
-```
-
-# Configuration reference
-
-Every setting lives in one of two places:
-
-- a **command-line option** of the `check` command (e.g. `phparkitect check --stop-on-failure`), each with a short alias;
-- a **method on the `Config` object** inside your `phparkitect.php` file.
-
-Most settings are available in both. When a setting is set in both places, the command-line option wins. The table below lists every setting; follow the links for the detailed explanation.
+Every setting can be passed as a CLI option or set via the corresponding `Config` method. When both are set, **the CLI option wins**.
 
 | Option | Alias | Config method | Description |
-| --- | --- | --- | --- |
-| `--target-php-version` | `-t` | `targetPhpVersion()` | PHP version the parser targets: `8.0`–`8.5` (default: latest). |
-| `--stop-on-failure` | `-s` | `stopOnFailure()` | Stop at the first violation instead of collecting them all. |
-| `--format` | `-f` | `format()` | Report format: `text` (default), `json` or `gitlab`. See [Output format](#output-format). |
-| `--autoload` | `-a` | `autoloadFilePath()` | Autoload file to load first. **Required** for the PHAR with custom rules. See [Using a Phar](#using-a-phar). |
-| `--use-baseline` | `-b` | `baselineFilePath()` | Baseline file to ignore known violations. See [baseline](#using-a-baseline-file). |
-| `--skip-baseline` | `-k` | `skipBaseline()` | Ignore the default baseline even if present. See [baseline](#using-a-baseline-file). |
-| `--ignore-baseline-linenumbers` | `-i` | `ignoreBaselineLinenumbers()` | Match the baseline ignoring line numbers. See [Line numbers in baseline](#line-numbers-in-baseline). |
-| `--config` | `-c` | — | Configuration file to load (default `phparkitect.php`). See [Usage](#usage). |
-| `--generate-baseline` | `-g` | — | Write current violations to a baseline file instead of failing. See [baseline](#using-a-baseline-file). |
-| `--verbose` | `-v` | — | Print every parsed file instead of the progress bar. |
-| — | — | `skipParsingCustomAnnotations()` | Disable parsing of custom DocBlock annotations (e.g. `@Assert\NotBlank`); parsing is enabled by default. See [Configuration](#configuration). |
+|---|---|---|---|
+| `--target-php-version` | `-t` | `targetPhpVersion()` | PHP version the parser targets: `8.0`–`8.5` (default: current runtime version). |
+| `--stop-on-failure` | `-s` | `stopOnFailure()` | Stops at the first violation instead of collecting them all. |
+| `--format` | `-f` | `format()` | Report format: `text` (default), `json` or `gitlab`. |
+| `--autoload` | `-a` | `autoloadFilePath()` | Autoload file to load before running. Required for all Phar runs. |
+| `--use-baseline` | `-b` | `baselineFilePath()` | Baseline file path for ignoring known violations. |
+| `--skip-baseline` | `-k` | `skipBaseline()` | Skips the default baseline even if present. |
+| `--ignore-baseline-linenumbers` | `-i` | `ignoreBaselineLinenumbers()` | Matches baseline violations without checking line numbers. |
+| `--config` | `-c` | — | Configuration file to load (default: `phparkitect.php`). |
+| `--generate-baseline` | `-g` | — | Writes current violations to a baseline file instead of failing. |
+| `--verbose` | `-v` | — | Prints every parsed file instead of the progress bar. |
+| — | — | `skipParsingCustomAnnotations()` | Disables custom DocBlock annotation parsing (enabled by default). |
 
-# Integrations
+### Baseline
 
-## Laravel
+If your codebase already has violations you can't fix right now, generate a baseline to ignore them:
 
-If you plan to use Arkitect with Laravel, [smortexa](https://github.com/smortexa) wrote a nice wrapper with some predefined rules for laravel: https://github.com/smortexa/laravel-arkitect
+```
+phparkitect check --generate-baseline
+```
+
+This creates `phparkitect-baseline.json`. Subsequent runs pick it up automatically. Use a custom file name with `--generate-baseline=my-baseline.json`, point to it with `--use-baseline=my-baseline.json`, or skip it entirely with `--skip-baseline`.
+
+By default the baseline also checks line numbers — a change before the offending line shifts the number and the check fails. Use `--ignore-baseline-linenumbers` to match violations regardless of line number.
+
+> **Warning**: when ignoring line numbers, PHPArkitect cannot detect if the same rule is violated additional times in the same file.
+
+### Output format
+
+| Format | Description |
+|---|---|
+| `text` | Default human-readable output. |
+| `json` | Machine-readable JSON. Suppresses all output except violations. Suitable for GitHub Actions, SonarQube, etc. |
+| `gitlab` | Follows GitLab's [code quality format](https://docs.gitlab.com/ci/testing/code_quality/#code-quality-report-format). Suppresses all output except violations. |
+
+### Using a Phar
+
+If your project conflicts with PHPArkitect's dependencies, use the self-contained Phar:
+
+```
+wget https://github.com/phparkitect/arkitect/releases/latest/download/phparkitect.phar
+chmod +x phparkitect.phar
+./phparkitect.phar check --autoload=vendor/autoload.php
+```
+
+The `--autoload` option is required for all Phar runs.
+
+## Contributing
+
+Found a bug or missing information? [Open an issue](https://github.com/phparkitect/arkitect/issues).
+Want to contribute? See [CONTRIBUTING.md](CONTRIBUTING.md).
