@@ -1,6 +1,6 @@
 # Rules reference
 
-This page documents every built-in rule (expression) and the available rule builders.
+This page documents every built-in rule (expression) and the Component Architecture rule builder.
 
 ## Table of contents
 
@@ -10,11 +10,13 @@ This page documents every built-in rule (expression) and the available rule buil
 - [Traits](#traits)
 - [Type checks](#type-checks)
 - [Doc blocks & attributes](#doc-blocks--attributes)
-- [Rule builders](#rule-builders)
+- [Component Architecture builder](#component-architecture-builder)
 
 ---
 
 ## Namespace rules
+
+`Rule::namespace('App\Controller')` is a shortcut for `Rule::allClasses()->that(new ResideInOneOfTheseNamespaces('App\Controller'))`. It accepts multiple namespaces: `Rule::namespace('App\Controller', 'App\Service')`.
 
 ### ResideInOneOfTheseNamespaces / NotResideInTheseNamespaces
 
@@ -304,9 +306,7 @@ $rules[] = Rule::allClasses()
 
 ---
 
-## Rule builders
-
-### Component Architecture builder
+## Component Architecture builder
 
 Lets you define named components and enforce dependency constraints between them in a readable, declarative style.
 
@@ -318,6 +318,7 @@ declare(strict_types=1);
 use Arkitect\ClassSet;
 use Arkitect\CLI\Config;
 use Arkitect\RuleBuilders\Architecture\Architecture;
+use Arkitect\Rules\Rule;
 
 return static function (Config $config): void {
     $classSet = ClassSet::fromDir(__DIR__.'/src');
@@ -337,7 +338,13 @@ return static function (Config $config): void {
 
         ->rules();
 
-    $config->add($classSet, ...$layeredArchitectureRules);
+    // Architecture rules can be combined with regular rules in the same add() call
+    $namingRule = Rule::allClasses()
+        ->that(new ResideInOneOfTheseNamespaces('App\Service'))
+        ->should(new HaveNameMatching('*Service'))
+        ->because('we want uniform naming');
+
+    $config->add($classSet, $namingRule, ...$layeredArchitectureRules);
 };
 ```
 
@@ -345,67 +352,7 @@ Each component is defined by a glob pattern. The available dependency constraint
 
 | Method | Meaning |
 |---|---|
-| `mayDependOnComponents(...)` | May depend on the listed components (and nothing else) |
-| `shouldNotDependOnAnyComponent()` | Must not depend on any other component |
-| `shouldOnlyDependOnComponents(...)` | Alias for `mayDependOnComponents` |
-
-### Excluding classes
-
-Use `except()` to skip classes from the selector:
-
-```php
-$rules[] = Rule::allClasses()
-    ->except('App\Controller\FolderController\*')
-    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
-    ->should(new HaveNameMatching('*Controller'))
-    ->because('we want uniform naming');
-```
-
-Wildcards and exact class names are both supported.
-
-### Combining conditions with `andThat()`
-
-Chain `andThat()` to narrow the selection — `should()` is checked only against classes that satisfy **every** condition:
-
-```php
-// Only concrete domain events (non-abstract, named *Event) must be final
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
-    ->andThat(new HaveNameMatching('*Event'))
-    ->andThat(new IsNotAbstract())
-    ->should(new IsFinal())
-    ->because('concrete domain events must be immutable value objects');
-```
-
-A class that matches the first condition but not the second is silently skipped — no violation is raised.
-
-You can also reuse a partially-built rule to create independent branches:
-
-```php
-$domainClasses = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Domain'));
-
-$rules[] = $domainClasses
-    ->andThat(new HaveNameMatching('*Event'))
-    ->should(new IsFinal())
-    ->because('domain events must be final');
-
-$rules[] = $domainClasses
-    ->andThat(new HaveNameMatching('*Service'))
-    ->should(new IsNotAbstract())
-    ->because('domain services must be concrete');
-```
-
-Each branch is independent — modifying one does not affect the other.
-
-### Running only a specific rule
-
-Add `runOnlyThis()` to execute just that rule during a `check` run (useful for debugging):
-
-```php
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
-    ->should(new HaveNameMatching('*Controller'))
-    ->because('we want uniform naming')
-    ->runOnlyThis();
-```
+| `mayDependOnComponents(...)` | May depend on the listed components (and nothing else). |
+| `shouldOnlyDependOnComponents(...)` | Alias for `mayDependOnComponents`. |
+| `shouldNotDependOnAnyComponent()` | Must not depend on any other component. |
+| `mayDependOnAnyComponent()` | May depend on any component without restriction. |

@@ -39,9 +39,12 @@ PHPArkitect reports every violation with the class name, the broken rule, and th
 
 | Concept | What it is |
 |---|---|
-| `ClassSet` | The set of PHP files to analyse (`ClassSet::fromDir(__DIR__.'/src')`). |
-| `Rule` | A constraint: a selector (`that()`), a check (`should()`), and a reason (`because()`). |
+| `ClassSet` | The set of PHP files to analyse. `ClassSet::fromDir(__DIR__.'/src')` accepts one or more directories. |
+| `Rule` | A constraint: a selector (`that()`), a check (`should()`), and a reason (`because()`). The `because()` string appears verbatim in violation output. |
 | `Expression` | A single, composable condition — used in both `that()` and `should()`. |
+| `except()` | Excludes specific classes from a rule's selector. Accepts wildcards. |
+| `andThat()` | Narrows the selector with additional conditions (all must match). |
+| `runOnlyThis()` | Runs only this rule during `check`; useful for debugging. |
 
 A minimal config file:
 
@@ -67,7 +70,7 @@ return static function (Config $config): void {
 };
 ```
 
-`ClassSet::fromDir()` accepts one or more directories. PHPArkitect also parses custom DocBlock annotations (`@Assert\NotBlank`, etc.) by default; call `$config->skipParsingCustomAnnotations()` to disable this.
+PHPArkitect parses custom DocBlock annotations (`@Assert\NotBlank`, etc.) by default; call `$config->skipParsingCustomAnnotations()` to disable this.
 
 ## Available rules
 
@@ -80,10 +83,9 @@ return static function (Config $config): void {
 | Type | `IsFinal`, `IsAbstract`, `IsReadonly`, `IsInterface`, `IsEnum`, `IsTrait` … |
 | Doc blocks | `ContainDocBlockLike`, `HaveAttribute` |
 
-→ Full reference with code examples and rule builders: [`docs/rules.md`](docs/rules.md)
+→ Full reference with code examples and the Component Architecture builder: [`docs/rules.md`](docs/rules.md)
 
 ## Commands
-
 
 ### `check`
 
@@ -115,11 +117,16 @@ Lists which classes in a directory satisfy a given expression — handy for test
 phparkitect debug:expression <Expression> [arguments...]
 ```
 
-`<Expression>` is the short class name of any expression under `Arkitect\Expression\ForClasses` (see [Available rules](#available-rules)); arguments match its constructor. For example:
+`<Expression>` is the short class name of any expression under `Arkitect\Expression\ForClasses` (see [`docs/rules.md`](docs/rules.md)); arguments match its constructor. For example:
 
 ```
 phparkitect debug:expression ResideInOneOfTheseNamespaces App
 ```
+
+| Option | Alias | Description |
+|---|---|---|
+| `--from-dir` | `-d` | Directory to search for classes (default: current directory). |
+| `--target-php-version` | `-t` | PHP version the parser targets. |
 
 ## Configuration reference
 
@@ -128,16 +135,16 @@ Every setting can be passed as a CLI option or set via the corresponding `Config
 | Option | Alias | Config method | Description |
 |---|---|---|---|
 | `--target-php-version` | `-t` | `targetPhpVersion()` | PHP version the parser targets: `8.0`–`8.5` (default: latest). |
-| `--stop-on-failure` | `-s` | `stopOnFailure()` | Stop at the first violation instead of collecting them all. |
+| `--stop-on-failure` | `-s` | `stopOnFailure()` | Stops at the first violation instead of collecting them all. |
 | `--format` | `-f` | `format()` | Report format: `text` (default), `json` or `gitlab`. |
-| `--autoload` | `-a` | `autoloadFilePath()` | Autoload file to load first. Required for the Phar with custom rules. |
-| `--use-baseline` | `-b` | `baselineFilePath()` | Baseline file to ignore known violations. |
-| `--skip-baseline` | `-k` | `skipBaseline()` | Ignore the default baseline even if present. |
-| `--ignore-baseline-linenumbers` | `-i` | `ignoreBaselineLinenumbers()` | Match the baseline ignoring line numbers. |
+| `--autoload` | `-a` | `autoloadFilePath()` | Autoload file to load before running. Required for all Phar runs. |
+| `--use-baseline` | `-b` | `baselineFilePath()` | Baseline file path for ignoring known violations. |
+| `--skip-baseline` | `-k` | `skipBaseline()` | Skips the default baseline even if present. |
+| `--ignore-baseline-linenumbers` | `-i` | `ignoreBaselineLinenumbers()` | Matches baseline violations without checking line numbers. |
 | `--config` | `-c` | — | Configuration file to load (default: `phparkitect.php`). |
-| `--generate-baseline` | `-g` | — | Write current violations to a baseline file instead of failing. |
-| `--verbose` | `-v` | — | Print every parsed file instead of the progress bar. |
-| — | — | `skipParsingCustomAnnotations()` | Disable parsing of custom DocBlock annotations; enabled by default. |
+| `--generate-baseline` | `-g` | — | Writes current violations to a baseline file instead of failing. |
+| `--verbose` | `-v` | — | Prints every parsed file instead of the progress bar. |
+| — | — | `skipParsingCustomAnnotations()` | Disables custom DocBlock annotation parsing (enabled by default). |
 
 ### Baseline
 
@@ -168,12 +175,7 @@ If your project conflicts with PHPArkitect's dependencies, use the self-containe
 ```
 wget https://github.com/phparkitect/arkitect/releases/latest/download/phparkitect.phar
 chmod +x phparkitect.phar
-./phparkitect.phar check
-```
-
-When using the Phar with custom rules that need your project's autoloader:
-
-```
 ./phparkitect.phar check --autoload=vendor/autoload.php
 ```
 
+The `--autoload` option is required for all Phar runs.
