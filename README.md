@@ -69,7 +69,21 @@ return static function (Config $config): void {
 
 `ClassSet::fromDir()` accepts one or more directories. PHPArkitect also parses custom DocBlock annotations (`@Assert\NotBlank`, etc.) by default; call `$config->skipParsingCustomAnnotations()` to disable this.
 
+## Available rules
+
+| Category | Examples |
+|---|---|
+| Namespace | `ResideInOneOfTheseNamespaces`, `NotHaveDependencyOutsideNamespace`, `DependsOnlyOnTheseNamespaces` |
+| Naming | `HaveNameMatching`, `NotHaveNameMatching`, `MatchOneOfTheseNames` |
+| Inheritance | `Extend`, `NotExtend`, `Implement`, `NotImplement`, `IsA`, `IsNotA` |
+| Traits | `HaveTrait`, `NotHaveTrait` |
+| Type | `IsFinal`, `IsAbstract`, `IsReadonly`, `IsInterface`, `IsEnum`, `IsTrait` … |
+| Doc blocks | `ContainDocBlockLike`, `HaveAttribute` |
+
+→ Full reference with code examples and rule builders: [`docs/rules.md`](docs/rules.md)
+
 ## Commands
+
 
 ### `check`
 
@@ -162,17 +176,4 @@ When using the Phar with custom rules that need your project's autoloader:
 ```
 ./phparkitect.phar check --autoload=vendor/autoload.php
 ```
-
-## Available rules
-
-| Category | Examples |
-|---|---|
-| Namespace | `ResideInOneOfTheseNamespaces`, `NotHaveDependencyOutsideNamespace`, `DependsOnlyOnTheseNamespaces` |
-| Naming | `HaveNameMatching`, `NotHaveNameMatching`, `MatchOneOfTheseNames` |
-| Inheritance | `Extend`, `NotExtend`, `Implement`, `NotImplement`, `IsA`, `IsNotA` |
-| Traits | `HaveTrait`, `NotHaveTrait` |
-| Type | `IsFinal`, `IsAbstract`, `IsReadonly`, `IsInterface`, `IsEnum`, `IsTrait` … |
-| Doc blocks | `ContainDocBlockLike`, `HaveAttribute` |
-
-→ Full reference with code examples and rule builders: [`docs/rules.md`](docs/rules.md)
 
