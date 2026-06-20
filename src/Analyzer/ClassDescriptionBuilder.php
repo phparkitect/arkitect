@@ -41,6 +41,9 @@ class ClassDescriptionBuilder
 
     private ?string $filePath = null;
 
+    /** @var array<string, bool> */
+    private static array $cache = [];
+
     public function clear(): void
     {
         $this->FQCN = null;
@@ -189,16 +192,45 @@ class ClassDescriptionBuilder
 
     private function isPhpCoreClass(ClassDependency $dependency): bool
     {
-        $fqcn = $dependency->getFQCN();
+        $className = $dependency->getFQCN()->toString();
 
-        try {
-            /** @var class-string $className */
-            $className = $fqcn->toString();
-            $reflection = new \ReflectionClass($className);
+        if (!isset(self::$cache[$className])) {
+            self::$cache[$className] = $this->checkIsPhpCoreClass($className);
+        }
 
-            return $reflection->isInternal();
-        } catch (\ReflectionException $e) {
+        return self::$cache[$className];
+    }
+
+    private function checkIsPhpCoreClass(string $className): bool
+    {
+        if (!$this->isSymbolLoaded($className)) {
             return false;
         }
+
+        /** @var class-string $className */
+        $reflection = new \ReflectionClass($className);
+
+        return $reflection->isInternal();
+    }
+
+    private function isSymbolLoaded(string $className): bool
+    {
+        // PHP built-ins are always pre-loaded; skip autoloading to avoid side-effects.
+        // See: https://github.com/Sylius/Sylius/pull/19003
+        if (class_exists($className, false)) {
+            return true;
+        }
+        if (interface_exists($className, false)) {
+            return true;
+        }
+        if (trait_exists($className, false)) {
+            return true;
+        }
+        // enum_exists() is PHP 8.1+; enums cannot exist on 8.0 so we skip the check there.
+        if (\PHP_VERSION_ID >= 80100 && enum_exists($className, false)) {
+            return true;
+        }
+
+        return false;
     }
 }

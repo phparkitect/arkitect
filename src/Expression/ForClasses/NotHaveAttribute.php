@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Arkitect\Expression\ForClasses;
@@ -10,32 +11,23 @@ use Arkitect\Rules\Violation;
 use Arkitect\Rules\ViolationMessage;
 use Arkitect\Rules\Violations;
 
-final class HaveTrait implements Expression
+final class NotHaveAttribute implements Expression
 {
-    private string $trait;
+    private string $attribute;
 
-    public function __construct(string $trait)
+    public function __construct(string $attribute)
     {
-        $this->trait = $trait;
+        $this->attribute = $attribute;
     }
 
     public function describe(ClassDescription $theClass, string $because): Description
     {
-        return new Description("should use the trait {$this->trait}", $because);
-    }
-
-    public function appliesTo(ClassDescription $theClass): bool
-    {
-        return !$theClass->isInterface();
+        return new Description("should not have the attribute {$this->attribute}", $because);
     }
 
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
-        if ($theClass->isInterface()) {
-            return;
-        }
-
-        if ($theClass->hasTrait($this->trait)) {
+        if (!$theClass->hasAttribute($this->attribute)) {
             return;
         }
 

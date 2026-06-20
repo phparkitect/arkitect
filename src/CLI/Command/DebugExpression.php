@@ -22,8 +22,7 @@ class DebugExpression extends Command
 Check which classes respect an expression
 EOT;
 
-    /** @var string */
-    public static $help = <<< 'EOT'
+    public static string $help = <<< 'EOT'
 Check which classes respect an expression
 EOT;
 

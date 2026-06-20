@@ -21,7 +21,7 @@ class InitCommandTest extends TestCase
 
         self::assertFileExists($fs.'/phparkitect.php');
         self::assertStringContainsString('Creating phparkitect.php file...', $output);
-        self::assertStringContainsString('customize it and run with php bin/phparkitect check', $output);
+        self::assertStringContainsString('customize it and run with phparkitect check', $output);
     }
 
     public function test_it_creates_a_file_in_a_custom_dir(): void
@@ -40,7 +40,7 @@ class InitCommandTest extends TestCase
 
         self::assertFileExists($fs.'/nested/path/phparkitect.php');
         self::assertStringContainsString('Creating phparkitect.php file...', $output);
-        self::assertStringContainsString('customize it and run with php bin/phparkitect check', $output);
+        self::assertStringContainsString('customize it and run with phparkitect check', $output);
     }
 
     public function test_do_nothing_if_file_exists(): void
