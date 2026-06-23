@@ -19,7 +19,7 @@ jobs:
         php-versions: [ '8.0', '8.1', '8.2', '8.3', '8.4', '8.5' ]
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
 
     - name: Install PHP
       uses: shivammathur/setup-php@v2
@@ -67,7 +67,7 @@ jobs:
     runs-on: "ubuntu-22.04"
     needs: build
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Install PHP
         uses: shivammathur/setup-php@v2
@@ -109,7 +109,7 @@ jobs:
       matrix:
         php-versions: [ '8.0', '8.1', '8.2', '8.3', '8.4', '8.5' ]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Install PHP
         uses: shivammathur/setup-php@v2
