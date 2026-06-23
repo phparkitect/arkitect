@@ -11,6 +11,8 @@ Rule::allClasses()
     ->because('the domain must not depend on infrastructure');
 ```
 
+> Upgrading from an older version? Check [UPGRADE.md](UPGRADE.md) for breaking changes.
+
 ## Quick Start
 
 **1. Install**
@@ -179,6 +181,11 @@ chmod +x phparkitect.phar
 ```
 
 The `--autoload` option is required for all Phar runs.
+
+## Upgrading
+
+Upgrading from an older version? See [UPGRADE.md](UPGRADE.md) for the breaking
+changes you need to address.
 
 ## Contributing
 
