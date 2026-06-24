@@ -30,6 +30,7 @@ class Check extends Command
     private const IGNORE_BASELINE_LINENUMBERS_PARAM = 'ignore-baseline-linenumbers';
     private const FORMAT_PARAM = 'format';
     private const AUTOLOAD_PARAM = 'autoload';
+    private const NO_CACHE_PARAM = 'no-cache';
 
     private const GENERATE_BASELINE_PARAM = 'generate-baseline';
     private const DEFAULT_RULES_FILENAME = 'phparkitect.php';
@@ -105,6 +106,12 @@ class Check extends Command
                 'a',
                 InputOption::VALUE_REQUIRED,
                 'Specify an autoload file to use',
+            )
+            ->addOption(
+                self::NO_CACHE_PARAM,
+                'o',
+                InputOption::VALUE_NONE,
+                'Disable cache'
             );
     }
 
@@ -129,6 +136,7 @@ class Check extends Command
             $generateBaseline = $input->getOption(self::GENERATE_BASELINE_PARAM);
             $phpVersion = $input->getOption('target-php-version');
             $format = $input->getOption(self::FORMAT_PARAM);
+            $noCache = (bool) $input->getOption(self::NO_CACHE_PARAM);
 
             // we write everything on STDERR apart from the list of violations which goes on STDOUT
             // this allows to pipe the output of this command to a file while showing output on the terminal
@@ -150,7 +158,8 @@ class Check extends Command
                 ->baselineFilePath(Baseline::resolveFilePath($useBaseline, self::DEFAULT_BASELINE_FILENAME))
                 ->ignoreBaselineLinenumbers($ignoreBaselineLinenumbers)
                 ->skipBaseline($skipBaseline)
-                ->format($format);
+                ->format($format)
+                ->noCache($noCache);
 
             $this->requireAutoload($output, $config->getAutoloadFilePath());
             $printer = $this->createPrinter($output, $config->getFormat());
