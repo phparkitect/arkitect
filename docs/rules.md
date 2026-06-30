@@ -1,15 +1,47 @@
 # Rules reference
 
-This page documents every built-in rule (expression) available in PHPArkitect.
+This page documents every built-in rule (expression) available in PHPArkitect: what it checks, its constructor signature, and a runnable example.
+
+## Imports
+
+Every example below builds on these imports. The fluent builder and class set live under the `Arkitect\` root; **every expression** (`ResideInOneOfTheseNamespaces`, `IsFinal`, `HaveAttribute`, …) lives under `Arkitect\Expression\ForClasses`, so its fully-qualified name is always `Arkitect\Expression\ForClasses\<ExpressionName>`.
+
+```php
+use Arkitect\ClassSet;
+use Arkitect\CLI\Config;
+use Arkitect\Rules\Rule;
+use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
+// …and one `use Arkitect\Expression\ForClasses\<Name>;` per expression you use
+```
+
+The snippets assume you are inside the config callback, appending to a `$rules` array that is later passed to `$config->add($classSet, ...$rules)` (see the [README](../README.md) for the full file skeleton).
 
 ## Table of contents
 
 - [Namespace rules](#namespace-rules)
+  - [ResideInOneOfTheseNamespaces / NotResideInTheseNamespaces](#resideinoneofthesenamespaces--notresideinthesenamespaces)
+  - [ResideInOneOfTheseNamespacesExactly / NotResideInOneOfTheseNamespacesExactly](#resideinoneofthesenamespacesexactly--notresideinoneofthesenamespacesexactly)
+  - [DependsOnlyOnTheseNamespaces / NotDependsOnTheseNamespaces](#dependsonlyonthesenamespaces--notdependsonthesenamespaces)
+  - [NotHaveDependencyOutsideNamespace](#nothavedependencyoutsidenamespace)
 - [Naming rules](#naming-rules)
+  - [HaveNameMatching / NotHaveNameMatching](#havenamematching--nothavenamematching)
+  - [MatchOneOfTheseNames](#matchoneofthesenames)
 - [Inheritance & implementation](#inheritance--implementation)
+  - [Extend / NotExtend](#extend--notextend)
+  - [Implement / NotImplement](#implement--notimplement)
+  - [IsA / IsNotA](#isa--isnota)
 - [Traits](#traits)
+  - [HaveTrait / NotHaveTrait](#havetrait--nothavetrait)
 - [Type checks](#type-checks)
+  - [IsAbstract / IsNotAbstract](#isabstract--isnotabstract)
+  - [IsFinal / IsNotFinal](#isfinal--isnotfinal)
+  - [IsReadonly / IsNotReadonly](#isreadonly--isnotreadonly)
+  - [IsTrait / IsNotTrait](#istrait--isnottrait)
+  - [IsInterface / IsNotInterface](#isinterface--isnotinterface)
+  - [IsEnum / IsNotEnum](#isenum--isnotenum)
 - [Doc blocks & attributes](#doc-blocks--attributes)
+  - [ContainDocBlockLike / NotContainDocBlockLike](#containdocblocklike--notcontaindocblocklike)
+  - [HaveAttribute / NotHaveAttribute](#haveattribute--nothaveattribute)
 
 ---
 
@@ -18,6 +50,15 @@ This page documents every built-in rule (expression) available in PHPArkitect.
 `Rule::namespace('App\Controller')` is a shortcut for `Rule::allClasses()->that(new ResideInOneOfTheseNamespaces('App\Controller'))`. It accepts multiple namespaces: `Rule::namespace('App\Controller', 'App\Service')`.
 
 ### ResideInOneOfTheseNamespaces / NotResideInTheseNamespaces
+
+`ResideInOneOfTheseNamespaces` raises a violation when a class does **not** live in any of the given namespaces; `NotResideInTheseNamespaces` raises one when it lives in any of them. Matching is **recursive** — `App\Domain` also matches `App\Domain\Event\UserRegistered`.
+
+```php
+new ResideInOneOfTheseNamespaces(string ...$namespaces)
+new NotResideInTheseNamespaces(string ...$namespaces)
+```
+
+- `$namespaces` — one or more namespace prefixes (variadic).
 
 ```php
 // Enforce that all handlers live in the application layer
@@ -35,7 +76,18 @@ $rules[] = Rule::allClasses()
 
 ### ResideInOneOfTheseNamespacesExactly / NotResideInOneOfTheseNamespacesExactly
 
-These rules check namespace membership **without** matching child namespaces. Unlike `ResideInOneOfTheseNamespaces` which matches recursively, these rules only match classes directly in the given namespace.
+Like the rules above, but matching is **not** recursive: only classes sitting *directly* in the given namespace match, not those in child namespaces.
+
+```php
+new ResideInOneOfTheseNamespacesExactly(string ...$namespaces)
+new NotResideInOneOfTheseNamespacesExactly(string ...$namespaces)
+```
+
+- `$namespaces` — one or more exact namespaces (variadic).
+
+For example, with namespace `App\Domain\Entity`:
+- `App\Domain\Entity\User` ✅ matches `ResideInOneOfTheseNamespacesExactly`
+- `App\Domain\Entity\ValueObject\Email` ❌ does not match (child namespace)
 
 ```php
 // Only allow entity classes at the root Entity namespace, not in subdirectories
@@ -51,11 +103,17 @@ $rules[] = Rule::allClasses()
     ->because('we want to avoid classes directly in the Legacy namespace root');
 ```
 
-For example, with namespace `App\Domain\Entity`:
-- `App\Domain\Entity\User` ✅ matches `ResideInOneOfTheseNamespacesExactly`
-- `App\Domain\Entity\ValueObject\Email` ❌ does not match (child namespace)
-
 ### DependsOnlyOnTheseNamespaces / NotDependsOnTheseNamespaces
+
+`DependsOnlyOnTheseNamespaces` raises a violation when a class depends on **any** namespace outside the allow-list. `NotDependsOnTheseNamespaces` raises one when a class depends on **any** of the forbidden namespaces.
+
+```php
+new DependsOnlyOnTheseNamespaces(array $namespaces = [], array $exclude = [])
+new NotDependsOnTheseNamespaces(array $namespaces, array $exclude = [])
+```
+
+- `$namespaces` — the allowed (resp. forbidden) namespaces.
+- `$exclude` — namespaces/classes whose dependencies are **not** checked by this rule (an escape hatch for known exceptions).
 
 ```php
 // Allow only specific external dependencies in the domain
@@ -73,6 +131,15 @@ $rules[] = Rule::allClasses()
 
 ### NotHaveDependencyOutsideNamespace
 
+Raises a violation when a class depends on anything outside its own namespace (plus an optional allow-list of external dependencies).
+
+```php
+new NotHaveDependencyOutsideNamespace(string $namespace, array $externalDependenciesToExclude = [])
+```
+
+- `$namespace` — the namespace the class is allowed to depend on.
+- `$externalDependenciesToExclude` — extra namespaces that are tolerated as dependencies.
+
 ```php
 $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
@@ -87,6 +154,15 @@ $rules[] = Rule::allClasses()
 ## Naming rules
 
 ### HaveNameMatching / NotHaveNameMatching
+
+`HaveNameMatching` raises a violation when the class name does **not** match the pattern; `NotHaveNameMatching` raises one when it **does**. The pattern supports `*` as a wildcard.
+
+```php
+new HaveNameMatching(string $name)
+new NotHaveNameMatching(string $name)
+```
+
+- `$name` — a name pattern, e.g. `*Service`, `Abstract*`.
 
 ```php
 // Enforce a naming convention
@@ -104,7 +180,13 @@ $rules[] = Rule::allClasses()
 
 ### MatchOneOfTheseNames
 
-Similar to `HaveNameMatching`, but accepts an array of patterns. The rule passes if the class name matches **any** of the provided patterns.
+Like `HaveNameMatching`, but accepts several patterns — the rule passes if the class name matches **any** of them.
+
+```php
+new MatchOneOfTheseNames(array $names)
+```
+
+- `$names` — an array of name patterns.
 
 ```php
 $rules[] = Rule::allClasses()
@@ -119,7 +201,14 @@ $rules[] = Rule::allClasses()
 
 ### Extend / NotExtend
 
-`Extend` raises a violation when none of the given classes match; `NotExtend` raises a violation when any of them match.
+`Extend` raises a violation when the class extends **none** of the given classes; `NotExtend` raises one when it extends **any** of them.
+
+```php
+new Extend(string ...$classNames)
+new NotExtend(string ...$classNames)
+```
+
+- `$classNames` — one or more fully-qualified parent class names (variadic).
 
 ```php
 // All controllers must extend the base class
@@ -137,6 +226,15 @@ $rules[] = Rule::allClasses()
 
 ### Implement / NotImplement
 
+`Implement` raises a violation when the class does **not** implement the interface; `NotImplement` raises one when it **does**.
+
+```php
+new Implement(string $interface)
+new NotImplement(string $interface)
+```
+
+- `$interface` — the fully-qualified interface name.
+
 ```php
 $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Controller'))
@@ -151,7 +249,14 @@ $rules[] = Rule::allClasses()
 
 ### IsA / IsNotA
 
-These rules use PHP's `is_a()` and therefore match both inheritance and interface implementation.
+These rules use PHP's `is_a()` semantics, so they match **both** inheritance and interface implementation. `IsA` raises a violation when the class is not an instance of the given type; `IsNotA` raises one when it is.
+
+```php
+new IsA(string $allowedFqcn)
+new IsNotA(string $disallowedFqcn)
+```
+
+- `$allowedFqcn` / `$disallowedFqcn` — the fully-qualified class or interface name.
 
 ```php
 $rules[] = Rule::allClasses()
@@ -171,6 +276,15 @@ $rules[] = Rule::allClasses()
 
 ### HaveTrait / NotHaveTrait
 
+`HaveTrait` raises a violation when the class does **not** use the trait; `NotHaveTrait` raises one when it **does**.
+
+```php
+new HaveTrait(string $trait)
+new NotHaveTrait(string $trait)
+```
+
+- `$trait` — the fully-qualified trait name.
+
 ```php
 $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('Tests\Feature'))
@@ -187,7 +301,16 @@ $rules[] = Rule::allClasses()
 
 ## Type checks
 
+The type checks take **no arguments** — pair them with a selector via `that()`.
+
 ### IsAbstract / IsNotAbstract
+
+Raise a violation when the class is (resp. is not) declared `abstract`.
+
+```php
+new IsAbstract()
+new IsNotAbstract()
+```
 
 ```php
 $rules[] = Rule::allClasses()
@@ -203,6 +326,13 @@ $rules[] = Rule::allClasses()
 
 ### IsFinal / IsNotFinal
 
+Raise a violation when the class is (resp. is not) declared `final`.
+
+```php
+new IsFinal()
+new IsNotFinal()
+```
+
 ```php
 $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Domain\Aggregates'))
@@ -216,6 +346,13 @@ $rules[] = Rule::allClasses()
 ```
 
 ### IsReadonly / IsNotReadonly
+
+Raise a violation when the class is (resp. is not) declared `readonly` (PHP 8.2+).
+
+```php
+new IsReadonly()
+new IsNotReadonly()
+```
 
 ```php
 $rules[] = Rule::allClasses()
@@ -231,6 +368,13 @@ $rules[] = Rule::allClasses()
 
 ### IsTrait / IsNotTrait
 
+Raise a violation when the type is (resp. is not) a `trait`.
+
+```php
+new IsTrait()
+new IsNotTrait()
+```
+
 ```php
 $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Customer\Service\Traits'))
@@ -245,6 +389,13 @@ $rules[] = Rule::allClasses()
 
 ### IsInterface / IsNotInterface
 
+Raise a violation when the type is (resp. is not) an `interface`.
+
+```php
+new IsInterface()
+new IsNotInterface()
+```
+
 ```php
 $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Interfaces'))
@@ -258,6 +409,13 @@ $rules[] = Rule::allClasses()
 ```
 
 ### IsEnum / IsNotEnum
+
+Raise a violation when the type is (resp. is not) an `enum` (PHP 8.1+).
+
+```php
+new IsEnum()
+new IsNotEnum()
+```
 
 ```php
 $rules[] = Rule::allClasses()
@@ -277,6 +435,15 @@ $rules[] = Rule::allClasses()
 
 ### ContainDocBlockLike / NotContainDocBlockLike
 
+`ContainDocBlockLike` raises a violation when the class docblock does **not** contain the given text; `NotContainDocBlockLike` raises one when it **does**.
+
+```php
+new ContainDocBlockLike(string $docBlock)
+new NotContainDocBlockLike(string $docBlock)
+```
+
+- `$docBlock` — the substring/annotation to look for in the class docblock.
+
 ```php
 $rules[] = Rule::allClasses()
     ->that(new ResideInOneOfTheseNamespaces('App\Domain\Events'))
@@ -290,6 +457,15 @@ $rules[] = Rule::allClasses()
 ```
 
 ### HaveAttribute / NotHaveAttribute
+
+`HaveAttribute` raises a violation when the class does **not** carry the given PHP attribute; `NotHaveAttribute` raises one when it **does**.
+
+```php
+new HaveAttribute(string $attribute)
+new NotHaveAttribute(string $attribute)
+```
+
+- `$attribute` — the attribute class name (fully-qualified, or short name if unambiguous).
 
 ```php
 $rules[] = Rule::allClasses()
