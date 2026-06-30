@@ -180,6 +180,14 @@ class Check extends Command
                 $output->writeln("⚠️ {$result->getViolations()->count()} violations detected!");
             }
 
+            $staleViolationsCount = $baseline->getStaleViolationsCount();
+            if ($staleViolationsCount > 0) {
+                $verb = 1 === $staleViolationsCount ? 'looks' : 'look';
+                $pronoun = 1 === $staleViolationsCount ? 'it' : 'them';
+                $noun = 1 === $staleViolationsCount ? 'violation' : 'violations';
+                $output->writeln("💡 {$staleViolationsCount} {$noun} in the baseline {$verb} fixed — regenerate the baseline to remove {$pronoun}");
+            }
+
             if ($result->hasParsingErrors()) {
                 $output->writeln('❌ found parsing errors in these files:');
                 foreach ($result->getParsingErrors() as $parsingError) {

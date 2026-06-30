@@ -314,4 +314,63 @@ class ViolationsTest extends TestCase
             $violation3,
         ], $this->violationStore->toArray());
     }
+
+    public function test_count_unmatched_in_returns_zero_when_everything_still_occurs(): void
+    {
+        $baseline = new Violations();
+        $baseline->add($this->violation);
+
+        $current = new Violations();
+        $current->add($this->violation);
+
+        self::assertSame(0, $baseline->countUnmatchedIn($current, false));
+    }
+
+    public function test_count_unmatched_in_counts_fixed_baseline_entries(): void
+    {
+        $stillPresent = new Violation('App\Controller\Shop', 'should have name end with Controller', 10);
+        $fixed = new Violation('App\Controller\Shop', 'should implement AbstractController', 20);
+
+        $baseline = new Violations();
+        $baseline->add($stillPresent);
+        $baseline->add($fixed);
+
+        $current = new Violations();
+        $current->add($stillPresent);
+
+        self::assertSame(1, $baseline->countUnmatchedIn($current, false));
+    }
+
+    public function test_count_unmatched_in_counts_fixed_baseline_entries_ignoring_line_numbers(): void
+    {
+        $stillPresent = new Violation('App\Controller\Shop', 'should have name end with Controller', 10);
+        $fixed = new Violation('App\Controller\Shop', 'should implement AbstractController', 20);
+        $stillPresentMovedLine = new Violation('App\Controller\Shop', 'should have name end with Controller', 15);
+
+        $baseline = new Violations();
+        $baseline->add($stillPresent);
+        $baseline->add($fixed);
+
+        $current = new Violations();
+        $current->add($stillPresentMovedLine);
+
+        self::assertSame(1, $baseline->countUnmatchedIn($current, true));
+        self::assertSame(2, $baseline->countUnmatchedIn($current, false));
+    }
+
+    public function test_count_unmatched_in_does_not_mutate_either_set(): void
+    {
+        $stillPresent = new Violation('App\Controller\Shop', 'should have name end with Controller', 10);
+
+        $baseline = new Violations();
+        $baseline->add($stillPresent);
+
+        $current = new Violations();
+        $current->add($stillPresent);
+
+        $baseline->countUnmatchedIn($current, true);
+
+        self::assertCount(1, $baseline);
+        self::assertCount(1, $current);
+    }
 }
