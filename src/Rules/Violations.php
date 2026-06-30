@@ -109,6 +109,40 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
         $this->violations = array_values($this->violations);
     }
 
+    /**
+     * Counts how many violations in this set (typically the baseline) have no
+     * corresponding entry in $current (typically the current run's violations) —
+     * i.e. how many are stale and could be removed from the baseline.
+     */
+    public function countUnmatchedIn(self $current, bool $ignoreLineNumbers): int
+    {
+        if (!$ignoreLineNumbers) {
+            return \count(array_udiff(
+                $this->violations,
+                $current->violations,
+                [__CLASS__, 'compareViolations']
+            ));
+        }
+
+        $currentViolations = $current->violations;
+        $unmatched = 0;
+        foreach ($this->violations as $violation) {
+            foreach ($currentViolations as $idx => $currentViolation) {
+                if (
+                    $currentViolation->getFqcn() === $violation->getFqcn()
+                    && self::extractViolationKey($currentViolation->getError()) === self::extractViolationKey($violation->getError())
+                ) {
+                    unset($currentViolations[$idx]);
+                    continue 2;
+                }
+            }
+
+            ++$unmatched;
+        }
+
+        return $unmatched;
+    }
+
     public function withoutLineNumbers(): self
     {
         $copy = new self();
