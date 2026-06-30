@@ -85,6 +85,8 @@ PHPArkitect parses custom DocBlock annotations (`@Assert\NotBlank`, etc.) by def
 
 → Full reference with code examples: [`docs/rules.md`](docs/rules.md)
 
+Need a check the built-ins don't cover? Write your own: [`docs/custom-rules.md`](docs/custom-rules.md).
+
 ## Commands
 
 ### `check`
