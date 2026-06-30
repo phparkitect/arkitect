@@ -237,6 +237,25 @@ class ViolationsTest extends TestCase
         self::assertCount(0, $violations);
     }
 
+    public function test_remove_violations_matches_self_explanatory_messages_when_because_is_reworded(): void
+    {
+        $violations = new Violations();
+        $violations->add(new Violation(
+            'App\Foo',
+            'should be final because we want immutability and avoid side-effects'
+        ));
+
+        $baseline = new Violations();
+        $baseline->add(new Violation(
+            'App\Foo',
+            'should be final because we want immutability'
+        ));
+
+        $violations->remove($baseline);
+
+        self::assertCount(0, $violations);
+    }
+
     public function test_violation_without_line_number_returns_copy_with_null_line(): void
     {
         $violation = new Violation('App\Foo', 'some error', 42, '/src/Foo.php');

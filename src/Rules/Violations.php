@@ -156,16 +156,22 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
      *
      * ViolationMessage produces two formats:
      * - withDescription: "$violation, but $ruleDescription" → returns $violation
-     * - selfExplanatory: "$ruleDescription" (no ", but ") → returns the full string
+     * - selfExplanatory: "$ruleDescription" (no ", but ") → returns $ruleDescription without its trailing " because $because"
      *
-     * The rule description may include configuration-dependent values (like namespace lists)
-     * that change when the rule config is updated. The violation part is always stable.
+     * The rule description may include configuration-dependent values (like namespace lists),
+     * and the because() reason is free text — both change when the config is reworded.
+     * The violation part is always stable.
      */
     private static function extractViolationKey(string $error): string
     {
         $pos = strpos($error, ', but ');
         if (false !== $pos) {
             return substr($error, 0, $pos);
+        }
+
+        $becausePos = strpos($error, ' because ');
+        if (false !== $becausePos) {
+            return substr($error, 0, $becausePos);
         }
 
         return $error;
