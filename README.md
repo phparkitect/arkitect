@@ -191,3 +191,5 @@ changes you need to address.
 
 Found a bug or missing information? [Open an issue](https://github.com/phparkitect/arkitect/issues).
 Want to contribute? See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+Before proposing a new feature, read our [Design Philosophy](docs/philosophy.md) — it explains what PHPArkitect aims to be and the kinds of additions we deliberately keep out of the core.
