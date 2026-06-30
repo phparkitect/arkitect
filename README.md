@@ -78,14 +78,14 @@ PHPArkitect parses custom DocBlock annotations (`@Assert\NotBlank`, etc.) by def
 
 | Category | Examples |
 |---|---|
-| Namespace | `ResideInOneOfTheseNamespaces`, `NotHaveDependencyOutsideNamespace`, `DependsOnlyOnTheseNamespaces` |
-| Naming | `HaveNameMatching`, `NotHaveNameMatching`, `MatchOneOfTheseNames` |
-| Inheritance | `Extend`, `NotExtend`, `Implement`, `NotImplement`, `IsA`, `IsNotA` |
-| Traits | `HaveTrait`, `NotHaveTrait` |
-| Type | `IsFinal`, `IsAbstract`, `IsReadonly`, `IsInterface`, `IsEnum`, `IsTrait` … |
-| Doc blocks | `ContainDocBlockLike`, `HaveAttribute` |
+| [📦 Namespace](docs/rules.md#namespace-rules) | `ResideInOneOfTheseNamespaces`, `NotHaveDependencyOutsideNamespace`, `DependsOnlyOnTheseNamespaces` |
+| [🏷️ Naming](docs/rules.md#naming-rules) | `HaveNameMatching`, `NotHaveNameMatching`, `MatchOneOfTheseNames` |
+| [🧬 Inheritance](docs/rules.md#inheritance--implementation) | `Extend`, `NotExtend`, `Implement`, `NotImplement`, `IsA`, `IsNotA` |
+| [🧩 Traits](docs/rules.md#traits) | `HaveTrait`, `NotHaveTrait` |
+| [🔖 Type](docs/rules.md#type-checks) | `IsFinal`, `IsAbstract`, `IsReadonly`, `IsInterface`, `IsEnum`, `IsTrait` … |
+| [📝 Doc blocks](docs/rules.md#doc-blocks--attributes) | `ContainDocBlockLike`, `HaveAttribute` |
 
-→ Full reference with code examples: [`docs/rules.md`](docs/rules.md)
+**📖 [Full rules reference →](docs/rules.md)**
 
 ## Commands
 
