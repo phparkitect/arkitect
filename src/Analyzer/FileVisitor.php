@@ -249,18 +249,10 @@ class FileVisitor extends NodeVisitorAbstract
             return;
         }
 
-        if (null === $node->type) {
-            return;
+        foreach ($this->extractFullyQualifiedTypes($node->type) as $type) {
+            $this->classDescriptionBuilder
+                ->addDependency(new ClassDependency($type->toString(), $node->getLine()));
         }
-
-        $type = $node->type instanceof NullableType ? $node->type->type : $node->type;
-
-        if (!$type instanceof Node\Name\FullyQualified) {
-            return;
-        }
-
-        $this->classDescriptionBuilder
-            ->addDependency(new ClassDependency($type->toString(), $node->getLine()));
     }
 
     private function handleDocComment(Node $node): void
@@ -332,14 +324,10 @@ class FileVisitor extends NodeVisitorAbstract
             return;
         }
 
-        $returnType = $node->returnType instanceof NullableType ? $node->returnType->type : $node->returnType;
-
-        if (!$returnType instanceof Node\Name\FullyQualified) {
-            return;
+        foreach ($this->extractFullyQualifiedTypes($node->returnType) as $returnType) {
+            $this->classDescriptionBuilder
+                ->addDependency(new ClassDependency($returnType->toString(), $returnType->getLine()));
         }
-
-        $this->classDescriptionBuilder
-            ->addDependency(new ClassDependency($returnType->toString(), $returnType->getLine()));
     }
 
     private function handleAttributeNode(Node $node): void
@@ -385,18 +373,38 @@ class FileVisitor extends NodeVisitorAbstract
 
     private function addParamDependency(Node\Param $node): void
     {
-        if (null === $node->type || $node->type instanceof Node\Identifier) {
-            return;
+        foreach ($this->extractFullyQualifiedTypes($node->type) as $type) {
+            $this->classDescriptionBuilder
+                ->addDependency(new ClassDependency($type->toString(), $node->getLine()));
+        }
+    }
+
+    /**
+     * Flattens a type node into the class names it references, unwrapping
+     * nullable, union, intersection and DNF types.
+     *
+     * @return list<Node\Name\FullyQualified>
+     */
+    private function extractFullyQualifiedTypes(?Node $type): array
+    {
+        if ($type instanceof NullableType) {
+            return $this->extractFullyQualifiedTypes($type->type);
         }
 
-        $type = $node->type instanceof NullableType ? $node->type->type : $node->type;
+        if ($type instanceof Node\UnionType || $type instanceof Node\IntersectionType) {
+            $types = [];
+            foreach ($type->types as $innerType) {
+                $types = array_merge($types, $this->extractFullyQualifiedTypes($innerType));
+            }
 
-        if (!$type instanceof Node\Name\FullyQualified) {
-            return;
+            return $types;
         }
 
-        $this->classDescriptionBuilder
-            ->addDependency(new ClassDependency($type->toString(), $node->getLine()));
+        if ($type instanceof Node\Name\FullyQualified) {
+            return [$type];
+        }
+
+        return [];
     }
 
     private function handlePropertyHookNode(Node $node): void
