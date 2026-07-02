@@ -65,7 +65,7 @@ class FileVisitor extends NodeVisitorAbstract
         // handles code like public function myMethod(MyClass $myClass) {}
         $this->handleParamDependency($node);
 
-        // handles code like public function myMethod(): MyClass {}
+        // handles return types like public function myMethod(): MyClass {}, function (): MyClass {}, fn (): MyClass => ...
         $this->handleReturnTypeDependency($node);
 
         // handles attribute definition like #[MyAttribute]
@@ -320,11 +320,11 @@ class FileVisitor extends NodeVisitorAbstract
 
     private function handleReturnTypeDependency(Node $node): void
     {
-        if (!$node instanceof Node\Stmt\ClassMethod) {
+        if (!$node instanceof Node\FunctionLike) {
             return;
         }
 
-        foreach ($this->extractFullyQualifiedTypes($node->returnType) as $returnType) {
+        foreach ($this->extractFullyQualifiedTypes($node->getReturnType()) as $returnType) {
             $this->classDescriptionBuilder
                 ->addDependency(new ClassDependency($returnType->toString(), $returnType->getLine()));
         }
