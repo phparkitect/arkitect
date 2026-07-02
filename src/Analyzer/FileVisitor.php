@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Arkitect\Analyzer;
 
 use PhpParser\Node;
-use PhpParser\Node\NullableType;
 use PhpParser\NodeVisitorAbstract;
 
 class FileVisitor extends NodeVisitorAbstract
@@ -402,7 +401,7 @@ class FileVisitor extends NodeVisitorAbstract
      */
     private function extractFullyQualifiedTypes(?Node $type): array
     {
-        if ($type instanceof NullableType) {
+        if ($type instanceof Node\NullableType) {
             return $this->extractFullyQualifiedTypes($type->type);
         }
 
