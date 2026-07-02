@@ -332,7 +332,7 @@ class FileVisitor extends NodeVisitorAbstract
             return;
         }
 
-        $returnType = $node->returnType;
+        $returnType = $node->returnType instanceof NullableType ? $node->returnType->type : $node->returnType;
 
         if (!$returnType instanceof Node\Name\FullyQualified) {
             return;
