@@ -567,6 +567,100 @@ class CanParseClassTest extends TestCase
         self::assertCount(1, $violations);
     }
 
+    public function test_it_handles_union_param_and_return_types(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+        namespace Foo\Bar;
+
+        use Symfony\Component\HttpFoundation\Request;
+        use Symfony\Component\HttpFoundation\Response;
+
+        class MyClass
+        {
+            public function handle(Request|Response $message): Request|Response|null
+            {
+                return $message;
+            }
+        }
+        EOF;
+
+        $cd = $this->parseCode($code);
+        $dependencies = array_map(
+            static fn (ClassDependency $dependency): string => $dependency->getFQCN()->toString(),
+            $cd[0]->getDependencies()
+        );
+
+        self::assertEquals([
+            'Symfony\Component\HttpFoundation\Request',
+            'Symfony\Component\HttpFoundation\Response',
+            'Symfony\Component\HttpFoundation\Request',
+            'Symfony\Component\HttpFoundation\Response',
+        ], $dependencies);
+    }
+
+    public function test_it_handles_intersection_param_and_return_types(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+        namespace Foo\Bar;
+
+        use Doctrine\Common\Collections\Collection;
+        use Doctrine\Common\Collections\Selectable;
+
+        class MyClass
+        {
+            public function handle(Collection&Selectable $collection): Collection&Selectable
+            {
+                return $collection;
+            }
+        }
+        EOF;
+
+        $cd = $this->parseCode($code, TargetPhpVersion::PHP_8_1);
+        $dependencies = array_map(
+            static fn (ClassDependency $dependency): string => $dependency->getFQCN()->toString(),
+            $cd[0]->getDependencies()
+        );
+
+        self::assertEquals([
+            'Doctrine\Common\Collections\Collection',
+            'Doctrine\Common\Collections\Selectable',
+            'Doctrine\Common\Collections\Collection',
+            'Doctrine\Common\Collections\Selectable',
+        ], $dependencies);
+    }
+
+    public function test_it_handles_dnf_return_types(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+        namespace Foo\Bar;
+
+        use Doctrine\Common\Collections\Collection;
+        use Doctrine\Common\Collections\Selectable;
+
+        class MyClass
+        {
+            public function handle(): (Collection&Selectable)|null
+            {
+                return null;
+            }
+        }
+        EOF;
+
+        $cd = $this->parseCode($code, TargetPhpVersion::PHP_8_2);
+        $dependencies = array_map(
+            static fn (ClassDependency $dependency): string => $dependency->getFQCN()->toString(),
+            $cd[0]->getDependencies()
+        );
+
+        self::assertEquals([
+            'Doctrine\Common\Collections\Collection',
+            'Doctrine\Common\Collections\Selectable',
+        ], $dependencies);
+    }
+
     public function test_is_final_when_there_is_anonymous_final(): void
     {
         $code = <<< 'EOF'

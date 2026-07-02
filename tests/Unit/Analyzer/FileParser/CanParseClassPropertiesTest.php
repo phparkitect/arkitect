@@ -68,6 +68,61 @@ class CanParseClassPropertiesTest extends TestCase
         self::assertEquals('Symfony\Component\Validator\Constraints\NotBlank', $dep[0]->getFQCN()->toString());
     }
 
+    public function test_it_parse_union_typed_property(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+        namespace MyProject\AppBundle\Application;
+
+        use Symfony\Component\Validator\Constraints\Email;
+        use Symfony\Component\Validator\Constraints\NotBlank;
+
+        class ApplicationLevelDto
+        {
+            public NotBlank|Email $foo;
+
+            public NotBlank|string|null $bar;
+        }
+        EOF;
+
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
+        $result = $fp->parse($code, 'relativePathName');
+
+        $cd = $result->classDescriptions();
+        $dep = $cd[0]->getDependencies();
+
+        self::assertCount(3, $dep);
+        self::assertEquals('Symfony\Component\Validator\Constraints\NotBlank', $dep[0]->getFQCN()->toString());
+        self::assertEquals('Symfony\Component\Validator\Constraints\Email', $dep[1]->getFQCN()->toString());
+        self::assertEquals('Symfony\Component\Validator\Constraints\NotBlank', $dep[2]->getFQCN()->toString());
+    }
+
+    public function test_it_parse_intersection_typed_property(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+        namespace MyProject\AppBundle\Application;
+
+        use Symfony\Component\Validator\Constraints\Email;
+        use Symfony\Component\Validator\Constraints\NotBlank;
+
+        class ApplicationLevelDto
+        {
+            public NotBlank&Email $foo;
+        }
+        EOF;
+
+        $fp = FileParserFactory::forPhpVersion(TargetPhpVersion::PHP_8_1);
+        $result = $fp->parse($code, 'relativePathName');
+
+        $cd = $result->classDescriptions();
+        $dep = $cd[0]->getDependencies();
+
+        self::assertCount(2, $dep);
+        self::assertEquals('Symfony\Component\Validator\Constraints\NotBlank', $dep[0]->getFQCN()->toString());
+        self::assertEquals('Symfony\Component\Validator\Constraints\Email', $dep[1]->getFQCN()->toString());
+    }
+
     public function test_it_parse_scalar_typed_property(): void
     {
         $code = <<< 'EOF'
