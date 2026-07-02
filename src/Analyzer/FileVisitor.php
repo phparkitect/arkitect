@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Arkitect\Analyzer;
 
 use PhpParser\Node;
-use PhpParser\Node\NullableType;
 use PhpParser\NodeVisitorAbstract;
 
 class FileVisitor extends NodeVisitorAbstract
@@ -27,61 +26,28 @@ class FileVisitor extends NodeVisitorAbstract
 
     public function enterNode(Node $node): void
     {
+        // class-like declarations: class, anonymous class, enum, interface, trait, use MyTrait;
         $this->handleClassNode($node);
-
-        // handles anonymous class definition like new class() {}
-        $this->handleAnonClassNode($node);
-
-        // handles enum definition
         $this->handleEnumNode($node);
-
-        // handles interface definition like interface MyInterface {}
         $this->handleInterfaceNode($node);
-
-        // handles trait definition like trait MyTrait {}
         $this->handleTraitNode($node);
-
-        // handles trait usage like use MyTrait;
         $this->handleTraitUseNode($node);
 
-        // handles code like $constantValue = StaticClass::constant;
-        $this->handleStaticClassConstantNode($node);
-
-        // handles code like $static = StaticClass::foo();
-        $this->handleStaticClassCallsNode($node);
-
-        // handles code lik $a instanceof MyClass
-        $this->handleInstanceOf($node);
-
-        // handles code like $a = new MyClass();
-        $this->handleNewExpression($node);
-
-        // handles code like public MyClass $myClass;
+        // dependencies from type declarations: public MyClass $a;, myMethod(MyClass $a): MyClass,
+        // const MyClass FOO = null;, catch (MyException $e)
         $this->handleTypedProperty($node);
-
-        // handles docblock like /** @var MyClass $myClass */
-        $this->handleDocComment($node);
-
-        // handles code like public function myMethod(MyClass $myClass) {}
         $this->handleParamDependency($node);
-
-        // handles return types like public function myMethod(): MyClass {}, function (): MyClass {}, fn (): MyClass => ...
         $this->handleReturnTypeDependency($node);
-
-        // handles attribute definition like #[MyAttribute]
-        $this->handleAttributeNode($node);
-
-        // handles property hooks like public string $name { get => ...; set { ... } }
-        $this->handlePropertyHookNode($node);
-
-        // handles throws types like @throws MyClass
-        $this->handleThrowsTags($node);
-
-        // handles catch types like catch (MyException $e)
+        $this->handleClassConstDependency($node);
         $this->handleCatchDependency($node);
 
-        // handles typed class constants like const MyClass FOO = null;
-        $this->handleClassConstDependency($node);
+        // dependencies from expressions: new MyClass(), MyClass::foo(), MyClass::CONST, $a instanceof MyClass
+        $this->handleClassReferenceExpression($node);
+
+        // attributes like #[MyAttribute], docblocks like /** @var MyClass $a */ and @throws MyClass
+        $this->handleAttributeNode($node);
+        $this->handleDocComment($node);
+        $this->handleThrowsTags($node);
     }
 
     public function getClassDescriptions(): array
@@ -98,25 +64,16 @@ class FileVisitor extends NodeVisitorAbstract
 
     public function leaveNode(Node $node): void
     {
-        if ($node instanceof Node\Stmt\Class_ && !$node->isAnonymous()) {
-            $this->classDescriptions[] = $this->classDescriptionBuilder->build();
-            $this->classDescriptionBuilder->clear();
+        if (!$node instanceof Node\Stmt\ClassLike) {
+            return;
         }
 
-        if ($node instanceof Node\Stmt\Enum_) {
-            $this->classDescriptions[] = $this->classDescriptionBuilder->build();
-            $this->classDescriptionBuilder->clear();
+        if ($node instanceof Node\Stmt\Class_ && $node->isAnonymous()) {
+            return;
         }
 
-        if ($node instanceof Node\Stmt\Interface_) {
-            $this->classDescriptions[] = $this->classDescriptionBuilder->build();
-            $this->classDescriptionBuilder->clear();
-        }
-
-        if ($node instanceof Node\Stmt\Trait_) {
-            $this->classDescriptions[] = $this->classDescriptionBuilder->build();
-            $this->classDescriptionBuilder->clear();
-        }
+        $this->classDescriptions[] = $this->classDescriptionBuilder->build();
+        $this->classDescriptionBuilder->clear();
     }
 
     private function handleClassNode(Node $node): void
@@ -126,6 +83,18 @@ class FileVisitor extends NodeVisitorAbstract
         }
 
         if ($node->isAnonymous()) {
+            // an anonymous class is not a class description of its own:
+            // what it extends and implements are dependencies of the class defining it
+            foreach ($node->implements as $interface) {
+                $this->classDescriptionBuilder
+                    ->addDependency(new ClassDependency($interface->toString(), $interface->getLine()));
+            }
+
+            if (null !== $node->extends) {
+                $this->classDescriptionBuilder
+                    ->addDependency(new ClassDependency($node->extends->toString(), $node->getLine()));
+            }
+
             return;
         }
 
@@ -150,27 +119,6 @@ class FileVisitor extends NodeVisitorAbstract
         $this->classDescriptionBuilder->setAbstract($node->isAbstract());
     }
 
-    private function handleAnonClassNode(Node $node): void
-    {
-        if (!$node instanceof Node\Stmt\Class_) {
-            return;
-        }
-
-        if (!$node->isAnonymous()) {
-            return;
-        }
-
-        foreach ($node->implements as $interface) {
-            $this->classDescriptionBuilder
-                ->addDependency(new ClassDependency($interface->toString(), $interface->getLine()));
-        }
-
-        if (null !== $node->extends) {
-            $this->classDescriptionBuilder
-                ->addDependency(new ClassDependency($node->extends->toString(), $node->getLine()));
-        }
-    }
-
     private function handleEnumNode(Node $node): void
     {
         if (!$node instanceof Node\Stmt\Enum_) {
@@ -187,92 +135,6 @@ class FileVisitor extends NodeVisitorAbstract
         foreach ($node->implements as $interface) {
             $this->classDescriptionBuilder
                 ->addInterface($interface->toString(), $interface->getLine());
-        }
-    }
-
-    private function handleStaticClassConstantNode(Node $node): void
-    {
-        if (!$node instanceof Node\Expr\ClassConstFetch) {
-            return;
-        }
-
-        if (!$node->class instanceof Node\Name\FullyQualified) {
-            return;
-        }
-
-        $this->classDescriptionBuilder
-            ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
-    }
-
-    private function handleStaticClassCallsNode(Node $node): void
-    {
-        if (!$node instanceof Node\Expr\StaticCall) {
-            return;
-        }
-
-        if (!$node->class instanceof Node\Name\FullyQualified) {
-            return;
-        }
-
-        $this->classDescriptionBuilder
-            ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
-    }
-
-    private function handleInstanceOf(Node $node): void
-    {
-        if (!$node instanceof Node\Expr\Instanceof_) {
-            return;
-        }
-
-        if (!$node->class instanceof Node\Name\FullyQualified) {
-            return;
-        }
-
-        $this->classDescriptionBuilder
-            ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
-    }
-
-    private function handleNewExpression(Node $node): void
-    {
-        if (!$node instanceof Node\Expr\New_) {
-            return;
-        }
-
-        if (!$node->class instanceof Node\Name\FullyQualified) {
-            return;
-        }
-
-        $this->classDescriptionBuilder
-            ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
-    }
-
-    private function handleTypedProperty(Node $node): void
-    {
-        if (!$node instanceof Node\Stmt\Property) {
-            return;
-        }
-
-        foreach ($this->extractFullyQualifiedTypes($node->type) as $type) {
-            $this->classDescriptionBuilder
-                ->addDependency(new ClassDependency($type->toString(), $node->getLine()));
-        }
-    }
-
-    private function handleDocComment(Node $node): void
-    {
-        $docComment = $node->getDocComment();
-
-        if (null === $docComment) {
-            return;
-        }
-
-        $this->classDescriptionBuilder->addDocBlock($docComment->getText());
-    }
-
-    private function handleParamDependency(Node $node): void
-    {
-        if ($node instanceof Node\Param) {
-            $this->addParamDependency($node);
         }
     }
 
@@ -321,6 +183,30 @@ class FileVisitor extends NodeVisitorAbstract
         }
     }
 
+    private function handleTypedProperty(Node $node): void
+    {
+        if (!$node instanceof Node\Stmt\Property) {
+            return;
+        }
+
+        foreach ($this->extractFullyQualifiedTypes($node->type) as $type) {
+            $this->classDescriptionBuilder
+                ->addDependency(new ClassDependency($type->toString(), $node->getLine()));
+        }
+    }
+
+    private function handleParamDependency(Node $node): void
+    {
+        if (!$node instanceof Node\Param) {
+            return;
+        }
+
+        foreach ($this->extractFullyQualifiedTypes($node->type) as $type) {
+            $this->classDescriptionBuilder
+                ->addDependency(new ClassDependency($type->toString(), $node->getLine()));
+        }
+    }
+
     private function handleReturnTypeDependency(Node $node): void
     {
         if (!$node instanceof Node\FunctionLike) {
@@ -330,35 +216,6 @@ class FileVisitor extends NodeVisitorAbstract
         foreach ($this->extractFullyQualifiedTypes($node->getReturnType()) as $returnType) {
             $this->classDescriptionBuilder
                 ->addDependency(new ClassDependency($returnType->toString(), $returnType->getLine()));
-        }
-    }
-
-    private function handleAttributeNode(Node $node): void
-    {
-        if (!$node instanceof Node\Attribute) {
-            return;
-        }
-
-        $nodeName = $node->name;
-
-        if (!$nodeName instanceof Node\Name\FullyQualified) {
-            return;
-        }
-
-        $this->classDescriptionBuilder
-            ->addAttribute($node->name->toString(), $node->getLine());
-    }
-
-    private function handleThrowsTags(Node $node): void
-    {
-        if (!$node->hasAttribute(DocblockTypesResolver::THROWS_TYPES_ATTRIBUTE)) {
-            return;
-        }
-
-        /** @var Node\Name\FullyQualified $throw */
-        foreach ($node->getAttribute(DocblockTypesResolver::THROWS_TYPES_ATTRIBUTE) as $throw) {
-            $this->classDescriptionBuilder
-                ->addDependency(new ClassDependency($throw->toString(), $throw->getLine()));
         }
     }
 
@@ -386,11 +243,60 @@ class FileVisitor extends NodeVisitorAbstract
         }
     }
 
-    private function addParamDependency(Node\Param $node): void
+    private function handleClassReferenceExpression(Node $node): void
     {
-        foreach ($this->extractFullyQualifiedTypes($node->type) as $type) {
+        if (!$node instanceof Node\Expr\New_
+            && !$node instanceof Node\Expr\StaticCall
+            && !$node instanceof Node\Expr\ClassConstFetch
+            && !$node instanceof Node\Expr\Instanceof_) {
+            return;
+        }
+
+        if (!$node->class instanceof Node\Name\FullyQualified) {
+            return;
+        }
+
+        $this->classDescriptionBuilder
+            ->addDependency(new ClassDependency($node->class->toString(), $node->getLine()));
+    }
+
+    private function handleAttributeNode(Node $node): void
+    {
+        if (!$node instanceof Node\Attribute) {
+            return;
+        }
+
+        $nodeName = $node->name;
+
+        if (!$nodeName instanceof Node\Name\FullyQualified) {
+            return;
+        }
+
+        $this->classDescriptionBuilder
+            ->addAttribute($node->name->toString(), $node->getLine());
+    }
+
+    private function handleDocComment(Node $node): void
+    {
+        $docComment = $node->getDocComment();
+
+        if (null === $docComment) {
+            return;
+        }
+
+        $this->classDescriptionBuilder->addDocBlock($docComment->getText());
+    }
+
+    private function handleThrowsTags(Node $node): void
+    {
+        if (!$node->hasAttribute(DocblockTypesResolver::THROWS_TYPES_ATTRIBUTE)) {
+            return;
+        }
+
+        /** @var Node\Name\FullyQualified $throw */
+        foreach ($node->getAttribute(DocblockTypesResolver::THROWS_TYPES_ATTRIBUTE) as $throw) {
             $this->classDescriptionBuilder
-                ->addDependency(new ClassDependency($type->toString(), $node->getLine()));
+                ->addDependency(new ClassDependency($throw->toString(), $throw->getLine()));
         }
     }
 
@@ -402,7 +308,7 @@ class FileVisitor extends NodeVisitorAbstract
      */
     private function extractFullyQualifiedTypes(?Node $type): array
     {
-        if ($type instanceof NullableType) {
+        if ($type instanceof Node\NullableType) {
             return $this->extractFullyQualifiedTypes($type->type);
         }
 
@@ -420,17 +326,5 @@ class FileVisitor extends NodeVisitorAbstract
         }
 
         return [];
-    }
-
-    private function handlePropertyHookNode(Node $node): void
-    {
-        if (!$node instanceof Node\PropertyHook) {
-            return;
-        }
-
-        // Handle parameters in set hooks (e.g., set(MyClass $value) { ... })
-        foreach ($node->params as $param) {
-            $this->addParamDependency($param);
-        }
     }
 }

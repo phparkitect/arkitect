@@ -109,6 +109,6 @@ class CanParsePropertyHooksTest extends TestCase
         $dependencies = $cd[0]->getDependencies();
         $dependencyNames = array_map(static fn ($dep) => $dep->getFQCN()->toString(), $dependencies);
 
-        self::assertContains('App\ValueObjects\Name', $dependencyNames);
+        self::assertEquals(['App\ValueObjects\Name'], $dependencyNames);
     }
 }
