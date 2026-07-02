@@ -720,6 +720,38 @@ class CanParseClassTest extends TestCase
         ], $dependencies);
     }
 
+    public function test_it_handles_typed_class_constants(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+        namespace Foo\Bar;
+
+        use Symfony\Component\HttpFoundation\Request;
+        use Symfony\Component\HttpFoundation\Response;
+
+        class MyClass
+        {
+            public const ?Request EMPTY_REQUEST = null;
+
+            public const Request|Response|null FALLBACK = null;
+
+            public const string NAME = 'name';
+        }
+        EOF;
+
+        $cd = $this->parseCode($code, TargetPhpVersion::PHP_8_3);
+        $dependencies = array_map(
+            static fn (ClassDependency $dependency): string => $dependency->getFQCN()->toString(),
+            $cd[0]->getDependencies()
+        );
+
+        self::assertEquals([
+            'Symfony\Component\HttpFoundation\Request',
+            'Symfony\Component\HttpFoundation\Request',
+            'Symfony\Component\HttpFoundation\Response',
+        ], $dependencies);
+    }
+
     public function test_is_final_when_there_is_anonymous_final(): void
     {
         $code = <<< 'EOF'

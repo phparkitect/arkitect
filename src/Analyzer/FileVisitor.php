@@ -79,6 +79,9 @@ class FileVisitor extends NodeVisitorAbstract
 
         // handles catch types like catch (MyException $e)
         $this->handleCatchDependency($node);
+
+        // handles typed class constants like const MyClass FOO = null;
+        $this->handleClassConstDependency($node);
     }
 
     public function getClassDescriptions(): array
@@ -356,6 +359,18 @@ class FileVisitor extends NodeVisitorAbstract
         foreach ($node->getAttribute(DocblockTypesResolver::THROWS_TYPES_ATTRIBUTE) as $throw) {
             $this->classDescriptionBuilder
                 ->addDependency(new ClassDependency($throw->toString(), $throw->getLine()));
+        }
+    }
+
+    private function handleClassConstDependency(Node $node): void
+    {
+        if (!$node instanceof Node\Stmt\ClassConst) {
+            return;
+        }
+
+        foreach ($this->extractFullyQualifiedTypes($node->type) as $type) {
+            $this->classDescriptionBuilder
+                ->addDependency(new ClassDependency($type->toString(), $node->getLine()));
         }
     }
 
