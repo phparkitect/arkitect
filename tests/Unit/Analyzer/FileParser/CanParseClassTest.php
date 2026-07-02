@@ -661,6 +661,65 @@ class CanParseClassTest extends TestCase
         ], $dependencies);
     }
 
+    public function test_it_handles_closure_return_types(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+        namespace Foo\Bar;
+
+        use Symfony\Component\HttpFoundation\Request;
+
+        class MyClass
+        {
+            public function make(): callable
+            {
+                return function (): ?Request {
+                    return null;
+                };
+            }
+        }
+        EOF;
+
+        $cd = $this->parseCode($code);
+        $dependencies = array_map(
+            static fn (ClassDependency $dependency): string => $dependency->getFQCN()->toString(),
+            $cd[0]->getDependencies()
+        );
+
+        self::assertEquals(['Symfony\Component\HttpFoundation\Request'], $dependencies);
+    }
+
+    public function test_it_handles_arrow_function_return_types(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+        namespace Foo\Bar;
+
+        use Symfony\Component\HttpFoundation\Request;
+        use Symfony\Component\HttpFoundation\Response;
+
+        class MyClass
+        {
+            public function make(): callable
+            {
+                return fn (): Request|Response => new Request();
+            }
+        }
+        EOF;
+
+        $cd = $this->parseCode($code);
+        $dependencies = array_map(
+            static fn (ClassDependency $dependency): string => $dependency->getFQCN()->toString(),
+            $cd[0]->getDependencies()
+        );
+
+        self::assertEquals([
+            'Symfony\Component\HttpFoundation\Request',
+            'Symfony\Component\HttpFoundation\Response',
+            'Symfony\Component\HttpFoundation\Request',
+        ], $dependencies);
+    }
+
     public function test_is_final_when_there_is_anonymous_final(): void
     {
         $code = <<< 'EOF'
