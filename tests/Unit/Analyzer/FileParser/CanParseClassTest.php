@@ -539,6 +539,34 @@ class CanParseClassTest extends TestCase
         self::assertCount(0, $violations);
     }
 
+    public function test_it_handles_nullable_return_types(): void
+    {
+        $code = <<< 'EOF'
+        <?php
+        namespace Foo\Bar;
+
+        use Symfony\Component\HttpFoundation\Request;
+
+        class MyClass
+        {
+            public function getRequest(): ?Request
+            {
+                return null;
+            }
+        }
+        EOF;
+
+        $cd = $this->parseCode($code);
+
+        self::assertCount(1, $cd[0]->getDependencies());
+        self::assertEquals('Symfony\Component\HttpFoundation\Request', $cd[0]->getDependencies()[0]->getFQCN()->toString());
+
+        $dependsOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['Foo']);
+        $violations = $this->evaluateRule($dependsOnTheseNamespaces, $cd[0]);
+
+        self::assertCount(1, $violations);
+    }
+
     public function test_is_final_when_there_is_anonymous_final(): void
     {
         $code = <<< 'EOF'
