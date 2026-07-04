@@ -13,3 +13,4 @@ composer.lock
 composer.phar
 .phpunit.cache/
 .vscode
+.phparkitect.cache

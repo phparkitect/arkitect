@@ -31,6 +31,8 @@ class Config
 
     private TargetPhpVersion $targetPhpVersion;
 
+    private ?string $cacheFilePath = null;
+
     public function __construct()
     {
         $this->classSetRules = [];
@@ -43,6 +45,7 @@ class Config
         $this->format = PrinterFactory::default();
         $this->autoloadFilePath = null;
         $this->targetPhpVersion = TargetPhpVersion::latest();
+        $this->cacheFilePath = '.phparkitect.cache';
     }
 
     public function add(ClassSet $classSet, ArchRule ...$rules): self
@@ -166,5 +169,19 @@ class Config
     public function getAutoloadFilePath(): ?string
     {
         return $this->autoloadFilePath;
+    }
+
+    public function noCache(bool $noCache): self
+    {
+        if ($noCache) {
+            $this->cacheFilePath = null;
+        }
+
+        return $this;
+    }
+
+    public function getCacheFilePath(): ?string
+    {
+        return $this->cacheFilePath;
     }
 }

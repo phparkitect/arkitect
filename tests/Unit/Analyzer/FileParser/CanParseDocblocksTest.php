@@ -418,8 +418,10 @@ class CanParseDocblocksTest extends TestCase
 
         $fp = FileParserFactory::createFileParser(
             TargetPhpVersion::create(TargetPhpVersion::PHP_8_1),
-            false
+            false,
+            null
         );
+
         $result = $fp->parse($code, 'relativePathName');
 
         $cd = $result->classDescriptions();

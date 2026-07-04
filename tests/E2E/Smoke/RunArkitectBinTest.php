@@ -113,7 +113,7 @@ App\Controller\Foo has 1 violations
 
     protected function runArkitectPassingConfigFilePath($configFilePath): Process
     {
-        $process = new Process([$this->phparkitect, 'check', '--config='.$configFilePath], __DIR__);
+        $process = new Process([$this->phparkitect, 'check', '--no-cache', '--config='.$configFilePath], __DIR__);
         $process->run();
 
         return $process;
@@ -121,7 +121,7 @@ App\Controller\Foo has 1 violations
 
     protected function runArkitect(): Process
     {
-        $process = new Process([$this->phparkitect, 'check'], __DIR__);
+        $process = new Process([$this->phparkitect, 'check', '--no-cache'], __DIR__);
         $process->run();
 
         return $process;
