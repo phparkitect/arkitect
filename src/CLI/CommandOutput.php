@@ -16,13 +16,18 @@ final class CommandOutput
 {
     private OutputInterface $output;
 
+    private float $startTime;
+
     public function __construct(OutputInterface $output)
     {
         $this->output = $output;
+        $this->startTime = microtime(true);
     }
 
-    public function printHeading(string $version): void
+    public function printHeading(?string $version): void
     {
+        $version ??= 'unknown';
+
         $this->output->writeln("<info>PHPArkitect $version</info>\n");
     }
 
@@ -33,9 +38,9 @@ final class CommandOutput
         return $verbose ? new DebugProgress($this->output) : new ProgressBarProgress($this->output);
     }
 
-    public function printExecutionTime(float $startTime): void
+    public function printExecutionTime(): void
     {
-        $executionTime = number_format(microtime(true) - $startTime, 2);
+        $executionTime = number_format(microtime(true) - $this->startTime, 2);
 
         $this->output->writeln("⏱️ Execution time: $executionTime\n");
     }

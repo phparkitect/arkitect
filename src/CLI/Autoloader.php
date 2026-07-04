@@ -9,12 +9,29 @@ use Webmozart\Assert\Assert;
 
 final class Autoloader
 {
+    /** @var \Closure(): bool */
+    private \Closure $isRunningAsPhar;
+
+    /**
+     * @param \Closure(): bool|null $isRunningAsPhar
+     */
+    public function __construct(?\Closure $isRunningAsPhar = null)
+    {
+        $this->isRunningAsPhar = $isRunningAsPhar ?? static fn (): bool => '' !== \Phar::running();
+    }
+
     /**
      * @psalm-suppress UnresolvableInclude
      */
-    public static function load(?string $filePath, OutputInterface $output): void
+    public function load(?string $filePath, OutputInterface $output): void
     {
         if (null === $filePath) {
+            // the phar bundles its own dependencies, so without an explicit
+            // autoload file the user's classes cannot be resolved
+            if (($this->isRunningAsPhar)()) {
+                throw new \RuntimeException('The --autoload option is required when running phparkitect as a PHAR');
+            }
+
             return;
         }
 

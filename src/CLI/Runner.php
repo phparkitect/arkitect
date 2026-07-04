@@ -77,6 +77,10 @@ class Runner
 
     protected function doRun(Config $config, Progress $progress): array
     {
+        // parsing large codebases is memory hungry and recurses deeply
+        ini_set('memory_limit', '-1');
+        ini_set('xdebug.max_nesting_level', '10000');
+
         $violations = new Violations();
         $parsingErrors = new ParsingErrors();
 

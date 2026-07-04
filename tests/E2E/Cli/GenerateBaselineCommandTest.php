@@ -4,35 +4,13 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\E2E\Cli;
 
-use Arkitect\CLI\PhpArkitectApplication;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Tester\ApplicationTester;
-
-class GenerateBaselineCommandTest extends TestCase
+class GenerateBaselineCommandTest extends CommandTestCase
 {
-    const SUCCESS_CODE = 0;
-
-    const ERROR_CODE = 1;
-
-    private string $customBaselineFilename = __DIR__.'/my-baseline.json';
-
-    private string $defaultBaselineFilename = 'phparkitect-baseline.json';
-
-    protected function tearDown(): void
-    {
-        if (file_exists($this->customBaselineFilename)) {
-            unlink($this->customBaselineFilename);
-        }
-        if (file_exists($this->defaultBaselineFilename)) {
-            unlink($this->defaultBaselineFilename);
-        }
-    }
-
     public function test_generates_baseline_with_default_filename(): void
     {
         $cmdTester = $this->runGenerateBaseline(__DIR__.'/../_fixtures/configMvcForYieldBug.php');
 
-        self::assertEquals(self::SUCCESS_CODE, $cmdTester->getStatusCode());
+        self::assertCommandWasSuccessful($cmdTester);
         self::assertStringContainsString("ℹ️ Baseline file '{$this->defaultBaselineFilename}' created!", $cmdTester->getErrorOutput());
         self::assertFileExists($this->defaultBaselineFilename);
     }
@@ -41,7 +19,7 @@ class GenerateBaselineCommandTest extends TestCase
     {
         $cmdTester = $this->runGenerateBaseline(__DIR__.'/../_fixtures/configMvcForYieldBug.php', $this->customBaselineFilename);
 
-        self::assertEquals(self::SUCCESS_CODE, $cmdTester->getStatusCode());
+        self::assertCommandWasSuccessful($cmdTester);
         self::assertStringContainsString("ℹ️ Baseline file '{$this->customBaselineFilename}' created!", $cmdTester->getErrorOutput());
         self::assertFileExists($this->customBaselineFilename);
     }
@@ -77,31 +55,7 @@ class GenerateBaselineCommandTest extends TestCase
     {
         $cmdTester = $this->runGenerateBaseline(__DIR__.'/not-existing-config.php');
 
-        self::assertEquals(self::ERROR_CODE, $cmdTester->getStatusCode());
+        self::assertCommandExitedWithError($cmdTester);
         self::assertFileDoesNotExist($this->defaultBaselineFilename);
-    }
-
-    protected function runGenerateBaseline(
-        string $configFilePath,
-        ?string $filename = null,
-        bool $ignoreBaselineNumbers = false,
-    ): ApplicationTester {
-        $input = ['generate-baseline', '--config' => $configFilePath];
-
-        if (null !== $filename) {
-            $input['filename'] = $filename;
-        }
-
-        if ($ignoreBaselineNumbers) {
-            $input['--ignore-baseline-linenumbers'] = true;
-        }
-
-        $app = new PhpArkitectApplication();
-        $app->setAutoExit(false);
-
-        $appTester = new ApplicationTester($app);
-        $appTester->run($input, ['capture_stderr_separately' => true]);
-
-        return $appTester;
     }
 }

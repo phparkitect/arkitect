@@ -4,32 +4,13 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\E2E\Cli;
 
+use Arkitect\CLI\Autoloader;
 use Arkitect\CLI\Command\Check;
-use Arkitect\CLI\PhpArkitectApplication;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
-class CheckCommandTest extends TestCase
+class CheckCommandTest extends CommandTestCase
 {
-    const SUCCESS_CODE = 0;
-
-    const ERROR_CODE = 1;
-
-    private string $customBaselineFilename = __DIR__.'/my-baseline.json';
-
-    private string $defaultBaselineFilename = 'phparkitect-baseline.json';
-
-    protected function tearDown(): void
-    {
-        if (file_exists($this->customBaselineFilename)) {
-            unlink($this->customBaselineFilename);
-        }
-        if (file_exists($this->defaultBaselineFilename)) {
-            unlink($this->defaultBaselineFilename);
-        }
-    }
-
     public function test_app_returns_error_with_multiple_violations(): void
     {
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvc.php');
@@ -306,7 +287,7 @@ class CheckCommandTest extends TestCase
 
     public function test_autoload_is_required_when_running_as_phar(): void
     {
-        $pharCheck = new Check(static fn (): bool => true);
+        $pharCheck = new Check(new Autoloader(static fn (): bool => true));
 
         $app = new Application();
         $app->setAutoExit(false);
@@ -367,37 +348,5 @@ class CheckCommandTest extends TestCase
         }
 
         return $this->runApplication($input);
-    }
-
-    protected function runGenerateBaseline(string $configFilePath, ?string $filename = null): ApplicationTester
-    {
-        $input = ['generate-baseline', '--config' => $configFilePath];
-
-        if (null !== $filename) {
-            $input['filename'] = $filename;
-        }
-
-        return $this->runApplication($input);
-    }
-
-    protected function runApplication(array $input): ApplicationTester
-    {
-        $app = new PhpArkitectApplication();
-        $app->setAutoExit(false);
-
-        $appTester = new ApplicationTester($app);
-        $appTester->run($input, ['capture_stderr_separately' => true]);
-
-        return $appTester;
-    }
-
-    protected static function assertCommandExitedWithError(ApplicationTester $applicationTester): void
-    {
-        self::assertEquals(self::ERROR_CODE, $applicationTester->getStatusCode());
-    }
-
-    protected static function assertCommandWasSuccessful(ApplicationTester $applicationTester): void
-    {
-        self::assertEquals(self::SUCCESS_CODE, $applicationTester->getStatusCode());
     }
 }

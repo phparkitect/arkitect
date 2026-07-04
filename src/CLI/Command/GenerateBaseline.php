@@ -20,17 +20,13 @@ class GenerateBaseline extends Command
 {
     private const FILENAME_ARGUMENT = 'filename';
 
-    /** @var \Closure(): bool */
-    private \Closure $isRunningAsPhar;
+    private Autoloader $autoloader;
 
-    /**
-     * @param \Closure(): bool|null $isRunningAsPhar
-     */
-    public function __construct(?\Closure $isRunningAsPhar = null)
+    public function __construct(?Autoloader $autoloader = null)
     {
         parent::__construct('generate-baseline');
 
-        $this->isRunningAsPhar = $isRunningAsPhar ?? static fn (): bool => '' !== \Phar::running();
+        $this->autoloader = $autoloader ?? new Autoloader();
     }
 
     protected function configure(): void
@@ -59,10 +55,6 @@ class GenerateBaseline extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        ini_set('memory_limit', '-1');
-        ini_set('xdebug.max_nesting_level', '10000');
-        $startTime = microtime(true);
-
         $output = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
         $commandOutput = new CommandOutput($output);
 
@@ -74,19 +66,13 @@ class GenerateBaseline extends Command
             /** @var string|null $baselineFilename */
             $baselineFilename = $input->getArgument(self::FILENAME_ARGUMENT);
 
-            if (($this->isRunningAsPhar)() && null === $input->getOption(CommonOptions::AUTOLOAD)) {
-                $output->writeln('❌ The --autoload option is required when running phparkitect as a PHAR');
-
-                return self::FAILURE;
-            }
-
-            $commandOutput->printHeading($this->getApplication()?->getVersion() ?? 'unknown');
+            $commandOutput->printHeading($this->getApplication()?->getVersion());
 
             $config = ConfigBuilder::loadFromFile($rulesFilename)
                 ->autoloadFilePath($input->getOption(CommonOptions::AUTOLOAD))
                 ->targetPhpVersion(TargetPhpVersion::create($phpVersion));
 
-            Autoloader::load($config->getAutoloadFilePath(), $output);
+            $this->autoloader->load($config->getAutoloadFilePath(), $output);
             $progress = $commandOutput->createProgress($verbose);
 
             $output->writeln("Config file '$rulesFilename' found\n");
@@ -105,7 +91,7 @@ class GenerateBaseline extends Command
 
             return self::FAILURE;
         } finally {
-            $commandOutput->printExecutionTime($startTime);
+            $commandOutput->printExecutionTime();
         }
     }
 }

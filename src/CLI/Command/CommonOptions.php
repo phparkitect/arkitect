@@ -17,7 +17,7 @@ final class CommonOptions
     public const IGNORE_BASELINE_LINENUMBERS = 'ignore-baseline-linenumbers';
     public const AUTOLOAD = 'autoload';
 
-    public const DEFAULT_RULES_FILENAME = 'phparkitect.php';
+    private const DEFAULT_RULES_FILENAME = 'phparkitect.php';
 
     public static function config(): InputOption
     {

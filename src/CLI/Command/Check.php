@@ -27,17 +27,13 @@ class Check extends Command
 
     private const GENERATE_BASELINE_PARAM = 'generate-baseline';
 
-    /** @var \Closure(): bool */
-    private \Closure $isRunningAsPhar;
+    private Autoloader $autoloader;
 
-    /**
-     * @param \Closure(): bool|null $isRunningAsPhar
-     */
-    public function __construct(?\Closure $isRunningAsPhar = null)
+    public function __construct(?Autoloader $autoloader = null)
     {
         parent::__construct('check');
 
-        $this->isRunningAsPhar = $isRunningAsPhar ?? static fn (): bool => '' !== \Phar::running();
+        $this->autoloader = $autoloader ?? new Autoloader();
     }
 
     protected function configure(): void
@@ -88,10 +84,6 @@ class Check extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        ini_set('memory_limit', '-1');
-        ini_set('xdebug.max_nesting_level', '10000');
-        $startTime = microtime(true);
-
         // we write everything on STDERR apart from the list of violations which goes on STDOUT
         // this allows to pipe the output of this command to a file while showing output on the terminal
         $stdOut = $output;
@@ -115,13 +107,7 @@ class Check extends Command
                 return self::FAILURE;
             }
 
-            if (($this->isRunningAsPhar)() && null === $input->getOption(CommonOptions::AUTOLOAD)) {
-                $output->writeln('❌ The --autoload option is required when running phparkitect as a PHAR');
-
-                return self::FAILURE;
-            }
-
-            $commandOutput->printHeading($this->getApplication()?->getVersion() ?? 'unknown');
+            $commandOutput->printHeading($this->getApplication()?->getVersion());
 
             $config = ConfigBuilder::loadFromFile($rulesFilename)
                 ->autoloadFilePath($input->getOption(CommonOptions::AUTOLOAD))
@@ -132,7 +118,7 @@ class Check extends Command
                 ->skipBaseline($skipBaseline)
                 ->format($format);
 
-            Autoloader::load($config->getAutoloadFilePath(), $output);
+            $this->autoloader->load($config->getAutoloadFilePath(), $output);
             $printer = $this->createPrinter($output, $config->getFormat());
             $progress = $commandOutput->createProgress($verbose);
             $baseline = $this->createBaseline($output, $config->isSkipBaseline(), $config->getBaselineFilePath());
@@ -173,7 +159,7 @@ class Check extends Command
 
             return self::FAILURE;
         } finally {
-            $commandOutput->printExecutionTime($startTime);
+            $commandOutput->printExecutionTime();
         }
     }
 
