@@ -180,6 +180,29 @@ class CheckCommandTest extends TestCase
         self::assertCommandExitedWithError($cmdTester);
     }
 
+    public function test_baseline_reports_stale_violations(): void
+    {
+        $configFilePath = __DIR__.'/../_fixtures/configMvcForYieldBug.php';
+
+        // Produce the baseline matching the current violation
+        $this->runCheck($configFilePath, null, null, $this->customBaselineFilename);
+
+        // Add a fake, already-fixed entry to the baseline
+        $baseline = json_decode((string) file_get_contents($this->customBaselineFilename), true);
+        $baseline['violations'][] = [
+            'fqcn' => 'App\Controller\AlreadyFixed',
+            'error' => 'should have a name that matches *Controller because all controllers should be end name with Controller',
+            'line' => 1,
+            'filePath' => 'Controller/AlreadyFixed.php',
+        ];
+        file_put_contents($this->customBaselineFilename, json_encode($baseline));
+
+        $cmdTester = $this->runCheck($configFilePath, null, $this->customBaselineFilename);
+
+        self::assertCommandWasSuccessful($cmdTester);
+        self::assertStringContainsString('💡 1 violation in the baseline looks fixed — regenerate the baseline to remove it', $cmdTester->getErrorOutput());
+    }
+
     public function test_json_format_output_errors(): void
     {
         $configFilePath = __DIR__.'/../_fixtures/configMvcForYieldBug.php';

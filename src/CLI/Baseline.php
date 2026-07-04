@@ -11,6 +11,8 @@ class Baseline
 
     private string $filename;
 
+    private int $staleViolationsCount = 0;
+
     private function __construct(Violations $violations, string $filename)
     {
         $this->violations = $violations;
@@ -24,7 +26,19 @@ class Baseline
 
     public function applyTo(Violations $violations, bool $ignoreBaselineLinenumbers): void
     {
+        $this->staleViolationsCount = $this->violations->countUnmatchedIn($violations, $ignoreBaselineLinenumbers);
+
         $violations->remove($this->violations, $ignoreBaselineLinenumbers);
+    }
+
+    /**
+     * Number of baseline entries that no longer match any current violation,
+     * i.e. that have already been fixed and could be removed from the baseline.
+     * Only meaningful after applyTo() has run.
+     */
+    public function getStaleViolationsCount(): int
+    {
+        return $this->staleViolationsCount;
     }
 
     /**
