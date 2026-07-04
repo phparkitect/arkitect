@@ -101,6 +101,18 @@ Looks for `phparkitect.php` in the current directory by default. Use `--config` 
 phparkitect check --config=/project/yourConfigFile.php
 ```
 
+### `generate-baseline`
+
+Runs the checks and writes the current violations to a baseline file, so `check` can ignore them later:
+
+```
+phparkitect generate-baseline [filename]
+```
+
+`filename` defaults to `phparkitect-baseline.json`. The command accepts `--config`, `--autoload`, `--target-php-version` and `--ignore-baseline-linenumbers` (see [Baseline](#baseline)).
+
+> **Note**: this replaces the old `check --generate-baseline` option, which now fails with an error pointing to this command.
+
 ### `init`
 
 Scaffolds a `phparkitect.php` so you don't have to write it from scratch:
@@ -144,7 +156,6 @@ Every setting can be passed as a CLI option or set via the corresponding `Config
 | `--skip-baseline` | `-k` | `skipBaseline()` | Skips the default baseline even if present. |
 | `--ignore-baseline-linenumbers` | `-i` | `ignoreBaselineLinenumbers()` | Matches baseline violations without checking line numbers. |
 | `--config` | `-c` | — | Configuration file to load (default: `phparkitect.php`). |
-| `--generate-baseline` | `-g` | — | Writes current violations to a baseline file instead of failing. |
 | `--verbose` | `-v` | — | Prints every parsed file instead of the progress bar. |
 | — | — | `skipParsingCustomAnnotations()` | Disables custom DocBlock annotation parsing (enabled by default). |
 
@@ -153,12 +164,12 @@ Every setting can be passed as a CLI option or set via the corresponding `Config
 If your codebase already has violations you can't fix right now, generate a baseline to ignore them:
 
 ```
-phparkitect check --generate-baseline
+phparkitect generate-baseline
 ```
 
-This creates `phparkitect-baseline.json`. Subsequent runs pick it up automatically. Use a custom file name with `--generate-baseline=my-baseline.json`, point to it with `--use-baseline=my-baseline.json`, or skip it entirely with `--skip-baseline`.
+This creates `phparkitect-baseline.json`. Subsequent `check` runs pick it up automatically. Use a custom file name with `phparkitect generate-baseline my-baseline.json`, point to it with `--use-baseline=my-baseline.json`, or skip it entirely with `--skip-baseline`.
 
-By default the baseline also checks line numbers — a change before the offending line shifts the number and the check fails. Use `--ignore-baseline-linenumbers` to match violations regardless of line number.
+By default the baseline also checks line numbers — a change before the offending line shifts the number and the check fails. Use `--ignore-baseline-linenumbers` (on both `generate-baseline` and `check`) to match violations regardless of line number.
 
 > **Warning**: when ignoring line numbers, PHPArkitect cannot detect if the same rule is violated additional times in the same file.
 
