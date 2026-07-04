@@ -4,22 +4,33 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI\Command;
 
+use Arkitect\CLI\Autoloader;
 use Arkitect\CLI\Baseline;
+use Arkitect\CLI\CommandOutput;
 use Arkitect\CLI\ConfigBuilder;
 use Arkitect\CLI\Runner;
 use Arkitect\CLI\TargetPhpVersion;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class GenerateBaseline extends AbstractCommand
+class GenerateBaseline extends Command
 {
     private const FILENAME_ARGUMENT = 'filename';
 
-    public function __construct()
+    /** @var \Closure(): bool */
+    private \Closure $isRunningAsPhar;
+
+    /**
+     * @param \Closure(): bool|null $isRunningAsPhar
+     */
+    public function __construct(?\Closure $isRunningAsPhar = null)
     {
         parent::__construct('generate-baseline');
+
+        $this->isRunningAsPhar = $isRunningAsPhar ?? static fn (): bool => '' !== \Phar::running();
     }
 
     protected function configure(): void
@@ -30,15 +41,20 @@ class GenerateBaseline extends AbstractCommand
                 'This command runs the checks defined in your config file and saves the current violations '
                 .'to a baseline file, so they can be ignored in subsequent <comment>check</comment> runs.'
             )
-            ->addUsage('generates '.self::DEFAULT_BASELINE_FILENAME.' in the current dir')
+            ->addUsage('generates '.Baseline::DEFAULT_FILENAME.' in the current dir')
             ->addUsage('my-baseline.json generates my-baseline.json in the current dir')
             ->addArgument(
                 self::FILENAME_ARGUMENT,
                 InputArgument::OPTIONAL,
-                'The baseline file to generate (default: '.self::DEFAULT_BASELINE_FILENAME.')'
+                'The baseline file to generate (default: '.Baseline::DEFAULT_FILENAME.')'
             );
 
-        $this->configureCommonOptions();
+        $this->getDefinition()->addOptions([
+            CommonOptions::config(),
+            CommonOptions::targetPhpVersion(),
+            CommonOptions::ignoreBaselineLinenumbers(),
+            CommonOptions::autoload(),
+        ]);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -47,30 +63,31 @@ class GenerateBaseline extends AbstractCommand
         ini_set('xdebug.max_nesting_level', '10000');
         $startTime = microtime(true);
 
+        $output = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
+        $commandOutput = new CommandOutput($output);
+
         try {
             $verbose = (bool) $input->getOption('verbose');
-            $rulesFilename = $input->getOption(self::CONFIG_FILENAME_PARAM);
-            $ignoreBaselineLinenumbers = (bool) $input->getOption(self::IGNORE_BASELINE_LINENUMBERS_PARAM);
-            $phpVersion = $input->getOption(self::TARGET_PHP_PARAM);
+            $rulesFilename = $input->getOption(CommonOptions::CONFIG_FILENAME);
+            $ignoreBaselineLinenumbers = (bool) $input->getOption(CommonOptions::IGNORE_BASELINE_LINENUMBERS);
+            $phpVersion = $input->getOption(CommonOptions::TARGET_PHP_VERSION);
             /** @var string|null $baselineFilename */
             $baselineFilename = $input->getArgument(self::FILENAME_ARGUMENT);
 
-            $output = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
-
-            if ($this->isRunningAsPhar() && null === $input->getOption(self::AUTOLOAD_PARAM)) {
+            if (($this->isRunningAsPhar)() && null === $input->getOption(CommonOptions::AUTOLOAD)) {
                 $output->writeln('❌ The --autoload option is required when running phparkitect as a PHAR');
 
-                return self::ERROR_CODE;
+                return self::FAILURE;
             }
 
-            $this->printHeadingLine($output);
+            $commandOutput->printHeading($this->getApplication()?->getVersion() ?? 'unknown');
 
             $config = ConfigBuilder::loadFromFile($rulesFilename)
-                ->autoloadFilePath($input->getOption(self::AUTOLOAD_PARAM))
+                ->autoloadFilePath($input->getOption(CommonOptions::AUTOLOAD))
                 ->targetPhpVersion(TargetPhpVersion::create($phpVersion));
 
-            $this->requireAutoload($output, $config->getAutoloadFilePath());
-            $progress = $this->createProgress($output, $verbose);
+            Autoloader::load($config->getAutoloadFilePath(), $output);
+            $progress = $commandOutput->createProgress($verbose);
 
             $output->writeln("Config file '$rulesFilename' found\n");
 
@@ -78,17 +95,17 @@ class GenerateBaseline extends AbstractCommand
 
             $result = $runner->baseline($config, $progress);
 
-            $baselineFilePath = Baseline::save($baselineFilename, self::DEFAULT_BASELINE_FILENAME, $result->getViolations(), $ignoreBaselineLinenumbers);
+            $baselineFilePath = Baseline::save($baselineFilename, $result->getViolations(), $ignoreBaselineLinenumbers);
 
             $output->writeln("ℹ️ Baseline file '$baselineFilePath' created!");
 
-            return self::SUCCESS_CODE;
+            return self::SUCCESS;
         } catch (\Throwable $e) {
             $output->writeln("❌ {$e->getMessage()}");
 
-            return self::ERROR_CODE;
+            return self::FAILURE;
         } finally {
-            $this->printExecutionTime($output, $startTime);
+            $commandOutput->printExecutionTime($startTime);
         }
     }
 }

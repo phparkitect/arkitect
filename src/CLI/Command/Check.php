@@ -4,18 +4,21 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI\Command;
 
+use Arkitect\CLI\Autoloader;
 use Arkitect\CLI\Baseline;
+use Arkitect\CLI\CommandOutput;
 use Arkitect\CLI\ConfigBuilder;
 use Arkitect\CLI\Printer\Printer;
 use Arkitect\CLI\Printer\PrinterFactory;
 use Arkitect\CLI\Runner;
 use Arkitect\CLI\TargetPhpVersion;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Check extends AbstractCommand
+class Check extends Command
 {
     private const STOP_ON_FAILURE_PARAM = 'stop-on-failure';
     private const USE_BASELINE_PARAM = 'use-baseline';
@@ -24,9 +27,17 @@ class Check extends AbstractCommand
 
     private const GENERATE_BASELINE_PARAM = 'generate-baseline';
 
-    public function __construct()
+    /** @var \Closure(): bool */
+    private \Closure $isRunningAsPhar;
+
+    /**
+     * @param \Closure(): bool|null $isRunningAsPhar
+     */
+    public function __construct(?\Closure $isRunningAsPhar = null)
     {
         parent::__construct('check');
+
+        $this->isRunningAsPhar = $isRunningAsPhar ?? static fn (): bool => '' !== \Phar::running();
     }
 
     protected function configure(): void
@@ -67,7 +78,12 @@ class Check extends AbstractCommand
                 'text'
             );
 
-        $this->configureCommonOptions();
+        $this->getDefinition()->addOptions([
+            CommonOptions::config(),
+            CommonOptions::targetPhpVersion(),
+            CommonOptions::ignoreBaselineLinenumbers(),
+            CommonOptions::autoload(),
+        ]);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -76,48 +92,49 @@ class Check extends AbstractCommand
         ini_set('xdebug.max_nesting_level', '10000');
         $startTime = microtime(true);
 
+        // we write everything on STDERR apart from the list of violations which goes on STDOUT
+        // this allows to pipe the output of this command to a file while showing output on the terminal
+        $stdOut = $output;
+        $output = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
+        $commandOutput = new CommandOutput($output);
+
         try {
             $verbose = (bool) $input->getOption('verbose');
-            $rulesFilename = $input->getOption(self::CONFIG_FILENAME_PARAM);
+            $rulesFilename = $input->getOption(CommonOptions::CONFIG_FILENAME);
             $stopOnFailure = (bool) $input->getOption(self::STOP_ON_FAILURE_PARAM);
             $useBaseline = (string) $input->getOption(self::USE_BASELINE_PARAM);
             $skipBaseline = (bool) $input->getOption(self::SKIP_BASELINE_PARAM);
-            $ignoreBaselineLinenumbers = (bool) $input->getOption(self::IGNORE_BASELINE_LINENUMBERS_PARAM);
-            $phpVersion = $input->getOption(self::TARGET_PHP_PARAM);
+            $ignoreBaselineLinenumbers = (bool) $input->getOption(CommonOptions::IGNORE_BASELINE_LINENUMBERS);
+            $phpVersion = $input->getOption(CommonOptions::TARGET_PHP_VERSION);
             $format = $input->getOption(self::FORMAT_PARAM);
-
-            // we write everything on STDERR apart from the list of violations which goes on STDOUT
-            // this allows to pipe the output of this command to a file while showing output on the terminal
-            $stdOut = $output;
-            $output = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
 
             if (false !== $input->getOption(self::GENERATE_BASELINE_PARAM)) {
                 $output->writeln('❌ The --generate-baseline option has been moved to its own command.');
                 $output->writeln('Run: phparkitect generate-baseline [filename]');
 
-                return self::ERROR_CODE;
+                return self::FAILURE;
             }
 
-            if ($this->isRunningAsPhar() && null === $input->getOption(self::AUTOLOAD_PARAM)) {
+            if (($this->isRunningAsPhar)() && null === $input->getOption(CommonOptions::AUTOLOAD)) {
                 $output->writeln('❌ The --autoload option is required when running phparkitect as a PHAR');
 
-                return self::ERROR_CODE;
+                return self::FAILURE;
             }
 
-            $this->printHeadingLine($output);
+            $commandOutput->printHeading($this->getApplication()?->getVersion() ?? 'unknown');
 
             $config = ConfigBuilder::loadFromFile($rulesFilename)
-                ->autoloadFilePath($input->getOption(self::AUTOLOAD_PARAM))
+                ->autoloadFilePath($input->getOption(CommonOptions::AUTOLOAD))
                 ->stopOnFailure($stopOnFailure)
                 ->targetPhpVersion(TargetPhpVersion::create($phpVersion))
-                ->baselineFilePath(Baseline::resolveFilePath($useBaseline, self::DEFAULT_BASELINE_FILENAME))
+                ->baselineFilePath(Baseline::resolveFilePath($useBaseline))
                 ->ignoreBaselineLinenumbers($ignoreBaselineLinenumbers)
                 ->skipBaseline($skipBaseline)
                 ->format($format);
 
-            $this->requireAutoload($output, $config->getAutoloadFilePath());
+            Autoloader::load($config->getAutoloadFilePath(), $output);
             $printer = $this->createPrinter($output, $config->getFormat());
-            $progress = $this->createProgress($output, $verbose);
+            $progress = $commandOutput->createProgress($verbose);
             $baseline = $this->createBaseline($output, $config->isSkipBaseline(), $config->getBaselineFilePath());
 
             $output->writeln("Config file '$rulesFilename' found\n");
@@ -150,24 +167,24 @@ class Check extends AbstractCommand
 
             !$result->hasErrors() && $output->writeln('✅ No violations detected');
 
-            return $result->hasErrors() ? self::ERROR_CODE : self::SUCCESS_CODE;
+            return $result->hasErrors() ? self::FAILURE : self::SUCCESS;
         } catch (\Throwable $e) {
             $output->writeln("❌ {$e->getMessage()}");
 
-            return self::ERROR_CODE;
+            return self::FAILURE;
         } finally {
-            $this->printExecutionTime($output, $startTime);
+            $commandOutput->printExecutionTime($startTime);
         }
     }
 
-    protected function createPrinter(OutputInterface $output, string $format): Printer
+    private function createPrinter(OutputInterface $output, string $format): Printer
     {
         $output->writeln("Output format: $format");
 
         return PrinterFactory::create($format);
     }
 
-    protected function createBaseline(OutputInterface $output, bool $skipBaseline, ?string $baselineFilePath): Baseline
+    private function createBaseline(OutputInterface $output, bool $skipBaseline, ?string $baselineFilePath): Baseline
     {
         $baseline = Baseline::create($skipBaseline, $baselineFilePath);
 

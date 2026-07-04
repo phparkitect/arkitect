@@ -306,12 +306,7 @@ class CheckCommandTest extends TestCase
 
     public function test_autoload_is_required_when_running_as_phar(): void
     {
-        $pharCheck = new class extends Check {
-            protected function isRunningAsPhar(): bool
-            {
-                return true;
-            }
-        };
+        $pharCheck = new Check(static fn (): bool => true);
 
         $app = new Application();
         $app->setAutoExit(false);
