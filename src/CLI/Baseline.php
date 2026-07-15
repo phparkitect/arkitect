@@ -7,6 +7,8 @@ use Arkitect\Rules\Violations;
 
 class Baseline
 {
+    public const DEFAULT_FILENAME = 'phparkitect-baseline.json';
+
     private Violations $violations;
 
     private string $filename;
@@ -44,10 +46,10 @@ class Baseline
     /**
      * @psalm-suppress RiskyTruthyFalsyComparison
      */
-    public static function resolveFilePath(?string $filePath, string $defaultFilePath): ?string
+    public static function resolveFilePath(?string $filePath): ?string
     {
-        if (!$filePath && file_exists($defaultFilePath)) {
-            $filePath = $defaultFilePath;
+        if (!$filePath && file_exists(self::DEFAULT_FILENAME)) {
+            $filePath = self::DEFAULT_FILENAME;
         }
 
         return $filePath ?: null;
@@ -79,10 +81,10 @@ class Baseline
         );
     }
 
-    public static function save(?string $filename, string $defaultFilePath, Violations $violations, bool $ignoreLineNumbers = false): string
+    public static function save(?string $filename, Violations $violations, bool $ignoreLineNumbers = false): string
     {
         if (null === $filename) {
-            $filename = $defaultFilePath;
+            $filename = self::DEFAULT_FILENAME;
         }
 
         if ($ignoreLineNumbers) {

@@ -20,19 +20,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Check extends Command
 {
-    private const CONFIG_FILENAME_PARAM = 'config';
-    private const TARGET_PHP_PARAM = 'target-php-version';
     private const STOP_ON_FAILURE_PARAM = 'stop-on-failure';
     private const USE_BASELINE_PARAM = 'use-baseline';
     private const SKIP_BASELINE_PARAM = 'skip-baseline';
-    private const IGNORE_BASELINE_LINENUMBERS_PARAM = 'ignore-baseline-linenumbers';
     private const FORMAT_PARAM = 'format';
-    private const AUTOLOAD_PARAM = 'autoload';
 
     private const GENERATE_BASELINE_PARAM = 'generate-baseline';
-    private const DEFAULT_RULES_FILENAME = 'phparkitect.php';
-
-    private const DEFAULT_BASELINE_FILENAME = 'phparkitect-baseline.json';
 
     private Autoloader $autoloader;
 
@@ -48,19 +41,6 @@ class Check extends Command
         $this
             ->setDescription('Check that architectural rules are matched.')
             ->setHelp('This command allows you check that architectural rules defined in your config file are matched.')
-            ->addOption(
-                self::CONFIG_FILENAME_PARAM,
-                'c',
-                InputOption::VALUE_OPTIONAL,
-                'File containing configs, such as rules to be matched',
-                self::DEFAULT_RULES_FILENAME
-            )
-            ->addOption(
-                self::TARGET_PHP_PARAM,
-                't',
-                InputOption::VALUE_OPTIONAL,
-                'Target php version to use for parsing'
-            )
             ->addOption(
                 self::STOP_ON_FAILURE_PARAM,
                 's',
@@ -87,24 +67,19 @@ class Check extends Command
                 'Don\'t use the default baseline'
             )
             ->addOption(
-                self::IGNORE_BASELINE_LINENUMBERS_PARAM,
-                'i',
-                InputOption::VALUE_NONE,
-                'Ignore line numbers when checking the baseline'
-            )
-            ->addOption(
                 self::FORMAT_PARAM,
                 'f',
                 InputOption::VALUE_OPTIONAL,
                 'Output format: text (default), json, gitlab',
                 'text'
-            )
-            ->addOption(
-                self::AUTOLOAD_PARAM,
-                'a',
-                InputOption::VALUE_REQUIRED,
-                'Specify an autoload file to use',
             );
+
+        $this->getDefinition()->addOptions([
+            CommonOptions::config(),
+            CommonOptions::targetPhpVersion(),
+            CommonOptions::ignoreBaselineLinenumbers(),
+            CommonOptions::autoload(),
+        ]);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -117,22 +92,22 @@ class Check extends Command
 
         try {
             $verbose = (bool) $input->getOption('verbose');
-            $rulesFilename = $input->getOption(self::CONFIG_FILENAME_PARAM);
+            $rulesFilename = $input->getOption(CommonOptions::CONFIG_FILENAME);
             $stopOnFailure = (bool) $input->getOption(self::STOP_ON_FAILURE_PARAM);
             $useBaseline = (string) $input->getOption(self::USE_BASELINE_PARAM);
             $skipBaseline = (bool) $input->getOption(self::SKIP_BASELINE_PARAM);
-            $ignoreBaselineLinenumbers = (bool) $input->getOption(self::IGNORE_BASELINE_LINENUMBERS_PARAM);
+            $ignoreBaselineLinenumbers = (bool) $input->getOption(CommonOptions::IGNORE_BASELINE_LINENUMBERS);
             $generateBaseline = $input->getOption(self::GENERATE_BASELINE_PARAM);
-            $phpVersion = $input->getOption(self::TARGET_PHP_PARAM);
+            $phpVersion = $input->getOption(CommonOptions::TARGET_PHP_VERSION);
             $format = $input->getOption(self::FORMAT_PARAM);
 
             $commandOutput->printHeading($this->getApplication()?->getVersion());
 
             $config = ConfigBuilder::loadFromFile($rulesFilename)
-                ->autoloadFilePath($input->getOption(self::AUTOLOAD_PARAM))
+                ->autoloadFilePath($input->getOption(CommonOptions::AUTOLOAD))
                 ->stopOnFailure($stopOnFailure)
                 ->targetPhpVersion(TargetPhpVersion::create($phpVersion))
-                ->baselineFilePath(Baseline::resolveFilePath($useBaseline, self::DEFAULT_BASELINE_FILENAME))
+                ->baselineFilePath(Baseline::resolveFilePath($useBaseline))
                 ->ignoreBaselineLinenumbers($ignoreBaselineLinenumbers)
                 ->skipBaseline($skipBaseline)
                 ->format($format);
@@ -149,7 +124,7 @@ class Check extends Command
             if (false !== $generateBaseline) {
                 $result = $runner->baseline($config, $progress);
 
-                $baselineFilePath = Baseline::save($generateBaseline, self::DEFAULT_BASELINE_FILENAME, $result->getViolations(), $ignoreBaselineLinenumbers);
+                $baselineFilePath = Baseline::save($generateBaseline, $result->getViolations(), $ignoreBaselineLinenumbers);
 
                 $output->writeln("ℹ️ Baseline file '$baselineFilePath' created!");
 
