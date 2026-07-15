@@ -51,7 +51,7 @@ class Check extends Command
                 self::GENERATE_BASELINE_PARAM,
                 'g',
                 InputOption::VALUE_OPTIONAL,
-                'Generate a file containing the current errors',
+                'Moved: use the generate-baseline command instead',
                 false
             )
             ->addOption(
@@ -97,9 +97,15 @@ class Check extends Command
             $useBaseline = (string) $input->getOption(self::USE_BASELINE_PARAM);
             $skipBaseline = (bool) $input->getOption(self::SKIP_BASELINE_PARAM);
             $ignoreBaselineLinenumbers = (bool) $input->getOption(CommonOptions::IGNORE_BASELINE_LINENUMBERS);
-            $generateBaseline = $input->getOption(self::GENERATE_BASELINE_PARAM);
             $phpVersion = $input->getOption(CommonOptions::TARGET_PHP_VERSION);
             $format = $input->getOption(self::FORMAT_PARAM);
+
+            if (false !== $input->getOption(self::GENERATE_BASELINE_PARAM)) {
+                $output->writeln('❌ The --generate-baseline option has been moved to its own command.');
+                $output->writeln('Run: phparkitect generate-baseline [filename]');
+
+                return self::FAILURE;
+            }
 
             $commandOutput->printHeading($this->getApplication()?->getVersion());
 
@@ -120,16 +126,6 @@ class Check extends Command
             $output->writeln("Config file '$rulesFilename' found\n");
 
             $runner = new Runner();
-
-            if (false !== $generateBaseline) {
-                $result = $runner->baseline($config, $progress);
-
-                $baselineFilePath = Baseline::save($generateBaseline, $result->getViolations(), $ignoreBaselineLinenumbers);
-
-                $output->writeln("ℹ️ Baseline file '$baselineFilePath' created!");
-
-                return self::SUCCESS;
-            }
 
             $result = $runner->run($config, $baseline, $progress);
 

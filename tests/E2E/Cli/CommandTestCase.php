@@ -39,6 +39,24 @@ abstract class CommandTestCase extends TestCase
         return $appTester;
     }
 
+    protected function runGenerateBaseline(
+        string $configFilePath,
+        ?string $filename = null,
+        bool $ignoreBaselineNumbers = false,
+    ): ApplicationTester {
+        $input = ['generate-baseline', '--config' => $configFilePath];
+
+        if (null !== $filename) {
+            $input['filename'] = $filename;
+        }
+
+        if ($ignoreBaselineNumbers) {
+            $input['--ignore-baseline-linenumbers'] = true;
+        }
+
+        return $this->runApplication($input);
+    }
+
     protected static function assertCommandExitedWithError(ApplicationTester $applicationTester): void
     {
         self::assertEquals(self::ERROR_CODE, $applicationTester->getStatusCode());
