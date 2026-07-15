@@ -8,7 +8,7 @@ updates:
       time: "09:00"
       timezone: "Europe/Rome"
     open-pull-requests-limit: 5
-    versioning-strategy: increase
+    versioning-strategy: widen
     commit-message:
       prefix: "deps"
       include: "scope"
