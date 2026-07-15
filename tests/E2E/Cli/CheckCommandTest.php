@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\E2E\Cli;
 
+use Arkitect\CLI\Autoloader;
 use Arkitect\CLI\Command\Check;
 use Arkitect\CLI\PhpArkitectApplication;
 use PHPUnit\Framework\TestCase;
@@ -279,12 +280,7 @@ class CheckCommandTest extends TestCase
 
     public function test_autoload_is_required_when_running_as_phar(): void
     {
-        $pharCheck = new class extends Check {
-            protected function isRunningAsPhar(): bool
-            {
-                return true;
-            }
-        };
+        $pharCheck = new Check(new Autoloader(static fn (): bool => true));
 
         $app = new Application();
         $app->setAutoExit(false);
