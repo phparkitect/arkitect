@@ -7,6 +7,8 @@ use Arkitect\Rules\Violations;
 
 class Baseline
 {
+    public const DEFAULT_FILENAME = 'phparkitect-baseline.json';
+
     private Violations $violations;
 
     private string $filename;

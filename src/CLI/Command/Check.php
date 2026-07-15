@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace Arkitect\CLI\Command;
 
 use Arkitect\CLI\Baseline;
-use Arkitect\CLI\ConfigBuilder;
-use Arkitect\CLI\Printer\Printer;
-use Arkitect\CLI\Printer\PrinterFactory;
+use Arkitect\CLI\CheckHandler;
+use Arkitect\CLI\CheckOptions;
 use Arkitect\CLI\Progress\DebugProgress;
 use Arkitect\CLI\Progress\Progress;
 use Arkitect\CLI\Progress\ProgressBarProgress;
 use Arkitect\CLI\Runner;
-use Arkitect\CLI\TargetPhpVersion;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -34,14 +32,16 @@ class Check extends Command
     private const GENERATE_BASELINE_PARAM = 'generate-baseline';
     private const DEFAULT_RULES_FILENAME = 'phparkitect.php';
 
-    private const DEFAULT_BASELINE_FILENAME = 'phparkitect-baseline.json';
-
     private const SUCCESS_CODE = 0;
     private const ERROR_CODE = 1;
 
-    public function __construct()
+    private CheckHandler $handler;
+
+    public function __construct(?CheckHandler $handler = null)
     {
         parent::__construct('check');
+
+        $this->handler = $handler ?? new CheckHandler(new Runner());
     }
 
     protected function configure(): void
@@ -119,83 +119,34 @@ class Check extends Command
         ini_set('xdebug.max_nesting_level', '10000');
         $startTime = microtime(true);
 
+        // we write everything on STDERR apart from the list of violations which goes on STDOUT
+        // this allows to pipe the output of this command to a file while showing output on the terminal
+        $stdOut = $output;
+        $output = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
+
         try {
             $verbose = (bool) $input->getOption('verbose');
-            $rulesFilename = $input->getOption(self::CONFIG_FILENAME_PARAM);
-            $stopOnFailure = (bool) $input->getOption(self::STOP_ON_FAILURE_PARAM);
-            $useBaseline = (string) $input->getOption(self::USE_BASELINE_PARAM);
-            $skipBaseline = (bool) $input->getOption(self::SKIP_BASELINE_PARAM);
-            $ignoreBaselineLinenumbers = (bool) $input->getOption(self::IGNORE_BASELINE_LINENUMBERS_PARAM);
-            $generateBaseline = $input->getOption(self::GENERATE_BASELINE_PARAM);
-            $phpVersion = $input->getOption('target-php-version');
-            $format = $input->getOption(self::FORMAT_PARAM);
+            $options = $this->parseOptions($input);
 
-            // we write everything on STDERR apart from the list of violations which goes on STDOUT
-            // this allows to pipe the output of this command to a file while showing output on the terminal
-            $stdOut = $output;
-            $output = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
-
-            if ($this->isRunningAsPhar() && null === $input->getOption(self::AUTOLOAD_PARAM)) {
+            if ($this->isRunningAsPhar() && null === $options->getAutoloadFilePath()) {
                 $output->writeln('❌ The --autoload option is required when running phparkitect as a PHAR');
 
                 return self::ERROR_CODE;
             }
 
             $this->printHeadingLine($output);
+            $this->requireAutoload($output, $options->getAutoloadFilePath());
 
-            $config = ConfigBuilder::loadFromFile($rulesFilename)
-                ->autoloadFilePath($input->getOption(self::AUTOLOAD_PARAM))
-                ->stopOnFailure($stopOnFailure)
-                ->targetPhpVersion(TargetPhpVersion::create($phpVersion))
-                ->baselineFilePath(Baseline::resolveFilePath($useBaseline, self::DEFAULT_BASELINE_FILENAME))
-                ->ignoreBaselineLinenumbers($ignoreBaselineLinenumbers)
-                ->skipBaseline($skipBaseline)
-                ->format($format);
-
-            $this->requireAutoload($output, $config->getAutoloadFilePath());
-            $printer = $this->createPrinter($output, $config->getFormat());
+            $output->writeln("Output format: {$options->getFormat()}");
             $progress = $this->createProgress($output, $verbose);
-            $baseline = $this->createBaseline($output, $config->isSkipBaseline(), $config->getBaselineFilePath());
 
-            $output->writeln("Config file '$rulesFilename' found\n");
-
-            $runner = new Runner();
-
-            if (false !== $generateBaseline) {
-                $result = $runner->baseline($config, $progress);
-
-                $baselineFilePath = Baseline::save($generateBaseline, self::DEFAULT_BASELINE_FILENAME, $result->getViolations(), $ignoreBaselineLinenumbers);
-
-                $output->writeln("ℹ️ Baseline file '$baselineFilePath' created!");
+            if ($options->shouldGenerateBaseline()) {
+                $this->handler->generateBaseline($options, $progress, $output);
 
                 return self::SUCCESS_CODE;
             }
 
-            $result = $runner->run($config, $baseline, $progress);
-
-            // we always print this so we do not have to do additional ifs later
-            $stdOut->writeln($printer->print($result->getViolations()->groupedByFqcn()));
-
-            if ($result->hasViolations()) {
-                $output->writeln("⚠️ {$result->getViolations()->count()} violations detected!");
-            }
-
-            $staleViolationsCount = $baseline->getStaleViolationsCount();
-            if ($staleViolationsCount > 0) {
-                $verb = 1 === $staleViolationsCount ? 'looks' : 'look';
-                $pronoun = 1 === $staleViolationsCount ? 'it' : 'them';
-                $noun = 1 === $staleViolationsCount ? 'violation' : 'violations';
-                $output->writeln("💡 {$staleViolationsCount} {$noun} in the baseline {$verb} fixed — regenerate the baseline to remove {$pronoun}");
-            }
-
-            if ($result->hasParsingErrors()) {
-                $output->writeln('❌ found parsing errors in these files:');
-                foreach ($result->getParsingErrors() as $parsingError) {
-                    $output->writeln("$parsingError");
-                }
-            }
-
-            !$result->hasErrors() && $output->writeln('✅ No violations detected');
+            $result = $this->handler->check($options, $progress, $output, $stdOut);
 
             return $result->hasErrors() ? self::ERROR_CODE : self::SUCCESS_CODE;
         } catch (\Throwable $e) {
@@ -205,6 +156,29 @@ class Check extends Command
         } finally {
             $this->printExecutionTime($output, $startTime);
         }
+    }
+
+    protected function parseOptions(InputInterface $input): CheckOptions
+    {
+        $targetPhpVersion = $input->getOption(self::TARGET_PHP_PARAM);
+        $autoloadFilePath = $input->getOption(self::AUTOLOAD_PARAM);
+        $useBaseline = (string) $input->getOption(self::USE_BASELINE_PARAM);
+
+        // false = option not set, null = option set but without value, string = option with value
+        $generateBaseline = $input->getOption(self::GENERATE_BASELINE_PARAM);
+
+        return new CheckOptions(
+            configFilePath: (string) $input->getOption(self::CONFIG_FILENAME_PARAM),
+            targetPhpVersion: \is_string($targetPhpVersion) ? $targetPhpVersion : null,
+            stopOnFailure: (bool) $input->getOption(self::STOP_ON_FAILURE_PARAM),
+            baselineFilePath: Baseline::resolveFilePath($useBaseline, Baseline::DEFAULT_FILENAME),
+            skipBaseline: (bool) $input->getOption(self::SKIP_BASELINE_PARAM),
+            ignoreBaselineLinenumbers: (bool) $input->getOption(self::IGNORE_BASELINE_LINENUMBERS_PARAM),
+            generateBaseline: false !== $generateBaseline,
+            generateBaselineFilePath: \is_string($generateBaseline) ? $generateBaseline : null,
+            format: (string) $input->getOption(self::FORMAT_PARAM),
+            autoloadFilePath: \is_string($autoloadFilePath) ? $autoloadFilePath : null,
+        );
     }
 
     /**
@@ -223,27 +197,11 @@ class Check extends Command
         $output->writeln("Autoload file '$filePath' added");
     }
 
-    protected function createPrinter(OutputInterface $output, string $format): Printer
-    {
-        $output->writeln("Output format: $format");
-
-        return PrinterFactory::create($format);
-    }
-
     protected function createProgress(OutputInterface $output, bool $verbose): Progress
     {
         $output->writeln('Progress: '.($verbose ? 'debug' : 'bar'));
 
         return $verbose ? new DebugProgress($output) : new ProgressBarProgress($output);
-    }
-
-    protected function createBaseline(OutputInterface $output, bool $skipBaseline, ?string $baselineFilePath): Baseline
-    {
-        $baseline = Baseline::create($skipBaseline, $baselineFilePath);
-
-        $baseline->getFilename() && $output->writeln("Baseline file '{$baseline->getFilename()}' found");
-
-        return $baseline;
     }
 
     protected function printHeadingLine(OutputInterface $output): void

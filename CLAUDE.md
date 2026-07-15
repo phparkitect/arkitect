@@ -43,7 +43,7 @@ Before committing, `make csfix && make psalm && make test` must all pass (CI gat
 
 `bin/phparkitect` → `PhpArkitectApplication` registers the commands in `src/CLI/Command/` (`Check`, `Init`, `DebugExpression`).
 
-`Check::execute` (`src/CLI/Command/Check.php`):
+`Check::execute` (`src/CLI/Command/Check.php`) parses the CLI options into a `CheckOptions` value object and delegates to `CheckHandler` (`src/CLI/CheckHandler.php`), the application service that runs the actual flow:
 1. `ConfigBuilder` loads the user's `phparkitect.php`, which receives a `Config` and registers `ClassSet`s + `Rule`s.
 2. `Runner` (`src/CLI/Runner.php`) iterates every `SplFileInfo` in each `ClassSet`, parses it via `FileParser`, and gets back `ClassDescription`s.
 3. Each `Rule` is evaluated against each `ClassDescription`, accumulating `Violations`.
