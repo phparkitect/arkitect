@@ -15,7 +15,6 @@ final class CheckOptions
         private ?string $targetPhpVersion,
         private bool $stopOnFailure,
         private ?string $baselineFilePath,
-        private bool $skipBaseline,
         private bool $ignoreBaselineLinenumbers,
         private string $format,
         private ?string $autoloadFilePath,
@@ -40,11 +39,6 @@ final class CheckOptions
     public function getBaselineFilePath(): ?string
     {
         return $this->baselineFilePath;
-    }
-
-    public function isSkipBaseline(): bool
-    {
-        return $this->skipBaseline;
     }
 
     public function isIgnoreBaselineLinenumbers(): bool

@@ -102,7 +102,6 @@ class CheckHandlerTest extends TestCase
             targetPhpVersion: null,
             stopOnFailure: false,
             baselineFilePath: $baselineFilePath,
-            skipBaseline: false,
             ignoreBaselineLinenumbers: false,
             format: 'text',
             autoloadFilePath: null,

@@ -139,18 +139,34 @@ class Check extends Command
 
     protected function parseOptions(InputInterface $input): CheckOptions
     {
-        $useBaseline = (string) $input->getOption(self::USE_BASELINE_PARAM);
-        $defaultBaselineFilePath = BaselineFileRepository::hasDefaultBaseline() ? BaselineFileRepository::DEFAULT_FILENAME : null;
-
         return new CheckOptions(
             configFilePath: $this->commonOptions->configFilePath($input),
             targetPhpVersion: $this->commonOptions->targetPhpVersion($input),
             stopOnFailure: (bool) $input->getOption(self::STOP_ON_FAILURE_PARAM),
-            baselineFilePath: '' !== $useBaseline ? $useBaseline : $defaultBaselineFilePath,
-            skipBaseline: (bool) $input->getOption(self::SKIP_BASELINE_PARAM),
+            baselineFilePath: $this->resolveBaselineFilePath($input),
             ignoreBaselineLinenumbers: $this->commonOptions->isIgnoreBaselineLinenumbers($input),
             format: (string) $input->getOption(self::FORMAT_PARAM),
             autoloadFilePath: $this->commonOptions->autoloadFilePath($input),
         );
+    }
+
+    /**
+     * The single "which baseline" decision: the file path to load, or null
+     * for an empty baseline. --skip-baseline forces empty; an explicit
+     * --use-baseline wins over the auto-detected default baseline, whose
+     * absence just means "empty".
+     */
+    private function resolveBaselineFilePath(InputInterface $input): ?string
+    {
+        if ((bool) $input->getOption(self::SKIP_BASELINE_PARAM)) {
+            return null;
+        }
+
+        $useBaseline = (string) $input->getOption(self::USE_BASELINE_PARAM);
+        if ('' !== $useBaseline) {
+            return $useBaseline;
+        }
+
+        return BaselineFileRepository::hasDefaultBaseline() ? BaselineFileRepository::DEFAULT_FILENAME : null;
     }
 }

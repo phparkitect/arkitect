@@ -32,12 +32,12 @@ final class CheckHandler
             ->autoloadFilePath($options->getAutoloadFilePath())
             ->stopOnFailure($options->isStopOnFailure())
             ->targetPhpVersion(TargetPhpVersion::create($options->getTargetPhpVersion()))
-            ->baselineFilePath($options->getBaselineFilePath())
             ->ignoreBaselineLinenumbers($options->isIgnoreBaselineLinenumbers())
-            ->skipBaseline($options->isSkipBaseline())
             ->format($options->getFormat());
 
-        $baselineFilePath = $config->isSkipBaseline() ? null : $config->getBaselineFilePath();
+        // null baselineFilePath means: use an empty baseline (no --use-baseline,
+        // no default file on disk, or --skip-baseline)
+        $baselineFilePath = $options->getBaselineFilePath();
         $baseline = null === $baselineFilePath ? Baseline::empty() : $this->baselineRepository->load($baselineFilePath);
 
         null !== $baselineFilePath && $output->writeln("Baseline file '$baselineFilePath' found");
