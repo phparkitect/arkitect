@@ -41,7 +41,7 @@ Before committing, `make csfix && make psalm && make test` must all pass (CI gat
 
 ## Pipeline (how a `check` run flows)
 
-`bin/phparkitect` → `PhpArkitectApplication` registers the commands in `src/CLI/Command/` (`Check`, `Init`, `DebugExpression`).
+`bin/phparkitect` → `PhpArkitectApplication` registers the commands in `src/CLI/Command/` (`Check`, `Init`, `DebugExpression`). Options shared between analysis-running commands (`--config`, `--target-php-version`, `--autoload`, `--ignore-baseline-linenumbers`) are defined once in `CommonOptions`, composed by each command.
 
 `Check::execute` (`src/CLI/Command/Check.php`) parses the CLI options into a `CheckOptions` value object and delegates to `CheckHandler` (`src/CLI/CheckHandler.php`), the application service that runs the actual flow:
 1. `ConfigBuilder` loads the user's `phparkitect.php`, which receives a `Config` and registers `ClassSet`s + `Rule`s.
