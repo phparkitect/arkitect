@@ -26,7 +26,20 @@ final class CheckHandler
         OutputInterface $output,
         OutputInterface $violationsOutput,
     ): AnalysisResult {
-        [$config, $baseline] = $this->prepare($options, $output);
+        $config = ConfigBuilder::loadFromFile($options->getConfigFilePath())
+            ->autoloadFilePath($options->getAutoloadFilePath())
+            ->stopOnFailure($options->isStopOnFailure())
+            ->targetPhpVersion(TargetPhpVersion::create($options->getTargetPhpVersion()))
+            ->baselineFilePath($options->getBaselineFilePath())
+            ->ignoreBaselineLinenumbers($options->isIgnoreBaselineLinenumbers())
+            ->skipBaseline($options->isSkipBaseline())
+            ->format($options->getFormat());
+
+        $baseline = Baseline::create($config->isSkipBaseline(), $config->getBaselineFilePath());
+
+        $baseline->getFilename() && $output->writeln("Baseline file '{$baseline->getFilename()}' found");
+
+        $output->writeln("Config file '{$options->getConfigFilePath()}' found\n");
 
         $printer = PrinterFactory::create($config->getFormat());
 
@@ -51,45 +64,6 @@ final class CheckHandler
         !$result->hasErrors() && $output->writeln('✅ No violations detected');
 
         return $result;
-    }
-
-    public function generateBaseline(CheckOptions $options, Progress $progress, OutputInterface $output): void
-    {
-        [$config] = $this->prepare($options, $output);
-
-        $result = $this->runner->baseline($config, $progress);
-
-        $baselineFilePath = Baseline::save(
-            $options->getGenerateBaselineFilePath(),
-            Baseline::DEFAULT_FILENAME,
-            $result->getViolations(),
-            $options->isIgnoreBaselineLinenumbers()
-        );
-
-        $output->writeln("ℹ️ Baseline file '$baselineFilePath' created!");
-    }
-
-    /**
-     * @return array{Config, Baseline}
-     */
-    private function prepare(CheckOptions $options, OutputInterface $output): array
-    {
-        $config = ConfigBuilder::loadFromFile($options->getConfigFilePath())
-            ->autoloadFilePath($options->getAutoloadFilePath())
-            ->stopOnFailure($options->isStopOnFailure())
-            ->targetPhpVersion(TargetPhpVersion::create($options->getTargetPhpVersion()))
-            ->baselineFilePath($options->getBaselineFilePath())
-            ->ignoreBaselineLinenumbers($options->isIgnoreBaselineLinenumbers())
-            ->skipBaseline($options->isSkipBaseline())
-            ->format($options->getFormat());
-
-        $baseline = Baseline::create($config->isSkipBaseline(), $config->getBaselineFilePath());
-
-        $baseline->getFilename() && $output->writeln("Baseline file '{$baseline->getFilename()}' found");
-
-        $output->writeln("Config file '{$options->getConfigFilePath()}' found\n");
-
-        return [$config, $baseline];
     }
 
     private function printStaleBaselineViolations(Baseline $baseline, OutputInterface $output): void

@@ -81,18 +81,12 @@ class Baseline
         );
     }
 
-    public static function save(?string $filename, string $defaultFilePath, Violations $violations, bool $ignoreLineNumbers = false): string
+    public static function save(string $filename, Violations $violations, bool $ignoreLineNumbers = false): void
     {
-        if (null === $filename) {
-            $filename = $defaultFilePath;
-        }
-
         if ($ignoreLineNumbers) {
             $violations = $violations->withoutLineNumbers();
         }
 
         file_put_contents($filename, json_encode($violations, \JSON_PRETTY_PRINT));
-
-        return $filename;
     }
 }

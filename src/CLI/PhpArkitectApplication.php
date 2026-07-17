@@ -6,6 +6,7 @@ namespace Arkitect\CLI;
 
 use Arkitect\CLI\Command\Check;
 use Arkitect\CLI\Command\DebugExpression;
+use Arkitect\CLI\Command\GenerateBaseline;
 use Arkitect\CLI\Command\Init;
 
 class PhpArkitectApplication extends \Symfony\Component\Console\Application
@@ -27,6 +28,7 @@ class PhpArkitectApplication extends \Symfony\Component\Console\Application
         $addMethod = method_exists($this, 'addCommand') ? 'addCommand' : 'add';
 
         $this->$addMethod(new Check());
+        $this->$addMethod(new GenerateBaseline());
         $this->$addMethod(new Init());
         $this->$addMethod(new DebugExpression());
     }

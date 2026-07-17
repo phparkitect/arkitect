@@ -7,9 +7,6 @@ namespace Arkitect\CLI\Command;
 use Arkitect\CLI\Baseline;
 use Arkitect\CLI\CheckHandler;
 use Arkitect\CLI\CheckOptions;
-use Arkitect\CLI\Progress\DebugProgress;
-use Arkitect\CLI\Progress\Progress;
-use Arkitect\CLI\Progress\ProgressBarProgress;
 use Arkitect\CLI\Runner;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,12 +23,11 @@ class Check extends Command
 
     private const GENERATE_BASELINE_PARAM = 'generate-baseline';
 
-    private const SUCCESS_CODE = 0;
-    private const ERROR_CODE = 1;
-
     private CheckHandler $handler;
 
     private CommonOptions $commonOptions;
+
+    private CommandRuntime $runtime;
 
     public function __construct(?CheckHandler $handler = null)
     {
@@ -42,6 +38,7 @@ class Check extends Command
         parent::__construct('check');
 
         $this->handler = $handler ?? new CheckHandler(new Runner());
+        $this->runtime = new CommandRuntime();
     }
 
     protected function configure(): void
@@ -59,7 +56,7 @@ class Check extends Command
                 self::GENERATE_BASELINE_PARAM,
                 'g',
                 InputOption::VALUE_OPTIONAL,
-                'Generate a file containing the current errors',
+                '[MOVED] Use the generate-baseline command instead',
                 false
             )
             ->addOption(
@@ -92,8 +89,7 @@ class Check extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        ini_set('memory_limit', '-1');
-        ini_set('xdebug.max_nesting_level', '10000');
+        $this->runtime->raiseLimits();
         $startTime = microtime(true);
 
         // we write everything on STDERR apart from the list of violations which goes on STDOUT
@@ -102,45 +98,47 @@ class Check extends Command
         $output = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
 
         try {
+            // the option is kept (instead of being removed) so users get this
+            // explanation rather than a generic "option does not exist" error
+            $generateBaseline = $input->getOption(self::GENERATE_BASELINE_PARAM);
+            if (false !== $generateBaseline) {
+                $filename = \is_string($generateBaseline) ? " $generateBaseline" : '';
+                $output->writeln('❌ The --generate-baseline option has been moved to its own command.');
+                $output->writeln("   Run: phparkitect generate-baseline$filename");
+
+                return self::FAILURE;
+            }
+
             $verbose = (bool) $input->getOption('verbose');
             $options = $this->parseOptions($input);
 
             if ($this->isRunningAsPhar() && null === $options->getAutoloadFilePath()) {
                 $output->writeln('❌ The --autoload option is required when running phparkitect as a PHAR');
 
-                return self::ERROR_CODE;
+                return self::FAILURE;
             }
 
-            $this->printHeadingLine($output);
+            $this->runtime->printHeadingLine($this, $output);
             $this->commonOptions->requireAutoload($input, $output);
 
             $output->writeln("Output format: {$options->getFormat()}");
-            $progress = $this->createProgress($output, $verbose);
-
-            if ($options->shouldGenerateBaseline()) {
-                $this->handler->generateBaseline($options, $progress, $output);
-
-                return self::SUCCESS_CODE;
-            }
+            $progress = $this->runtime->createProgress($output, $verbose);
 
             $result = $this->handler->check($options, $progress, $output, $stdOut);
 
-            return $result->hasErrors() ? self::ERROR_CODE : self::SUCCESS_CODE;
+            return $result->hasErrors() ? self::FAILURE : self::SUCCESS;
         } catch (\Throwable $e) {
             $output->writeln("❌ {$e->getMessage()}");
 
-            return self::ERROR_CODE;
+            return self::FAILURE;
         } finally {
-            $this->printExecutionTime($output, $startTime);
+            $this->runtime->printExecutionTime($output, $startTime);
         }
     }
 
     protected function parseOptions(InputInterface $input): CheckOptions
     {
         $useBaseline = (string) $input->getOption(self::USE_BASELINE_PARAM);
-
-        // false = option not set, null = option set but without value, string = option with value
-        $generateBaseline = $input->getOption(self::GENERATE_BASELINE_PARAM);
 
         return new CheckOptions(
             configFilePath: $this->commonOptions->configFilePath($input),
@@ -149,34 +147,8 @@ class Check extends Command
             baselineFilePath: Baseline::resolveFilePath($useBaseline, Baseline::DEFAULT_FILENAME),
             skipBaseline: (bool) $input->getOption(self::SKIP_BASELINE_PARAM),
             ignoreBaselineLinenumbers: $this->commonOptions->isIgnoreBaselineLinenumbers($input),
-            generateBaseline: false !== $generateBaseline,
-            generateBaselineFilePath: \is_string($generateBaseline) ? $generateBaseline : null,
             format: (string) $input->getOption(self::FORMAT_PARAM),
             autoloadFilePath: $this->commonOptions->autoloadFilePath($input),
         );
-    }
-
-    protected function createProgress(OutputInterface $output, bool $verbose): Progress
-    {
-        $output->writeln('Progress: '.($verbose ? 'debug' : 'bar'));
-
-        return $verbose ? new DebugProgress($output) : new ProgressBarProgress($output);
-    }
-
-    protected function printHeadingLine(OutputInterface $output): void
-    {
-        $app = $this->getApplication();
-
-        $version = $app ? $app->getVersion() : 'unknown';
-
-        $output->writeln("<info>PHPArkitect $version</info>\n");
-    }
-
-    protected function printExecutionTime(OutputInterface $output, float $startTime): void
-    {
-        $endTime = microtime(true);
-        $executionTime = number_format($endTime - $startTime, 2);
-
-        $output->writeln("⏱️ Execution time: $executionTime\n");
     }
 }

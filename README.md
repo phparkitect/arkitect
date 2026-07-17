@@ -146,7 +146,6 @@ Every setting can be passed as a CLI option or set via the corresponding `Config
 | `--skip-baseline` | `-k` | `skipBaseline()` | Skips the default baseline even if present. |
 | `--ignore-baseline-linenumbers` | `-i` | `ignoreBaselineLinenumbers()` | Matches baseline violations without checking line numbers. |
 | `--config` | `-c` | — | Configuration file to load (default: `phparkitect.php`). |
-| `--generate-baseline` | `-g` | — | Writes current violations to a baseline file instead of failing. |
 | `--verbose` | `-v` | — | Prints every parsed file instead of the progress bar. |
 | — | — | `skipParsingCustomAnnotations()` | Disables custom DocBlock annotation parsing (enabled by default). |
 
@@ -155,10 +154,14 @@ Every setting can be passed as a CLI option or set via the corresponding `Config
 If your codebase already has violations you can't fix right now, generate a baseline to ignore them:
 
 ```
-phparkitect check --generate-baseline
+phparkitect generate-baseline
 ```
 
-This creates `phparkitect-baseline.json`. Subsequent runs pick it up automatically. Use a custom file name with `--generate-baseline=my-baseline.json`, point to it with `--use-baseline=my-baseline.json`, or skip it entirely with `--skip-baseline`.
+This creates `phparkitect-baseline.json`. Subsequent `check` runs pick it up automatically. Use a custom file name with `phparkitect generate-baseline my-baseline.json`, point `check` to it with `--use-baseline=my-baseline.json`, or skip it entirely with `--skip-baseline`.
+
+The `generate-baseline` command accepts the same `--config`, `--target-php-version`, `--autoload` and `--ignore-baseline-linenumbers` options as `check`.
+
+> **Note**: baseline generation was previously a `check` option (`check --generate-baseline`); it is now a dedicated command, and the old option fails with a pointer to the new one.
 
 By default the baseline also checks line numbers — a change before the offending line shifts the number and the check fails. Use `--ignore-baseline-linenumbers` to match violations regardless of line number.
 
