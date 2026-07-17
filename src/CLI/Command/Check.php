@@ -16,29 +16,29 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Webmozart\Assert\Assert;
 
 class Check extends Command
 {
-    private const CONFIG_FILENAME_PARAM = 'config';
-    private const TARGET_PHP_PARAM = 'target-php-version';
     private const STOP_ON_FAILURE_PARAM = 'stop-on-failure';
     private const USE_BASELINE_PARAM = 'use-baseline';
     private const SKIP_BASELINE_PARAM = 'skip-baseline';
-    private const IGNORE_BASELINE_LINENUMBERS_PARAM = 'ignore-baseline-linenumbers';
     private const FORMAT_PARAM = 'format';
-    private const AUTOLOAD_PARAM = 'autoload';
 
     private const GENERATE_BASELINE_PARAM = 'generate-baseline';
-    private const DEFAULT_RULES_FILENAME = 'phparkitect.php';
 
     private const SUCCESS_CODE = 0;
     private const ERROR_CODE = 1;
 
     private CheckHandler $handler;
 
+    private CommonOptions $commonOptions;
+
     public function __construct(?CheckHandler $handler = null)
     {
+        // assigned before the parent constructor because Symfony's
+        // Command::__construct() invokes configure(), which uses it
+        $this->commonOptions = new CommonOptions();
+
         parent::__construct('check');
 
         $this->handler = $handler ?? new CheckHandler(new Runner());
@@ -49,19 +49,6 @@ class Check extends Command
         $this
             ->setDescription('Check that architectural rules are matched.')
             ->setHelp('This command allows you check that architectural rules defined in your config file are matched.')
-            ->addOption(
-                self::CONFIG_FILENAME_PARAM,
-                'c',
-                InputOption::VALUE_OPTIONAL,
-                'File containing configs, such as rules to be matched',
-                self::DEFAULT_RULES_FILENAME
-            )
-            ->addOption(
-                self::TARGET_PHP_PARAM,
-                't',
-                InputOption::VALUE_OPTIONAL,
-                'Target php version to use for parsing'
-            )
             ->addOption(
                 self::STOP_ON_FAILURE_PARAM,
                 's',
@@ -88,24 +75,14 @@ class Check extends Command
                 'Don\'t use the default baseline'
             )
             ->addOption(
-                self::IGNORE_BASELINE_LINENUMBERS_PARAM,
-                'i',
-                InputOption::VALUE_NONE,
-                'Ignore line numbers when checking the baseline'
-            )
-            ->addOption(
                 self::FORMAT_PARAM,
                 'f',
                 InputOption::VALUE_OPTIONAL,
                 'Output format: text (default), json, gitlab',
                 'text'
-            )
-            ->addOption(
-                self::AUTOLOAD_PARAM,
-                'a',
-                InputOption::VALUE_REQUIRED,
-                'Specify an autoload file to use',
             );
+
+        $this->commonOptions->addTo($this);
     }
 
     protected function isRunningAsPhar(): bool
@@ -135,7 +112,7 @@ class Check extends Command
             }
 
             $this->printHeadingLine($output);
-            $this->requireAutoload($output, $options->getAutoloadFilePath());
+            $this->commonOptions->requireAutoload($input, $output);
 
             $output->writeln("Output format: {$options->getFormat()}");
             $progress = $this->createProgress($output, $verbose);
@@ -160,41 +137,23 @@ class Check extends Command
 
     protected function parseOptions(InputInterface $input): CheckOptions
     {
-        $targetPhpVersion = $input->getOption(self::TARGET_PHP_PARAM);
-        $autoloadFilePath = $input->getOption(self::AUTOLOAD_PARAM);
         $useBaseline = (string) $input->getOption(self::USE_BASELINE_PARAM);
 
         // false = option not set, null = option set but without value, string = option with value
         $generateBaseline = $input->getOption(self::GENERATE_BASELINE_PARAM);
 
         return new CheckOptions(
-            configFilePath: (string) $input->getOption(self::CONFIG_FILENAME_PARAM),
-            targetPhpVersion: \is_string($targetPhpVersion) ? $targetPhpVersion : null,
+            configFilePath: $this->commonOptions->configFilePath($input),
+            targetPhpVersion: $this->commonOptions->targetPhpVersion($input),
             stopOnFailure: (bool) $input->getOption(self::STOP_ON_FAILURE_PARAM),
             baselineFilePath: Baseline::resolveFilePath($useBaseline, Baseline::DEFAULT_FILENAME),
             skipBaseline: (bool) $input->getOption(self::SKIP_BASELINE_PARAM),
-            ignoreBaselineLinenumbers: (bool) $input->getOption(self::IGNORE_BASELINE_LINENUMBERS_PARAM),
+            ignoreBaselineLinenumbers: $this->commonOptions->isIgnoreBaselineLinenumbers($input),
             generateBaseline: false !== $generateBaseline,
             generateBaselineFilePath: \is_string($generateBaseline) ? $generateBaseline : null,
             format: (string) $input->getOption(self::FORMAT_PARAM),
-            autoloadFilePath: \is_string($autoloadFilePath) ? $autoloadFilePath : null,
+            autoloadFilePath: $this->commonOptions->autoloadFilePath($input),
         );
-    }
-
-    /**
-     * @psalm-suppress UnresolvableInclude
-     */
-    protected function requireAutoload(OutputInterface $output, ?string $filePath): void
-    {
-        if (null === $filePath) {
-            return;
-        }
-
-        Assert::file($filePath, "Cannot find '$filePath'");
-
-        require_once $filePath;
-
-        $output->writeln("Autoload file '$filePath' added");
     }
 
     protected function createProgress(OutputInterface $output, bool $verbose): Progress
