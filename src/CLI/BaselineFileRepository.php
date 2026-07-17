@@ -29,11 +29,11 @@ final class BaselineFileRepository
     }
 
     /**
-     * The default baseline file, or null when none exists — this is what
-     * lets `check` pick up a generated baseline automatically.
+     * Whether the default baseline file exists — this is what lets `check`
+     * pick up a generated baseline automatically.
      */
-    public static function findDefaultFilePath(): ?string
+    public static function hasDefaultBaseline(): bool
     {
-        return file_exists(self::DEFAULT_FILENAME) ? self::DEFAULT_FILENAME : null;
+        return file_exists(self::DEFAULT_FILENAME);
     }
 }

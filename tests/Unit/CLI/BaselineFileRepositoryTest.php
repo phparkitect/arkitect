@@ -42,19 +42,19 @@ class BaselineFileRepositoryTest extends TestCase
         (new BaselineFileRepository())->load('not-a-real-file.json');
     }
 
-    public function test_find_default_file_path_is_null_when_no_default_baseline_exists(): void
+    public function test_has_default_baseline_is_false_when_no_default_baseline_exists(): void
     {
         $this->inEmptyDirectory(static function (): void {
-            self::assertNull(BaselineFileRepository::findDefaultFilePath());
+            self::assertFalse(BaselineFileRepository::hasDefaultBaseline());
         });
     }
 
-    public function test_find_default_file_path_returns_the_default_baseline_when_it_exists(): void
+    public function test_has_default_baseline_is_true_when_the_default_baseline_exists(): void
     {
         $this->inEmptyDirectory(static function (): void {
             file_put_contents(BaselineFileRepository::DEFAULT_FILENAME, '{"violations": []}');
 
-            self::assertSame(BaselineFileRepository::DEFAULT_FILENAME, BaselineFileRepository::findDefaultFilePath());
+            self::assertTrue(BaselineFileRepository::hasDefaultBaseline());
 
             unlink(BaselineFileRepository::DEFAULT_FILENAME);
         });

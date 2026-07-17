@@ -140,12 +140,13 @@ class Check extends Command
     protected function parseOptions(InputInterface $input): CheckOptions
     {
         $useBaseline = (string) $input->getOption(self::USE_BASELINE_PARAM);
+        $defaultBaselineFilePath = BaselineFileRepository::hasDefaultBaseline() ? BaselineFileRepository::DEFAULT_FILENAME : null;
 
         return new CheckOptions(
             configFilePath: $this->commonOptions->configFilePath($input),
             targetPhpVersion: $this->commonOptions->targetPhpVersion($input),
             stopOnFailure: (bool) $input->getOption(self::STOP_ON_FAILURE_PARAM),
-            baselineFilePath: '' !== $useBaseline ? $useBaseline : BaselineFileRepository::findDefaultFilePath(),
+            baselineFilePath: '' !== $useBaseline ? $useBaseline : $defaultBaselineFilePath,
             skipBaseline: (bool) $input->getOption(self::SKIP_BASELINE_PARAM),
             ignoreBaselineLinenumbers: $this->commonOptions->isIgnoreBaselineLinenumbers($input),
             format: (string) $input->getOption(self::FORMAT_PARAM),
