@@ -11,7 +11,6 @@ use Arkitect\CLI\Runner;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class PruneBaseline extends Command
@@ -60,9 +59,6 @@ class PruneBaseline extends Command
     {
         $this->runtime->raiseLimits();
         $startTime = microtime(true);
-
-        // we write everything on STDERR to be consistent with the check command
-        $output = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
 
         try {
             $verbose = (bool) $input->getOption('verbose');

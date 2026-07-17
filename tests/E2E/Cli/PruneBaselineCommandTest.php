@@ -43,7 +43,7 @@ class PruneBaselineCommandTest extends TestCase
         $cmdTester = $this->runCommand(['prune-baseline', '--config' => $configFilePath, 'filename' => $this->customBaselineFilename]);
 
         self::assertEquals(self::SUCCESS_CODE, $cmdTester->getStatusCode());
-        self::assertStringContainsString("ℹ️ Baseline file '{$this->customBaselineFilename}' pruned: 1 removed, 1 kept", $cmdTester->getErrorOutput());
+        self::assertStringContainsString("ℹ️ Baseline file '{$this->customBaselineFilename}' pruned: 1 removed, 1 kept", $cmdTester->getDisplay());
 
         $pruned = json_decode((string) file_get_contents($this->customBaselineFilename), true);
 
@@ -66,7 +66,7 @@ class PruneBaselineCommandTest extends TestCase
         $cmdTester = $this->runCommand(['prune-baseline', '--config' => $configFilePath, 'filename' => $this->customBaselineFilename]);
 
         self::assertEquals(self::SUCCESS_CODE, $cmdTester->getStatusCode());
-        self::assertStringContainsString('pruned: 0 removed, 1 kept', $cmdTester->getErrorOutput());
+        self::assertStringContainsString('pruned: 0 removed, 1 kept', $cmdTester->getDisplay());
     }
 
     public function test_fails_gracefully_when_the_baseline_file_does_not_exist(): void
@@ -76,7 +76,7 @@ class PruneBaselineCommandTest extends TestCase
         $cmdTester = $this->runCommand(['prune-baseline', '--config' => $configFilePath, 'filename' => $this->customBaselineFilename]);
 
         self::assertEquals(self::ERROR_CODE, $cmdTester->getStatusCode());
-        self::assertStringContainsString('not found', $cmdTester->getErrorOutput());
+        self::assertStringContainsString('not found', $cmdTester->getDisplay());
     }
 
     protected function runCommand(array $input): ApplicationTester

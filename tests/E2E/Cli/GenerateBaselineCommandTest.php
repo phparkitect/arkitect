@@ -33,7 +33,7 @@ class GenerateBaselineCommandTest extends TestCase
         $cmdTester = $this->runGenerateBaseline(__DIR__.'/../_fixtures/configMvcForYieldBug.php');
 
         self::assertEquals(self::SUCCESS_CODE, $cmdTester->getStatusCode());
-        self::assertStringContainsString("ℹ️ Baseline file '{$this->defaultBaselineFilename}' created!", $cmdTester->getErrorOutput());
+        self::assertStringContainsString("ℹ️ Baseline file '{$this->defaultBaselineFilename}' created!", $cmdTester->getDisplay());
         self::assertFileExists($this->defaultBaselineFilename);
 
         $baseline = json_decode((string) file_get_contents($this->defaultBaselineFilename), true);
@@ -50,7 +50,7 @@ class GenerateBaselineCommandTest extends TestCase
         );
 
         self::assertEquals(self::SUCCESS_CODE, $cmdTester->getStatusCode());
-        self::assertStringContainsString("ℹ️ Baseline file '{$this->customBaselineFilename}' created!", $cmdTester->getErrorOutput());
+        self::assertStringContainsString("ℹ️ Baseline file '{$this->customBaselineFilename}' created!", $cmdTester->getDisplay());
         self::assertFileExists($this->customBaselineFilename);
         self::assertFileDoesNotExist($this->defaultBaselineFilename);
     }
@@ -76,7 +76,7 @@ class GenerateBaselineCommandTest extends TestCase
         $cmdTester = $this->runGenerateBaseline('not-a-real-config.php');
 
         self::assertEquals(self::ERROR_CODE, $cmdTester->getStatusCode());
-        self::assertStringContainsString('not found', $cmdTester->getErrorOutput());
+        self::assertStringContainsString('not found', $cmdTester->getDisplay());
         self::assertFileDoesNotExist($this->defaultBaselineFilename);
     }
 
