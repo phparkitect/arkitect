@@ -59,7 +59,7 @@ class Check extends Command
                 self::GENERATE_BASELINE_PARAM,
                 'g',
                 InputOption::VALUE_OPTIONAL,
-                'Generate a file containing the current errors',
+                '[MOVED] Use the generate-baseline command instead',
                 false
             )
             ->addOption(
@@ -102,6 +102,17 @@ class Check extends Command
         $output = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
 
         try {
+            // the option is kept (instead of being removed) so users get this
+            // explanation rather than a generic "option does not exist" error
+            $generateBaseline = $input->getOption(self::GENERATE_BASELINE_PARAM);
+            if (false !== $generateBaseline) {
+                $filename = \is_string($generateBaseline) ? " $generateBaseline" : '';
+                $output->writeln('❌ The --generate-baseline option has been moved to its own command.');
+                $output->writeln("   Run: phparkitect generate-baseline$filename");
+
+                return self::ERROR_CODE;
+            }
+
             $verbose = (bool) $input->getOption('verbose');
             $options = $this->parseOptions($input);
 
@@ -116,12 +127,6 @@ class Check extends Command
 
             $output->writeln("Output format: {$options->getFormat()}");
             $progress = $this->createProgress($output, $verbose);
-
-            if ($options->shouldGenerateBaseline()) {
-                $this->handler->generateBaseline($options, $progress, $output);
-
-                return self::SUCCESS_CODE;
-            }
 
             $result = $this->handler->check($options, $progress, $output, $stdOut);
 
@@ -139,9 +144,6 @@ class Check extends Command
     {
         $useBaseline = (string) $input->getOption(self::USE_BASELINE_PARAM);
 
-        // false = option not set, null = option set but without value, string = option with value
-        $generateBaseline = $input->getOption(self::GENERATE_BASELINE_PARAM);
-
         return new CheckOptions(
             configFilePath: $this->commonOptions->configFilePath($input),
             targetPhpVersion: $this->commonOptions->targetPhpVersion($input),
@@ -149,8 +151,6 @@ class Check extends Command
             baselineFilePath: Baseline::resolveFilePath($useBaseline, Baseline::DEFAULT_FILENAME),
             skipBaseline: (bool) $input->getOption(self::SKIP_BASELINE_PARAM),
             ignoreBaselineLinenumbers: $this->commonOptions->isIgnoreBaselineLinenumbers($input),
-            generateBaseline: false !== $generateBaseline,
-            generateBaselineFilePath: \is_string($generateBaseline) ? $generateBaseline : null,
             format: (string) $input->getOption(self::FORMAT_PARAM),
             autoloadFilePath: $this->commonOptions->autoloadFilePath($input),
         );

@@ -111,13 +111,25 @@ class CheckCommandTest extends TestCase
         self::assertStringContainsString($expectedErrors, $cmdTester->getDisplay());
     }
 
+    public function test_generate_baseline_option_has_moved_to_its_own_command(): void
+    {
+        $configFilePath = __DIR__.'/../_fixtures/configMvcForYieldBug.php';
+
+        $cmdTester = $this->runCheck($configFilePath, null, null, false, false, 'text', null, $this->customBaselineFilename);
+
+        self::assertCommandExitedWithError($cmdTester);
+        self::assertStringContainsString('The --generate-baseline option has been moved to its own command', $cmdTester->getErrorOutput());
+        self::assertStringContainsString("Run: phparkitect generate-baseline {$this->customBaselineFilename}", $cmdTester->getErrorOutput());
+        self::assertFileDoesNotExist($this->customBaselineFilename);
+    }
+
     public function test_baseline(): void
     {
         $configFilePath = __DIR__.'/../_fixtures/configMvcForYieldBug.php';
 
         // Produce the baseline
 
-        $this->runCheck($configFilePath, null, null, $this->customBaselineFilename);
+        $this->runGenerateBaseline($configFilePath, $this->customBaselineFilename);
 
         // Check it detects error if baseline is not used
 
@@ -138,7 +150,7 @@ class CheckCommandTest extends TestCase
 
         // Produce the baseline
 
-        $this->runCheck($configFilePath, null, null, null);
+        $this->runGenerateBaseline($configFilePath);
 
         // Check it ignores error if baseline is used
 
@@ -152,10 +164,10 @@ class CheckCommandTest extends TestCase
         $configFilePath = __DIR__.'/../_fixtures/configMvcForYieldBug.php';
 
         // Produce the baseline
-        $this->runCheck($configFilePath, null, null, null);
+        $this->runGenerateBaseline($configFilePath);
 
         // Check it ignores the default baseline
-        $cmdTester = $this->runCheck($configFilePath, null, null, false, true);
+        $cmdTester = $this->runCheck($configFilePath, null, null, true);
 
         self::assertCommandExitedWithError($cmdTester);
     }
@@ -172,7 +184,7 @@ class CheckCommandTest extends TestCase
         $configFilePath = __DIR__.'/../_fixtures/configIgnoreBaselineLineNumbers.php';
 
         // No errors when ignoring baseline line numbers
-        $cmdTester = $this->runCheck($configFilePath, null, __DIR__.'/../_fixtures/line_numbers/baseline.json', false, false, true);
+        $cmdTester = $this->runCheck($configFilePath, null, __DIR__.'/../_fixtures/line_numbers/baseline.json', false, true);
         self::assertCommandWasSuccessful($cmdTester);
 
         // Errors when not ignoring baseline line numbers
@@ -185,7 +197,7 @@ class CheckCommandTest extends TestCase
         $configFilePath = __DIR__.'/../_fixtures/configMvcForYieldBug.php';
 
         // Produce the baseline matching the current violation
-        $this->runCheck($configFilePath, null, null, $this->customBaselineFilename);
+        $this->runGenerateBaseline($configFilePath, $this->customBaselineFilename);
 
         // Add a fake, already-fixed entry to the baseline
         $baseline = json_decode((string) file_get_contents($this->customBaselineFilename), true);
@@ -207,7 +219,7 @@ class CheckCommandTest extends TestCase
     {
         $configFilePath = __DIR__.'/../_fixtures/configMvcForYieldBug.php';
 
-        $cmdTester = $this->runCheck($configFilePath, null, null, false, false, false, 'json');
+        $cmdTester = $this->runCheck($configFilePath, null, null, false, false, 'json');
 
         $expectedJson = <<<'ERRORS'
         {
@@ -230,7 +242,7 @@ class CheckCommandTest extends TestCase
     {
         $configFilePath = __DIR__.'/../_fixtures/configMvcWithoutErrors.php';
 
-        $cmdTester = $this->runCheck($configFilePath, null, null, false, false, false, 'json');
+        $cmdTester = $this->runCheck($configFilePath, null, null, false, false, 'json');
 
         $expectedJson = '{"totalViolations":0,"details":[]}';
 
@@ -242,7 +254,7 @@ class CheckCommandTest extends TestCase
     {
         $configFilePath = __DIR__.'/../_fixtures/configMvcForYieldBug.php';
 
-        $cmdTester = $this->runCheck($configFilePath, null, null, false, false, false, 'gitlab');
+        $cmdTester = $this->runCheck($configFilePath, null, null, false, false, 'gitlab');
 
         $expectedJson = <<<'ERRORS'
         [
@@ -269,7 +281,7 @@ class CheckCommandTest extends TestCase
     {
         $configFilePath = __DIR__.'/../_fixtures/configMvcWithoutErrors.php';
 
-        $cmdTester = $this->runCheck($configFilePath, null, null, false, false, false, 'gitlab');
+        $cmdTester = $this->runCheck($configFilePath, null, null, false, false, 'gitlab');
 
         $expectedJson = '[]';
 
@@ -305,7 +317,7 @@ class CheckCommandTest extends TestCase
     {
         $configFilePath = __DIR__.'/../_fixtures/autoload/phparkitect.php';
 
-        $cmdTester = $this->runCheck($configFilePath, null, null, false, false, false, 'text', __DIR__.'/../_fixtures/autoload/autoload.php');
+        $cmdTester = $this->runCheck($configFilePath, null, null, false, false, 'text', __DIR__.'/../_fixtures/autoload/autoload.php');
 
         self::assertCommandWasSuccessful($cmdTester);
     }
@@ -314,11 +326,11 @@ class CheckCommandTest extends TestCase
         $configFilePath = null,
         ?bool $stopOnFailure = null,
         ?string $useBaseline = null,
-        $generateBaseline = false,
         bool $skipBaseline = false,
         bool $ignoreBaselineNumbers = false,
         string $format = 'text',
         ?string $autoloadFilePath = null,
+        $generateBaseline = false,
     ): ApplicationTester {
         $input = ['check'];
 
@@ -348,6 +360,23 @@ class CheckCommandTest extends TestCase
 
         if ($autoloadFilePath) {
             $input['--autoload'] = $autoloadFilePath;
+        }
+
+        $app = new PhpArkitectApplication();
+        $app->setAutoExit(false);
+
+        $appTester = new ApplicationTester($app);
+        $appTester->run($input, ['capture_stderr_separately' => true]);
+
+        return $appTester;
+    }
+
+    protected function runGenerateBaseline(string $configFilePath, ?string $filename = null): ApplicationTester
+    {
+        $input = ['generate-baseline', '--config' => $configFilePath];
+
+        if (null !== $filename) {
+            $input['filename'] = $filename;
         }
 
         $app = new PhpArkitectApplication();

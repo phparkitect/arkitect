@@ -17,8 +17,6 @@ final class CheckOptions
         private ?string $baselineFilePath,
         private bool $skipBaseline,
         private bool $ignoreBaselineLinenumbers,
-        private bool $generateBaseline,
-        private ?string $generateBaselineFilePath,
         private string $format,
         private ?string $autoloadFilePath,
     ) {
@@ -52,16 +50,6 @@ final class CheckOptions
     public function isIgnoreBaselineLinenumbers(): bool
     {
         return $this->ignoreBaselineLinenumbers;
-    }
-
-    public function shouldGenerateBaseline(): bool
-    {
-        return $this->generateBaseline;
-    }
-
-    public function getGenerateBaselineFilePath(): ?string
-    {
-        return $this->generateBaselineFilePath;
     }
 
     public function getFormat(): string

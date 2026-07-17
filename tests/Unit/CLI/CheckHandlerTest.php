@@ -6,6 +6,8 @@ namespace Arkitect\Tests\Unit\CLI;
 
 use Arkitect\CLI\CheckHandler;
 use Arkitect\CLI\CheckOptions;
+use Arkitect\CLI\GenerateBaselineHandler;
+use Arkitect\CLI\GenerateBaselineOptions;
 use Arkitect\CLI\Progress\VoidProgress;
 use Arkitect\CLI\Runner;
 use PHPUnit\Framework\TestCase;
@@ -59,18 +61,22 @@ class CheckHandlerTest extends TestCase
 
     public function test_check_applies_the_baseline(): void
     {
-        $handler = new CheckHandler(new Runner());
+        $generateBaselineHandler = new GenerateBaselineHandler(new Runner());
         $output = new BufferedOutput();
 
-        $handler->generateBaseline(
-            $this->createOptions(
+        $generateBaselineHandler->generateBaseline(
+            new GenerateBaselineOptions(
                 configFilePath: __DIR__.'/_fixtures/checkhandler/configWithViolations.php',
-                generateBaseline: true,
-                generateBaselineFilePath: $this->generatedBaselineFilePath
+                targetPhpVersion: null,
+                autoloadFilePath: null,
+                ignoreBaselineLinenumbers: false,
+                baselineFilePath: $this->generatedBaselineFilePath,
             ),
             new VoidProgress(),
             $output
         );
+
+        $handler = new CheckHandler(new Runner());
 
         $result = $handler->check(
             $this->createOptions(
@@ -86,35 +92,9 @@ class CheckHandlerTest extends TestCase
         self::assertStringContainsString("Baseline file '{$this->generatedBaselineFilePath}' found", $output->fetch());
     }
 
-    public function test_generate_baseline_writes_the_violations_to_a_file(): void
-    {
-        $handler = new CheckHandler(new Runner());
-        $output = new BufferedOutput();
-
-        $handler->generateBaseline(
-            $this->createOptions(
-                configFilePath: __DIR__.'/_fixtures/checkhandler/configWithViolations.php',
-                generateBaseline: true,
-                generateBaselineFilePath: $this->generatedBaselineFilePath
-            ),
-            new VoidProgress(),
-            $output
-        );
-
-        self::assertFileExists($this->generatedBaselineFilePath);
-        self::assertStringContainsString("ℹ️ Baseline file '{$this->generatedBaselineFilePath}' created!", $output->fetch());
-
-        $baseline = json_decode((string) file_get_contents($this->generatedBaselineFilePath), true);
-
-        self::assertCount(1, $baseline['violations']);
-        self::assertSame('App\Foo', $baseline['violations'][0]['fqcn']);
-    }
-
     private function createOptions(
         string $configFilePath,
         ?string $baselineFilePath = null,
-        bool $generateBaseline = false,
-        ?string $generateBaselineFilePath = null,
     ): CheckOptions {
         return new CheckOptions(
             configFilePath: $configFilePath,
@@ -123,8 +103,6 @@ class CheckHandlerTest extends TestCase
             baselineFilePath: $baselineFilePath,
             skipBaseline: false,
             ignoreBaselineLinenumbers: false,
-            generateBaseline: $generateBaseline,
-            generateBaselineFilePath: $generateBaselineFilePath,
             format: 'text',
             autoloadFilePath: null,
         );

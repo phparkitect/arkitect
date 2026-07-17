@@ -11,9 +11,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\Assert;
 
 /**
- * The CLI options shared by every command that runs an analysis.
- * Commands compose this object so the option names, shortcuts, defaults
- * and parsing stay in sync across the whole CLI.
+ * The CLI options shared by every command that runs an analysis
+ * (`check`, `generate-baseline`). Commands compose this object so the
+ * option names, shortcuts, defaults and parsing stay in sync across
+ * the whole CLI.
  */
 final class CommonOptions
 {
@@ -50,7 +51,7 @@ final class CommonOptions
                 self::IGNORE_BASELINE_LINENUMBERS_PARAM,
                 'i',
                 InputOption::VALUE_NONE,
-                'Ignore line numbers when checking the baseline'
+                'Ignore line numbers when checking or generating the baseline'
             );
     }
 
