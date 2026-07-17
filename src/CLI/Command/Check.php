@@ -145,7 +145,7 @@ class Check extends Command
             configFilePath: $this->commonOptions->configFilePath($input),
             targetPhpVersion: $this->commonOptions->targetPhpVersion($input),
             stopOnFailure: (bool) $input->getOption(self::STOP_ON_FAILURE_PARAM),
-            baselineFilePath: BaselineFileRepository::resolveFilePath($useBaseline),
+            baselineFilePath: '' !== $useBaseline ? $useBaseline : BaselineFileRepository::findDefaultFilePath(),
             skipBaseline: (bool) $input->getOption(self::SKIP_BASELINE_PARAM),
             ignoreBaselineLinenumbers: $this->commonOptions->isIgnoreBaselineLinenumbers($input),
             format: (string) $input->getOption(self::FORMAT_PARAM),

@@ -29,14 +29,11 @@ final class BaselineFileRepository
     }
 
     /**
-     * @psalm-suppress RiskyTruthyFalsyComparison
+     * The default baseline file, or null when none exists — this is what
+     * lets `check` pick up a generated baseline automatically.
      */
-    public static function resolveFilePath(?string $filePath): ?string
+    public static function findDefaultFilePath(): ?string
     {
-        if (!$filePath && file_exists(self::DEFAULT_FILENAME)) {
-            $filePath = self::DEFAULT_FILENAME;
-        }
-
-        return $filePath ?: null;
+        return file_exists(self::DEFAULT_FILENAME) ? self::DEFAULT_FILENAME : null;
     }
 }

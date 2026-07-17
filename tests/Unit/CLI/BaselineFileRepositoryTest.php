@@ -42,23 +42,40 @@ class BaselineFileRepositoryTest extends TestCase
         (new BaselineFileRepository())->load('not-a-real-file.json');
     }
 
-    public function test_resolve_file_path_prefers_the_explicit_path(): void
+    public function test_find_default_file_path_is_null_when_no_default_baseline_exists(): void
     {
-        self::assertSame('custom.json', BaselineFileRepository::resolveFilePath('custom.json'));
+        $this->inEmptyDirectory(static function (): void {
+            self::assertNull(BaselineFileRepository::findDefaultFilePath());
+        });
     }
 
-    public function test_resolve_file_path_is_null_when_nothing_is_given_and_no_default_exists(): void
+    public function test_find_default_file_path_returns_the_default_baseline_when_it_exists(): void
     {
-        // the default baseline is resolved against the current working
-        // directory, so move to an empty one to make the test deterministic
+        $this->inEmptyDirectory(static function (): void {
+            file_put_contents(BaselineFileRepository::DEFAULT_FILENAME, '{"violations": []}');
+
+            self::assertSame(BaselineFileRepository::DEFAULT_FILENAME, BaselineFileRepository::findDefaultFilePath());
+
+            unlink(BaselineFileRepository::DEFAULT_FILENAME);
+        });
+    }
+
+    /**
+     * The default baseline is looked up in the current working directory,
+     * so run the callback from a fresh empty one to make tests deterministic.
+     */
+    private function inEmptyDirectory(callable $test): void
+    {
         $cwd = (string) getcwd();
-        chdir(sys_get_temp_dir());
+        $directory = sys_get_temp_dir().'/arkitect-baseline-test-'.uniqid();
+        mkdir($directory);
+        chdir($directory);
 
         try {
-            self::assertNull(BaselineFileRepository::resolveFilePath(''));
-            self::assertNull(BaselineFileRepository::resolveFilePath(null));
+            $test();
         } finally {
             chdir($cwd);
+            rmdir($directory);
         }
     }
 }
