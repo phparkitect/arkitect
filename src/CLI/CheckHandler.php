@@ -16,8 +16,10 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class CheckHandler
 {
-    public function __construct(private Runner $runner)
-    {
+    public function __construct(
+        private Runner $runner,
+        private BaselineFileRepository $baselineRepository,
+    ) {
     }
 
     public function check(
@@ -35,9 +37,10 @@ final class CheckHandler
             ->skipBaseline($options->isSkipBaseline())
             ->format($options->getFormat());
 
-        $baseline = Baseline::create($config->isSkipBaseline(), $config->getBaselineFilePath());
+        $baselineFilePath = $config->isSkipBaseline() ? null : $config->getBaselineFilePath();
+        $baseline = null === $baselineFilePath ? Baseline::empty() : $this->baselineRepository->load($baselineFilePath);
 
-        $baseline->getFilename() && $output->writeln("Baseline file '{$baseline->getFilename()}' found");
+        null !== $baselineFilePath && $output->writeln("Baseline file '$baselineFilePath' found");
 
         $output->writeln("Config file '{$options->getConfigFilePath()}' found\n");
 
@@ -74,7 +77,7 @@ final class CheckHandler
             $verb = 1 === $staleViolationsCount ? 'looks' : 'look';
             $pronoun = 1 === $staleViolationsCount ? 'it' : 'them';
             $noun = 1 === $staleViolationsCount ? 'violation' : 'violations';
-            $output->writeln("💡 {$staleViolationsCount} {$noun} in the baseline {$verb} fixed — regenerate the baseline to remove {$pronoun}");
+            $output->writeln("💡 {$staleViolationsCount} {$noun} in the baseline {$verb} fixed — run `phparkitect prune-baseline` to remove {$pronoun}");
         }
     }
 }

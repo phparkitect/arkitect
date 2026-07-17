@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI\Command;
 
-use Arkitect\CLI\Baseline;
+use Arkitect\CLI\BaselineFileRepository;
 use Arkitect\CLI\CheckHandler;
 use Arkitect\CLI\CheckOptions;
 use Arkitect\CLI\Runner;
@@ -37,7 +37,7 @@ class Check extends Command
 
         parent::__construct('check');
 
-        $this->handler = $handler ?? new CheckHandler(new Runner());
+        $this->handler = $handler ?? new CheckHandler(new Runner(), new BaselineFileRepository());
         $this->runtime = new CommandRuntime();
     }
 
@@ -144,7 +144,7 @@ class Check extends Command
             configFilePath: $this->commonOptions->configFilePath($input),
             targetPhpVersion: $this->commonOptions->targetPhpVersion($input),
             stopOnFailure: (bool) $input->getOption(self::STOP_ON_FAILURE_PARAM),
-            baselineFilePath: Baseline::resolveFilePath($useBaseline, Baseline::DEFAULT_FILENAME),
+            baselineFilePath: BaselineFileRepository::resolveFilePath($useBaseline),
             skipBaseline: (bool) $input->getOption(self::SKIP_BASELINE_PARAM),
             ignoreBaselineLinenumbers: $this->commonOptions->isIgnoreBaselineLinenumbers($input),
             format: (string) $input->getOption(self::FORMAT_PARAM),

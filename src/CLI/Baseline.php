@@ -1,29 +1,41 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Arkitect\CLI;
 
 use Arkitect\Rules\Violations;
 
+/**
+ * The set of known violations to be ignored by a check run.
+ *
+ * This is a pure domain object: loading and saving baselines from disk
+ * lives in BaselineFileRepository.
+ */
 class Baseline
 {
-    public const DEFAULT_FILENAME = 'phparkitect-baseline.json';
-
     private Violations $violations;
-
-    private string $filename;
 
     private int $staleViolationsCount = 0;
 
-    private function __construct(Violations $violations, string $filename)
+    private function __construct(Violations $violations)
     {
         $this->violations = $violations;
-        $this->filename = $filename;
     }
 
-    public function getFilename(): string
+    public static function fromViolations(Violations $violations): self
     {
-        return $this->filename;
+        return new self($violations);
+    }
+
+    public static function empty(): self
+    {
+        return new self(new Violations());
+    }
+
+    public function getViolations(): Violations
+    {
+        return $this->violations;
     }
 
     public function applyTo(Violations $violations, bool $ignoreBaselineLinenumbers): void
@@ -44,49 +56,18 @@ class Baseline
     }
 
     /**
-     * @psalm-suppress RiskyTruthyFalsyComparison
+     * Shrink-only update: returns a baseline containing only the entries that
+     * still match a current violation — nothing is ever added. Matching
+     * ignores line numbers and the current violations are the ones kept, so
+     * pruning also refreshes line numbers gone stale after refactorings.
      */
-    public static function resolveFilePath(?string $filePath, string $defaultFilePath): ?string
+    public function prune(Violations $currentViolations): self
     {
-        if (!$filePath && file_exists($defaultFilePath)) {
-            $filePath = $defaultFilePath;
-        }
-
-        return $filePath ?: null;
+        return new self($currentViolations->intersection($this->violations));
     }
 
-    public static function empty(): self
+    public function withoutLineNumbers(): self
     {
-        return new self(new Violations(), '');
-    }
-
-    public static function create(bool $skipBaseline, ?string $baselineFilePath): self
-    {
-        if ($skipBaseline || null === $baselineFilePath) {
-            return self::empty();
-        }
-
-        return self::loadFromFile($baselineFilePath);
-    }
-
-    public static function loadFromFile(string $filename): self
-    {
-        if (!file_exists($filename)) {
-            throw new \RuntimeException("Baseline file '$filename' not found.");
-        }
-
-        return new self(
-            Violations::fromJson(file_get_contents($filename)),
-            $filename
-        );
-    }
-
-    public static function save(string $filename, Violations $violations, bool $ignoreLineNumbers = false): void
-    {
-        if ($ignoreLineNumbers) {
-            $violations = $violations->withoutLineNumbers();
-        }
-
-        file_put_contents($filename, json_encode($violations, \JSON_PRETTY_PRINT));
+        return new self($this->violations->withoutLineNumbers());
     }
 }

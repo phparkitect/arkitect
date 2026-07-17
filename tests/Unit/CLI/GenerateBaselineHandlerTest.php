@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\CLI;
 
+use Arkitect\CLI\BaselineFileRepository;
 use Arkitect\CLI\GenerateBaselineHandler;
 use Arkitect\CLI\GenerateBaselineOptions;
 use Arkitect\CLI\Progress\VoidProgress;
@@ -24,7 +25,7 @@ class GenerateBaselineHandlerTest extends TestCase
 
     public function test_generate_baseline_writes_the_violations_to_a_file(): void
     {
-        $handler = new GenerateBaselineHandler(new Runner());
+        $handler = new GenerateBaselineHandler(new Runner(), new BaselineFileRepository());
         $output = new BufferedOutput();
 
         $handler->generateBaseline(
@@ -44,7 +45,7 @@ class GenerateBaselineHandlerTest extends TestCase
 
     public function test_generate_baseline_can_omit_line_numbers(): void
     {
-        $handler = new GenerateBaselineHandler(new Runner());
+        $handler = new GenerateBaselineHandler(new Runner(), new BaselineFileRepository());
         $output = new BufferedOutput();
 
         $handler->generateBaseline(
@@ -64,7 +65,7 @@ class GenerateBaselineHandlerTest extends TestCase
 
     public function test_generate_baseline_writes_an_empty_baseline_when_there_are_no_violations(): void
     {
-        $handler = new GenerateBaselineHandler(new Runner());
+        $handler = new GenerateBaselineHandler(new Runner(), new BaselineFileRepository());
         $output = new BufferedOutput();
 
         $handler->generateBaseline(

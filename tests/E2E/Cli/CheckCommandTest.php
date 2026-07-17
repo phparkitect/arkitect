@@ -212,7 +212,7 @@ class CheckCommandTest extends TestCase
         $cmdTester = $this->runCheck($configFilePath, null, $this->customBaselineFilename);
 
         self::assertCommandWasSuccessful($cmdTester);
-        self::assertStringContainsString('💡 1 violation in the baseline looks fixed — regenerate the baseline to remove it', $cmdTester->getErrorOutput());
+        self::assertStringContainsString('💡 1 violation in the baseline looks fixed — run `phparkitect prune-baseline` to remove it', $cmdTester->getErrorOutput());
     }
 
     public function test_json_format_output_errors(): void

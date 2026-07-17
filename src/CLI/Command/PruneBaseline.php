@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Arkitect\CLI\Command;
 
 use Arkitect\CLI\BaselineFileRepository;
-use Arkitect\CLI\GenerateBaselineHandler;
-use Arkitect\CLI\GenerateBaselineOptions;
+use Arkitect\CLI\PruneBaselineHandler;
+use Arkitect\CLI\PruneBaselineOptions;
 use Arkitect\CLI\Runner;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -14,37 +14,37 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class GenerateBaseline extends Command
+class PruneBaseline extends Command
 {
     private const FILENAME_ARG = 'filename';
 
-    private GenerateBaselineHandler $handler;
+    private PruneBaselineHandler $handler;
 
     private CommonOptions $commonOptions;
 
     private CommandRuntime $runtime;
 
-    public function __construct(?GenerateBaselineHandler $handler = null)
+    public function __construct(?PruneBaselineHandler $handler = null)
     {
         // assigned before the parent constructor because Symfony's
         // Command::__construct() invokes configure(), which uses it
         $this->commonOptions = new CommonOptions();
 
-        parent::__construct('generate-baseline');
+        parent::__construct('prune-baseline');
 
-        $this->handler = $handler ?? new GenerateBaselineHandler(new Runner(), new BaselineFileRepository());
+        $this->handler = $handler ?? new PruneBaselineHandler(new Runner(), new BaselineFileRepository());
         $this->runtime = new CommandRuntime();
     }
 
     protected function configure(): void
     {
         $this
-            ->setDescription('Generate a file containing the current violations, to be ignored by the check command.')
-            ->setHelp('This command runs the analysis and saves the current violations to a baseline file, so that the check command can ignore them.')
+            ->setDescription('Remove from the baseline the violations that no longer exist, without adding anything.')
+            ->setHelp('This command runs the analysis and keeps in the baseline only the entries that still match a current violation. It never adds entries, so unlike regenerating the baseline it cannot hide new violations, and it refreshes stale line numbers.')
             ->addArgument(
                 self::FILENAME_ARG,
                 InputArgument::OPTIONAL,
-                'The baseline file to create',
+                'The baseline file to prune',
                 BaselineFileRepository::DEFAULT_FILENAME
             );
 
@@ -79,7 +79,7 @@ class GenerateBaseline extends Command
 
             $progress = $this->runtime->createProgress($output, $verbose);
 
-            $this->handler->generateBaseline($options, $progress, $output);
+            $this->handler->pruneBaseline($options, $progress, $output);
 
             return self::SUCCESS;
         } catch (\Throwable $e) {
@@ -91,9 +91,9 @@ class GenerateBaseline extends Command
         }
     }
 
-    protected function parseOptions(InputInterface $input): GenerateBaselineOptions
+    protected function parseOptions(InputInterface $input): PruneBaselineOptions
     {
-        return new GenerateBaselineOptions(
+        return new PruneBaselineOptions(
             configFilePath: $this->commonOptions->configFilePath($input),
             targetPhpVersion: $this->commonOptions->targetPhpVersion($input),
             autoloadFilePath: $this->commonOptions->autoloadFilePath($input),

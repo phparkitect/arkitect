@@ -8,6 +8,7 @@ use Arkitect\CLI\Command\Check;
 use Arkitect\CLI\Command\DebugExpression;
 use Arkitect\CLI\Command\GenerateBaseline;
 use Arkitect\CLI\Command\Init;
+use Arkitect\CLI\Command\PruneBaseline;
 
 class PhpArkitectApplication extends \Symfony\Component\Console\Application
 {
@@ -29,6 +30,7 @@ class PhpArkitectApplication extends \Symfony\Component\Console\Application
 
         $this->$addMethod(new Check());
         $this->$addMethod(new GenerateBaseline());
+        $this->$addMethod(new PruneBaseline());
         $this->$addMethod(new Init());
         $this->$addMethod(new DebugExpression());
     }

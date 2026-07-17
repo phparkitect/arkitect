@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Unit\CLI;
 
+use Arkitect\CLI\BaselineFileRepository;
 use Arkitect\CLI\CheckHandler;
 use Arkitect\CLI\CheckOptions;
 use Arkitect\CLI\GenerateBaselineHandler;
@@ -26,7 +27,7 @@ class CheckHandlerTest extends TestCase
 
     public function test_check_reports_violations(): void
     {
-        $handler = new CheckHandler(new Runner());
+        $handler = new CheckHandler(new Runner(), new BaselineFileRepository());
         $output = new BufferedOutput();
         $violationsOutput = new BufferedOutput();
 
@@ -44,7 +45,7 @@ class CheckHandlerTest extends TestCase
 
     public function test_check_reports_success_when_there_are_no_violations(): void
     {
-        $handler = new CheckHandler(new Runner());
+        $handler = new CheckHandler(new Runner(), new BaselineFileRepository());
         $output = new BufferedOutput();
         $violationsOutput = new BufferedOutput();
 
@@ -61,7 +62,7 @@ class CheckHandlerTest extends TestCase
 
     public function test_check_applies_the_baseline(): void
     {
-        $generateBaselineHandler = new GenerateBaselineHandler(new Runner());
+        $generateBaselineHandler = new GenerateBaselineHandler(new Runner(), new BaselineFileRepository());
         $output = new BufferedOutput();
 
         $generateBaselineHandler->generateBaseline(
@@ -76,7 +77,7 @@ class CheckHandlerTest extends TestCase
             $output
         );
 
-        $handler = new CheckHandler(new Runner());
+        $handler = new CheckHandler(new Runner(), new BaselineFileRepository());
 
         $result = $handler->check(
             $this->createOptions(
