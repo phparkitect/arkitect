@@ -14,7 +14,6 @@ final class PruneBaselineOptions
         private string $configFilePath,
         private ?string $targetPhpVersion,
         private ?string $autoloadFilePath,
-        private bool $ignoreBaselineLinenumbers,
         private string $baselineFilePath,
     ) {
     }
@@ -32,11 +31,6 @@ final class PruneBaselineOptions
     public function getAutoloadFilePath(): ?string
     {
         return $this->autoloadFilePath;
-    }
-
-    public function isIgnoreBaselineLinenumbers(): bool
-    {
-        return $this->ignoreBaselineLinenumbers;
     }
 
     public function getBaselineFilePath(): string

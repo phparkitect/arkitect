@@ -80,6 +80,7 @@ class Check extends Command
             );
 
         $this->commonOptions->addTo($this);
+        $this->commonOptions->addIgnoreBaselineLinenumbers($this);
     }
 
     protected function isRunningAsPhar(): bool

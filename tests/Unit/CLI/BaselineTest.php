@@ -75,6 +75,20 @@ class BaselineTest extends TestCase
         self::assertEquals(42, $pruned->getViolations()->get(0)->getLine());
     }
 
+    public function test_prune_preserves_a_line_numberless_baseline_format(): void
+    {
+        $baselineViolations = new Violations();
+        $baselineViolations->add(new Violation('App\Controller\Shop', 'should have name end with Controller', null));
+
+        $current = new Violations();
+        $current->add(new Violation('App\Controller\Shop', 'should have name end with Controller', 42));
+
+        $pruned = Baseline::fromViolations($baselineViolations)->prune($current);
+
+        self::assertCount(1, $pruned->getViolations());
+        self::assertNull($pruned->getViolations()->get(0)->getLine());
+    }
+
     public function test_without_line_numbers_returns_a_copy_with_stripped_line_numbers(): void
     {
         $baselineViolations = new Violations();

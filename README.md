@@ -167,7 +167,7 @@ phparkitect prune-baseline
 
 Pruning only removes entries that no longer match a current violation — it never adds anything. Regenerating snapshots the entire current state, so it would silently legitimize any new violation introduced since the baseline was created; pruning cannot, which makes it safe to run routinely (even automated). Since matching ignores line numbers and the kept entries are saved with their current ones, pruning also refreshes a baseline whose line numbers went stale after refactorings. `check` prints a hint when it detects baseline entries that look fixed.
 
-Both `generate-baseline` and `prune-baseline` accept an optional custom file name as argument and the same `--config`, `--target-php-version`, `--autoload` and `--ignore-baseline-linenumbers` options as `check`.
+Both `generate-baseline` and `prune-baseline` accept an optional custom file name as argument and the same `--config`, `--target-php-version` and `--autoload` options as `check`; `generate-baseline` also accepts `--ignore-baseline-linenumbers` to write the baseline without line numbers. `prune-baseline` needs no such flag: matching already ignores line numbers, and a baseline stored without line numbers keeps its format when pruned.
 
 > **Note**: baseline generation was previously a `check` option (`check --generate-baseline`); it is now a dedicated command, and the old option fails with a pointer to the new one.
 

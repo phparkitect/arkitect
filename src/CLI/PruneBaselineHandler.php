@@ -39,10 +39,6 @@ final class PruneBaselineHandler
 
         $prunedBaseline = $baseline->prune($result->getViolations());
 
-        if ($options->isIgnoreBaselineLinenumbers()) {
-            $prunedBaseline = $prunedBaseline->withoutLineNumbers();
-        }
-
         $this->baselineRepository->save($prunedBaseline, $options->getBaselineFilePath());
 
         $keptCount = $prunedBaseline->getViolations()->count();

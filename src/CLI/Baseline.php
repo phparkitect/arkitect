@@ -63,11 +63,29 @@ class Baseline
      */
     public function prune(Violations $currentViolations): self
     {
-        return new self($currentViolations->intersection($this->violations));
+        $prunedViolations = $currentViolations->intersection($this->violations);
+
+        // a baseline stored without line numbers keeps its format
+        if (!$this->hasLineNumbers()) {
+            $prunedViolations = $prunedViolations->withoutLineNumbers();
+        }
+
+        return new self($prunedViolations);
     }
 
     public function withoutLineNumbers(): self
     {
         return new self($this->violations->withoutLineNumbers());
+    }
+
+    private function hasLineNumbers(): bool
+    {
+        foreach ($this->violations as $violation) {
+            if (null !== $violation->getLine()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

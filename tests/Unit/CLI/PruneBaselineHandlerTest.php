@@ -96,7 +96,6 @@ class PruneBaselineHandlerTest extends TestCase
             configFilePath: $configFilePath,
             targetPhpVersion: null,
             autoloadFilePath: null,
-            ignoreBaselineLinenumbers: false,
             baselineFilePath: $this->baselineFilePath,
         );
     }

@@ -97,7 +97,6 @@ class PruneBaseline extends Command
             configFilePath: $this->commonOptions->configFilePath($input),
             targetPhpVersion: $this->commonOptions->targetPhpVersion($input),
             autoloadFilePath: $this->commonOptions->autoloadFilePath($input),
-            ignoreBaselineLinenumbers: $this->commonOptions->isIgnoreBaselineLinenumbers($input),
             baselineFilePath: (string) $input->getArgument(self::FILENAME_ARG),
         );
     }
