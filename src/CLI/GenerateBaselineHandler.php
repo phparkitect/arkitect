@@ -29,13 +29,12 @@ final class GenerateBaselineHandler
 
         $result = $this->runner->baseline($config, $progress);
 
-        $baselineFilePath = Baseline::save(
+        Baseline::save(
             $options->getBaselineFilePath(),
-            Baseline::DEFAULT_FILENAME,
             $result->getViolations(),
             $options->isIgnoreBaselineLinenumbers()
         );
 
-        $output->writeln("ℹ️ Baseline file '$baselineFilePath' created!");
+        $output->writeln("ℹ️ Baseline file '{$options->getBaselineFilePath()}' created!");
     }
 }
