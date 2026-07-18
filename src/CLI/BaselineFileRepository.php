@@ -28,8 +28,13 @@ final class BaselineFileRepository
         file_put_contents($filename, json_encode($baseline->getViolations(), \JSON_PRETTY_PRINT));
     }
 
-    public function exists(string $filename): bool
+    /**
+     * The baseline at $filename, or null when the file is absent — for
+     * callers (like check) where the baseline is optional and a missing
+     * one just means "nothing to ignore".
+     */
+    public function loadIfPresent(string $filename): ?Baseline
     {
-        return file_exists($filename);
+        return file_exists($filename) ? $this->load($filename) : null;
     }
 }

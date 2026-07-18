@@ -42,16 +42,22 @@ class BaselineFileRepositoryTest extends TestCase
         (new BaselineFileRepository())->load('not-a-real-file.json');
     }
 
-    public function test_exists_is_false_when_the_file_is_absent(): void
+    public function test_load_if_present_is_null_when_the_file_is_absent(): void
     {
-        self::assertFalse((new BaselineFileRepository())->exists($this->baselineFilePath));
+        self::assertNull((new BaselineFileRepository())->loadIfPresent($this->baselineFilePath));
     }
 
-    public function test_exists_is_true_when_the_file_is_present(): void
+    public function test_load_if_present_returns_the_baseline_when_the_file_is_present(): void
     {
-        $repository = new BaselineFileRepository();
-        $repository->save(Baseline::empty(), $this->baselineFilePath);
+        $violations = new Violations();
+        $violations->add(new Violation('App\Controller\Shop', 'should have name end with Controller', 10, 'Controller/Shop.php'));
 
-        self::assertTrue($repository->exists($this->baselineFilePath));
+        $repository = new BaselineFileRepository();
+        $repository->save(Baseline::fromViolations($violations), $this->baselineFilePath);
+
+        $loaded = $repository->loadIfPresent($this->baselineFilePath);
+
+        self::assertNotNull($loaded);
+        self::assertEquals($violations, $loaded->getViolations());
     }
 }

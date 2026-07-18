@@ -38,10 +38,11 @@ final class CheckHandler
         // the baseline is optional for check: an absent file just means there
         // is nothing to ignore, so we fall back to an empty baseline
         $baselineFilePath = $options->getBaselineFilePath();
-        $baseline = Baseline::empty();
+        $baseline = null === $baselineFilePath ? null : $this->baselineRepository->loadIfPresent($baselineFilePath);
 
-        if (null !== $baselineFilePath && $this->baselineRepository->exists($baselineFilePath)) {
-            $baseline = $this->baselineRepository->load($baselineFilePath);
+        if (null === $baseline) {
+            $baseline = Baseline::empty();
+        } else {
             $output->writeln("Baseline file '$baselineFilePath' found");
         }
 
