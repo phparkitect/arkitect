@@ -35,12 +35,15 @@ final class CheckHandler
             ->ignoreBaselineLinenumbers($options->isIgnoreBaselineLinenumbers())
             ->format($options->getFormat());
 
-        // null baselineFilePath means: use an empty baseline (no --use-baseline,
-        // no default file on disk, or --skip-baseline)
+        // the baseline is optional for check: an absent file just means there
+        // is nothing to ignore, so we fall back to an empty baseline
         $baselineFilePath = $options->getBaselineFilePath();
-        $baseline = null === $baselineFilePath ? Baseline::empty() : $this->baselineRepository->load($baselineFilePath);
+        $baseline = Baseline::empty();
 
-        null !== $baselineFilePath && $output->writeln("Baseline file '$baselineFilePath' found");
+        if (null !== $baselineFilePath && $this->baselineRepository->exists($baselineFilePath)) {
+            $baseline = $this->baselineRepository->load($baselineFilePath);
+            $output->writeln("Baseline file '$baselineFilePath' found");
+        }
 
         $output->writeln("Config file '{$options->getConfigFilePath()}' found\n");
 

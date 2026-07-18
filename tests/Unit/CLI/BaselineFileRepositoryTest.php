@@ -42,40 +42,16 @@ class BaselineFileRepositoryTest extends TestCase
         (new BaselineFileRepository())->load('not-a-real-file.json');
     }
 
-    public function test_has_default_baseline_is_false_when_no_default_baseline_exists(): void
+    public function test_exists_is_false_when_the_file_is_absent(): void
     {
-        $this->inEmptyDirectory(static function (): void {
-            self::assertFalse(BaselineFileRepository::hasDefaultBaseline());
-        });
+        self::assertFalse((new BaselineFileRepository())->exists($this->baselineFilePath));
     }
 
-    public function test_has_default_baseline_is_true_when_the_default_baseline_exists(): void
+    public function test_exists_is_true_when_the_file_is_present(): void
     {
-        $this->inEmptyDirectory(static function (): void {
-            file_put_contents(BaselineFileRepository::DEFAULT_FILENAME, '{"violations": []}');
+        $repository = new BaselineFileRepository();
+        $repository->save(Baseline::empty(), $this->baselineFilePath);
 
-            self::assertTrue(BaselineFileRepository::hasDefaultBaseline());
-
-            unlink(BaselineFileRepository::DEFAULT_FILENAME);
-        });
-    }
-
-    /**
-     * The default baseline is looked up in the current working directory,
-     * so run the callback from a fresh empty one to make tests deterministic.
-     */
-    private function inEmptyDirectory(callable $test): void
-    {
-        $cwd = (string) getcwd();
-        $directory = sys_get_temp_dir().'/arkitect-baseline-test-'.uniqid();
-        mkdir($directory);
-        chdir($directory);
-
-        try {
-            $test();
-        } finally {
-            chdir($cwd);
-            rmdir($directory);
-        }
+        self::assertTrue($repository->exists($this->baselineFilePath));
     }
 }

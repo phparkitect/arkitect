@@ -28,12 +28,8 @@ final class BaselineFileRepository
         file_put_contents($filename, json_encode($baseline->getViolations(), \JSON_PRETTY_PRINT));
     }
 
-    /**
-     * Whether the default baseline file exists — this is what lets `check`
-     * pick up a generated baseline automatically.
-     */
-    public static function hasDefaultBaseline(): bool
+    public function exists(string $filename): bool
     {
-        return file_exists(self::DEFAULT_FILENAME);
+        return file_exists($filename);
     }
 }
