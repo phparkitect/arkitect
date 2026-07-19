@@ -36,6 +36,6 @@ class JsonPrinter implements Printer
             'details' => $details,
         ];
 
-        return json_encode($errors);
+        return json_encode($errors, \JSON_INVALID_UTF8_SUBSTITUTE | \JSON_THROW_ON_ERROR);
     }
 }

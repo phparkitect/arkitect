@@ -47,8 +47,9 @@ jobs:
     - name: Install dependencies
       run: composer install --prefer-dist
 
+    # Psalm 6 needs PHP >= 8.1 to run; the analysis target stays 8.0 (phpVersion in psalm.xml)
     - name: Static Analysis
-      if: ${{ matrix.php-versions  == '8.0' }}
+      if: ${{ matrix.php-versions  == '8.1' }}
       run: |
         composer install --prefer-dist -d tools/psalm
         tools/psalm/vendor/bin/psalm --no-cache

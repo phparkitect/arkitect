@@ -54,10 +54,8 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
         return 'satisfies all architectural constraints';
     }
 
-    protected function matches(
-        /** @var ArchRule $rule */
-        $other,
-    ): bool {
+    protected function matches(mixed $other): bool
+    {
         $this->runner->check(
             ClassSetRules::create($this->classSet, $other),
             new VoidProgress(),
@@ -73,7 +71,7 @@ class ArchRuleCheckerConstraintAdapter extends Constraint
         return 0 === $violationsCount && 0 === $parsingErrorsCount;
     }
 
-    protected function failureDescription($other): string
+    protected function failureDescription(mixed $other): string
     {
         if ($this->parsingErrors->count() > 0) {
             $result = "\n parsing error: ";

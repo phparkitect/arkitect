@@ -107,7 +107,7 @@ EOT;
 
             /** @var ParsingError $parsedError */
             foreach ($parsingErrors as $parsedError) {
-                $output->writeln(' - '.$parsedError);
+                $output->writeln(' - '.$parsedError->__toString());
             }
 
             $output->writeln('');

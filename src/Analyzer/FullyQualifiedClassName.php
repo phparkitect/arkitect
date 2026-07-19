@@ -66,7 +66,7 @@ class FullyQualifiedClassName
         $className = array_pop($piecesWithoutEmpty);
         $namespace = implode('\\', $piecesWithoutEmpty);
 
-        return new self(new PatternString($fqcn), new PatternString($namespace), new PatternString($className));
+        return new self(new PatternString($fqcn), new PatternString($namespace), new PatternString($className ?? ''));
     }
 
     public function isNotAValidPattern(string $pattern): bool

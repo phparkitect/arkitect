@@ -75,8 +75,14 @@ class Baseline
             throw new \RuntimeException("Baseline file '$filename' not found.");
         }
 
+        $contents = file_get_contents($filename);
+
+        if (false === $contents) {
+            throw new \RuntimeException("Baseline file '$filename' could not be read.");
+        }
+
         return new self(
-            Violations::fromJson(file_get_contents($filename)),
+            Violations::fromJson($contents),
             $filename
         );
     }
@@ -87,6 +93,6 @@ class Baseline
             $violations = $violations->withoutLineNumbers();
         }
 
-        file_put_contents($filename, json_encode($violations, \JSON_PRETTY_PRINT));
+        file_put_contents($filename, json_encode($violations, \JSON_PRETTY_PRINT | \JSON_INVALID_UTF8_SUBSTITUTE | \JSON_THROW_ON_ERROR));
     }
 }

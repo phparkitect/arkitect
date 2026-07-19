@@ -36,13 +36,13 @@ class GitlabPrinter implements Printer
             }
         }
 
-        return json_encode($allErrors);
+        return json_encode($allErrors, \JSON_INVALID_UTF8_SUBSTITUTE | \JSON_THROW_ON_ERROR);
     }
 
     private function toKebabCase(string $string): string
     {
-        $string = preg_replace('/[^a-zA-Z0-9]+/', ' ', $string);
-        $string = preg_replace('/\s+/', ' ', $string);
+        $string = (string) preg_replace('/[^a-zA-Z0-9]+/', ' ', $string);
+        $string = (string) preg_replace('/\s+/', ' ', $string);
         $string = strtolower(trim($string));
         $string = str_replace(' ', '-', $string);
 
