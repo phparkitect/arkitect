@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Arkitect\Rules;
 
+/**
+ * @psalm-immutable
+ */
 class Violation implements \JsonSerializable
 {
     private string $fqcn;

@@ -22,9 +22,8 @@ class TextPrinter implements Printer
             foreach ($violationsByFqcn as $violation) {
                 $errors .= "\n  ".$violation->getError();
 
-                $line = $violation->getLine();
-                if (null !== $line) {
-                    $errors .= ' (on line '.$line.')';
+                if (null !== $violation->getLine()) {
+                    $errors .= ' (on line '.$violation->getLine().')';
                 }
             }
             $errors .= "\n";
