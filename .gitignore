@@ -5,10 +5,9 @@
 .php-cs-fixer.cache
 /web
 /bin/
-!/bin/box.phar
-!/bin/psalm.phar
+/tools/*/vendor/
 phparkitect.phar
-composer.lock
+/composer.lock
 .php-version
 composer.phar
 .phpunit.cache/

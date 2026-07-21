@@ -37,7 +37,9 @@ jobs:
       id: composer-cache
       uses: actions/cache@v6
       with:
-        path: vendor
+        path: |
+          vendor
+          tools/psalm/vendor
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
         restore-keys: |
           ${{ runner.os }}-php-
@@ -47,7 +49,9 @@ jobs:
 
     - name: Static Analysis
       if: ${{ matrix.php-versions  == '8.0' }}
-      run: ./bin/psalm.phar --no-cache
+      run: |
+        composer install --prefer-dist -d tools/psalm
+        tools/psalm/vendor/bin/psalm --no-cache
 
     - name: Test with coverage
       if: ${{ matrix.php-versions  == '8.0' }}
@@ -86,8 +90,11 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-dev -o
 
+      - name: "Install box"
+        run: composer install --prefer-dist -d tools/box
+
       - name: "Compile phparkitect phar"
-        run: php bin/box.phar compile -c ./box.json
+        run: tools/box/vendor/bin/box compile -c ./box.json
 
       - name: "Check phar"
         run: php ./phparkitect.phar
