@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI\Printer;
 
+use Arkitect\Json;
 use Arkitect\Rules\Violation;
 
 class GitlabPrinter implements Printer
@@ -36,13 +37,13 @@ class GitlabPrinter implements Printer
             }
         }
 
-        return json_encode($allErrors);
+        return Json::encode($allErrors);
     }
 
     private function toKebabCase(string $string): string
     {
-        $string = preg_replace('/[^a-zA-Z0-9]+/', ' ', $string);
-        $string = preg_replace('/\s+/', ' ', $string);
+        $string = (string) preg_replace('/[^a-zA-Z0-9]+/', ' ', $string);
+        $string = (string) preg_replace('/\s+/', ' ', $string);
         $string = strtolower(trim($string));
         $string = str_replace(' ', '-', $string);
 

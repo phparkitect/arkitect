@@ -66,6 +66,8 @@ class FullyQualifiedClassName
         $className = array_pop($piecesWithoutEmpty);
         $namespace = implode('\\', $piecesWithoutEmpty);
 
+        // $className can't be null: the regex above rejects an empty or trailing-backslash $fqcn
+        /** @psalm-suppress PossiblyNullArgument */
         return new self(new PatternString($fqcn), new PatternString($namespace), new PatternString($className));
     }
 

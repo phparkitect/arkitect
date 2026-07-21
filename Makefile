@@ -16,10 +16,11 @@ test_%: ## it launches a test
 	bin/phpunit --filter $@
 
 phar: ## it creates phar
+	composer install -d tools/box
 	rm -rf ${TMP_DIR} && mkdir -p ${TMP_DIR}
 	cp -R src bin-stub box.json README.md composer.json phparkitect-stub.php bin scoper.inc.php ${TMP_DIR}
 	cd ${TMP_DIR} && composer install --prefer-source --no-dev -o
-	bin/box.phar compile -c ${TMP_DIR}/box.json
+	tools/box/vendor/bin/box compile -c ${TMP_DIR}/box.json
 	cp ${TMP_DIR}/phparkitect.phar .
 
 outdated:
@@ -30,10 +31,12 @@ csfix: ## it launches cs fix
 	PHP_CS_FIXER_IGNORE_ENV=1 bin/php-cs-fixer fix -v
 
 psalm: ## it launches psalm
-	bin/psalm.phar --no-cache
+	composer install -d tools/psalm
+	tools/psalm/vendor/bin/psalm --no-cache
 
 build: ## it launches all the build
 	composer install
+	composer install -d tools/psalm
 	PHP_CS_FIXER_IGNORE_ENV=1 bin/php-cs-fixer fix -v
-	bin/psalm.phar --no-cache
+	tools/psalm/vendor/bin/psalm --no-cache
 	bin/phpunit

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI;
 
+use Arkitect\Json;
 use Arkitect\Rules\Violations;
 
 /**
@@ -25,7 +26,7 @@ final class BaselineFileRepository
 
     public function save(Baseline $baseline, string $filename): void
     {
-        file_put_contents($filename, json_encode($baseline->getViolations(), \JSON_PRETTY_PRINT));
+        file_put_contents($filename, Json::encode($baseline->getViolations()));
     }
 
     /**

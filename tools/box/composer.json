@@ -1,0 +1,10 @@
+{
+    "require": {
+        "humbug/box": "^4.7"
+    },
+    "config": {
+        "platform": {
+            "php": "8.2"
+        }
+    }
+}
