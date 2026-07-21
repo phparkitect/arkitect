@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI\Printer;
 
+use Arkitect\Json;
 use Arkitect\Rules\Violation;
 
 class GitlabPrinter implements Printer
@@ -36,7 +37,7 @@ class GitlabPrinter implements Printer
             }
         }
 
-        return json_encode($allErrors, \JSON_INVALID_UTF8_SUBSTITUTE | \JSON_THROW_ON_ERROR);
+        return Json::encode($allErrors);
     }
 
     private function toKebabCase(string $string): string

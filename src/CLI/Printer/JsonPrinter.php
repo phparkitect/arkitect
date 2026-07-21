@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI\Printer;
 
+use Arkitect\Json;
 use Arkitect\Rules\Violation;
 
 class JsonPrinter implements Printer
@@ -36,6 +37,6 @@ class JsonPrinter implements Printer
             'details' => $details,
         ];
 
-        return json_encode($errors, \JSON_INVALID_UTF8_SUBSTITUTE | \JSON_THROW_ON_ERROR);
+        return Json::encode($errors);
     }
 }

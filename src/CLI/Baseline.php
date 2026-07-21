@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI;
 
+use Arkitect\Json;
 use Arkitect\Rules\Violations;
 
 class Baseline
@@ -93,6 +94,6 @@ class Baseline
             $violations = $violations->withoutLineNumbers();
         }
 
-        file_put_contents($filename, json_encode($violations, \JSON_PRETTY_PRINT | \JSON_INVALID_UTF8_SUBSTITUTE | \JSON_THROW_ON_ERROR));
+        file_put_contents($filename, Json::encode($violations));
     }
 }
