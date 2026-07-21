@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI;
 
+use Arkitect\Json;
 use Arkitect\Rules\Violations;
 
 class Baseline
@@ -75,8 +76,14 @@ class Baseline
             throw new \RuntimeException("Baseline file '$filename' not found.");
         }
 
+        $contents = file_get_contents($filename);
+
+        if (false === $contents) {
+            throw new \RuntimeException("Baseline file '$filename' could not be read.");
+        }
+
         return new self(
-            Violations::fromJson(file_get_contents($filename)),
+            Violations::fromJson($contents),
             $filename
         );
     }
@@ -87,6 +94,6 @@ class Baseline
             $violations = $violations->withoutLineNumbers();
         }
 
-        file_put_contents($filename, json_encode($violations, \JSON_PRETTY_PRINT));
+        file_put_contents($filename, Json::encode($violations));
     }
 }

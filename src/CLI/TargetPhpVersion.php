@@ -47,7 +47,7 @@ class TargetPhpVersion
 
     public static function create(?string $version): self
     {
-        return new self($version ?? phpversion());
+        return new self($version ?? \PHP_VERSION);
     }
 
     public function get(): string

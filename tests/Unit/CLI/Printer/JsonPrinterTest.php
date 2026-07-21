@@ -20,7 +20,7 @@ class JsonPrinterTest extends TestCase
         $expected = json_encode([
             'totalViolations' => 0,
             'details' => [],
-        ]);
+        ], \JSON_PRETTY_PRINT);
 
         self::assertSame($expected, $result);
     }
@@ -51,7 +51,7 @@ class JsonPrinterTest extends TestCase
                     ],
                 ],
             ],
-        ]);
+        ], \JSON_PRETTY_PRINT);
 
         self::assertSame($expected, $result);
     }
@@ -91,7 +91,7 @@ class JsonPrinterTest extends TestCase
                     ],
                 ],
             ],
-        ]);
+        ], \JSON_PRETTY_PRINT);
 
         self::assertSame($expected, $result);
     }
