@@ -66,7 +66,9 @@ class FullyQualifiedClassName
         $className = array_pop($piecesWithoutEmpty);
         $namespace = implode('\\', $piecesWithoutEmpty);
 
-        return new self(new PatternString($fqcn), new PatternString($namespace), new PatternString($className ?? ''));
+        // $className can't be null: the regex above rejects an empty or trailing-backslash $fqcn
+        /** @psalm-suppress PossiblyNullArgument */
+        return new self(new PatternString($fqcn), new PatternString($namespace), new PatternString($className));
     }
 
     public function isNotAValidPattern(string $pattern): bool
