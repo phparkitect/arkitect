@@ -20,14 +20,6 @@ The people who use this tool are developers writing rules and reading failures, 
 
 ## Commands
 
-```bash
-make build      # full build: composer install + csfix + psalm + phpunit
-make test       # run all tests (bin/phpunit)
-make csfix      # apply php-cs-fixer (run before committing)
-make psalm      # static analysis (psalm errorLevel 2)
-make phar       # build phparkitect.phar via box
-```
-
 Run a single test by name — the Makefile has pattern targets:
 
 ```bash
@@ -39,23 +31,12 @@ bin/phpunit tests/Unit/Analyzer/FileVisitorTest.php
 
 Before committing, `make csfix && make psalm && make test` must all pass (CI gates merges on a green build).
 
-## Pipeline (how a `check` run flows)
-
-`bin/phparkitect` → `PhpArkitectApplication` registers the commands in `src/CLI/Command/` (`Check`, `GenerateBaseline`, `PruneBaseline`, `Init`, `DebugExpression`). Options shared between analysis-running commands (`--config`, `--target-php-version`, `--autoload`, `--ignore-baseline-linenumbers`) are defined once in `CommonOptions`, and the shared console plumbing (process limits, progress, heading, timing) in `CommandRuntime` — both composed by each command.
-
-`Check::execute` (`src/CLI/Command/Check.php`) parses the CLI options into a `CheckOptions` value object and delegates to `CheckHandler` (`src/CLI/CheckHandler.php`), the application service that runs the actual flow:
-1. `ConfigBuilder` loads the user's `phparkitect.php`, which receives a `Config` and registers `ClassSet`s + `Rule`s.
-2. `Runner` (`src/CLI/Runner.php`) iterates every `SplFileInfo` in each `ClassSet`, parses it via `FileParser`, and gets back `ClassDescription`s.
-3. Each `Rule` is evaluated against each `ClassDescription`, accumulating `Violations`.
-4. `Baseline` (`src/CLI/Baseline.php`, a pure domain object persisted via `BaselineFileRepository`) filters out known/ignored violations.
-5. A `Printer` (`text` / `json` / `gitlab`, `src/CLI/Printer/`) renders the result; exit code is non-zero if violations remain.
-
 ## Architecture — the two halves
 
-**Analysis (`src/Analyzer/`)** turns source into a queryable model. `FileParser` runs `nikic/php-parser` with `FileVisitor`, a `NodeVisitorAbstract` that walks the AST and builds a `ClassDescription` (name, dependencies, interfaces, parents, traits, attributes, docblock types, final/abstract/readonly/enum flags…). Dependencies are collected from every construct that references another type: `new`, `instanceof`, static calls/constants, typed properties, param/return types, etc. `DocblockParser` (via `phpstan/phpdoc-parser`) extracts types from annotations. **Most parser bugs are a missing `handle*` case in `FileVisitor` for some syntax — add the case and a fixture-based test.**
+**Analysis (`src/Analyzer/`)** turns source into a queryable model. **Most parser bugs are a missing `handle*` case in `FileVisitor` for some syntax — add the case and a fixture-based test.**
 
 **Rules / Expressions (`src/Rules/`, `src/Expression/`)** are the constraint model:
-- An **`Expression`** (`src/Expression/Expression.php`) is one composable boolean check over a `ClassDescription`, producing a `Violation` with a description when it fails. All concrete checks live in `src/Expression/ForClasses/` (e.g. `ResideInOneOfTheseNamespaces`, `NotHaveDependencyOutsideNamespace`, `HaveNameMatching`, `Extend`, `Implement`, `IsFinal`, `HaveAttribute`). Every class here implements `Expression` — that invariant is itself enforced by `phparkitect.php`.
+- An **`Expression`** (`src/Expression/Expression.php`) is one composable boolean check over a `ClassDescription`, producing a `Violation` with a description when it fails. All concrete checks live in `src/Expression/ForClasses/`. Every class here implements `Expression` — that invariant is itself enforced by `phparkitect.php`.
 - A **`Rule`** combines a selector (`that(...)`), a constraint (`should(...)`), and a `because(...)` reason. The fluent builder lives in `src/Rules/` (`Rule`, `RuleBuilder`, `ArchRule`) with the `that → should → because` grammar parsed in `src/Rules/DSL/`. The `because` string is printed verbatim in violation output.
 - **`src/RuleBuilders/Architecture/`** is a higher-level DSL on top of expressions: define named `Component`s by namespace and declare allowed dependencies between them (`Architecture::withComponents(...)->where(...)->shouldNotDependOnAnyComponent()`).
 
@@ -69,11 +50,10 @@ Before committing, `make csfix && make psalm && make test` must all pass (CI gat
 
 ## Tests
 
-`tests/` mirrors `src/`. Layout: `tests/Unit/` (Analyzer, Expressions, Rules, CLI, Architecture), `tests/Integration/`, and `tests/E2E/` (`Cli`, `PHPUnit`, `Smoke`, with `_fixtures/`). E2E tests shell out to the built CLI/Phar; unit tests for the analyzer parse small fixture snippets. Mocking uses `phpspec/prophecy`; `mikey179/vfsstream` provides a virtual filesystem.
+`tests/` mirrors `src/`. E2E tests shell out to the built CLI/Phar; unit tests for the analyzer parse small fixture snippets.
 
 ## Conventions
 
-- PSR-4: `Arkitect\` → `src/`, `Arkitect\Tests\` → `tests/`.
 - Code style is enforced by `.php-cs-fixer.dist.php` — don't hand-format; run `make csfix`.
 - The parser supports a configurable target PHP version (`--target-php-version`, `8.0`–`8.5`); when touching `FileVisitor`/analyzer code, consider syntax across that range.
 - This tool analyzes other people's code, so the analyzer must tolerate any valid PHP without crashing — prefer surfacing a `ParsingError` over throwing.
