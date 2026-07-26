@@ -43,12 +43,9 @@ class Baseline
      */
     public function applyTo(Violations $violations, bool $ignoreBaselineLinenumbers): BaselineResult
     {
-        $staleEntriesCount = $this->violations->countUnmatchedIn($violations, $ignoreBaselineLinenumbers);
+        $match = $violations->matchAgainst($this->violations, $ignoreBaselineLinenumbers);
 
-        $remainingViolations = clone $violations;
-        $remainingViolations->remove($this->violations, $ignoreBaselineLinenumbers);
-
-        return new BaselineResult($remainingViolations, $staleEntriesCount);
+        return new BaselineResult($match->new(), $match->stale()->count());
     }
 
     /**
@@ -59,7 +56,7 @@ class Baseline
      */
     public function prune(Violations $currentViolations): self
     {
-        $prunedViolations = $currentViolations->intersection($this->violations);
+        $prunedViolations = $currentViolations->matchAgainst($this->violations, true)->known();
 
         // a baseline stored without line numbers keeps its format
         if (!$this->hasLineNumbers()) {

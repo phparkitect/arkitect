@@ -78,98 +78,41 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
     }
 
     /**
-     * @param Violations $violations                Known violations from the baseline
-     * @param bool       $ignoreBaselineLinenumbers If set to true, violations from the baseline are ignored for the same file even if the line number is different
+     * Pairs the violations of this set (the current run) with the entries of
+     * $baseline, one to one: what matched, what is new and what the baseline
+     * still claims but nothing matches anymore.
+     *
+     * A violation is identified by its class and by the problem it reports;
+     * $ignoreLineNumbers decides whether where it sits in the file is part of
+     * that identity too.
      */
-    public function remove(self $violations, bool $ignoreBaselineLinenumbers = false): void
+    public function matchAgainst(self $baseline, bool $ignoreLineNumbers): ViolationsMatch
     {
-        if (!$ignoreBaselineLinenumbers) {
-            $this->violations = array_values(array_udiff(
-                $this->violations,
-                $violations->violations,
-                [__CLASS__, 'compareViolations']
-            ));
+        $key = $ignoreLineNumbers ? [__CLASS__, 'violationKey'] : [__CLASS__, 'positionKey'];
+        $unpairedByKey = self::indexBy($baseline->violations, $key);
 
-            return;
-        }
+        $known = [];
+        $new = [];
+        $paired = [];
 
-        $baselineViolations = $violations->violations;
-        foreach ($this->violations as $idx => $violation) {
-            foreach ($baselineViolations as $baseIdx => $baselineViolation) {
-                if (
-                    $baselineViolation->getFqcn() === $violation->getFqcn()
-                    && self::extractViolationKey($baselineViolation->getError()) === self::extractViolationKey($violation->getError())
-                ) {
-                    unset($this->violations[$idx], $baselineViolations[$baseIdx]);
-                    continue 2;
-                }
-            }
-        }
-
-        $this->violations = array_values($this->violations);
-    }
-
-    /**
-     * Counts how many violations in this set (typically the baseline) have no
-     * corresponding entry in $current (typically the current run's violations) —
-     * i.e. how many are stale and could be removed from the baseline.
-     */
-    public function countUnmatchedIn(self $current, bool $ignoreLineNumbers): int
-    {
-        if (!$ignoreLineNumbers) {
-            return \count(array_udiff(
-                $this->violations,
-                $current->violations,
-                [__CLASS__, 'compareViolations']
-            ));
-        }
-
-        $currentViolations = $current->violations;
-        $unmatched = 0;
         foreach ($this->violations as $violation) {
-            foreach ($currentViolations as $idx => $currentViolation) {
-                if (
-                    $currentViolation->getFqcn() === $violation->getFqcn()
-                    && self::extractViolationKey($currentViolation->getError()) === self::extractViolationKey($violation->getError())
-                ) {
-                    unset($currentViolations[$idx]);
-                    continue 2;
-                }
+            $violationKey = $key($violation);
+
+            if ([] === ($unpairedByKey[$violationKey] ?? [])) {
+                $new[] = $violation;
+
+                continue;
             }
 
-            ++$unmatched;
+            // the bucket was just checked to be non-empty, so array_pop() returns an index
+            /** @psalm-suppress PossiblyNullArrayOffset */
+            $paired[array_pop($unpairedByKey[$violationKey])] = true;
+            $known[] = $violation;
         }
 
-        return $unmatched;
-    }
+        $stale = array_diff_key($baseline->violations, $paired);
 
-    /**
-     * Returns a new set with the violations from this set (typically the
-     * current run) that have a matching entry in $other (typically the
-     * baseline). Matching uses the stable violation key and ignores line
-     * numbers, so the returned violations carry this set's line numbers.
-     * Each entry in $other matches at most one violation, so duplicated
-     * violations are kept only as many times as they appear in $other.
-     */
-    public function intersection(self $other): self
-    {
-        $result = new self();
-
-        $otherViolations = $other->violations;
-        foreach ($this->violations as $violation) {
-            foreach ($otherViolations as $idx => $otherViolation) {
-                if (
-                    $otherViolation->getFqcn() === $violation->getFqcn()
-                    && self::extractViolationKey($otherViolation->getError()) === self::extractViolationKey($violation->getError())
-                ) {
-                    $result->add($violation);
-                    unset($otherViolations[$idx]);
-                    continue 2;
-                }
-            }
-        }
-
-        return $result;
+        return new ViolationsMatch(self::fromArray($known), self::fromArray($new), self::fromArray($stale));
     }
 
     public function withoutLineNumbers(): self
@@ -193,25 +136,51 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
     }
 
     /**
-     * Comparison method that respects all fields in the violation.
+     * Groups the given violations by the key the callback derives from each
+     * of them, so that only the ones that can possibly match are compared.
      *
-     * Uses the stable violation key (the part before ', but ') for comparison,
-     * so that changes to rule configuration (e.g. allowed namespaces) do not
-     * invalidate existing baseline entries.
+     * @param array<Violation>           $violations
+     * @param callable(Violation):string $key
+     *
+     * @return array<string, array<int>> the indexes of $violations, by key
      */
-    public static function compareViolations(Violation $a, Violation $b): int
+    private static function indexBy(array $violations, callable $key): array
     {
-        return [
-            $a->getFqcn(),
-            $a->getLine(),
-            $a->getFilePath(),
-            self::extractViolationKey($a->getError()),
-        ] <=> [
-            $b->getFqcn(),
-            $b->getLine(),
-            $b->getFilePath(),
-            self::extractViolationKey($b->getError()),
-        ];
+        $indexes = [];
+
+        foreach ($violations as $idx => $violation) {
+            $indexes[$key($violation)][] = $idx;
+        }
+
+        return $indexes;
+    }
+
+    /**
+     * Identifies the problem a violation reports, no matter where in the file
+     * it sits: same class, same violation.
+     */
+    private static function violationKey(Violation $violation): string
+    {
+        return $violation->getFqcn()."\0".self::extractViolationKey($violation->getError());
+    }
+
+    /**
+     * Identifies a violation down to the exact spot it was reported at.
+     */
+    private static function positionKey(Violation $violation): string
+    {
+        return self::violationKey($violation)."\0".$violation->getFilePath()."\0".(string) $violation->getLine();
+    }
+
+    /**
+     * @param array<Violation> $violations
+     */
+    private static function fromArray(array $violations): self
+    {
+        $instance = new self();
+        $instance->violations = array_values($violations);
+
+        return $instance;
     }
 
     /**
