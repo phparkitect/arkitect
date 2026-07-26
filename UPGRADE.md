@@ -6,6 +6,33 @@ PHPArkitect, ordered from the most recent version to the oldest.
 > If a release is **not** listed here, it contains no breaking changes and you
 > can upgrade to it without modifying your configuration.
 
+## 1.3.0
+
+### `check --generate-baseline` is now the `generate-baseline` command
+
+Generating a baseline was an action disguised as a `check` option: it ran a
+different flow, printed no violations and always exited successfully. It is now
+a dedicated command:
+
+```diff
+- phparkitect check --generate-baseline
++ phparkitect generate-baseline
+
+- phparkitect check --generate-baseline my-baseline.json
++ phparkitect generate-baseline my-baseline.json
+```
+
+The optional filename is now an argument (still defaulting to
+`phparkitect-baseline.json`), and the command accepts the same `--config`,
+`--target-php-version`, `--autoload` and `--ignore-baseline-linenumbers`
+options as before. The check-only options that never affected generation
+(`--stop-on-failure`, `--format`, `--use-baseline`, `--skip-baseline`) are no
+longer accepted.
+
+`check --generate-baseline` is kept as a failing stub that points to the new
+command, so an old CI invocation fails loudly with a migration hint instead of
+silently doing nothing.
+
 ## 1.0.0
 
 ### PHP 7 support dropped
@@ -38,8 +65,8 @@ consumed as a substring match.
 
 ### User-defined classes in the global namespace are now evaluated
 
-PHP core classes are now auto-excluded from dependency checks via reflection
-(`isInternal()`), so you no longer need to list `\Exception`, `\DateTime`,
+**PHP core classes are now auto-excluded** from dependency checks via reflection
+(`isInternal()`) — you **no longer need to list** `\Exception`, `\DateTime`,
 `MongoDB\Driver\Manager`, etc. in your rules.
 
 As a consequence, the previous "skip everything in the root namespace" shortcut
