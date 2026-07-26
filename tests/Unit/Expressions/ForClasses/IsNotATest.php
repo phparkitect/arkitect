@@ -14,7 +14,7 @@ use Arkitect\Tests\Unit\Expressions\ForClasses\IsNotA\Fruit\DwarfCavendishBanana
 use Arkitect\Tests\Unit\Expressions\ForClasses\IsNotA\Fruit\FruitInterface;
 use PHPUnit\Framework\TestCase;
 
-final class IsNotATest extends TestCase
+class IsNotATest extends TestCase
 {
     public function test_it_should_have_no_violation_when_it_doesnt_extend(): void
     {

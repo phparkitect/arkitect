@@ -12,7 +12,7 @@ use Arkitect\Tests\Utils\TestRunner;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 
-final class CheckClassNotHaveAttributeTest extends TestCase
+class CheckClassNotHaveAttributeTest extends TestCase
 {
     public function test_controllers_should_not_have_deprecated_attribute(): void
     {
