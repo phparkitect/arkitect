@@ -69,6 +69,48 @@ class PruneBaselineCommandTest extends TestCase
         self::assertStringContainsString('pruned: 0 removed, 1 kept', $cmdTester->getDisplay());
     }
 
+    /**
+     * Pruning has no --ignore-baseline-linenumbers flag: it always matches
+     * ignoring line numbers and infers the format to save from the baseline
+     * itself, so a line-numberless workflow has nothing to remember.
+     */
+    public function test_pruning_preserves_a_baseline_generated_without_line_numbers(): void
+    {
+        // this fixture violates a dependency rule, so its violations carry a
+        // line number: without -i the baseline would store one
+        $configFilePath = __DIR__.'/../_fixtures/configIgnoreBaselineLineNumbers.php';
+
+        $this->runCommand([
+            'generate-baseline',
+            '--config' => $configFilePath,
+            'filename' => $this->customBaselineFilename,
+            '--ignore-baseline-linenumbers' => true,
+        ]);
+
+        $cmdTester = $this->runCommand(['prune-baseline', '--config' => $configFilePath, 'filename' => $this->customBaselineFilename]);
+
+        self::assertEquals(self::SUCCESS_CODE, $cmdTester->getStatusCode());
+        self::assertStringContainsString('pruned: 0 removed, 3 kept', $cmdTester->getDisplay());
+
+        $pruned = json_decode((string) file_get_contents($this->customBaselineFilename), true);
+
+        self::assertCount(3, $pruned['violations']);
+        foreach ($pruned['violations'] as $violation) {
+            self::assertNull($violation['line'], 'pruning must not reintroduce the line numbers the baseline was generated without');
+        }
+
+        // the pruned baseline still makes the check pass, as the generated one did
+        $cmdTester = $this->runCommand([
+            'check',
+            '--config' => $configFilePath,
+            '--use-baseline' => $this->customBaselineFilename,
+            '--ignore-baseline-linenumbers' => true,
+        ]);
+
+        self::assertEquals(self::SUCCESS_CODE, $cmdTester->getStatusCode());
+        self::assertStringNotContainsString('💡', $cmdTester->getErrorOutput());
+    }
+
     public function test_fails_gracefully_when_the_baseline_file_does_not_exist(): void
     {
         $configFilePath = __DIR__.'/../_fixtures/configMvcForYieldBug.php';
