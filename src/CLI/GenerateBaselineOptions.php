@@ -8,7 +8,7 @@ namespace Arkitect\CLI;
  * Immutable bag of the options a `generate-baseline` run needs,
  * already parsed and resolved: no CLI concerns leak past here.
  */
-final class GenerateBaselineOptions
+class GenerateBaselineOptions
 {
     public function __construct(
         private string $configFilePath,

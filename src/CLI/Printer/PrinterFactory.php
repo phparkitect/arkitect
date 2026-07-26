@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI\Printer;
 
-final class PrinterFactory
+class PrinterFactory
 {
     public static function default(): string
     {

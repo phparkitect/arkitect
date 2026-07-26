@@ -8,7 +8,7 @@ namespace Arkitect\CLI;
  * Immutable bag of the options a `check` run needs, already parsed and
  * resolved: no CLI concerns (option names, tri-state flags) leak past here.
  */
-final class CheckOptions
+class CheckOptions
 {
     public function __construct(
         private string $configFilePath,

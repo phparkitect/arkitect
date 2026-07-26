@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * OutputInterface for writing, so it can be unit tested with a
  * BufferedOutput — no console, no exit codes, no global state.
  */
-final class CheckHandler
+class CheckHandler
 {
     public function __construct(
         private Runner $runner,

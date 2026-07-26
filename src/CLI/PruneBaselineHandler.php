@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * anything, so unlike regenerating it cannot legitimize new violations
  * and is safe to automate.
  */
-final class PruneBaselineHandler
+class PruneBaselineHandler
 {
     public function __construct(
         private Runner $runner,

@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * baseline file. It only depends on OutputInterface for writing, so it
  * can be unit tested with a BufferedOutput.
  */
-final class GenerateBaselineHandler
+class GenerateBaselineHandler
 {
     public function __construct(
         private Runner $runner,

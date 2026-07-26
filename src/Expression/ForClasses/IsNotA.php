@@ -11,7 +11,7 @@ use Arkitect\Rules\Violation;
 use Arkitect\Rules\ViolationMessage;
 use Arkitect\Rules\Violations;
 
-final class IsNotA implements Expression
+class IsNotA implements Expression
 {
     /** @var class-string */
     private string $disallowedFqcn;

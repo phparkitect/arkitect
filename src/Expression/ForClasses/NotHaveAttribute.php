@@ -11,7 +11,7 @@ use Arkitect\Rules\Violation;
 use Arkitect\Rules\ViolationMessage;
 use Arkitect\Rules\Violations;
 
-final class NotHaveAttribute implements Expression
+class NotHaveAttribute implements Expression
 {
     private string $attribute;
 

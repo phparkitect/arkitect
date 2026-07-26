@@ -11,7 +11,7 @@ use Arkitect\Rules\Violation;
 use Arkitect\Rules\ViolationMessage;
 use Arkitect\Rules\Violations;
 
-final class IsA implements Expression
+class IsA implements Expression
 {
     /** @var class-string */
     private string $allowedFqcn;
