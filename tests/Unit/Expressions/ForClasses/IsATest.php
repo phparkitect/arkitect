@@ -14,7 +14,7 @@ use Arkitect\Tests\Unit\Expressions\ForClasses\IsATest\Fruit\DwarfCavendishBanan
 use Arkitect\Tests\Unit\Expressions\ForClasses\IsATest\Fruit\FruitInterface;
 use PHPUnit\Framework\TestCase;
 
-final class IsATest extends TestCase
+class IsATest extends TestCase
 {
     public function test_it_should_have_no_violation_when_it_implements(): void
     {

@@ -16,7 +16,7 @@ use Webmozart\Assert\Assert;
  * option names, shortcuts, defaults and parsing stay in sync across
  * the whole CLI.
  */
-final class CommonOptions
+class CommonOptions
 {
     public const CONFIG_PARAM = 'config';
     public const TARGET_PHP_PARAM = 'target-php-version';

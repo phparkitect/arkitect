@@ -12,7 +12,7 @@ use Arkitect\Tests\Utils\TestRunner;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 
-final class CheckClassHaveTraitTest extends TestCase
+class CheckClassHaveTraitTest extends TestCase
 {
     public function test_feature_tests_should_use_database_transactions_trait(): void
     {

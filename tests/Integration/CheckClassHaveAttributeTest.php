@@ -12,7 +12,7 @@ use Arkitect\Tests\Utils\TestRunner;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 
-final class CheckClassHaveAttributeTest extends TestCase
+class CheckClassHaveAttributeTest extends TestCase
 {
     public function test_models_should_reside_in_app_model(): void
     {

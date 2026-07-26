@@ -11,7 +11,7 @@ use Arkitect\Rules\Violations;
  * Loads and saves Baselines as JSON files. All the filesystem concerns of
  * the baseline live here, so Baseline itself stays a pure domain object.
  */
-final class BaselineFileRepository
+class BaselineFileRepository
 {
     public const DEFAULT_FILENAME = 'phparkitect-baseline.json';
 

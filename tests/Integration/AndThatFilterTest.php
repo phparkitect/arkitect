@@ -14,7 +14,7 @@ use Arkitect\Tests\Utils\TestRunner;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 
-final class AndThatFilterTest extends TestCase
+class AndThatFilterTest extends TestCase
 {
     public function test_only_classes_matching_both_namespace_and_naming_are_checked(): void
     {

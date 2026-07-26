@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * execution-time footer. Commands compose this object (like CommonOptions)
  * so the run lifecycle cannot drift between them.
  */
-final class CommandRuntime
+class CommandRuntime
 {
     public function raiseLimits(): void
     {

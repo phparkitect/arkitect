@@ -10,7 +10,7 @@ use Arkitect\Rules\Violation;
 use Arkitect\Rules\ViolationMessage;
 use Arkitect\Rules\Violations;
 
-final class HaveTrait implements Expression
+class HaveTrait implements Expression
 {
     private string $trait;
 
