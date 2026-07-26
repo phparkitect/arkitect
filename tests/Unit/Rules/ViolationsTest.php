@@ -197,6 +197,22 @@ class ViolationsTest extends TestCase
         self::assertCount(0, $violations);
     }
 
+    public function test_remove_reports_a_duplicate_the_baseline_only_knows_once(): void
+    {
+        $error = 'depends on App\Bar, but should depend only on classes in one of these namespaces: App\Domain';
+
+        $baseline = new Violations();
+        $baseline->add(new Violation('App\Foo', $error, 10, 'src/Foo.php'));
+
+        $violations = new Violations();
+        $violations->add(new Violation('App\Foo', $error, 10, 'src/Foo.php'));
+        $violations->add(new Violation('App\Foo', $error, 10, 'src/Foo.php'));
+
+        $violations->remove($baseline);
+
+        self::assertCount(1, $violations, 'each baseline entry covers one violation, not every identical one');
+    }
+
     public function test_remove_violations_does_not_match_different_dependency(): void
     {
         $violations = new Violations();

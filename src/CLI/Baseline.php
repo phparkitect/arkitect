@@ -43,12 +43,9 @@ class Baseline
      */
     public function applyTo(Violations $violations, bool $ignoreBaselineLinenumbers): BaselineResult
     {
-        $staleEntriesCount = $this->violations->countUnmatchedIn($violations, $ignoreBaselineLinenumbers);
+        $match = $violations->matchAgainst($this->violations, $ignoreBaselineLinenumbers);
 
-        $remainingViolations = clone $violations;
-        $remainingViolations->remove($this->violations, $ignoreBaselineLinenumbers);
-
-        return new BaselineResult($remainingViolations, $staleEntriesCount);
+        return new BaselineResult($match->new(), $match->stale()->count());
     }
 
     /**
