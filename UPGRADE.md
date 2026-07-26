@@ -65,8 +65,8 @@ consumed as a substring match.
 
 ### User-defined classes in the global namespace are now evaluated
 
-PHP core classes are now auto-excluded from dependency checks via reflection
-(`isInternal()`), so you no longer need to list `\Exception`, `\DateTime`,
+**PHP core classes are now auto-excluded** from dependency checks via reflection
+(`isInternal()`) — you **no longer need to list** `\Exception`, `\DateTime`,
 `MongoDB\Driver\Manager`, etc. in your rules.
 
 As a consequence, the previous "skip everything in the root namespace" shortcut
