@@ -89,30 +89,30 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
     public function matchAgainst(self $baseline, bool $ignoreLineNumbers): ViolationsMatch
     {
         $key = $ignoreLineNumbers ? [__CLASS__, 'violationKey'] : [__CLASS__, 'positionKey'];
+        $unpairedByKey = self::indexBy($baseline->violations, $key);
 
-        $currentViolations = $this->violations;
-        $baselineViolations = $baseline->violations;
-        $baselineByKey = self::indexBy($baselineViolations, $key);
+        $known = [];
+        $new = [];
+        $paired = [];
 
-        foreach ($currentViolations as $idx => $violation) {
+        foreach ($this->violations as $violation) {
             $violationKey = $key($violation);
-            $unpaired = $baselineByKey[$violationKey] ?? [];
 
-            if ([] === $unpaired) {
+            if ([] === ($unpairedByKey[$violationKey] ?? [])) {
+                $new[] = $violation;
+
                 continue;
             }
 
-            $baselineIdx = array_shift($unpaired);
-            $baselineByKey[$violationKey] = $unpaired;
-
-            unset($currentViolations[$idx], $baselineViolations[$baselineIdx]);
+            // the bucket was just checked to be non-empty, so array_pop() returns an index
+            /** @psalm-suppress PossiblyNullArrayOffset */
+            $paired[array_pop($unpairedByKey[$violationKey])] = true;
+            $known[] = $violation;
         }
 
-        return new ViolationsMatch(
-            self::fromArray(array_diff_key($this->violations, $currentViolations)),
-            self::fromArray($currentViolations),
-            self::fromArray($baselineViolations)
-        );
+        $stale = array_diff_key($baseline->violations, $paired);
+
+        return new ViolationsMatch(self::fromArray($known), self::fromArray($new), self::fromArray($stale));
     }
 
     /**
