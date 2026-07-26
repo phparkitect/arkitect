@@ -41,22 +41,22 @@ class Baseline
      * given set untouched: what is left to report is in the returned result,
      * together with the number of baseline entries nothing matched.
      */
-    public function applyTo(Violations $violations, bool $ignoreBaselineLinenumbers): BaselineResult
+    public function applyTo(Violations $violations): BaselineResult
     {
-        $match = $violations->matchAgainst($this->violations, $ignoreBaselineLinenumbers);
+        $match = $violations->matchAgainst($this->violations);
 
         return new BaselineResult($match->new(), $match->stale()->count());
     }
 
     /**
      * Shrink-only update: returns a baseline containing only the entries that
-     * still match a current violation — nothing is ever added. Matching
-     * ignores line numbers and the current violations are the ones kept, so
-     * pruning also refreshes line numbers gone stale after refactorings.
+     * still match a current violation — nothing is ever added. The current
+     * violations are the ones kept, so pruning also refreshes line numbers
+     * gone stale after refactorings.
      */
     public function prune(Violations $currentViolations): self
     {
-        $prunedViolations = $currentViolations->matchAgainst($this->violations, true)->known();
+        $prunedViolations = $currentViolations->matchAgainst($this->violations)->known();
 
         // a baseline stored without line numbers keeps its format
         if (!$this->hasLineNumbers()) {

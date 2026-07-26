@@ -70,22 +70,20 @@ class PruneBaselineCommandTest extends TestCase
     }
 
     /**
-     * Pruning has no --ignore-baseline-linenumbers flag: it always matches
-     * ignoring line numbers and infers the format to save from the baseline
-     * itself, so a line-numberless workflow has nothing to remember.
+     * Baselines written by older versions with --ignore-baseline-linenumbers
+     * store no line number: pruning keeps that format instead of silently
+     * upgrading the file.
      */
-    public function test_pruning_preserves_a_baseline_generated_without_line_numbers(): void
+    public function test_pruning_preserves_a_baseline_stored_without_line_numbers(): void
     {
-        // this fixture violates a dependency rule, so its violations carry a
-        // line number: without -i the baseline would store one
         $configFilePath = __DIR__.'/../_fixtures/configIgnoreBaselineLineNumbers.php';
 
         $this->runCommand([
             'generate-baseline',
             '--config' => $configFilePath,
             'filename' => $this->customBaselineFilename,
-            '--ignore-baseline-linenumbers' => true,
         ]);
+        $this->stripLineNumbersFrom($this->customBaselineFilename);
 
         $cmdTester = $this->runCommand(['prune-baseline', '--config' => $configFilePath, 'filename' => $this->customBaselineFilename]);
 
@@ -104,7 +102,6 @@ class PruneBaselineCommandTest extends TestCase
             'check',
             '--config' => $configFilePath,
             '--use-baseline' => $this->customBaselineFilename,
-            '--ignore-baseline-linenumbers' => true,
         ]);
 
         self::assertEquals(self::SUCCESS_CODE, $cmdTester->getStatusCode());
@@ -130,5 +127,16 @@ class PruneBaselineCommandTest extends TestCase
         $appTester->run($input, ['capture_stderr_separately' => true]);
 
         return $appTester;
+    }
+
+    private function stripLineNumbersFrom(string $baselineFilename): void
+    {
+        $baseline = json_decode((string) file_get_contents($baselineFilename), true);
+
+        foreach ($baseline['violations'] as $idx => $violation) {
+            $baseline['violations'][$idx]['line'] = null;
+        }
+
+        file_put_contents($baselineFilename, json_encode($baseline));
     }
 }

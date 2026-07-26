@@ -82,37 +82,29 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
      * $baseline, one to one: what matched, what is new and what the baseline
      * still claims but nothing matches anymore.
      *
-     * A violation is identified by its class and by the problem it reports;
-     * $ignoreLineNumbers decides whether where it sits in the file is part of
-     * that identity too.
+     * Pairing happens in two passes: first the violations still sitting where
+     * the baseline recorded them, then, among what is left, the ones matching
+     * by class and reported problem alone — an edit above a violation moves it
+     * without making it a new one. The line number is therefore never part of
+     * the identity of a violation, only a hint on which entry of a group to
+     * pair with, so there is nothing for the user to choose here.
+     *
+     * When a group of identical violations both moved and grew, which of them
+     * is reported as new is a guess; how many are is not.
      */
-    public function matchAgainst(self $baseline, bool $ignoreLineNumbers): ViolationsMatch
+    public function matchAgainst(self $baseline): ViolationsMatch
     {
-        $key = $ignoreLineNumbers ? [__CLASS__, 'violationKey'] : [__CLASS__, 'positionKey'];
-        $unpairedByKey = self::indexBy($baseline->violations, $key);
+        [$stillThere, $moved, $paired] = self::pairWith($this->violations, $baseline->violations, [__CLASS__, 'positionKey']);
 
-        $known = [];
-        $new = [];
-        $paired = [];
+        $unpairedEntries = array_diff_key($baseline->violations, $paired);
 
-        foreach ($this->violations as $violation) {
-            $violationKey = $key($violation);
+        [$movedAndKnown, $new, $pairedMoved] = self::pairWith($moved, $unpairedEntries, [__CLASS__, 'violationKey']);
 
-            if ([] === ($unpairedByKey[$violationKey] ?? [])) {
-                $new[] = $violation;
-
-                continue;
-            }
-
-            // the bucket was just checked to be non-empty, so array_pop() returns an index
-            /** @psalm-suppress PossiblyNullArrayOffset */
-            $paired[array_pop($unpairedByKey[$violationKey])] = true;
-            $known[] = $violation;
-        }
-
-        $stale = array_diff_key($baseline->violations, $paired);
-
-        return new ViolationsMatch(self::fromArray($known), self::fromArray($new), self::fromArray($stale));
+        return new ViolationsMatch(
+            self::fromArray(array_intersect_key($this->violations, $stillThere + $movedAndKnown)),
+            self::fromArray($new),
+            self::fromArray(array_diff_key($unpairedEntries, $pairedMoved))
+        );
     }
 
     public function withoutLineNumbers(): self
@@ -133,6 +125,43 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
     public function jsonSerialize(): array
     {
         return get_object_vars($this);
+    }
+
+    /**
+     * Pairs each violation with an entry carrying the same key, in the order
+     * both appear in their file, and reports what paired with what.
+     *
+     * @param array<int, Violation>      $violations
+     * @param array<int, Violation>      $entries
+     * @param callable(Violation):string $key
+     *
+     * @return array{array<int, true>, array<int, Violation>, array<int, true>} the paired violations, the unpaired ones, the paired entries
+     */
+    private static function pairWith(array $violations, array $entries, callable $key): array
+    {
+        $entriesByKey = self::indexBy($entries, $key);
+
+        $matched = [];
+        $unpaired = [];
+        $paired = [];
+        $pairedPerKey = [];
+
+        foreach ($violations as $idx => $violation) {
+            $violationKey = $key($violation);
+            $alreadyPaired = $pairedPerKey[$violationKey] ?? 0;
+
+            if (!isset($entriesByKey[$violationKey][$alreadyPaired])) {
+                $unpaired[$idx] = $violation;
+
+                continue;
+            }
+
+            $pairedPerKey[$violationKey] = $alreadyPaired + 1;
+            $paired[$entriesByKey[$violationKey][$alreadyPaired]] = true;
+            $matched[$idx] = true;
+        }
+
+        return [$matched, $unpaired, $paired];
     }
 
     /**
