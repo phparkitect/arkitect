@@ -20,11 +20,12 @@ class Runner
     {
         [$violations, $parsingErrors] = $this->doRun($config, $progress);
 
-        $baseline->applyTo($violations, $config->isIgnoreBaselineLinenumbers());
+        $baselineResult = $baseline->applyTo($violations, $config->isIgnoreBaselineLinenumbers());
 
         return new AnalysisResult(
-            $violations,
+            $baselineResult->getRemainingViolations(),
             $parsingErrors,
+            $baselineResult->getStaleBaselineEntriesCount(),
         );
     }
 

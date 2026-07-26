@@ -25,10 +25,25 @@ class BaselineTest extends TestCase
         $current = new Violations();
         $current->add($stillPresent);
 
-        $baseline->applyTo($current, false);
+        $result = $baseline->applyTo($current, false);
 
-        self::assertCount(0, $current);
-        self::assertSame(1, $baseline->getStaleViolationsCount());
+        self::assertCount(0, $result->getRemainingViolations());
+        self::assertSame(1, $result->getStaleBaselineEntriesCount());
+    }
+
+    public function test_apply_to_does_not_mutate_the_given_violations(): void
+    {
+        $violation = new Violation('App\Controller\Shop', 'should have name end with Controller', 10);
+
+        $baselineViolations = new Violations();
+        $baselineViolations->add($violation);
+
+        $current = new Violations();
+        $current->add($violation);
+
+        Baseline::fromViolations($baselineViolations)->applyTo($current, false);
+
+        self::assertCount(1, $current);
     }
 
     public function test_prune_keeps_only_entries_matching_a_current_violation(): void

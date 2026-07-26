@@ -57,7 +57,7 @@ final class CheckHandler
             $output->writeln("⚠️ {$result->getViolations()->count()} violations detected!");
         }
 
-        $this->printStaleBaselineViolations($baseline, $output);
+        $this->printStaleBaselineViolations($result->getStaleBaselineEntriesCount(), $output);
 
         if ($result->hasParsingErrors()) {
             $output->writeln('❌ found parsing errors in these files:');
@@ -71,10 +71,8 @@ final class CheckHandler
         return $result;
     }
 
-    private function printStaleBaselineViolations(Baseline $baseline, OutputInterface $output): void
+    private function printStaleBaselineViolations(int $staleViolationsCount, OutputInterface $output): void
     {
-        $staleViolationsCount = $baseline->getStaleViolationsCount();
-
         if ($staleViolationsCount > 0) {
             $verb = 1 === $staleViolationsCount ? 'looks' : 'look';
             $pronoun = 1 === $staleViolationsCount ? 'it' : 'them';

@@ -16,8 +16,6 @@ class Baseline
 {
     private Violations $violations;
 
-    private int $staleViolationsCount = 0;
-
     private function __construct(Violations $violations)
     {
         $this->violations = $violations;
@@ -38,21 +36,19 @@ class Baseline
         return $this->violations;
     }
 
-    public function applyTo(Violations $violations, bool $ignoreBaselineLinenumbers): void
-    {
-        $this->staleViolationsCount = $this->violations->countUnmatchedIn($violations, $ignoreBaselineLinenumbers);
-
-        $violations->remove($this->violations, $ignoreBaselineLinenumbers);
-    }
-
     /**
-     * Number of baseline entries that no longer match any current violation,
-     * i.e. that have already been fixed and could be removed from the baseline.
-     * Only meaningful after applyTo() has run.
+     * Filters out of $violations the ones known to the baseline, leaving the
+     * given set untouched: what is left to report is in the returned result,
+     * together with the number of baseline entries nothing matched.
      */
-    public function getStaleViolationsCount(): int
+    public function applyTo(Violations $violations, bool $ignoreBaselineLinenumbers): BaselineResult
     {
-        return $this->staleViolationsCount;
+        $staleEntriesCount = $this->violations->countUnmatchedIn($violations, $ignoreBaselineLinenumbers);
+
+        $remainingViolations = clone $violations;
+        $remainingViolations->remove($this->violations, $ignoreBaselineLinenumbers);
+
+        return new BaselineResult($remainingViolations, $staleEntriesCount);
     }
 
     /**
