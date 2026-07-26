@@ -56,7 +56,7 @@ class Baseline
      */
     public function prune(Violations $currentViolations): self
     {
-        $prunedViolations = $currentViolations->intersection($this->violations);
+        $prunedViolations = $currentViolations->matchAgainst($this->violations, true)->known();
 
         // a baseline stored without line numbers keeps its format
         if (!$this->hasLineNumbers()) {

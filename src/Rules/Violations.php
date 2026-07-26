@@ -115,38 +115,6 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
         return new ViolationsMatch(self::fromArray($known), self::fromArray($new), self::fromArray($stale));
     }
 
-    /**
-     * @param Violations $violations                Known violations from the baseline
-     * @param bool       $ignoreBaselineLinenumbers If set to true, violations from the baseline are ignored for the same file even if the line number is different
-     */
-    public function remove(self $violations, bool $ignoreBaselineLinenumbers = false): void
-    {
-        $this->violations = $this->matchAgainst($violations, $ignoreBaselineLinenumbers)->new()->violations;
-    }
-
-    /**
-     * Counts how many violations in this set (typically the baseline) have no
-     * corresponding entry in $current (typically the current run's violations) —
-     * i.e. how many are stale and could be removed from the baseline.
-     */
-    public function countUnmatchedIn(self $current, bool $ignoreLineNumbers): int
-    {
-        return $current->matchAgainst($this, $ignoreLineNumbers)->stale()->count();
-    }
-
-    /**
-     * Returns a new set with the violations from this set (typically the
-     * current run) that have a matching entry in $other (typically the
-     * baseline). Matching uses the stable violation key and ignores line
-     * numbers, so the returned violations carry this set's line numbers.
-     * Each entry in $other matches at most one violation, so duplicated
-     * violations are kept only as many times as they appear in $other.
-     */
-    public function intersection(self $other): self
-    {
-        return $this->matchAgainst($other, true)->known();
-    }
-
     public function withoutLineNumbers(): self
     {
         $copy = new self();

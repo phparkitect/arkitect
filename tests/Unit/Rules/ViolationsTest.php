@@ -82,7 +82,7 @@ class ViolationsTest extends TestCase
         ], $this->violationStore->toArray());
     }
 
-    public function test_remove_violations_from_violations(): void
+    public function test_match_reports_the_violations_the_baseline_does_not_know(): void
     {
         $violation1 = new Violation(
             'App\Controller\Shop',
@@ -101,13 +101,13 @@ class ViolationsTest extends TestCase
         $violationsBaseline = new Violations();
         $violationsBaseline->add($this->violation);
 
-        $this->violationStore->remove($violationsBaseline);
+        $new = $this->violationStore->matchAgainst($violationsBaseline, false)->new();
 
-        self::assertCount(2, $this->violationStore->toArray());
+        self::assertCount(2, $new);
         self::assertEquals([
             $violation1,
             $violation2,
-        ], $this->violationStore->toArray());
+        ], $new->toArray());
     }
 
     public function test_sort(): void
@@ -155,7 +155,7 @@ class ViolationsTest extends TestCase
         ], $violationStore->toArray());
     }
 
-    public function test_remove_violations_matches_when_rule_description_changes(): void
+    public function test_match_pairs_when_rule_description_changes(): void
     {
         $violations = new Violations();
         $violations->add(new Violation(
@@ -171,12 +171,10 @@ class ViolationsTest extends TestCase
             10
         ));
 
-        $violations->remove($baseline);
-
-        self::assertCount(0, $violations);
+        self::assertCount(0, $violations->matchAgainst($baseline, false)->new());
     }
 
-    public function test_remove_violations_matches_when_rule_description_changes_ignore_linenumber(): void
+    public function test_match_pairs_when_rule_description_changes_ignore_linenumber(): void
     {
         $violations = new Violations();
         $violations->add(new Violation(
@@ -192,12 +190,10 @@ class ViolationsTest extends TestCase
             10
         ));
 
-        $violations->remove($baseline, true);
-
-        self::assertCount(0, $violations);
+        self::assertCount(0, $violations->matchAgainst($baseline, true)->new());
     }
 
-    public function test_remove_reports_a_duplicate_the_baseline_only_knows_once(): void
+    public function test_match_reports_a_duplicate_the_baseline_only_knows_once(): void
     {
         $error = 'depends on App\Bar, but should depend only on classes in one of these namespaces: App\Domain';
 
@@ -208,12 +204,10 @@ class ViolationsTest extends TestCase
         $violations->add(new Violation('App\Foo', $error, 10, 'src/Foo.php'));
         $violations->add(new Violation('App\Foo', $error, 10, 'src/Foo.php'));
 
-        $violations->remove($baseline);
-
-        self::assertCount(1, $violations, 'each baseline entry covers one violation, not every identical one');
+        self::assertCount(1, $violations->matchAgainst($baseline, false)->new(), 'each baseline entry covers one violation, not every identical one');
     }
 
-    public function test_remove_violations_does_not_match_different_dependency(): void
+    public function test_match_does_not_pair_different_dependency(): void
     {
         $violations = new Violations();
         $violations->add(new Violation(
@@ -229,12 +223,10 @@ class ViolationsTest extends TestCase
             10
         ));
 
-        $violations->remove($baseline);
-
-        self::assertCount(1, $violations);
+        self::assertCount(1, $violations->matchAgainst($baseline, false)->new());
     }
 
-    public function test_remove_violations_still_works_for_self_explanatory_messages(): void
+    public function test_match_pairs_self_explanatory_messages(): void
     {
         $violations = new Violations();
         $violations->add(new Violation(
@@ -248,12 +240,10 @@ class ViolationsTest extends TestCase
             'should be final because we want immutability'
         ));
 
-        $violations->remove($baseline);
-
-        self::assertCount(0, $violations);
+        self::assertCount(0, $violations->matchAgainst($baseline, false)->new());
     }
 
-    public function test_remove_violations_matches_self_explanatory_messages_when_because_is_reworded(): void
+    public function test_match_pairs_self_explanatory_messages_when_because_is_reworded(): void
     {
         $violations = new Violations();
         $violations->add(new Violation(
@@ -267,9 +257,7 @@ class ViolationsTest extends TestCase
             'should be final because we want immutability'
         ));
 
-        $violations->remove($baseline);
-
-        self::assertCount(0, $violations);
+        self::assertCount(0, $violations->matchAgainst($baseline, false)->new());
     }
 
     public function test_violation_without_line_number_returns_copy_with_null_line(): void
@@ -340,17 +328,17 @@ class ViolationsTest extends TestCase
             21
         ));
 
-        $this->violationStore->remove($violationsBaseline, true);
+        $new = $this->violationStore->matchAgainst($violationsBaseline, true)->new();
 
-        self::assertCount(3, $this->violationStore->toArray());
+        self::assertCount(3, $new);
         self::assertEquals([
             $this->violation,
             $violation2,
             $violation3,
-        ], $this->violationStore->toArray());
+        ], $new->toArray());
     }
 
-    public function test_count_unmatched_in_returns_zero_when_everything_still_occurs(): void
+    public function test_match_stale_returns_zero_when_everything_still_occurs(): void
     {
         $baseline = new Violations();
         $baseline->add($this->violation);
@@ -358,10 +346,10 @@ class ViolationsTest extends TestCase
         $current = new Violations();
         $current->add($this->violation);
 
-        self::assertSame(0, $baseline->countUnmatchedIn($current, false));
+        self::assertCount(0, $current->matchAgainst($baseline, false)->stale());
     }
 
-    public function test_count_unmatched_in_counts_fixed_baseline_entries(): void
+    public function test_match_stale_counts_fixed_baseline_entries(): void
     {
         $stillPresent = new Violation('App\Controller\Shop', 'should have name end with Controller', 10);
         $fixed = new Violation('App\Controller\Shop', 'should implement AbstractController', 20);
@@ -373,10 +361,10 @@ class ViolationsTest extends TestCase
         $current = new Violations();
         $current->add($stillPresent);
 
-        self::assertSame(1, $baseline->countUnmatchedIn($current, false));
+        self::assertCount(1, $current->matchAgainst($baseline, false)->stale());
     }
 
-    public function test_count_unmatched_in_counts_fixed_baseline_entries_ignoring_line_numbers(): void
+    public function test_match_stale_counts_fixed_baseline_entries_ignoring_line_numbers(): void
     {
         $stillPresent = new Violation('App\Controller\Shop', 'should have name end with Controller', 10);
         $fixed = new Violation('App\Controller\Shop', 'should implement AbstractController', 20);
@@ -389,11 +377,11 @@ class ViolationsTest extends TestCase
         $current = new Violations();
         $current->add($stillPresentMovedLine);
 
-        self::assertSame(1, $baseline->countUnmatchedIn($current, true));
-        self::assertSame(2, $baseline->countUnmatchedIn($current, false));
+        self::assertCount(1, $current->matchAgainst($baseline, true)->stale());
+        self::assertCount(2, $current->matchAgainst($baseline, false)->stale());
     }
 
-    public function test_count_unmatched_in_does_not_mutate_either_set(): void
+    public function test_match_stale_does_not_mutate_either_set(): void
     {
         $stillPresent = new Violation('App\Controller\Shop', 'should have name end with Controller', 10);
 
@@ -403,13 +391,13 @@ class ViolationsTest extends TestCase
         $current = new Violations();
         $current->add($stillPresent);
 
-        $baseline->countUnmatchedIn($current, true);
+        $current->matchAgainst($baseline, true);
 
         self::assertCount(1, $baseline);
         self::assertCount(1, $current);
     }
 
-    public function test_intersection_keeps_only_matching_violations_with_this_sets_line_numbers(): void
+    public function test_match_known_keeps_only_matching_violations_with_this_sets_line_numbers(): void
     {
         $current = new Violations();
         $current->add(new Violation('App\Controller\Shop', 'should have name end with Controller', 25));
@@ -419,14 +407,14 @@ class ViolationsTest extends TestCase
         $baseline->add(new Violation('App\Controller\Shop', 'should have name end with Controller', 10));
         $baseline->add(new Violation('App\Controller\Fixed', 'should have name end with Controller', 3));
 
-        $intersection = $current->intersection($baseline);
+        $intersection = $current->matchAgainst($baseline, true)->known();
 
         self::assertCount(1, $intersection);
         self::assertEquals('App\Controller\Shop', $intersection->get(0)->getFqcn());
         self::assertEquals(25, $intersection->get(0)->getLine());
     }
 
-    public function test_intersection_matches_each_entry_at_most_once(): void
+    public function test_match_known_matches_each_entry_at_most_once(): void
     {
         $duplicated = new Violation('App\Controller\Shop', 'should have name end with Controller', 10);
 
@@ -437,10 +425,10 @@ class ViolationsTest extends TestCase
         $baseline = new Violations();
         $baseline->add($duplicated);
 
-        self::assertCount(1, $current->intersection($baseline));
+        self::assertCount(1, $current->matchAgainst($baseline, true)->known());
     }
 
-    public function test_intersection_does_not_mutate_either_set(): void
+    public function test_match_known_does_not_mutate_either_set(): void
     {
         $violation = new Violation('App\Controller\Shop', 'should have name end with Controller', 10);
 
@@ -450,7 +438,7 @@ class ViolationsTest extends TestCase
         $baseline = new Violations();
         $baseline->add($violation);
 
-        $current->intersection($baseline);
+        $current->matchAgainst($baseline, true);
 
         self::assertCount(1, $current);
         self::assertCount(1, $baseline);
