@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\CLI\Command;
 
-use Arkitect\CLI\Baseline;
+use Arkitect\CLI\BaselineFileRepository;
 use Arkitect\CLI\CheckHandler;
 use Arkitect\CLI\CheckOptions;
 use Arkitect\CLI\Runner;
@@ -37,7 +37,7 @@ class Check extends Command
 
         parent::__construct('check');
 
-        $this->handler = $handler ?? new CheckHandler(new Runner());
+        $this->handler = $handler ?? new CheckHandler(new Runner(), new BaselineFileRepository());
         $this->runtime = new CommandRuntime();
     }
 
@@ -80,6 +80,7 @@ class Check extends Command
             );
 
         $this->commonOptions->addTo($this);
+        $this->commonOptions->addIgnoreBaselineLinenumbers($this);
     }
 
     protected function isRunningAsPhar(): bool
@@ -138,17 +139,36 @@ class Check extends Command
 
     protected function parseOptions(InputInterface $input): CheckOptions
     {
-        $useBaseline = (string) $input->getOption(self::USE_BASELINE_PARAM);
-
         return new CheckOptions(
             configFilePath: $this->commonOptions->configFilePath($input),
             targetPhpVersion: $this->commonOptions->targetPhpVersion($input),
             stopOnFailure: (bool) $input->getOption(self::STOP_ON_FAILURE_PARAM),
-            baselineFilePath: Baseline::resolveFilePath($useBaseline, Baseline::DEFAULT_FILENAME),
-            skipBaseline: (bool) $input->getOption(self::SKIP_BASELINE_PARAM),
+            baselineFilePath: $this->resolveBaselineFilePath($input),
             ignoreBaselineLinenumbers: $this->commonOptions->isIgnoreBaselineLinenumbers($input),
             format: (string) $input->getOption(self::FORMAT_PARAM),
             autoloadFilePath: $this->commonOptions->autoloadFilePath($input),
         );
+    }
+
+    /**
+     * The baseline file check should use, or null when there is nothing to
+     * ignore: --skip-baseline opts out, and the default baseline is used only
+     * when it happens to exist. An explicit --use-baseline is returned as is
+     * even if missing, so that a wrong path fails loudly at load time instead
+     * of being silently ignored.
+     */
+    private function resolveBaselineFilePath(InputInterface $input): ?string
+    {
+        if ((bool) $input->getOption(self::SKIP_BASELINE_PARAM)) {
+            return null;
+        }
+
+        $useBaseline = (string) $input->getOption(self::USE_BASELINE_PARAM);
+
+        if ('' !== $useBaseline) {
+            return $useBaseline;
+        }
+
+        return file_exists(BaselineFileRepository::DEFAULT_FILENAME) ? BaselineFileRepository::DEFAULT_FILENAME : null;
     }
 }

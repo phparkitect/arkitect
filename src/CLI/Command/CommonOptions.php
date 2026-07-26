@@ -46,13 +46,22 @@ final class CommonOptions
                 'a',
                 InputOption::VALUE_REQUIRED,
                 'Specify an autoload file to use',
-            )
-            ->addOption(
-                self::IGNORE_BASELINE_LINENUMBERS_PARAM,
-                'i',
-                InputOption::VALUE_NONE,
-                'Ignore line numbers when checking or generating the baseline'
             );
+    }
+
+    /**
+     * Not part of addTo() because not every analysis command takes it:
+     * prune-baseline always matches ignoring line numbers and preserves
+     * the baseline's stored format instead.
+     */
+    public function addIgnoreBaselineLinenumbers(Command $command): void
+    {
+        $command->addOption(
+            self::IGNORE_BASELINE_LINENUMBERS_PARAM,
+            'i',
+            InputOption::VALUE_NONE,
+            'Ignore line numbers when checking or generating the baseline'
+        );
     }
 
     public function configFilePath(InputInterface $input): string

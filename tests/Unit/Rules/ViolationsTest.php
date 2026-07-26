@@ -392,4 +392,51 @@ class ViolationsTest extends TestCase
         self::assertCount(1, $baseline);
         self::assertCount(1, $current);
     }
+
+    public function test_intersection_keeps_only_matching_violations_with_this_sets_line_numbers(): void
+    {
+        $current = new Violations();
+        $current->add(new Violation('App\Controller\Shop', 'should have name end with Controller', 25));
+        $current->add(new Violation('App\Controller\NewViolation', 'should implement ContainerInterface', 5));
+
+        $baseline = new Violations();
+        $baseline->add(new Violation('App\Controller\Shop', 'should have name end with Controller', 10));
+        $baseline->add(new Violation('App\Controller\Fixed', 'should have name end with Controller', 3));
+
+        $intersection = $current->intersection($baseline);
+
+        self::assertCount(1, $intersection);
+        self::assertEquals('App\Controller\Shop', $intersection->get(0)->getFqcn());
+        self::assertEquals(25, $intersection->get(0)->getLine());
+    }
+
+    public function test_intersection_matches_each_entry_at_most_once(): void
+    {
+        $duplicated = new Violation('App\Controller\Shop', 'should have name end with Controller', 10);
+
+        $current = new Violations();
+        $current->add($duplicated);
+        $current->add($duplicated);
+
+        $baseline = new Violations();
+        $baseline->add($duplicated);
+
+        self::assertCount(1, $current->intersection($baseline));
+    }
+
+    public function test_intersection_does_not_mutate_either_set(): void
+    {
+        $violation = new Violation('App\Controller\Shop', 'should have name end with Controller', 10);
+
+        $current = new Violations();
+        $current->add($violation);
+
+        $baseline = new Violations();
+        $baseline->add($violation);
+
+        $current->intersection($baseline);
+
+        self::assertCount(1, $current);
+        self::assertCount(1, $baseline);
+    }
 }

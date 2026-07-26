@@ -16,8 +16,10 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class CheckHandler
 {
-    public function __construct(private Runner $runner)
-    {
+    public function __construct(
+        private Runner $runner,
+        private BaselineFileRepository $baselineRepository,
+    ) {
     }
 
     public function check(
@@ -30,14 +32,17 @@ final class CheckHandler
             ->autoloadFilePath($options->getAutoloadFilePath())
             ->stopOnFailure($options->isStopOnFailure())
             ->targetPhpVersion(TargetPhpVersion::create($options->getTargetPhpVersion()))
-            ->baselineFilePath($options->getBaselineFilePath())
             ->ignoreBaselineLinenumbers($options->isIgnoreBaselineLinenumbers())
-            ->skipBaseline($options->isSkipBaseline())
             ->format($options->getFormat());
 
-        $baseline = Baseline::create($config->isSkipBaseline(), $config->getBaselineFilePath());
+        $baselineFilePath = $options->getBaselineFilePath();
 
-        $baseline->getFilename() && $output->writeln("Baseline file '{$baseline->getFilename()}' found");
+        if (null === $baselineFilePath) {
+            $baseline = Baseline::empty();
+        } else {
+            $baseline = $this->baselineRepository->load($baselineFilePath);
+            $output->writeln("Baseline file '$baselineFilePath' found");
+        }
 
         $output->writeln("Config file '{$options->getConfigFilePath()}' found\n");
 
@@ -52,7 +57,7 @@ final class CheckHandler
             $output->writeln("⚠️ {$result->getViolations()->count()} violations detected!");
         }
 
-        $this->printStaleBaselineViolations($baseline, $output);
+        $this->printStaleBaselineViolations($result->getStaleBaselineEntriesCount(), $output);
 
         if ($result->hasParsingErrors()) {
             $output->writeln('❌ found parsing errors in these files:');
@@ -66,15 +71,13 @@ final class CheckHandler
         return $result;
     }
 
-    private function printStaleBaselineViolations(Baseline $baseline, OutputInterface $output): void
+    private function printStaleBaselineViolations(int $staleViolationsCount, OutputInterface $output): void
     {
-        $staleViolationsCount = $baseline->getStaleViolationsCount();
-
         if ($staleViolationsCount > 0) {
             $verb = 1 === $staleViolationsCount ? 'looks' : 'look';
             $pronoun = 1 === $staleViolationsCount ? 'it' : 'them';
             $noun = 1 === $staleViolationsCount ? 'violation' : 'violations';
-            $output->writeln("💡 {$staleViolationsCount} {$noun} in the baseline {$verb} fixed — regenerate the baseline to remove {$pronoun}");
+            $output->writeln("💡 {$staleViolationsCount} {$noun} in the baseline {$verb} fixed — run `phparkitect prune-baseline` to remove {$pronoun}");
         }
     }
 }

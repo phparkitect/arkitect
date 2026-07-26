@@ -143,6 +143,35 @@ class Violations implements \IteratorAggregate, \Countable, \JsonSerializable
         return $unmatched;
     }
 
+    /**
+     * Returns a new set with the violations from this set (typically the
+     * current run) that have a matching entry in $other (typically the
+     * baseline). Matching uses the stable violation key and ignores line
+     * numbers, so the returned violations carry this set's line numbers.
+     * Each entry in $other matches at most one violation, so duplicated
+     * violations are kept only as many times as they appear in $other.
+     */
+    public function intersection(self $other): self
+    {
+        $result = new self();
+
+        $otherViolations = $other->violations;
+        foreach ($this->violations as $violation) {
+            foreach ($otherViolations as $idx => $otherViolation) {
+                if (
+                    $otherViolation->getFqcn() === $violation->getFqcn()
+                    && self::extractViolationKey($otherViolation->getError()) === self::extractViolationKey($violation->getError())
+                ) {
+                    $result->add($violation);
+                    unset($otherViolations[$idx]);
+                    continue 2;
+                }
+            }
+        }
+
+        return $result;
+    }
+
     public function withoutLineNumbers(): self
     {
         $copy = new self();

@@ -12,10 +12,13 @@ class AnalysisResult
 
     private ParsingErrors $parsingErrors;
 
-    public function __construct(Violations $violations, ParsingErrors $parsingErrors)
+    private int $staleBaselineEntriesCount;
+
+    public function __construct(Violations $violations, ParsingErrors $parsingErrors, int $staleBaselineEntriesCount = 0)
     {
         $this->violations = $violations;
         $this->parsingErrors = $parsingErrors;
+        $this->staleBaselineEntriesCount = $staleBaselineEntriesCount;
     }
 
     public function getViolations(): Violations
@@ -26,6 +29,15 @@ class AnalysisResult
     public function getParsingErrors(): ParsingErrors
     {
         return $this->parsingErrors;
+    }
+
+    /**
+     * Number of baseline entries that no longer match any current violation,
+     * i.e. that have already been fixed and could be removed from the baseline.
+     */
+    public function getStaleBaselineEntriesCount(): int
+    {
+        return $this->staleBaselineEntriesCount;
     }
 
     public function hasErrors(): bool

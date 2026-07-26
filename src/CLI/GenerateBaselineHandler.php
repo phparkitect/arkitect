@@ -15,8 +15,10 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class GenerateBaselineHandler
 {
-    public function __construct(private Runner $runner)
-    {
+    public function __construct(
+        private Runner $runner,
+        private BaselineFileRepository $baselineRepository,
+    ) {
     }
 
     public function generateBaseline(GenerateBaselineOptions $options, Progress $progress, OutputInterface $output): void
@@ -29,11 +31,13 @@ final class GenerateBaselineHandler
 
         $result = $this->runner->baseline($config, $progress);
 
-        Baseline::save(
-            $options->getBaselineFilePath(),
-            $result->getViolations(),
-            $options->isIgnoreBaselineLinenumbers()
-        );
+        $baseline = Baseline::fromViolations($result->getViolations());
+
+        if ($options->isIgnoreBaselineLinenumbers()) {
+            $baseline = $baseline->withoutLineNumbers();
+        }
+
+        $this->baselineRepository->save($baseline, $options->getBaselineFilePath());
 
         $output->writeln("ℹ️ Baseline file '{$options->getBaselineFilePath()}' created!");
     }
