@@ -35,14 +35,12 @@ final class CheckHandler
             ->ignoreBaselineLinenumbers($options->isIgnoreBaselineLinenumbers())
             ->format($options->getFormat());
 
-        // the baseline is optional for check: an absent file just means there
-        // is nothing to ignore, so we fall back to an empty baseline
         $baselineFilePath = $options->getBaselineFilePath();
-        $baseline = null === $baselineFilePath ? null : $this->baselineRepository->loadIfPresent($baselineFilePath);
 
-        if (null === $baseline) {
+        if (null === $baselineFilePath) {
             $baseline = Baseline::empty();
         } else {
+            $baseline = $this->baselineRepository->load($baselineFilePath);
             $output->writeln("Baseline file '$baselineFilePath' found");
         }
 

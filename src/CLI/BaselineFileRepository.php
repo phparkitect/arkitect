@@ -21,21 +21,17 @@ final class BaselineFileRepository
             throw new \RuntimeException("Baseline file '$filename' not found.");
         }
 
-        return Baseline::fromViolations(Violations::fromJson((string) file_get_contents($filename)));
+        $contents = file_get_contents($filename);
+
+        if (false === $contents) {
+            throw new \RuntimeException("Baseline file '$filename' could not be read.");
+        }
+
+        return Baseline::fromViolations(Violations::fromJson($contents));
     }
 
     public function save(Baseline $baseline, string $filename): void
     {
         file_put_contents($filename, Json::encode($baseline->getViolations()));
-    }
-
-    /**
-     * The baseline at $filename, or null when the file is absent — for
-     * callers (like check) where the baseline is optional and a missing
-     * one just means "nothing to ignore".
-     */
-    public function loadIfPresent(string $filename): ?Baseline
-    {
-        return file_exists($filename) ? $this->load($filename) : null;
     }
 }

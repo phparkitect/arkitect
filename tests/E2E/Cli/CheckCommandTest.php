@@ -215,6 +215,14 @@ class CheckCommandTest extends TestCase
         self::assertStringContainsString('💡 1 violation in the baseline looks fixed — run `phparkitect prune-baseline` to remove it', $cmdTester->getErrorOutput());
     }
 
+    public function test_fails_when_the_baseline_passed_with_use_baseline_does_not_exist(): void
+    {
+        $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvcForYieldBug.php', null, 'not-a-real-baseline.json');
+
+        self::assertCommandExitedWithError($cmdTester);
+        self::assertStringContainsString("Baseline file 'not-a-real-baseline.json' not found.", $cmdTester->getErrorOutput());
+    }
+
     public function test_json_format_output_errors(): void
     {
         $configFilePath = __DIR__.'/../_fixtures/configMvcForYieldBug.php';

@@ -151,10 +151,11 @@ class Check extends Command
     }
 
     /**
-     * The baseline file check should use: an explicit --use-baseline, or the
-     * default phparkitect-baseline.json. Null when --skip-baseline opts out.
-     * Whether that file exists is decided at load time — the baseline is
-     * optional for check, so an absent one just means nothing to ignore.
+     * The baseline file check should use, or null when there is nothing to
+     * ignore: --skip-baseline opts out, and the default baseline is used only
+     * when it happens to exist. An explicit --use-baseline is returned as is
+     * even if missing, so that a wrong path fails loudly at load time instead
+     * of being silently ignored.
      */
     private function resolveBaselineFilePath(InputInterface $input): ?string
     {
@@ -164,6 +165,10 @@ class Check extends Command
 
         $useBaseline = (string) $input->getOption(self::USE_BASELINE_PARAM);
 
-        return '' !== $useBaseline ? $useBaseline : BaselineFileRepository::DEFAULT_FILENAME;
+        if ('' !== $useBaseline) {
+            return $useBaseline;
+        }
+
+        return file_exists(BaselineFileRepository::DEFAULT_FILENAME) ? BaselineFileRepository::DEFAULT_FILENAME : null;
     }
 }
