@@ -34,7 +34,7 @@ class GenerateBaselineHandler
         $baseline = Baseline::fromViolations($result->getViolations());
 
         if ($options->isIgnoreBaselineLinenumbers()) {
-            $baseline = $baseline->withoutLineNumbers();
+            $output->writeln(DeprecationNotice::IGNORE_BASELINE_LINENUMBERS);
         }
 
         $this->baselineRepository->save($baseline, $options->getBaselineFilePath());

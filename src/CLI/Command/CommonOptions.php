@@ -50,9 +50,10 @@ class CommonOptions
     }
 
     /**
-     * Not part of addTo() because not every analysis command takes it:
-     * prune-baseline always matches ignoring line numbers and preserves
-     * the baseline's stored format instead.
+     * Not part of addTo() because prune-baseline never took it.
+     *
+     * The option is deprecated and has no effect: it is still registered so
+     * that the commands accept it and can warn who is passing it.
      */
     public function addIgnoreBaselineLinenumbers(Command $command): void
     {
@@ -60,7 +61,7 @@ class CommonOptions
             self::IGNORE_BASELINE_LINENUMBERS_PARAM,
             'i',
             InputOption::VALUE_NONE,
-            'Ignore line numbers when checking or generating the baseline'
+            'Deprecated: has no effect, baseline matching already tolerates moved violations'
         );
     }
 

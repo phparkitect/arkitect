@@ -25,7 +25,7 @@ class BaselineTest extends TestCase
         $current = new Violations();
         $current->add($stillPresent);
 
-        $result = $baseline->applyTo($current, false);
+        $result = $baseline->applyTo($current);
 
         self::assertCount(0, $result->getRemainingViolations());
         self::assertSame(1, $result->getStaleBaselineEntriesCount());
@@ -41,7 +41,7 @@ class BaselineTest extends TestCase
         $current = new Violations();
         $current->add($violation);
 
-        Baseline::fromViolations($baselineViolations)->applyTo($current, false);
+        Baseline::fromViolations($baselineViolations)->applyTo($current);
 
         self::assertCount(1, $current);
     }
@@ -104,14 +104,17 @@ class BaselineTest extends TestCase
         self::assertNull($pruned->getViolations()->get(0)->getLine());
     }
 
-    public function test_without_line_numbers_returns_a_copy_with_stripped_line_numbers(): void
+    public function test_apply_to_keeps_a_violation_moved_by_an_edit_above_it(): void
     {
         $baselineViolations = new Violations();
         $baselineViolations->add(new Violation('App\Controller\Shop', 'should have name end with Controller', 10));
 
-        $stripped = Baseline::fromViolations($baselineViolations)->withoutLineNumbers();
+        $current = new Violations();
+        $current->add(new Violation('App\Controller\Shop', 'should have name end with Controller', 42));
 
-        self::assertNull($stripped->getViolations()->get(0)->getLine());
-        self::assertEquals(10, $baselineViolations->get(0)->getLine());
+        $result = Baseline::fromViolations($baselineViolations)->applyTo($current);
+
+        self::assertCount(0, $result->getRemainingViolations());
+        self::assertSame(0, $result->getStaleBaselineEntriesCount());
     }
 }

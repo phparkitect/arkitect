@@ -179,17 +179,23 @@ class CheckCommandTest extends TestCase
         self::assertCommandWasSuccessful($cmdTester);
     }
 
-    public function test_baseline_line_numbers_can_be_ignored(): void
+    public function test_baseline_matches_violations_whose_line_number_moved(): void
     {
         $configFilePath = __DIR__.'/../_fixtures/configIgnoreBaselineLineNumbers.php';
 
-        // No errors when ignoring baseline line numbers
-        $cmdTester = $this->runCheck($configFilePath, null, __DIR__.'/../_fixtures/line_numbers/baseline.json', false, true);
-        self::assertCommandWasSuccessful($cmdTester);
-
-        // Errors when not ignoring baseline line numbers
         $cmdTester = $this->runCheck($configFilePath, null, __DIR__.'/../_fixtures/line_numbers/baseline.json');
-        self::assertCommandExitedWithError($cmdTester);
+
+        self::assertCommandWasSuccessful($cmdTester);
+    }
+
+    public function test_deprecated_ignore_baseline_linenumbers_warns_and_changes_nothing(): void
+    {
+        $configFilePath = __DIR__.'/../_fixtures/configIgnoreBaselineLineNumbers.php';
+
+        $cmdTester = $this->runCheck($configFilePath, null, __DIR__.'/../_fixtures/line_numbers/baseline.json', false, true);
+
+        self::assertCommandWasSuccessful($cmdTester);
+        self::assertStringContainsString('is deprecated and has no effect', $cmdTester->getErrorOutput());
     }
 
     public function test_baseline_reports_stale_violations(): void

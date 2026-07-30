@@ -55,20 +55,20 @@ class GenerateBaselineCommandTest extends TestCase
         self::assertFileDoesNotExist($this->defaultBaselineFilename);
     }
 
-    public function test_can_ignore_line_numbers(): void
+    public function test_deprecated_ignore_line_numbers_warns_and_still_writes_them(): void
     {
         $cmdTester = $this->runGenerateBaseline(
-            __DIR__.'/../_fixtures/configMvcForYieldBug.php',
+            __DIR__.'/../_fixtures/configIgnoreBaselineLineNumbers.php',
             $this->customBaselineFilename,
             true
         );
 
         self::assertEquals(self::SUCCESS_CODE, $cmdTester->getStatusCode());
+        self::assertStringContainsString('is deprecated and has no effect', $cmdTester->getDisplay());
 
         $baseline = json_decode((string) file_get_contents($this->customBaselineFilename), true);
 
-        self::assertCount(1, $baseline['violations']);
-        self::assertNull($baseline['violations'][0]['line']);
+        self::assertNotNull($baseline['violations'][0]['line']);
     }
 
     public function test_fails_gracefully_when_the_config_file_does_not_exist(): void

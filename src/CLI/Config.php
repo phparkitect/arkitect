@@ -120,6 +120,11 @@ class Config
         return $this->baselineFilePath;
     }
 
+    /**
+     * @deprecated baseline matching no longer depends on line numbers; this
+     *             option has no effect and will be removed in the next major
+     *             version. The value is kept only to warn the user about it.
+     */
     public function ignoreBaselineLinenumbers(bool $ignoreBaselineLinenumbers): self
     {
         $this->ignoreBaselineLinenumbers = $ignoreBaselineLinenumbers;

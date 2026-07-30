@@ -8,6 +8,30 @@ PHPArkitect, ordered from the most recent version to the oldest.
 
 ## 1.3.0
 
+### `--ignore-baseline-linenumbers` is deprecated
+
+Baseline matching no longer depends on line numbers: a violation is identified
+by its class and by what it reports, so an edit above the offending line does
+not reopen a known violation, and two violations of the same rule in the same
+class stay distinct. The option that used to select this behaviour has no
+effect and prints a deprecation notice, both from the CLI and from
+`phparkitect.php`:
+
+```diff
+- phparkitect check --ignore-baseline-linenumbers
++ phparkitect check
+
+- $config->ignoreBaselineLinenumbers(true);
++ $config;
+```
+
+It will be removed in the next major version.
+
+`generate-baseline` now always writes line numbers — the option no longer
+strips them. **Existing baselines keep working and need no regeneration**,
+whether or not they store line numbers, and `prune-baseline` still preserves
+the format it finds.
+
 ### `check --generate-baseline` is now the `generate-baseline` command
 
 Generating a baseline was an action disguised as a `check` option: it ran a
@@ -24,8 +48,7 @@ a dedicated command:
 
 The optional filename is now an argument (still defaulting to
 `phparkitect-baseline.json`), and the command accepts the same `--config`,
-`--target-php-version`, `--autoload` and `--ignore-baseline-linenumbers`
-options as before. The check-only options that never affected generation
+`--target-php-version` and `--autoload` options as before. The check-only options that never affected generation
 (`--stop-on-failure`, `--format`, `--use-baseline`, `--skip-baseline`) are no
 longer accepted.
 

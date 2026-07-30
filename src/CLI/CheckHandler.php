@@ -32,8 +32,11 @@ class CheckHandler
             ->autoloadFilePath($options->getAutoloadFilePath())
             ->stopOnFailure($options->isStopOnFailure())
             ->targetPhpVersion(TargetPhpVersion::create($options->getTargetPhpVersion()))
-            ->ignoreBaselineLinenumbers($options->isIgnoreBaselineLinenumbers())
             ->format($options->getFormat());
+
+        if ($options->isIgnoreBaselineLinenumbers() || $config->isIgnoreBaselineLinenumbers()) {
+            $output->writeln(DeprecationNotice::IGNORE_BASELINE_LINENUMBERS);
+        }
 
         $baselineFilePath = $options->getBaselineFilePath();
 

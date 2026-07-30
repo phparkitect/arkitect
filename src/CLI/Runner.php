@@ -20,7 +20,7 @@ class Runner
     {
         [$violations, $parsingErrors] = $this->doRun($config, $progress);
 
-        $baselineResult = $baseline->applyTo($violations, $config->isIgnoreBaselineLinenumbers());
+        $baselineResult = $baseline->applyTo($violations);
 
         return new AnalysisResult(
             $baselineResult->getRemainingViolations(),

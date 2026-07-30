@@ -144,7 +144,7 @@ Every setting can be passed as a CLI option or set via the corresponding `Config
 | `--autoload` | `-a` | `autoloadFilePath()` | Autoload file to load before running. Required for all Phar runs. |
 | `--use-baseline` | `-b` | `baselineFilePath()` | Baseline file path for ignoring known violations. |
 | `--skip-baseline` | `-k` | `skipBaseline()` | Skips the default baseline even if present. |
-| `--ignore-baseline-linenumbers` | `-i` | `ignoreBaselineLinenumbers()` | Matches baseline violations without checking line numbers. |
+| `--ignore-baseline-linenumbers` | `-i` | `ignoreBaselineLinenumbers()` | **Deprecated**: has no effect, baseline matching already tolerates moved violations. |
 | `--config` | `-c` | — | Configuration file to load (default: `phparkitect.php`). |
 | `--verbose` | `-v` | — | Prints every parsed file instead of the progress bar. |
 | — | — | `skipParsingCustomAnnotations()` | Disables custom DocBlock annotation parsing (enabled by default). |
@@ -165,15 +165,17 @@ When violations get fixed over time, prune the baseline instead of regenerating 
 phparkitect prune-baseline
 ```
 
-Pruning only removes entries that no longer match a current violation — it never adds anything. Regenerating snapshots the entire current state, so it would silently legitimize any new violation introduced since the baseline was created; pruning cannot, which makes it safe to run routinely (even automated). Since matching ignores line numbers and the kept entries are saved with their current ones, pruning also refreshes a baseline whose line numbers went stale after refactorings. `check` prints a hint when it detects baseline entries that look fixed.
+Pruning only removes entries that no longer match a current violation — it never adds anything. Regenerating snapshots the entire current state, so it would silently legitimize any new violation introduced since the baseline was created; pruning cannot, which makes it safe to run routinely (even automated). Pruning also refreshes a baseline whose line numbers went stale after refactorings, since the kept entries are saved with their current ones. `check` prints a hint when it detects baseline entries that look fixed.
 
-Both `generate-baseline` and `prune-baseline` accept an optional custom file name as argument and the same `--config`, `--target-php-version` and `--autoload` options as `check`; `generate-baseline` also accepts `--ignore-baseline-linenumbers` to write the baseline without line numbers. `prune-baseline` needs no such flag: matching already ignores line numbers, and a baseline stored without line numbers keeps its format when pruned.
+Both `generate-baseline` and `prune-baseline` accept an optional custom file name as argument and the same `--config`, `--target-php-version` and `--autoload` options as `check`.
 
 > **Note**: baseline generation was previously a `check` option (`check --generate-baseline`); it is now a dedicated command, and the old option fails with a pointer to the new one.
 
-By default the baseline also checks line numbers — a change before the offending line shifts the number and the check fails. Use `--ignore-baseline-linenumbers` to match violations regardless of line number.
+#### How baseline entries are matched
 
-> **Warning**: when ignoring line numbers, PHPArkitect cannot detect if the same rule is violated additional times in the same file.
+You don't have to choose: a violation is identified by its class and by what it reports, never by where it sits in the file. Entries are matched first by exact position, and whatever is left over is matched within the same class and rule, in file order. A change above the offending line therefore doesn't reopen a known violation, while two violations of the same rule in the same class stay distinct — and when a new one appears among them, it's the new one that gets reported.
+
+`--ignore-baseline-linenumbers` / `ignoreBaselineLinenumbers()` used to select this behaviour and is now **deprecated**: it has no effect and will be removed in the next major version. Existing baselines keep working and need no regeneration, whether or not they store line numbers.
 
 ### Output format
 
