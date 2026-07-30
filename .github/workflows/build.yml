@@ -141,6 +141,21 @@ jobs:
             --config tests/E2E/_fixtures/autoload/phparkitect.php \
             --autoload tests/E2E/_fixtures/autoload/autoload.php
 
+      - name: "End-to-end test phar: generate, use and prune a baseline"
+        run: |
+          php ./phparkitect-${{ github.sha }}.phar generate-baseline smoke-baseline.json \
+            --config tests/E2E/_fixtures/configMvcForYieldBug.php \
+            --autoload tests/E2E/_fixtures/autoload/autoload.php
+          test -s smoke-baseline.json
+          php ./phparkitect-${{ github.sha }}.phar check \
+            --config tests/E2E/_fixtures/configMvcForYieldBug.php \
+            --autoload tests/E2E/_fixtures/autoload/autoload.php \
+            --use-baseline smoke-baseline.json
+          php ./phparkitect-${{ github.sha }}.phar prune-baseline smoke-baseline.json \
+            --config tests/E2E/_fixtures/configMvcForYieldBug.php \
+            --autoload tests/E2E/_fixtures/autoload/autoload.php
+          test -s smoke-baseline.json
+
   publish_phar:
     needs: [build, smoke-test-phar]
     runs-on: "ubuntu-22.04"
