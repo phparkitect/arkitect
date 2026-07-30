@@ -81,7 +81,7 @@ class Runner
         $violations = new Violations();
         $parsingErrors = new ParsingErrors();
 
-        $fileParser = FileParserFactory::createFileParser(
+        $fileParser = FileParserFactory::createMemoizingFileParser(
             $config->getTargetPhpVersion(),
             $config->isParseCustomAnnotationsEnabled()
         );
