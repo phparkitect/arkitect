@@ -57,6 +57,29 @@ class CheckCommandTest extends TestCase
         self::assertStringContainsString($expectedErrors, $cmdTester->getDisplay());
     }
 
+    public function test_repeating_the_same_class_set_does_not_change_the_violations(): void
+    {
+        $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvcRepeatedClassSet.php');
+
+        $expectedErrors = <<<'ERRORS'
+        App\Controller\Foo has 2 violations
+          should have a name that matches *Controller because we want uniform naming
+          should implement ContainerAwareInterface because all controllers should be container aware
+
+        App\Controller\ProductsController has 1 violations
+          should implement ContainerAwareInterface because all controllers should be container aware
+
+        App\Controller\UserController has 1 violations
+          should implement ContainerAwareInterface because all controllers should be container aware
+
+        App\Controller\YieldController has 1 violations
+          should implement ContainerAwareInterface because all controllers should be container aware
+        ERRORS;
+
+        self::assertCommandExitedWithError($cmdTester);
+        self::assertStringContainsString($expectedErrors, $cmdTester->getDisplay());
+    }
+
     public function test_app_returns_single_error_because_there_is_stop_on_failure_param(): void
     {
         $cmdTester = $this->runCheck(__DIR__.'/../_fixtures/configMvc.php', true);
