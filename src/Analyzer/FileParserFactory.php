@@ -21,6 +21,11 @@ class FileParserFactory
         );
     }
 
+    public static function createMemoizingFileParser(TargetPhpVersion $targetPhpVersion, bool $parseCustomAnnotations = true): MemoizingParser
+    {
+        return new MemoizingParser(self::createFileParser($targetPhpVersion, $parseCustomAnnotations));
+    }
+
     public static function forPhpVersion(string $targetPhpVersion): FileParser
     {
         return self::createFileParser(TargetPhpVersion::create($targetPhpVersion), true);
