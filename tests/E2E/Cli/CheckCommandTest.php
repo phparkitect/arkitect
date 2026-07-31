@@ -241,6 +241,27 @@ class CheckCommandTest extends TestCase
         $cmdTester = $this->runCheck($configFilePath, null, $this->customBaselineFilename);
 
         self::assertCommandWasSuccessful($cmdTester);
+        self::assertStringContainsString("💡 1 violation in the baseline looks fixed — run `phparkitect prune-baseline {$this->customBaselineFilename}` to remove it", $cmdTester->getErrorOutput());
+    }
+
+    public function test_stale_violations_hint_omits_the_filename_for_the_default_baseline(): void
+    {
+        $configFilePath = __DIR__.'/../_fixtures/configMvcForYieldBug.php';
+
+        $this->runGenerateBaseline($configFilePath, $this->defaultBaselineFilename);
+
+        $baseline = json_decode((string) file_get_contents($this->defaultBaselineFilename), true);
+        $baseline['violations'][] = [
+            'fqcn' => 'App\Controller\AlreadyFixed',
+            'error' => 'should have a name that matches *Controller because all controllers should be end name with Controller',
+            'line' => 1,
+            'filePath' => 'Controller/AlreadyFixed.php',
+        ];
+        file_put_contents($this->defaultBaselineFilename, json_encode($baseline));
+
+        $cmdTester = $this->runCheck($configFilePath, null, $this->defaultBaselineFilename);
+
+        self::assertCommandWasSuccessful($cmdTester);
         self::assertStringContainsString('💡 1 violation in the baseline looks fixed — run `phparkitect prune-baseline` to remove it', $cmdTester->getErrorOutput());
     }
 

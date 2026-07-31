@@ -60,7 +60,7 @@ class CheckHandler
             $output->writeln("⚠️ {$result->getViolations()->count()} violations detected!");
         }
 
-        $this->printStaleBaselineViolations($result->getStaleBaselineEntriesCount(), $output);
+        $this->printStaleBaselineViolations($result->getStaleBaselineEntriesCount(), $baselineFilePath, $output);
 
         if ($result->hasParsingErrors()) {
             $output->writeln('❌ found parsing errors in these files:');
@@ -74,13 +74,16 @@ class CheckHandler
         return $result;
     }
 
-    private function printStaleBaselineViolations(int $staleViolationsCount, OutputInterface $output): void
+    private function printStaleBaselineViolations(int $staleViolationsCount, ?string $baselineFilePath, OutputInterface $output): void
     {
         if ($staleViolationsCount > 0) {
             $verb = 1 === $staleViolationsCount ? 'looks' : 'look';
             $pronoun = 1 === $staleViolationsCount ? 'it' : 'them';
             $noun = 1 === $staleViolationsCount ? 'violation' : 'violations';
-            $output->writeln("💡 {$staleViolationsCount} {$noun} in the baseline {$verb} fixed — run `phparkitect prune-baseline` to remove {$pronoun}");
+            // the suggested command must prune the baseline we just used,
+            // not the default one it would pick up on its own
+            $filename = (null === $baselineFilePath || BaselineFileRepository::DEFAULT_FILENAME === $baselineFilePath) ? '' : " $baselineFilePath";
+            $output->writeln("💡 {$staleViolationsCount} {$noun} in the baseline {$verb} fixed — run `phparkitect prune-baseline{$filename}` to remove {$pronoun}");
         }
     }
 }
