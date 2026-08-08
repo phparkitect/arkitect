@@ -17,6 +17,14 @@ jobs:
       fail-fast: false
       matrix:
         php-versions: [ '8.0', '8.1', '8.2', '8.3', '8.4', '8.5' ]
+        dependencies: [ 'highest' ]
+        include:
+          # The lowest allowed dependency set needs to be verified only once, and the
+          # oldest supported PHP is where consumers are most likely to end up with it.
+          - php-versions: '8.0'
+            dependencies: 'lowest'
+
+    name: "PHP ${{ matrix.php-versions }} (${{ matrix.dependencies }} deps)"
 
     steps:
     - uses: actions/checkout@v7
@@ -40,12 +48,24 @@ jobs:
         path: |
           vendor
           tools/psalm/vendor
-        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        # composer.lock is not committed, so it cannot take part in the cache key:
+        # the installed set depends on the PHP version and on the resolution
+        # strategy, and both must be part of the key to keep the caches separate
+        key: ${{ runner.os }}-php-${{ matrix.php-versions }}-${{ matrix.dependencies }}-${{ hashFiles('composer.json') }}
         restore-keys: |
-          ${{ runner.os }}-php-
+          ${{ runner.os }}-php-${{ matrix.php-versions }}-${{ matrix.dependencies }}-
 
     - name: Install dependencies
+      if: ${{ matrix.dependencies == 'highest' }}
       run: composer install --prefer-dist
+
+    # Without a committed composer.lock every other job resolves to the newest
+    # allowed release, so the lower bounds declared in composer.json are never
+    # exercised. This job installs the other end of those ranges: the set a
+    # consumer with older pinned dependencies actually gets.
+    - name: Install lowest allowed dependencies
+      if: ${{ matrix.dependencies == 'lowest' }}
+      run: composer update --prefer-dist --prefer-lowest --prefer-stable
 
     # Psalm 6 needs PHP >= 8.1 to run; the analysis target stays 8.0 (phpVersion in psalm.xml)
     - name: Static Analysis
@@ -55,15 +75,15 @@ jobs:
         tools/psalm/vendor/bin/psalm --no-cache
 
     - name: Test with coverage
-      if: ${{ matrix.php-versions  == '8.0' }}
+      if: ${{ matrix.php-versions  == '8.0' && matrix.dependencies == 'highest' }}
       run: ./bin/phpunit -d memory_limit=-1 --coverage-clover clover.xml
 
     - name: Test without coverage
-      if: ${{ matrix.php-versions  != '8.0' }}
+      if: ${{ matrix.php-versions  != '8.0' || matrix.dependencies == 'lowest' }}
       run: ./bin/phpunit -d memory_limit=-1
 
     - name: Upload coverage to Codecov
-      if: ${{ matrix.php-versions  == '8.0' }}
+      if: ${{ matrix.php-versions  == '8.0' && matrix.dependencies == 'highest' }}
       uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
       with:
         token: ${{ secrets.CODECOV_TOKEN }}

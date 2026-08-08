@@ -50,3 +50,22 @@ make csfix     # run code style fixer
 make psalm     # run static analysis
 ```
 
+### Testing against the lowest allowed dependencies
+
+`composer.lock` is not committed, so `composer install` always gives you the
+newest release allowed by `composer.json`. Arkitect is installed as a dependency
+of other projects, though, where the resolver often picks something older, so CI
+also runs the test suite against the lower bound of every declared constraint.
+
+To reproduce that job locally:
+
+```shell
+composer update --prefer-lowest --prefer-stable
+make test
+composer update            # restore the newest allowed dependencies
+```
+
+If a change needs a feature that is not in the lowest allowed version of a
+dependency, raise the constraint in `composer.json` instead of working around
+it.
+
