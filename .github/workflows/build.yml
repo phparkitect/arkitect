@@ -74,19 +74,23 @@ jobs:
         composer install --prefer-dist -d tools/psalm
         tools/psalm/vendor/bin/psalm --no-cache
 
+    # Both dependency sets report coverage: code that supports one version of a
+    # dependency is dead code under the other one, so a single set can never cover
+    # all of src. Codecov merges the two reports, and codecov.yml waits for both.
     - name: Test with coverage
-      if: ${{ matrix.php-versions  == '8.0' && matrix.dependencies == 'highest' }}
+      if: ${{ matrix.php-versions  == '8.0' }}
       run: ./bin/phpunit -d memory_limit=-1 --coverage-clover clover.xml
 
     - name: Test without coverage
-      if: ${{ matrix.php-versions  != '8.0' || matrix.dependencies == 'lowest' }}
+      if: ${{ matrix.php-versions  != '8.0' }}
       run: ./bin/phpunit -d memory_limit=-1
 
     - name: Upload coverage to Codecov
-      if: ${{ matrix.php-versions  == '8.0' && matrix.dependencies == 'highest' }}
+      if: ${{ matrix.php-versions  == '8.0' }}
       uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
+        flags: ${{ matrix.dependencies }}
 
   phar:
     runs-on: "ubuntu-22.04"
