@@ -358,6 +358,21 @@ than not extracting it, per *Explicit, never ambiguous*. Property hooks
 existing per-node-kind dispatch and the generic recursion already do the
 right thing, confirmed by tests rather than assumed.
 
+## File access: a port, not a filesystem call baked into ProjectParser
+
+`ProjectParser` doesn't touch the filesystem itself. It depends on
+`FileRepository` (`src/FileSystem/`), a two-method interface (`files()`,
+`read()`); `FilesystemFileRepository` is the only production
+implementation. Not adopting a general hexagonal-architecture posture for
+the whole codebase — `Parser` itself is already a pure domain service
+without needing that vocabulary, and nothing else currently reads files —
+this one seam is pulled out because the pain was already concrete: testing
+`ProjectParser` meant real temp directories, `mkdir`/`chmod`/`rmdir` per
+test. `InMemoryFileRepository` (test-only, under `tests/FileSystem/`)
+replaces that with an in-memory fixture; `FilesystemFileRepositoryTest`
+keeps a small, separate suite that exercises the real adapter against real
+disk I/O, so the abstraction itself doesn't go unverified.
+
 ## PoC exit criteria
 
 Set before writing implementation code, so the PoC has a defined end instead

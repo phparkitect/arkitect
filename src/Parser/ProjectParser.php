@@ -4,19 +4,26 @@ declare(strict_types=1);
 
 namespace Arkitect\Parser;
 
+use Arkitect\FileSystem\FileRepository;
+
 final class ProjectParser
 {
-    public function parse(string $rootPath, TargetPhpVersion $targetPhpVersion): ParseResult
+    public function __construct(
+        private readonly FileRepository $files,
+    ) {
+    }
+
+    public function parse(TargetPhpVersion $targetPhpVersion): ParseResult
     {
         $parser = new Parser();
         $classes = [];
         $errors = [];
 
-        foreach ($this->phpFilesUnder($rootPath) as $relativePath => $absolutePath) {
-            $content = @file_get_contents($absolutePath);
-
-            if (false === $content) {
-                $errors[] = new ParsingError($relativePath, "could not read '$absolutePath'");
+        foreach ($this->files->files() as $relativePath) {
+            try {
+                $content = $this->files->read($relativePath);
+            } catch (\RuntimeException $e) {
+                $errors[] = new ParsingError($relativePath, $e->getMessage());
                 continue;
             }
 
@@ -26,22 +33,5 @@ final class ProjectParser
         }
 
         return new ParseResult($classes, $errors);
-    }
-
-    /** @return \Generator<string, string> relative path => absolute path */
-    private function phpFilesUnder(string $rootPath): \Generator
-    {
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($rootPath, \FilesystemIterator::SKIP_DOTS)
-        );
-
-        foreach ($iterator as $file) {
-            if (!$file->isFile() || 'php' !== $file->getExtension()) {
-                continue;
-            }
-
-            $absolutePath = $file->getPathname();
-            yield substr($absolutePath, \strlen($rootPath) + 1) => $absolutePath;
-        }
     }
 }
