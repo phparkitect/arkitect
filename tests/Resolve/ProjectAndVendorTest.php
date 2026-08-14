@@ -7,8 +7,8 @@ namespace Arkitect\Tests\Resolve;
 use Arkitect\FileSystem\FilesystemFileRepository;
 use Arkitect\Parser\TargetPhpVersion;
 use Arkitect\ProjectParser;
+use Arkitect\Resolve\ClassGraph;
 use Arkitect\Resolve\Membership;
-use Arkitect\Resolve\Symbols;
 use Arkitect\Tests\FileSystem\InMemoryFileRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
  * The reason vendor/ gets parsed at all (see ARCHITECTURE.md, stage 1):
  * a project class can extend a vendor class, and resolving what it is-a
  * requires the vendor class's own ancestor chain. Every other Resolve test
- * builds its Symbols from one parsed set (either synthetic fixtures or
+ * builds its ClassGraph from one parsed set (either synthetic fixtures or
  * vendor/ alone) — this is the one that actually crosses the boundary,
  * using nikic/php-parser's own real inheritance as the vendor side.
  */
@@ -37,19 +37,19 @@ final class ProjectAndVendorTest extends TestCase
 
         self::assertNotEmpty($vendorResult->classes, 'sanity check: vendor actually parsed something');
 
-        $symbols = new Symbols(...$projectResult->classes, ...$vendorResult->classes);
+        $classGraph = new ClassGraph(...$projectResult->classes, ...$vendorResult->classes);
 
         // direct: App\MyVisitor extends PhpParser\NodeVisitorAbstract
         self::assertSame(
             Membership::Yes,
-            $symbols->isA('App\MyVisitor', 'PhpParser\NodeVisitorAbstract')
+            $classGraph->isA('App\MyVisitor', 'PhpParser\NodeVisitorAbstract')
         );
 
         // transitive, through a real vendor-internal edge:
         // NodeVisitorAbstract implements NodeVisitor
         self::assertSame(
             Membership::Yes,
-            $symbols->isA('App\MyVisitor', 'PhpParser\NodeVisitor')
+            $classGraph->isA('App\MyVisitor', 'PhpParser\NodeVisitor')
         );
     }
 }

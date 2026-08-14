@@ -6,7 +6,7 @@ namespace Arkitect\Resolve;
 
 use Arkitect\Parser\ParsedClass;
 
-final class Symbols
+final class ClassGraph
 {
     /** @var array<string, ParsedClass> */
     private array $byFqcn;

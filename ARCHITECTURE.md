@@ -375,23 +375,24 @@ disk I/O, so the abstraction itself doesn't go unverified.
 
 ## Resolve component: design note
 
-`Symbols::isA()` is built and verified across the actual boundary that
+`ClassGraph::isA()` is built and verified across the actual boundary that
 justifies parsing `vendor/` at all: `tests/Resolve/ProjectAndVendorTest.php`
 parses a small project-side fixture and nikic/php-parser's real source
-into two separate `ParseResult`s, merges their classes into one `Symbols`,
+into two separate `ParseResult`s, merges their classes into one `ClassGraph`,
 and confirms both a direct and a transitive relationship that only resolve
 correctly because the vendor side's own ancestor chain is visible too
 (`App\MyVisitor extends NodeVisitorAbstract`, which itself `implements
 NodeVisitor` — a real edge inside nikic/php-parser, not a fixture). Before
-this, every other Resolve test built its `Symbols` from a single parsed
+this, every other Resolve test built its `ClassGraph` from a single parsed
 set (synthetic fixtures, or `vendor/` alone) — none of them actually
 exercised combining project and vendor classes into one graph.
 
 Still open: whether `Implement`/`Extend`-family checks (not just `IsA`)
-route through `Symbols` too. v1's versions checked the *direct* relationship
-only; `Symbols::isA()` is transitive. Unifying them means deciding whether
+route through `ClassGraph` too. v1's versions checked the *direct*
+relationship only; `ClassGraph::isA()` is transitive. Unifying them means
+deciding whether
 `Implement` becomes "transitively is-a" (a behavior change from v1) or
-`Symbols` grows a direct-only query alongside the transitive one. Not
+`ClassGraph` grows a direct-only query alongside the transitive one. Not
 decided — matters once stage 3 (Evaluate) exists and those expressions get
 rebuilt.
 
@@ -410,7 +411,7 @@ of expanding into "the whole 2.0":
    verified against the literal old test names.
 2. **Met.** The state-leak case (`Innocent` reporting zero dependencies) is
    fixed structurally, with a regression test (`ParserTest`/`CollectTest`).
-3. **Met.** `Symbols::isA()` (`src/Resolve/Symbols.php`) answers purely
+3. **Met.** `ClassGraph::isA()` (`src/Resolve/ClassGraph.php`) answers purely
    from the parsed set — no reflection, no `is_a()`, no autoloading.
    Verified against this repo's own `vendor/`: a real two-hop `extends`
    chain resolves correctly, and querying an unrelated target through a
