@@ -105,6 +105,84 @@ final class ClassGraphTest extends TestCase
         self::assertSame(Membership::Unknown, $classGraph->isA('Totally\Unseen', 'App\Foo'));
     }
 
+    public function test_a_declared_parent_is_an_ancestor(): void
+    {
+        $classGraph = new ClassGraph($this->classOf('App\Child', extends: ['App\Base']));
+
+        self::assertSame(Membership::Yes, $classGraph->hasAncestor('App\Child', 'App\Base'));
+    }
+
+    public function test_a_grandparent_is_an_ancestor(): void
+    {
+        $classGraph = new ClassGraph(
+            $this->classOf('App\Child', extends: ['App\Middle']),
+            $this->classOf('App\Middle', extends: ['App\Base']),
+        );
+
+        self::assertSame(Membership::Yes, $classGraph->hasAncestor('App\Child', 'App\Base'));
+    }
+
+    public function test_an_interface_extending_an_interface_is_an_ancestor(): void
+    {
+        $classGraph = new ClassGraph($this->classOf('App\B', extends: ['App\A']));
+
+        self::assertSame(Membership::Yes, $classGraph->hasAncestor('App\B', 'App\A'));
+    }
+
+    /**
+     * The difference from isA(): an implemented interface is a supertype but
+     * not an ancestor, so Extend and IsA can't be the same question.
+     */
+    public function test_an_implemented_interface_is_not_an_ancestor(): void
+    {
+        $classGraph = new ClassGraph($this->classOf('App\Service', implements: ['App\Iface']));
+
+        self::assertSame(Membership::No, $classGraph->hasAncestor('App\Service', 'App\Iface'));
+    }
+
+    /**
+     * The other difference from isA(), which is reflexive: a class is a
+     * subtype of itself, but it is not its own ancestor.
+     */
+    public function test_a_class_is_not_its_own_ancestor(): void
+    {
+        $classGraph = new ClassGraph($this->classOf('App\Foo'));
+
+        self::assertSame(Membership::No, $classGraph->hasAncestor('App\Foo', 'App\Foo'));
+    }
+
+    public function test_a_class_declaring_no_parent_has_no_ancestor(): void
+    {
+        $classGraph = new ClassGraph($this->classOf('App\Foo'));
+
+        self::assertSame(Membership::No, $classGraph->hasAncestor('App\Foo', 'App\Base'));
+    }
+
+    /**
+     * The name matches before the walk continues into the parent, so a
+     * vendor parent nobody parsed still answers definitively.
+     */
+    public function test_a_declared_parent_outside_the_parsed_set_still_matches(): void
+    {
+        $classGraph = new ClassGraph($this->classOf('App\Child', extends: ['Vendor\Unparsed']));
+
+        self::assertSame(Membership::Yes, $classGraph->hasAncestor('App\Child', 'Vendor\Unparsed'));
+    }
+
+    public function test_an_unparsed_parent_makes_a_different_target_unknown(): void
+    {
+        $classGraph = new ClassGraph($this->classOf('App\Child', extends: ['Vendor\Unparsed']));
+
+        self::assertSame(Membership::Unknown, $classGraph->hasAncestor('App\Child', 'App\Base'));
+    }
+
+    public function test_a_class_never_seen_has_an_unknown_ancestry(): void
+    {
+        $classGraph = new ClassGraph($this->classOf('App\Foo'));
+
+        self::assertSame(Membership::Unknown, $classGraph->hasAncestor('Totally\Unseen', 'App\Base'));
+    }
+
     private function classOf(string $fqcn, array $extends = [], array $implements = [], array $traits = []): ParsedClass
     {
         return new ParsedClass(
