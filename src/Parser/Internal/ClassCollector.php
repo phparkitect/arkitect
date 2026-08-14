@@ -273,13 +273,13 @@ final class ClassCollector
     }
 
     /**
-     * @throws tags resolved two ways: a leading-`\` name is already fully
-     * qualified; a single-segment short name resolves via the file's own
-     * `use` imports. Anything else (multi-segment but not fully qualified,
-     * or an unimported short name) is left alone: without redoing full
-     * namespace resolution there's no reliable way to tell "same-namespace
-     * class" from "typo", and guessing wrong is worse than not extracting
-     * it at all.
+     * Docblock `@throws` tags are resolved two ways: a leading-`\` name is
+     * already fully qualified; a single-segment short name resolves via the
+     * file's own `use` imports. Anything else (multi-segment but not fully
+     * qualified, or an unimported short name) is left alone: without
+     * redoing full namespace resolution there's no reliable way to tell
+     * "same-namespace class" from "typo", and guessing wrong is worse than
+     * not extracting it at all.
      *
      * @param list<Node>            $nodes
      * @param array<string,string>  $imports short name => FQCN

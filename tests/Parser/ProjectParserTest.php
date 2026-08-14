@@ -23,25 +23,6 @@ final class ProjectParserTest extends TestCase
         $this->removeDir($this->root);
     }
 
-    private function removeDir(string $dir): void
-    {
-        foreach (scandir($dir) as $entry) {
-            if ('.' === $entry || '..' === $entry) {
-                continue;
-            }
-            $path = $dir.'/'.$entry;
-            is_dir($path) ? $this->removeDir($path) : unlink($path);
-        }
-        rmdir($dir);
-    }
-
-    private function writeFile(string $relativePath, string $content): void
-    {
-        $fullPath = $this->root.'/'.$relativePath;
-        @mkdir(\dirname($fullPath), recursive: true);
-        file_put_contents($fullPath, $content);
-    }
-
     public function test_an_empty_directory_produces_no_classes(): void
     {
         $result = (new ProjectParser())->parse($this->root, TargetPhpVersion::create('8.5'));
@@ -100,16 +81,35 @@ final class ProjectParserTest extends TestCase
     public function test_an_unreadable_file_produces_a_parsing_error_not_a_crash(): void
     {
         $this->writeFile('src/Locked.php', "<?php\nnamespace App;\nclass Locked {}\n");
-        chmod($this->root.'/src/Locked.php', 0000);
+        chmod($this->root.'/src/Locked.php', 0o000);
 
         try {
             $result = (new ProjectParser())->parse($this->root, TargetPhpVersion::create('8.5'));
         } finally {
-            chmod($this->root.'/src/Locked.php', 0644);
+            chmod($this->root.'/src/Locked.php', 0o644);
         }
 
         self::assertSame([], $result->classes);
         self::assertCount(1, $result->errors);
         self::assertSame('src/Locked.php', $result->errors[0]->filePath);
+    }
+
+    private function removeDir(string $dir): void
+    {
+        foreach (scandir($dir) as $entry) {
+            if ('.' === $entry || '..' === $entry) {
+                continue;
+            }
+            $path = $dir.'/'.$entry;
+            is_dir($path) ? $this->removeDir($path) : unlink($path);
+        }
+        rmdir($dir);
+    }
+
+    private function writeFile(string $relativePath, string $content): void
+    {
+        $fullPath = $this->root.'/'.$relativePath;
+        @mkdir(\dirname($fullPath), recursive: true);
+        file_put_contents($fullPath, $content);
     }
 }

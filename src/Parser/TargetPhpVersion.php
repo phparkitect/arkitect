@@ -13,9 +13,7 @@ final class TargetPhpVersion
     private function __construct(string $version)
     {
         if (!\in_array($version, self::VALID, true)) {
-            throw new \InvalidArgumentException(
-                "Invalid target PHP version '$version', expected one of: ".implode(', ', self::VALID)
-            );
+            throw new \InvalidArgumentException("Invalid target PHP version '$version', expected one of: ".implode(', ', self::VALID));
         }
 
         $this->version = $version;

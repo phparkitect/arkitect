@@ -11,12 +11,6 @@ use PHPUnit\Framework\TestCase;
 
 final class CollectTest extends TestCase
 {
-    /** @return list<string> */
-    private function names(iterable $refs): array
-    {
-        return array_map(static fn ($t) => $t->name, [...$refs]);
-    }
-
     public function test_a_file_with_no_class_produces_no_classes(): void
     {
         $result = (new Parser())->parse('<?php $x = 1;', 'test.php', TargetPhpVersion::create('8.5'));
@@ -304,5 +298,11 @@ final class CollectTest extends TestCase
 
         self::assertCount(1, $result->classes[0]->docBlocks);
         self::assertStringContainsString('@Assert\NotBlank', $result->classes[0]->docBlocks[0]);
+    }
+
+    /** @return list<string> */
+    private function names(iterable $refs): array
+    {
+        return array_map(static fn ($t) => $t->name, [...$refs]);
     }
 }

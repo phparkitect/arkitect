@@ -13,37 +13,6 @@ use PHPUnit\Framework\TestCase;
 
 final class ParserTest extends TestCase
 {
-    private function parse(string $code, string $targetPhpVersion = '8.4', string $filePath = 'test.php'): ParseResult
-    {
-        return (new Parser())->parse($code, $filePath, TargetPhpVersion::create($targetPhpVersion));
-    }
-
-    /** @return list<ParsedClass> */
-    private function classesOf(string $code, string $targetPhpVersion = '8.4'): array
-    {
-        return $this->parse($code, $targetPhpVersion)->classes;
-    }
-
-    private function onlyClassOf(string $code, string $targetPhpVersion = '8.4'): ParsedClass
-    {
-        $classes = $this->classesOf($code, $targetPhpVersion);
-        self::assertCount(1, $classes, 'expected exactly one parsed class');
-
-        return $classes[0];
-    }
-
-    /** @return list<string> */
-    private function names(iterable $refs): array
-    {
-        return array_map(static fn ($t) => $t->name, [...$refs]);
-    }
-
-    /** @return list<string> */
-    private function dependencyNames(ParsedClass $class): array
-    {
-        return $this->names($class->dependencies);
-    }
-
     public function test_parses_class_name_and_its_own_declaration_line(): void
     {
         $class = $this->onlyClassOf(<<<'PHP'
@@ -539,5 +508,36 @@ final class ParserTest extends TestCase
         self::assertSame([], $result->classes);
         self::assertNotEmpty($result->errors);
         self::assertSame('test.php', $result->errors[0]->filePath);
+    }
+
+    private function parse(string $code, string $targetPhpVersion = '8.4', string $filePath = 'test.php'): ParseResult
+    {
+        return (new Parser())->parse($code, $filePath, TargetPhpVersion::create($targetPhpVersion));
+    }
+
+    /** @return list<ParsedClass> */
+    private function classesOf(string $code, string $targetPhpVersion = '8.4'): array
+    {
+        return $this->parse($code, $targetPhpVersion)->classes;
+    }
+
+    private function onlyClassOf(string $code, string $targetPhpVersion = '8.4'): ParsedClass
+    {
+        $classes = $this->classesOf($code, $targetPhpVersion);
+        self::assertCount(1, $classes, 'expected exactly one parsed class');
+
+        return $classes[0];
+    }
+
+    /** @return list<string> */
+    private function names(iterable $refs): array
+    {
+        return array_map(static fn ($t) => $t->name, [...$refs]);
+    }
+
+    /** @return list<string> */
+    private function dependencyNames(ParsedClass $class): array
+    {
+        return $this->names($class->dependencies);
     }
 }
