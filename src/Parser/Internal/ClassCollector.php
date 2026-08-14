@@ -167,9 +167,7 @@ final class ClassCollector
     }
 
     /**
-     * Every type name referenced anywhere in the given nodes. Called once,
-     * with a found class's own body as the root — never with anything a
-     * class doesn't own.
+     * Every type name referenced anywhere in the given nodes.
      *
      * @param list<Node> $nodes
      *

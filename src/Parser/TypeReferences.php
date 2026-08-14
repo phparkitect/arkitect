@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace Arkitect\Parser;
 
 /**
- * A typed collection of TypeReference — the only thing a bare array can't
- * do here is stop something other than a TypeReference from ending up in
- * extends/implements/traits/dependencies/attributes. No query methods:
- * those belong wherever the first real need for one shows up.
+ * No query methods: those belong wherever the first real need for one
+ * shows up.
  *
  * @implements \IteratorAggregate<int, TypeReference>
  */
