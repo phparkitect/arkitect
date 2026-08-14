@@ -46,32 +46,32 @@ final class ClassCollector
 
             if (null !== $declaration) {
                 $ownDocBlock = null !== $node->getDocComment() ? [$node->getDocComment()->getText()] : [];
-                $ownAttributes = $this->collectDependencies($declaration['attrGroups']);
-                $traits = $this->collectTraits($declaration['stmts']);
+                $ownAttributes = $this->collectDependencies($declaration->attrGroups);
+                $traits = $this->collectTraits($declaration->stmts);
 
                 $classes[] = new ParsedClass(
-                    fqcn: $declaration['fqcn'],
+                    fqcn: $declaration->fqcn,
                     line: $node->getLine(),
                     filePath: $filePath,
-                    kind: $declaration['kind'],
-                    extends: new TypeReferences(...$declaration['extends']),
-                    implements: new TypeReferences(...$declaration['implements']),
+                    kind: $declaration->kind,
+                    extends: new TypeReferences(...$declaration->extends),
+                    implements: new TypeReferences(...$declaration->implements),
                     traits: new TypeReferences(...$traits),
                     dependencies: new TypeReferences(
-                        ...$declaration['extends'],
-                        ...$declaration['implements'],
+                        ...$declaration->extends,
+                        ...$declaration->implements,
                         ...$traits,
                         ...$ownAttributes,
-                        ...$this->collectDependencies($declaration['stmts']),
-                        ...$this->collectThrowsDependencies($declaration['stmts'], $imports),
+                        ...$this->collectDependencies($declaration->stmts),
+                        ...$this->collectThrowsDependencies($declaration->stmts, $imports),
                     ),
                     attributes: new TypeReferences(...$ownAttributes),
-                    docBlocks: array_merge($ownDocBlock, $this->collectDocBlocks($declaration['stmts'])),
-                    isFinal: $declaration['isFinal'],
-                    isReadonly: $declaration['isReadonly'],
-                    isAbstract: $declaration['isAbstract'],
+                    docBlocks: array_merge($ownDocBlock, $this->collectDocBlocks($declaration->stmts)),
+                    isFinal: $declaration->isFinal,
+                    isReadonly: $declaration->isReadonly,
+                    isAbstract: $declaration->isAbstract,
                 );
-                $classes = array_merge($classes, $this->findClasses($declaration['stmts'], $filePath, $imports));
+                $classes = array_merge($classes, $this->findClasses($declaration->stmts, $filePath, $imports));
 
                 continue;
             }
@@ -87,67 +87,53 @@ final class ClassCollector
      * into one shape, so the rest of the walk doesn't need to know which
      * kind it's looking at. Returns null for anything that isn't a named
      * class-like declaration (including anonymous classes).
-     *
-     * @return array{fqcn: string, stmts: list<Node>, attrGroups: list<Node\AttributeGroup>, kind: ClassKind, extends: list<TypeReference>, implements: list<TypeReference>, isFinal: bool, isReadonly: bool, isAbstract: bool}|null
      */
-    private function declarationOf(Node $node): ?array
+    private function declarationOf(Node $node): ?Declaration
     {
-        $base = [
-            'extends' => [],
-            'implements' => [],
-            'isFinal' => false,
-            'isReadonly' => false,
-            'isAbstract' => false,
-        ];
-
         if ($node instanceof Node\Stmt\Class_ && !$node->isAnonymous() && null !== $node->namespacedName) {
-            return [
-                ...$base,
-                'fqcn' => $node->namespacedName->toCodeString(),
-                'stmts' => $node->stmts,
+            return new Declaration(
+                fqcn: $node->namespacedName->toCodeString(),
+                stmts: $node->stmts,
                 // attribute groups on the declaration itself (`#[X] class Foo`) are a
                 // property of $node, not part of $node->stmts — same reason $node's own
                 // doc comment needs separate handling from collectDocBlocks($stmts)
-                'attrGroups' => $node->attrGroups,
-                'kind' => ClassKind::RegularClass,
-                'extends' => null !== $node->extends ? [new TypeReference($node->extends->toString(), $node->extends->getLine())] : [],
-                'implements' => $this->namesToReferences($node->implements),
-                'isFinal' => $node->isFinal(),
-                'isReadonly' => $node->isReadonly(),
-                'isAbstract' => $node->isAbstract(),
-            ];
+                attrGroups: $node->attrGroups,
+                kind: ClassKind::RegularClass,
+                extends: null !== $node->extends ? [new TypeReference($node->extends->toString(), $node->extends->getLine())] : [],
+                implements: $this->namesToReferences($node->implements),
+                isFinal: $node->isFinal(),
+                isReadonly: $node->isReadonly(),
+                isAbstract: $node->isAbstract(),
+            );
         }
 
         if ($node instanceof Node\Stmt\Interface_ && null !== $node->namespacedName) {
-            return [
-                ...$base,
-                'fqcn' => $node->namespacedName->toCodeString(),
-                'stmts' => $node->stmts,
-                'attrGroups' => $node->attrGroups,
-                'kind' => ClassKind::Interface,
-                'extends' => $this->namesToReferences($node->extends),
-            ];
+            return new Declaration(
+                fqcn: $node->namespacedName->toCodeString(),
+                stmts: $node->stmts,
+                attrGroups: $node->attrGroups,
+                kind: ClassKind::Interface,
+                extends: $this->namesToReferences($node->extends),
+            );
         }
 
         if ($node instanceof Node\Stmt\Trait_ && null !== $node->namespacedName) {
-            return [
-                ...$base,
-                'fqcn' => $node->namespacedName->toCodeString(),
-                'stmts' => $node->stmts,
-                'attrGroups' => $node->attrGroups,
-                'kind' => ClassKind::Trait,
-            ];
+            return new Declaration(
+                fqcn: $node->namespacedName->toCodeString(),
+                stmts: $node->stmts,
+                attrGroups: $node->attrGroups,
+                kind: ClassKind::Trait,
+            );
         }
 
         if ($node instanceof Node\Stmt\Enum_ && null !== $node->namespacedName) {
-            return [
-                ...$base,
-                'fqcn' => $node->namespacedName->toCodeString(),
-                'stmts' => $node->stmts,
-                'attrGroups' => $node->attrGroups,
-                'kind' => ClassKind::Enum,
-                'implements' => $this->namesToReferences($node->implements),
-            ];
+            return new Declaration(
+                fqcn: $node->namespacedName->toCodeString(),
+                stmts: $node->stmts,
+                attrGroups: $node->attrGroups,
+                kind: ClassKind::Enum,
+                implements: $this->namesToReferences($node->implements),
+            );
         }
 
         return null;
