@@ -42,4 +42,12 @@ final class ParsedClass
 
         return false === $lastSeparator ? $this->fqcn : substr($this->fqcn, $lastSeparator + 1);
     }
+
+    /** Empty for a class declared in the global namespace. */
+    public function namespaceName(): string
+    {
+        $lastSeparator = strrpos($this->fqcn, '\\');
+
+        return false === $lastSeparator ? '' : substr($this->fqcn, 0, $lastSeparator);
+    }
 }

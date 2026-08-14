@@ -12,15 +12,18 @@ use Arkitect\Parser\TypeReferences;
 final class ParsedClassFixture
 {
     /**
-     * @param list<string> $extends
-     * @param list<string> $implements
-     * @param list<string> $traits
+     * @param list<string>        $extends
+     * @param list<string>        $implements
+     * @param list<string>        $traits
+     * @param array<string, int>  $dependencies FQCN => the line it is referenced on, since
+     *                                          dependency violations are asserted per line
      */
     public static function create(
         string $fqcn,
         array $extends = [],
         array $implements = [],
         array $traits = [],
+        array $dependencies = [],
         bool $isFinal = false,
         bool $isReadonly = false,
         bool $isAbstract = false,
@@ -36,7 +39,13 @@ final class ParsedClassFixture
             extends: self::references($extends, $line),
             implements: self::references($implements, $line),
             traits: self::references($traits, $line),
-            dependencies: new TypeReferences(),
+            dependencies: new TypeReferences(
+                ...array_map(
+                    static fn (string $name, int $at) => new TypeReference($name, $at),
+                    array_keys($dependencies),
+                    array_values($dependencies)
+                )
+            ),
             attributes: new TypeReferences(),
             docBlocks: [],
             isFinal: $isFinal,

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Evaluate;
 
 use Arkitect\Parser\ParsedClass;
+use Arkitect\Parser\TypeReference;
 
 /**
  * Structured, not a rendered sentence: the baseline keys on this data, so
@@ -39,6 +40,29 @@ final class Violation
             fqcn: $class->fqcn,
             filePath: $class->filePath,
             line: $class->line,
+            expression: $expression,
+            detail: $detail,
+        );
+    }
+
+    /**
+     * For an expression that found its problem at one specific referenced
+     * type: the violation points at that reference's line rather than at
+     * the class, so a class with several bad dependencies reports each one
+     * where it actually appears.
+     *
+     * @param class-string<Expression> $expression
+     */
+    public static function createAt(
+        ParsedClass $class,
+        TypeReference $reference,
+        string $expression,
+        string $detail,
+    ): self {
+        return new self(
+            fqcn: $class->fqcn,
+            filePath: $class->filePath,
+            line: $reference->line,
             expression: $expression,
             detail: $detail,
         );
