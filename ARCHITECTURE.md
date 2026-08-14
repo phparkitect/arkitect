@@ -326,33 +326,22 @@ you wait).
 
 ## Parser component: design note
 
-First attempt at the collecting engine ported `FileVisitor`'s shape
-(dispatch-per-node-type methods over a `NodeVisitorAbstract`, a stack of
-mutable accumulators to fix the leak bug). It worked, but was flagged as
-not clearly better than what it replaced — still one stateful object being
-mutated by a long sequence of callbacks, just with a stack instead of a
-single shared builder.
-
-Rebuilt with actual TDD (one failing test at a time, no upfront design),
-landed on something structurally different: `ClassCollector` holds **no
-instance state at all** — every method is a pure function of its
-arguments. Declarations and the facts inside them are found by two
+`ClassCollector` holds no instance state — every method is a pure function
+of its arguments. Declarations and the facts inside them come from two
 independent recursive walks: `findClasses` looks for named class-like
 declarations; `collectDependencies`/`collectTraits`/`collectDocBlocks` look
 for facts inside *one* declaration's own body, and are only ever called
 with that body as their root. The state-leak bug (a top-level function's
-parameter attaching to the next class) isn't prevented by a check — the
-fix in the first attempt was `if (stack empty) return;` repeated at every
-call site — it's structurally impossible: there is no code path that hands
-a top-level function's body to the dependency walk. Confirmed by writing
-the regression test *after* the design existed, expecting to have to add a
-guard, and it passed unmodified.
+parameter attaching to the next class, see the reproduction above) is
+structurally impossible as a result, not guarded against: there is no code
+path that hands a top-level function's body to the dependency walk.
 
-125 fewer lines than porting the old shape, one file instead of two,
-zero mutable fields instead of a stack. Kept as the resolved shape for
-this component; see `tests/Parser/CollectTest.php` for the scenario-by-
-scenario TDD trail and `tests/Parser/ParserTest.php` for the broader
-scenario suite it was checked against.
+A stateful alternative — a `NodeVisitorAbstract` with a stack of mutable
+accumulators, scoped via push/pop on entering/leaving a declaration — also
+fixes the leak, but by checking "is the stack empty" at every call site
+rather than by construction: a guard that has to be remembered at each new
+call site, not a state that can't exist. Rejected for that reason; don't
+reintroduce it.
 
 ## Parser component: @throws resolution
 
