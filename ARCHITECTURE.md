@@ -363,18 +363,25 @@ right thing, confirmed by tests rather than assumed.
 Set before writing implementation code, so the PoC has a defined end instead
 of expanding into "the whole 2.0":
 
-1. The syntax-edge-case scenarios in `CanParseClassTest.php` and the E2E
-   fixtures are re-implemented as fresh tests against the new parse stage,
-   and pass — ported as scenarios, not as code.
-2. The state-leak case above (`Innocent` must report zero dependencies) is
-   fixed.
-3. `IsA` (and the rest of the inheritance family) answers purely from the
-   resolved graph — no runtime call, provably (e.g. works correctly even
-   when the target class isn't autoloadable in the process running
-   `phparkitect`).
-4. The resulting code reads as well-organized on review — no mutable
-   shared state standing in for return values, clear separation between the
-   four stages. This is a qualitative call, not a metric, and it is the
-   primary bar for this PoC given performance is explicitly deferred (see
-   above) — a fast but tangled result does not pass; a clean but unoptimized
-   one does.
+1. **Partially met, differently than planned.** The formal extraction of
+   `CanParseClassTest.php`/E2E fixtures into a checklist was skipped (user's
+   call — recover from `main` if a gap ever surfaces). Coverage happened a
+   different way instead: `ParserTest.php` (written from `FileVisitor`
+   knowledge) and `CollectTest.php` (the TDD trail) together cover
+   nullable/union/intersection/DNF types, attributes, docblocks, property
+   hooks, anonymous classes, `@throws` resolution — a broad set, just not
+   verified against the literal old test names.
+2. **Met.** The state-leak case (`Innocent` reporting zero dependencies) is
+   fixed structurally, with a regression test (`ParserTest`/`CollectTest`).
+3. **Met.** `Symbols::isA()` (`src/Resolve/Symbols.php`) answers purely
+   from the parsed set — no reflection, no `is_a()`, no autoloading.
+   Verified against this repo's own `vendor/`: a real two-hop `extends`
+   chain resolves correctly, and querying an unrelated target through a
+   chain that passes through an unparsed core class correctly comes back
+   `Unknown` rather than a guessed `No`.
+4. **Ongoing, not a one-time checkbox.** The resulting code reads as
+   well-organized on review — no mutable shared state standing in for
+   return values, clear separation between stages. Qualitative, not a
+   metric, and the primary bar for this PoC given performance is explicitly
+   deferred (see above) — a fast but tangled result does not pass; a clean
+   but unoptimized one does.
