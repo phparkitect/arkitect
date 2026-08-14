@@ -1,4 +1,0 @@
-build:
-    environment:
-        php: 8.0
-
