@@ -11,6 +11,12 @@ use PHPUnit\Framework\TestCase;
 
 final class CollectTest extends TestCase
 {
+    /** @return list<string> */
+    private function names(iterable $refs): array
+    {
+        return array_map(static fn ($t) => $t->name, [...$refs]);
+    }
+
     public function test_a_file_with_no_class_produces_no_classes(): void
     {
         $result = (new Parser())->parse('<?php $x = 1;', 'test.php', TargetPhpVersion::create('8.5'));
@@ -40,7 +46,7 @@ final class CollectTest extends TestCase
             PHP, 'test.php', TargetPhpVersion::create('8.5'));
 
         self::assertCount(1, $result->classes);
-        self::assertSame(['App\Infra\Db'], array_map(static fn ($d) => $d->name, $result->classes[0]->dependencies));
+        self::assertSame(['App\Infra\Db'], $this->names($result->classes[0]->dependencies));
     }
 
     public function test_a_top_level_function_parameter_does_not_leak_into_the_next_class(): void
@@ -59,7 +65,7 @@ final class CollectTest extends TestCase
 
         self::assertCount(1, $result->classes);
         self::assertSame('App\Innocent', $result->classes[0]->fqcn);
-        self::assertSame([], $result->classes[0]->dependencies);
+        self::assertCount(0, $result->classes[0]->dependencies);
     }
 
     public function test_extends_and_implements_are_dependencies(): void
@@ -76,9 +82,9 @@ final class CollectTest extends TestCase
             PHP, 'test.php', TargetPhpVersion::create('8.5'));
 
         $class = $result->classes[0];
-        self::assertSame(['App\Base'], array_map(static fn ($t) => $t->name, $class->extends));
-        self::assertSame(['App\Contract'], array_map(static fn ($t) => $t->name, $class->implements));
-        self::assertSame(['App\Base', 'App\Contract'], array_map(static fn ($t) => $t->name, $class->dependencies));
+        self::assertSame(['App\Base'], $this->names($class->extends));
+        self::assertSame(['App\Contract'], $this->names($class->implements));
+        self::assertSame(['App\Base', 'App\Contract'], $this->names($class->dependencies));
     }
 
     public function test_trait_use_is_a_dependency(): void
@@ -95,8 +101,8 @@ final class CollectTest extends TestCase
             PHP, 'test.php', TargetPhpVersion::create('8.5'));
 
         $class = $result->classes[0];
-        self::assertSame(['App\Loggable'], array_map(static fn ($t) => $t->name, $class->traits));
-        self::assertSame(['App\Loggable'], array_map(static fn ($t) => $t->name, $class->dependencies));
+        self::assertSame(['App\Loggable'], $this->names($class->traits));
+        self::assertSame(['App\Loggable'], $this->names($class->dependencies));
     }
 
     public function test_interface_enum_and_trait_are_collected_and_flagged(): void
@@ -117,14 +123,14 @@ final class CollectTest extends TestCase
         $iface = $result->classes[0];
         self::assertSame('App\Iface', $iface->fqcn);
         self::assertSame(ClassKind::Interface, $iface->kind);
-        self::assertSame(['App\A'], array_map(static fn ($t) => $t->name, $iface->extends));
+        self::assertSame(['App\A'], $this->names($iface->extends));
 
         $trait = $result->classes[1];
         self::assertSame(ClassKind::Trait, $trait->kind);
 
         $enum = $result->classes[2];
         self::assertSame(ClassKind::Enum, $enum->kind);
-        self::assertSame(['App\HasLabel'], array_map(static fn ($t) => $t->name, $enum->implements));
+        self::assertSame(['App\HasLabel'], $this->names($enum->implements));
     }
 
     public function test_anonymous_class_dependencies_attach_to_the_enclosing_class(): void
@@ -145,7 +151,7 @@ final class CollectTest extends TestCase
 
         self::assertCount(1, $result->classes);
         self::assertSame('App\Factory', $result->classes[0]->fqcn);
-        self::assertSame(['App\Contract'], array_map(static fn ($t) => $t->name, $result->classes[0]->dependencies));
+        self::assertSame(['App\Contract'], $this->names($result->classes[0]->dependencies));
     }
 
     public function test_use_function_and_use_const_are_not_dependencies(): void
@@ -163,7 +169,7 @@ final class CollectTest extends TestCase
             }
             PHP, 'test.php', TargetPhpVersion::create('8.5'));
 
-        self::assertSame(['App\Infra\Db'], array_map(static fn ($d) => $d->name, $result->classes[0]->dependencies));
+        self::assertSame(['App\Infra\Db'], $this->names($result->classes[0]->dependencies));
     }
 
     public function test_property_hook_does_not_prevent_the_property_type_from_being_a_dependency(): void
@@ -191,7 +197,7 @@ final class CollectTest extends TestCase
         // the same type also produce two entries)
         self::assertSame(
             ['App\Infra\Money', 'App\Infra\Money'],
-            array_map(static fn ($d) => $d->name, $result->classes[0]->dependencies)
+            $this->names($result->classes[0]->dependencies)
         );
     }
 
@@ -210,7 +216,7 @@ final class CollectTest extends TestCase
             }
             PHP, 'test.php', TargetPhpVersion::create('8.5'));
 
-        self::assertSame(['App\Infra\DbException'], array_map(static fn ($d) => $d->name, $result->classes[0]->dependencies));
+        self::assertSame(['App\Infra\DbException'], $this->names($result->classes[0]->dependencies));
     }
 
     public function test_at_throws_with_a_short_name_resolves_via_the_files_use_import(): void
@@ -229,7 +235,7 @@ final class CollectTest extends TestCase
             }
             PHP, 'test.php', TargetPhpVersion::create('8.5'));
 
-        self::assertSame(['App\Infra\DbException'], array_map(static fn ($d) => $d->name, $result->classes[0]->dependencies));
+        self::assertSame(['App\Infra\DbException'], $this->names($result->classes[0]->dependencies));
     }
 
     public function test_at_throws_with_an_unimported_short_name_is_not_guessed(): void
@@ -247,7 +253,7 @@ final class CollectTest extends TestCase
             }
             PHP, 'test.php', TargetPhpVersion::create('8.5'));
 
-        self::assertSame([], $result->classes[0]->dependencies);
+        self::assertCount(0, $result->classes[0]->dependencies);
     }
 
     public function test_at_throws_with_a_union_resolves_each_member(): void
@@ -269,7 +275,7 @@ final class CollectTest extends TestCase
 
         self::assertSame(
             ['App\Infra\DbException', 'App\Infra\NetworkException'],
-            array_map(static fn ($d) => $d->name, $result->classes[0]->dependencies)
+            $this->names($result->classes[0]->dependencies)
         );
     }
 

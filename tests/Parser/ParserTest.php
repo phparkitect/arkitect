@@ -33,9 +33,15 @@ final class ParserTest extends TestCase
     }
 
     /** @return list<string> */
+    private function names(iterable $refs): array
+    {
+        return array_map(static fn ($t) => $t->name, [...$refs]);
+    }
+
+    /** @return list<string> */
     private function dependencyNames(ParsedClass $class): array
     {
-        return array_map(static fn ($d) => $d->name, $class->dependencies);
+        return $this->names($class->dependencies);
     }
 
     public function test_parses_class_name_and_its_own_declaration_line(): void
@@ -66,7 +72,7 @@ final class ParserTest extends TestCase
             }
             PHP);
 
-        self::assertSame(['App\Contract'], array_map(static fn ($t) => $t->name, $class->implements));
+        self::assertSame(['App\Contract'], $this->names($class->implements));
         self::assertSame(['App\Contract'], $this->dependencyNames($class));
     }
 
@@ -82,7 +88,7 @@ final class ParserTest extends TestCase
             }
             PHP);
 
-        self::assertSame(['App\Base'], array_map(static fn ($t) => $t->name, $class->extends));
+        self::assertSame(['App\Base'], $this->names($class->extends));
         self::assertSame(['App\Base'], $this->dependencyNames($class));
     }
 
@@ -100,7 +106,7 @@ final class ParserTest extends TestCase
             PHP);
 
         self::assertSame(ClassKind::Interface, $class->kind);
-        self::assertSame(['App\A', 'App\B'], array_map(static fn ($t) => $t->name, $class->extends));
+        self::assertSame(['App\A', 'App\B'], $this->names($class->extends));
     }
 
     public function test_trait_use_is_a_dependency(): void
@@ -116,7 +122,7 @@ final class ParserTest extends TestCase
             }
             PHP);
 
-        self::assertSame(['App\Loggable'], array_map(static fn ($t) => $t->name, $class->traits));
+        self::assertSame(['App\Loggable'], $this->names($class->traits));
         self::assertSame(['App\Loggable'], $this->dependencyNames($class));
     }
 
@@ -153,7 +159,7 @@ final class ParserTest extends TestCase
 
         self::assertSame(ClassKind::Enum, $class->kind);
         self::assertSame('App\Status', $class->fqcn);
-        self::assertSame(['App\HasLabel'], array_map(static fn ($t) => $t->name, $class->implements));
+        self::assertSame(['App\HasLabel'], $this->names($class->implements));
     }
 
     public function test_typed_property_dependency(): void
@@ -420,7 +426,7 @@ final class ParserTest extends TestCase
             }
             PHP);
 
-        self::assertSame(['App\Infra\AsCommand'], array_map(static fn ($t) => $t->name, $class->attributes));
+        self::assertSame(['App\Infra\AsCommand'], $this->names($class->attributes));
         self::assertSame(['App\Infra\AsCommand'], $this->dependencyNames($class));
     }
 
@@ -508,7 +514,7 @@ final class ParserTest extends TestCase
             PHP);
 
         self::assertSame('App\Innocent', $class->fqcn);
-        self::assertSame([], $class->dependencies);
+        self::assertCount(0, $class->dependencies);
     }
 
     public function test_php_core_classes_are_not_filtered_out_at_parse_time(): void

@@ -12,25 +12,22 @@ namespace Arkitect\Parser;
 final class ParsedClass
 {
     /**
-     * @param list<TypeReference> $extends       direct parents (interfaces may have more than one)
-     * @param list<TypeReference> $implements
-     * @param list<TypeReference> $traits
-     * @param list<TypeReference> $dependencies   every type name referenced anywhere in the
-     *                                            declaration (includes extends/implements/traits/
-     *                                            attributes too) — unfiltered, no core-class exclusion
-     * @param list<TypeReference> $attributes
-     * @param list<string>        $docBlocks      raw text, unparsed
+     * @param TypeReferences $extends      direct parents (interfaces may have more than one)
+     * @param TypeReferences $dependencies every type name referenced anywhere in the declaration
+     *                                     (includes extends/implements/traits/attributes too) —
+     *                                     unfiltered, no core-class exclusion
+     * @param list<string>   $docBlocks    raw text, unparsed
      */
     public function __construct(
         public readonly string $fqcn,
         public readonly int $line,
         public readonly string $filePath,
         public readonly ClassKind $kind,
-        public readonly array $extends,
-        public readonly array $implements,
-        public readonly array $traits,
-        public readonly array $dependencies,
-        public readonly array $attributes,
+        public readonly TypeReferences $extends,
+        public readonly TypeReferences $implements,
+        public readonly TypeReferences $traits,
+        public readonly TypeReferences $dependencies,
+        public readonly TypeReferences $attributes,
         public readonly array $docBlocks,
         public readonly bool $isFinal,
         public readonly bool $isReadonly,

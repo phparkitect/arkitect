@@ -7,6 +7,7 @@ namespace Arkitect\Parser\Internal;
 use Arkitect\Parser\ClassKind;
 use Arkitect\Parser\ParsedClass;
 use Arkitect\Parser\TypeReference;
+use Arkitect\Parser\TypeReferences;
 use PhpParser\Node;
 
 /**
@@ -53,18 +54,18 @@ final class ClassCollector
                     line: $node->getLine(),
                     filePath: $filePath,
                     kind: $declaration['kind'],
-                    extends: $declaration['extends'],
-                    implements: $declaration['implements'],
-                    traits: $traits,
-                    dependencies: array_merge(
-                        $declaration['extends'],
-                        $declaration['implements'],
-                        $traits,
-                        $ownAttributes,
-                        $this->collectDependencies($declaration['stmts']),
-                        $this->collectThrowsDependencies($declaration['stmts'], $imports),
+                    extends: new TypeReferences(...$declaration['extends']),
+                    implements: new TypeReferences(...$declaration['implements']),
+                    traits: new TypeReferences(...$traits),
+                    dependencies: new TypeReferences(
+                        ...$declaration['extends'],
+                        ...$declaration['implements'],
+                        ...$traits,
+                        ...$ownAttributes,
+                        ...$this->collectDependencies($declaration['stmts']),
+                        ...$this->collectThrowsDependencies($declaration['stmts'], $imports),
                     ),
-                    attributes: $ownAttributes,
+                    attributes: new TypeReferences(...$ownAttributes),
                     docBlocks: array_merge($ownDocBlock, $this->collectDocBlocks($declaration['stmts'])),
                     isFinal: $declaration['isFinal'],
                     isReadonly: $declaration['isReadonly'],
