@@ -273,6 +273,14 @@ you wait).
   as an alternative.
 - `targetPhpVersion()` is optional, defaulting to the running interpreter's
   version — matches today's de facto behavior, made intentional.
+- PHPArkitect 2.0 itself requires PHP `^8.5` to run (`composer.json`). This
+  is independent of `TargetPhpVersion` (8.0–8.5), which is about what PHP
+  version the *analyzed* project targets, not what runs the tool — same
+  distinction PHPStan/Psalm/Rector make: a modern runtime for the tool,
+  older syntax still analyzable. Not a decision to stop supporting
+  8.0–8.4 projects; `TargetPhpVersion`'s range is unchanged. Unlocks writing
+  the tool's own code with `readonly` and other 8.1+ syntax freely, which
+  the parser component now does throughout its value objects.
 - `ClassSet` is removed. A single `root()` replaces it; filtering is
   namespace-based (`that()`) or, exceptionally, path-based
   (`ResideInPath`).
@@ -315,6 +323,51 @@ you wait).
 - **Resolve-graph edge cases** — duplicate FQCNs, inheritance cycles, trait
   conflicts, diamond interfaces: not designed for; handle each when a real
   case surfaces it rather than speculatively now.
+
+## Parser component: design note
+
+First attempt at the collecting engine ported `FileVisitor`'s shape
+(dispatch-per-node-type methods over a `NodeVisitorAbstract`, a stack of
+mutable accumulators to fix the leak bug). It worked, but was flagged as
+not clearly better than what it replaced — still one stateful object being
+mutated by a long sequence of callbacks, just with a stack instead of a
+single shared builder.
+
+Rebuilt with actual TDD (one failing test at a time, no upfront design),
+landed on something structurally different: `ClassCollector` holds **no
+instance state at all** — every method is a pure function of its
+arguments. Declarations and the facts inside them are found by two
+independent recursive walks: `findClasses` looks for named class-like
+declarations; `collectDependencies`/`collectTraits`/`collectDocBlocks` look
+for facts inside *one* declaration's own body, and are only ever called
+with that body as their root. The state-leak bug (a top-level function's
+parameter attaching to the next class) isn't prevented by a check — the
+fix in the first attempt was `if (stack empty) return;` repeated at every
+call site — it's structurally impossible: there is no code path that hands
+a top-level function's body to the dependency walk. Confirmed by writing
+the regression test *after* the design existed, expecting to have to add a
+guard, and it passed unmodified.
+
+125 fewer lines than porting the old shape, one file instead of two,
+zero mutable fields instead of a stack. Kept as the resolved shape for
+this component; see `tests/Parser/CollectTest.php` for the scenario-by-
+scenario TDD trail and `tests/Parser/ParserTest.php` for the broader
+scenario suite it was checked against.
+
+## Parser component: @throws resolution
+
+`@throws` docblock tags are resolved to dependencies two ways: a
+leading-`\` name is already fully qualified; a single-segment short name
+resolves via the file's own `use` imports (built once per file by
+`collectUseImports`, a fourth independent recursive walk following the
+same shape as the others). A short name with no matching import is left
+unresolved — deliberately not guessed as "probably the same namespace":
+without redoing full namespace resolution there's no reliable way to tell
+a same-namespace class from a typo, and getting it wrong silently is worse
+than not extracting it, per *Explicit, never ambiguous*. Property hooks
+(PHP 8.4) and `use function`/`use const` needed no special handling — the
+existing per-node-kind dispatch and the generic recursion already do the
+right thing, confirmed by tests rather than assumed.
 
 ## PoC exit criteria
 
