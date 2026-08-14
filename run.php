@@ -16,8 +16,8 @@ declare(strict_types=1);
 require __DIR__.'/vendor/autoload.php';
 
 use Arkitect\FileSystem\FilesystemFileRepository;
-use Arkitect\Parser\ProjectParser;
 use Arkitect\Parser\TargetPhpVersion;
+use Arkitect\ProjectParser;
 
 $path = $argv[1] ?? 'src';
 

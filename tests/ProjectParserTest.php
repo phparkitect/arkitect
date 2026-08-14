@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Tests\Parser;
+namespace Arkitect\Tests;
 
-use Arkitect\Parser\ProjectParser;
 use Arkitect\Parser\TargetPhpVersion;
+use Arkitect\ProjectParser;
 use Arkitect\Tests\FileSystem\InMemoryFileRepository;
 use PHPUnit\Framework\TestCase;
 

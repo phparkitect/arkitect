@@ -2,9 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Parser;
+namespace Arkitect;
 
 use Arkitect\FileSystem\FileRepository;
+use Arkitect\Parser\Parser;
+use Arkitect\Parser\ParseResult;
+use Arkitect\Parser\ParsingError;
+use Arkitect\Parser\TargetPhpVersion;
 
 final class ProjectParser
 {
