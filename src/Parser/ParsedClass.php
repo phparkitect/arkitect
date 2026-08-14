@@ -34,4 +34,12 @@ final class ParsedClass
         public readonly bool $isAbstract,
     ) {
     }
+
+    /** The declared name without its namespace. */
+    public function shortName(): string
+    {
+        $lastSeparator = strrpos($this->fqcn, '\\');
+
+        return false === $lastSeparator ? $this->fqcn : substr($this->fqcn, $lastSeparator + 1);
+    }
 }
