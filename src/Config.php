@@ -16,14 +16,7 @@ use Arkitect\Evaluate\Rule;
  */
 final class Config
 {
-    /**
-     * The root is a constructor argument, not a fluent step: it is required,
-     * and PHP already refuses to build an object without a required
-     * argument. Optional settings are the fluent ones, so a config file
-     * shows at a glance what has to be given and what does not.
-     *
-     * @param list<Rule> $rules
-     */
+    /** @param list<Rule> $rules */
     public function __construct(
         public readonly string $root,
         public readonly array $rules = [],

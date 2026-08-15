@@ -8,21 +8,9 @@ use Arkitect\Parser\ParsedClass;
 use Arkitect\Resolve\ClassGraph;
 
 /**
- * What a rule talks about, as opposed to what it requires. A selector can
- * never produce a violation — a class it doesn't match is simply not this
- * rule's business — which is why nothing in this namespace knows Violation
- * exists.
- *
- * Selectors and constraints are separate types, and separate classes even
- * where they share a name. v1 used one type in both positions and needed
- * appliesTo() to tell them apart at runtime, which is where that method's
- * dual meaning came from: "excluded from the selector" in that(),
- * "vacuously true" in should(). Here the position has a type.
- *
- * The split also lets the same question have two different answers: an
- * unresolvable ancestor chain is reported per class by a constraint, while
- * for a selector it decides nothing at all — hence Selection::Unresolved
- * rather than a bool.
+ * What a rule talks about, as opposed to what it requires. A selector never
+ * produces a violation, and nothing in this namespace knows Violation
+ * exists — run.php checks that as a rule.
  */
 interface Selector
 {

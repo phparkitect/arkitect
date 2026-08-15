@@ -8,17 +8,11 @@ use Arkitect\Evaluate\RuleResult;
 use Arkitect\Parser\ParseResult;
 
 /**
- * Written for the run that fails, since that is the only one anybody reads.
- * A clean run is one line.
+ * Written for the run that fails; a clean run is one line.
  *
- * Violations are grouped under the rule's reason so it is read once rather
- * than repeated on every line, which is what makes a 400-violation report
- * unreadable in v1. Each line leads with `file:line` because that is the
- * part terminals and IDEs turn into a link, and everything is ordered by
- * file then line so two runs over the same code produce the same bytes.
- *
- * Rules that pass are not printed at all: ten green lines hide the two red
- * ones, and the summary already says how many rules ran.
+ * `file:line` leads every line because that is the part terminals and IDEs
+ * turn into a link, and the order is deterministic because the baseline
+ * will depend on it. The rest of the reasoning is in ARCHITECTURE.md.
  */
 final class TextReport
 {

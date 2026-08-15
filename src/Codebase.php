@@ -9,19 +9,11 @@ use Arkitect\Parser\ParseResult;
 use Arkitect\Resolve\ClassGraph;
 
 /**
- * One parse, two views of it, which is the whole reason this exists: names
- * resolve against everything that was parsed, while rules may only judge
- * the project's own code.
+ * One parse, two views of it: names resolve against everything parsed,
+ * while rules may only judge the project's own code.
  *
- * Both are needed and they are not the same set. `vendor/` has to be parsed
- * or inheritance cannot be resolved — a project class extending a vendor
- * class needs that class's own ancestors. It must not be judged, or a
- * config that forgets a namespace selector reports thousands of violations
- * in code its author cannot change.
- *
- * The `vendor/` rule lives here rather than in `Config` because nobody
- * declared it: it is our policy, not the user's input. It moves to `Config`
- * the day it becomes something a project can override.
+ * The `vendor/` rule is here and not in `Config` because nobody declared
+ * it. Move it there if a project ever needs to override it.
  */
 final class Codebase
 {

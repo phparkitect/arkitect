@@ -9,25 +9,14 @@ use Arkitect\Parser\ParsedClass;
 use Arkitect\Resolve\ClassGraph;
 
 /**
- * What a rule requires of the classes it selected. Returns what it found
- * rather than mutating an accumulator handed to it, which is what lets
- * Violations be immutable.
+ * What a rule requires of the classes it selected.
  *
- * The return is an `Outcome`, not `Violations`, because a constraint has
- * two different things to report: what the class got wrong, and what it
- * couldn't determine because an ancestor was never parsed. The second is a
- * problem with our input, not with the class, and must not reach a
- * baseline as though it were a violation.
+ * An `Outcome` and not `Violations`: what a class got wrong and what could
+ * not be determined about it are different claims, and only the first may
+ * reach a baseline.
  *
- * A constraint is strictly richer than a predicate, which is why it is not
- * the same contract as Selector: DependOnlyOnTheseNamespaces reports one
- * violation per offending dependency, each on its own line, and no boolean
- * expresses that.
- *
- * `ClassGraph` is a parameter rather than a constructor dependency because
- * constraints are built by the config, which is read before anything is
- * parsed — the graph doesn't exist yet at construction time. Constraints
- * that answer from the declaration alone ignore it.
+ * `ClassGraph` is a parameter and not a constructor dependency because the
+ * config builds constraints before anything has been parsed.
  */
 interface Constraint
 {

@@ -31,9 +31,8 @@ final class Violation
         string $constraint,
         public readonly string $detail,
     ) {
-        // fqcn, filePath and line arrive from an already-valid ParsedClass or
-        // TypeReference, which is what the private constructor guarantees;
-        // these two are the only things a caller still chooses freely
+        // the location comes from an already-valid ParsedClass or
+        // TypeReference; these two are what a caller still chooses
         $this->constraint = (new Fqcn($constraint))->toString();
 
         if ('' === trim($detail)) {

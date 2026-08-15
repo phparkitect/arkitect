@@ -8,17 +8,9 @@ use Arkitect\Evaluate\Constraint\Constraint;
 use Arkitect\Evaluate\Selector\Selector;
 
 /**
- * A rule being written, before it says anything a run could check.
- *
- * It exists so `Rule` never does: in v1 `Rule::allClasses()` handed back a
- * Rule that had no constraint yet and was mutated into shape, which is a
- * half-built object of exactly the kind a constructor should make
- * impossible. Here the incomplete states have their own types, and the only
- * way to reach a `Rule` is through `because()`.
- *
- * Selectors arrive one at a time — `that()` then `andThat()` — rather than
- * as a list, because the single-selector case is the common one and reads
- * better without brackets.
+ * A rule being written. It exists so that `Rule` is never a half-built
+ * object: the incomplete states have their own types, and `because()` is
+ * the only way out of them.
  */
 final class RuleDraft
 {

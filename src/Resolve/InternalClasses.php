@@ -5,20 +5,13 @@ declare(strict_types=1);
 namespace Arkitect\Resolve;
 
 /**
- * Internal in PHP's own sense (`ReflectionClass::isInternal()`): compiled
- * into the interpreter or provided by an extension, and therefore with no
- * PHP source anywhere. That covers `RuntimeException` and `ArrayObject`,
- * but equally `PDO` or `Redis` — which is why this isn't called "core".
+ * Internal in PHP's own sense (`ReflectionClass::isInternal()`): no PHP
+ * source anywhere, which covers extension classes like `PDO` as well as
+ * `RuntimeException` — hence not "core".
  *
- * The one place allowed to ask the PHP runtime a question. Parsing is
- * deliberately free of runtime calls so its output is identical on every
- * machine and can be cached; this check can't be, so it lives here, in a
- * stage that is neither cached nor shared (ARCHITECTURE.md, stage 1).
- *
- * Two things depend on it. Dependency rules would otherwise flag
- * `\DateTimeImmutable` as forbidden; and ClassGraph would otherwise answer
- * Unknown for every class descending from an internal one, which is every
- * custom exception ever written.
+ * The one place allowed to ask the PHP runtime a question. Keep it out of
+ * parsing, whose output has to be identical on every machine to be
+ * cacheable.
  */
 final class InternalClasses
 {

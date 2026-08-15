@@ -5,19 +5,16 @@ declare(strict_types=1);
 namespace Arkitect\Evaluate;
 
 /**
- * Carries how many classes the rule actually looked at, not just what it
- * found. A rule whose selectors match nothing produces no violations, and
- * so does a rule the whole codebase satisfies — the report has to tell
- * those two apart, and this is the only place the difference exists.
+ * What a rule found, and how much it actually looked at — a rule that
+ * matched nothing and a rule the codebase satisfies both report no
+ * violations, and only these counts tell them apart.
  *
- * `selected` and `checked` differ when a constraint couldn't mean anything
- * for some of the classes picked, which is why both are here rather than
- * one number: they fail in different ways and are fixed differently.
+ * `selected` and `checked` differ when a constraint could not mean anything
+ * for some of the classes picked.
  */
 final class RuleResult
 {
     public function __construct(
-        /** The rule's own reason, so a report can title the group without pairing objects up again. */
         public readonly string $because,
         public readonly int $selected,
         public readonly int $checked,
