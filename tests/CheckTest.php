@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Arkitect\Tests;
 
 use Arkitect\Command\Check;
+use Arkitect\Config;
 use Arkitect\Evaluate\Constraint;
 use Arkitect\Evaluate\Rule;
-use Arkitect\Evaluate\Rules;
 use Arkitect\Evaluate\Selector;
 use Arkitect\Parser\RepositoryParser;
-use Arkitect\Parser\TargetPhpVersion;
 use Arkitect\Tests\FileSystem\InMemoryFileRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -89,6 +88,6 @@ final class CheckTest extends TestCase
         }
 
         return (new Check(new RepositoryParser($repository)))
-            ->run(new Rules($rule), TargetPhpVersion::create('8.5'));
+            ->run(Config::create(__DIR__)->add([$rule])->targetPhpVersion('8.5'));
     }
 }

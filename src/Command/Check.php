@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Arkitect\Command;
 
 use Arkitect\Codebase;
+use Arkitect\Config;
 use Arkitect\Evaluate\RuleResults;
-use Arkitect\Evaluate\Rules;
 use Arkitect\Parser\ParsingErrors;
-use Arkitect\Parser\TargetPhpVersion;
 use Arkitect\ProjectParser;
 
 /**
@@ -22,14 +21,14 @@ final class Check
     {
     }
 
-    public function run(Rules $rules, TargetPhpVersion $version): CheckResult
+    public function run(Config $config): CheckResult
     {
-        $parsed = $this->parser->parse($version);
+        $parsed = $this->parser->parse($config->targetPhpVersion);
         $codebase = Codebase::of($parsed);
 
         $results = [];
 
-        foreach ($rules as $rule) {
+        foreach ($config->rules as $rule) {
             $results[] = $rule->check($codebase->ownClasses, $codebase->graph);
         }
 

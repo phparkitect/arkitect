@@ -71,7 +71,7 @@ try {
     exit(2);
 }
 
-$result = (new Check(new RepositoryParser($files)))->run($config->rules, $config->targetPhpVersion);
+$result = (new Check(new RepositoryParser($files)))->run($config);
 
 echo (new TextReport())->render($result), "\n";
 
