@@ -152,14 +152,14 @@ namespace Arkitect\Evaluate\Selector;
 
 interface Selector      // what the rule is about — that()
 {
-    public function matches(ParsedClass $class, ClassGraph $classGraph): bool;
+    public function matches(ParsedClass $class, ClassGraph $classGraph): Selection;
 }
 
 namespace Arkitect\Evaluate\Constraint;
 
 interface Constraint    // what it requires — should(); was void, mutated a param — #670
 {
-    public function evaluate(ParsedClass $class, ClassGraph $classGraph): Violations;
+    public function evaluate(ParsedClass $class, ClassGraph $classGraph): Outcome;
 }
 ```
 
@@ -182,14 +182,34 @@ bearing:
   `that(new DependOnlyOnTheseNamespaces(...))`, which v1 accepted and did
   something incoherent with.
 - The same question gets different answers in the two positions. An
-  unresolvable ancestor chain is a violation for a constraint; for a
-  selector it's a decision about whether to include the class at all. One
-  shared class would have forced those to be the same answer.
+  unresolvable ancestor chain is recorded per class by a constraint; for a
+  selector it decides nothing at all, so `matches()` returns a `Selection`
+  rather than a bool. One shared class would have forced those to be the
+  same answer.
 
 The duplicated names cost nothing in practice: both `ResideInNamespace`
 classes delegate to the same `Pattern` value object, so the logic lives in
 one place. And nothing under `Evaluate\Selector` references `Violation` —
 checked as a rule in `run.php`, not left as an intention.
+
+**"I couldn't tell" is not a violation, and gets its own channel.** A
+violation claims the code breaks a rule; an unresolvable ancestor chain
+says the tool couldn't decide, because our input was incomplete. Folding
+the second into the first had a concrete cost: the baseline keys on
+violations, so a resolution failure could be accepted once and then hidden
+forever, freezing a broken parse scope into the project's accepted state.
+
+So `Constraint::evaluate()` returns an `Outcome` (violations *and*
+unresolved classes), `Selector::matches()` returns `Selection::Unresolved`
+when it can't tell, and `RuleResult` carries both — `isConclusive()` is
+false when anything went unresolved, whatever the violation count.
+
+It is an input error in the same family as `ParsingError`, and that is
+exactly why it is collected rather than thrown: a syntax error in one file
+doesn't cost the report on the other five hundred, and an undecidable
+class shouldn't either. After the stage 2 fix for internal classes this
+should be rare, and when it happens it means one thing — something with
+PHP source wasn't in what we parsed.
 
 Direct vs. transitive is a `Depth` parameter on `Implement`/`Extend`, not
 a second pair of classes: the twin-class route is the wart `#516` already
@@ -349,7 +369,15 @@ you wait).
   runtime) rather than reporting `Unknown` for every descendant of an
   exception. Resolve is not cached, so this does not reintroduce the
   cacheability problem that ruled reflection out of parsing.
-- `Constraint::evaluate()` returns `Violations`. There is no `appliesTo()`:
+- "Could not determine" is never a violation. An unresolvable ancestor
+  chain goes to its own channel (`Outcome::$unresolved`,
+  `RuleResult::$unresolved`, `Selection::Unresolved`) because it is a gap in
+  our input, not a fault in the code — and because a baseline keys on
+  violations, so folding the two together would let a broken parse scope be
+  accepted once and hidden from then on. Collected rather than thrown, for
+  the same reason `ParsingError` is: one undecidable class must not cost the
+  report on everything else.
+- `Constraint::evaluate()` returns an `Outcome`. There is no `appliesTo()`:
   `Selector` and `Constraint` are separate contracts, which is what made
   the method unnecessary rather than merely hard to specify.
 - Every `Violation` carries a line — never null. `ParsedClass` stores its
@@ -406,17 +434,6 @@ you wait).
 - **Cache storage location and invalidation**: project-local directory vs.
   system cache dir; whether `vendor`'s cache invalidates as a block on
   `composer.lock` changes rather than per-file.
-- **What an unknown ancestor means for *selection*.** Settled for
-  constraints: `ClassGraph` answers with the tri-state `Membership`, and
-  `Unknown` produces a violation with its own wording, because a green run
-  must not hide an incomplete parse scope. That decision only became
-  defensible once internal classes stopped producing `Unknown` (stage 2) —
-  before that it would have fired on every custom exception. Unsettled for
-  selectors, which is why `IsA`/`Implement`/`Extend` have no `Selector`
-  counterpart yet: including a class whose ancestry can't be resolved means
-  checking something we're unsure about, excluding it means dropping it in
-  silence. This is the largest remaining gap in stage 3 — "all classes
-  implementing X" is probably the most common selector in real use.
 - **Parse scope vs. check scope**: whether namespace filtering via `that()`
   is enough on its own to keep `vendor/` (parsed, for resolution) out of
   rule checks by default, or whether "what we parse" and "what we check by
@@ -505,15 +522,21 @@ answers definitively instead of `Unknown`.
 ## Evaluate component: design note
 
 `Rule` is deliberately smaller than the eventual public rule. It holds
-selectors and constraints and returns a `RuleResult` carrying `checked`
-plus the violations — enough to prove the split works and to answer the
-zero-matched requirement, and nothing more. Missing on purpose:
+selectors and constraints and returns a `RuleResult` carrying three things
+— `checked`, the violations, and the classes it couldn't decide about —
+which is what it takes to answer both the zero-matched requirement and
+"can this answer be trusted at all" (`isConclusive()`). Missing on purpose:
 
 - **`because()`**. It's the message, and pulling it in opens the whole
-  description/report design, which is stage 4.
+  description/report design, which is stage 4. The only remaining piece
+  genuinely waiting on that stage.
 - **Applicability by kind** (see stage 3). It belongs to `Rule::check()`,
   which is what would do the skipping and the counting.
-- **Graph-backed selectors**, blocked on the `Unknown` question in Open.
+
+One decision worth knowing, since it isn't obvious from the types:
+selectors combine with *and*, so a definite `No` from any of them settles
+the class even when another came back `Unresolved`. The rule isn't about
+that class either way, and reporting it would be noise.
 
 `run.php` runs this codebase's own stage ordering as real rules rather
 than as a demo: parsing depends on neither resolving nor evaluating,
