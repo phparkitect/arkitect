@@ -38,16 +38,12 @@ final class ParsedClass
     /** The declared name without its namespace. */
     public function shortName(): string
     {
-        $lastSeparator = strrpos($this->fqcn, '\\');
-
-        return false === $lastSeparator ? $this->fqcn : substr($this->fqcn, $lastSeparator + 1);
+        return (new Fqcn($this->fqcn))->shortName();
     }
 
     /** Empty for a class declared in the global namespace. */
     public function namespaceName(): string
     {
-        $lastSeparator = strrpos($this->fqcn, '\\');
-
-        return false === $lastSeparator ? '' : substr($this->fqcn, 0, $lastSeparator);
+        return (new Fqcn($this->fqcn))->namespaceName();
     }
 }

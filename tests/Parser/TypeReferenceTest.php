@@ -28,15 +28,20 @@ final class TypeReferenceTest extends TestCase
     }
 
     /**
-     * ClassGraph indexes on this string, so the two spellings would become
-     * two unrelated types — the kind of bug that shows up as a rule quietly
-     * matching nothing.
+     * Normalized, not kept: ClassGraph indexes on this string, so the two
+     * spellings would otherwise become two unrelated types — the kind of bug
+     * that shows up as a rule quietly matching nothing.
      */
-    public function test_a_leading_separator_is_rejected(): void
+    public function test_a_leading_separator_is_normalized_away(): void
+    {
+        self::assertSame('App\Domain\Order', (new TypeReference('\App\Domain\Order', 12))->name);
+    }
+
+    public function test_a_doubled_leading_separator_is_still_rejected(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        new TypeReference('\App\Domain\Order', 12);
+        new TypeReference('\\\\App\Order', 12);
     }
 
     public function test_an_empty_name_is_rejected(): void

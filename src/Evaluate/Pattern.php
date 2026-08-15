@@ -19,8 +19,16 @@ final class Pattern
 {
     private const ALLOWED = '/^([a-zA-Z0-9_\x80-\xff]|\\\\|\*|\?)+$/';
 
-    public function __construct(private readonly string $value)
+    private readonly string $value;
+
+    public function __construct(string $value)
     {
+        // a pattern can't be an Fqcn — it has wildcards — but it is written
+        // against names that never carry a leading separator, so the same
+        // normalization applies or `\App\Domain` would match nothing at all
+        $value = str_starts_with($value, '\\') ? substr($value, 1) : $value;
+        $this->value = $value;
+
         if (1 !== preg_match(self::ALLOWED, $value)) {
             throw new \InvalidArgumentException(\sprintf("'%s' is not a valid class or namespace pattern: only * and ? are wildcards.", $value));
         }

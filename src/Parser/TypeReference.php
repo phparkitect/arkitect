@@ -17,15 +17,13 @@ namespace Arkitect\Parser;
  */
 final class TypeReference
 {
-    private const VALID_NAME = '/^[a-zA-Z0-9_\x80-\xff]+(\\\\[a-zA-Z0-9_\x80-\xff]+)*$/';
+    public readonly string $name;
 
     public function __construct(
-        public readonly string $name,
+        string $name,
         public readonly int $line,
     ) {
-        if (1 !== preg_match(self::VALID_NAME, $name)) {
-            throw new \InvalidArgumentException(\sprintf("'%s' is not a fully qualified type name.", $name));
-        }
+        $this->name = (new Fqcn($name))->toString();
 
         if ($line < 1) {
             throw new \InvalidArgumentException(\sprintf("'%s' was given line %d: a reference exists somewhere in a file, and every violation reports a line.", $name, $line));

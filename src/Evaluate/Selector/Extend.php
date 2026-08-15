@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Evaluate\Selector;
 
+use Arkitect\Parser\Fqcn;
 use Arkitect\Parser\ParsedClass;
 use Arkitect\Resolve\ClassGraph;
 use Arkitect\Resolve\Membership;
@@ -14,8 +15,11 @@ use Arkitect\Resolve\Membership;
  */
 final class Extend implements Selector
 {
-    public function __construct(private readonly string $target)
+    private readonly string $target;
+
+    public function __construct(string $target)
     {
+        $this->target = (new Fqcn($target))->toString();
     }
 
     public function matches(ParsedClass $class, ClassGraph $classGraph): Selection

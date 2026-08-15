@@ -7,6 +7,7 @@ namespace Arkitect\Evaluate\Constraint;
 use Arkitect\Evaluate\Outcome;
 use Arkitect\Evaluate\Violation;
 use Arkitect\Evaluate\Violations;
+use Arkitect\Parser\Fqcn;
 use Arkitect\Parser\ParsedClass;
 use Arkitect\Resolve\ClassGraph;
 use Arkitect\Resolve\Membership;
@@ -18,10 +19,13 @@ use Arkitect\Resolve\Membership;
  */
 final class Extend implements Constraint
 {
+    private readonly string $target;
+
     public function __construct(
-        private readonly string $target,
+        string $target,
         private readonly Depth $depth = Depth::Transitive,
     ) {
+        $this->target = (new Fqcn($target))->toString();
     }
 
     public function evaluate(ParsedClass $class, ClassGraph $classGraph): Outcome
