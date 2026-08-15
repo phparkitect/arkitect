@@ -521,17 +521,38 @@ answers definitively instead of `Unknown`.
 
 ## Evaluate component: design note
 
-`Rule` is deliberately smaller than the eventual public rule. It holds
-selectors and constraints and returns a `RuleResult` carrying three things
+`Rule` holds selectors, one constraint and a reason, and returns a
+`RuleResult` carrying three things
 — `checked`, the violations, and the classes it couldn't decide about —
 which is what it takes to answer both the zero-matched requirement and
 "can this answer be trusted at all" (`isConclusive()`). Missing on purpose:
 
-- **`because()`**. It's the message, and pulling it in opens the whole
-  description/report design, which is stage 4. The only remaining piece
-  genuinely waiting on that stage.
 - **Applicability by kind** (see stage 3). It belongs to `Rule::check()`,
-  which is what would do the skipping and the counting.
+  which is what would do the skipping and the counting. The only design
+  question left open in this stage.
+
+Rules are written through the DSL, which is the shape v1 established and
+2.0 keeps — with two changes. `Rule::allClasses()` returns a `RuleDraft`
+rather than a half-built `Rule`, so the incomplete states have their own
+types and `because()` is the only way to reach a `Rule`: a rule can't exist
+without a constraint, and can't exist without a reason to give when it
+fails.
+
+And there is no `andShould()`. A rule states **one** requirement, the way a
+good test makes one assertion — two requirements are two rules, each with
+its own reason. This is also what keeps a reason honest: one sentence
+explaining two unrelated constraints explains neither. Selectors still
+accumulate, one at a time, through `that()` and `andThat()`.
+
+```php
+Rule::allClasses()
+    ->that(new Selector\ResideInNamespace('Arkitect\Evaluate\Selector'))
+    ->should(new Constraint\NotDependOnTheseNamespaces(['Arkitect\Evaluate\Violation*']))
+    ->because('a selector decides what a rule is about and never reports anything');
+```
+
+That is a real rule from `run.php`, and its reason is what the output uses
+as the rule's title — a rule that explains itself needs no separate label.
 
 One decision worth knowing, since it isn't obvious from the types:
 selectors combine with *and*, so a definite `No` from any of them settles

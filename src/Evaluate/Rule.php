@@ -11,20 +11,26 @@ use Arkitect\Parser\ParsedClass;
 use Arkitect\Resolve\ClassGraph;
 
 /**
- * Selectors decide which classes the rule is about; constraints decide what
- * those classes must satisfy. With no selectors the rule is about every
- * class it is given.
+ * Selectors decide which classes the rule is about; the constraint decides
+ * what those classes must satisfy; the reason is what the report says when
+ * they don't. With no selectors the rule is about every class it is given.
+ *
+ * Written through the DSL — `Rule::allClasses()->that(...)->should(...)
+ * ->because(...)` — which is what guarantees every instance has all three.
  */
 final class Rule
 {
-    /**
-     * @param list<Selector>   $selectors
-     * @param list<Constraint> $constraints
-     */
+    /** @param list<Selector> $selectors */
     public function __construct(
         private readonly array $selectors,
-        private readonly array $constraints,
+        private readonly Constraint $constraint,
+        public readonly string $because,
     ) {
+    }
+
+    public static function allClasses(): RuleDraft
+    {
+        return RuleDraft::start();
     }
 
     /** @param list<ParsedClass> $classes */
@@ -54,16 +60,14 @@ final class Rule
 
             ++$checked;
 
-            foreach ($this->constraints as $constraint) {
-                $outcome = $constraint->evaluate($class, $classGraph);
+            $outcome = $this->constraint->evaluate($class, $classGraph);
 
-                foreach ($outcome->violations as $violation) {
-                    $violations[] = $violation;
-                }
+            foreach ($outcome->violations as $violation) {
+                $violations[] = $violation;
+            }
 
-                foreach ($outcome->unresolved as $unresolvedClass) {
-                    $unresolved[] = $unresolvedClass;
-                }
+            foreach ($outcome->unresolved as $unresolvedClass) {
+                $unresolved[] = $unresolvedClass;
             }
         }
 

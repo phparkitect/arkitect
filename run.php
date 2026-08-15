@@ -46,31 +46,34 @@ foreach ($parsed->errors as $error) {
 $classGraph = new ClassGraph(...$parsed->classes);
 
 $rules = [
-    'parsing depends on neither resolving nor evaluating' => new Rule(
-        [new Selector\ResideInNamespace('Arkitect\Parser')],
-        [new Constraint\NotDependOnTheseNamespaces(['Arkitect\Resolve', 'Arkitect\Evaluate'])]
-    ),
-    'resolving does not depend on evaluating' => new Rule(
-        [new Selector\ResideInNamespace('Arkitect\Resolve')],
-        [new Constraint\NotDependOnTheseNamespaces(['Arkitect\Evaluate'])]
-    ),
-    'nothing outside the filesystem component touches it directly' => new Rule(
-        [new Selector\ResideInNamespace('Arkitect\Evaluate')],
-        [new Constraint\NotDependOnTheseNamespaces(['Arkitect\FileSystem'])]
-    ),
-    'selectors do not know that violations exist' => new Rule(
-        [new Selector\ResideInNamespace('Arkitect\Evaluate\Selector')],
-        [new Constraint\NotDependOnTheseNamespaces(['Arkitect\Evaluate\Violation*'])]
-    ),
+    Rule::allClasses()
+        ->that(new Selector\ResideInNamespace('Arkitect\Parser'))
+        ->should(new Constraint\NotDependOnTheseNamespaces(['Arkitect\Resolve', 'Arkitect\Evaluate']))
+        ->because('parsing is the first stage and cannot know what comes after it'),
+
+    Rule::allClasses()
+        ->that(new Selector\ResideInNamespace('Arkitect\Resolve'))
+        ->should(new Constraint\NotDependOnTheseNamespaces(['Arkitect\Evaluate']))
+        ->because('resolving answers questions about types, not about rules'),
+
+    Rule::allClasses()
+        ->that(new Selector\ResideInNamespace('Arkitect\Evaluate'))
+        ->should(new Constraint\NotDependOnTheseNamespaces(['Arkitect\FileSystem']))
+        ->because('reading files is the parser\'s job, and it is already done by now'),
+
+    Rule::allClasses()
+        ->that(new Selector\ResideInNamespace('Arkitect\Evaluate\Selector'))
+        ->should(new Constraint\NotDependOnTheseNamespaces(['Arkitect\Evaluate\Violation*']))
+        ->because('a selector decides what a rule is about and never reports anything'),
 ];
 
 $failed = false;
 
-foreach ($rules as $label => $rule) {
+foreach ($rules as $rule) {
     $result = $rule->check($parsed->classes, $classGraph);
     $failed = $failed || \count($result->violations) > 0 || !$result->isConclusive();
 
-    printf("\n%s\n  %s\n", $label, summarize($result));
+    printf("\n%s\n  %s\n", $rule->because, summarize($result));
 
     foreach ($result->violations as $violation) {
         printf("  %s:%d %s %s\n", $violation->filePath, $violation->line, $violation->fqcn, $violation->detail);
