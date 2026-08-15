@@ -27,7 +27,7 @@ final class ResideInNamespace implements Constraint
         }
 
         return new Outcome(new Violations(
-            Violation::create($class, self::class, \sprintf('does not reside in %s', $this->pattern->toString())),
+            Violation::create($class, self::class, \sprintf('does not reside in %s', $this->pattern->toString()), $this->pattern->toString()),
         ));
     }
 

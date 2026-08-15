@@ -30,7 +30,8 @@ final class HaveNameMatching implements Constraint
             Violation::create(
                 $class,
                 self::class,
-                \sprintf('does not have a name matching %s', $this->pattern->toString())
+                \sprintf('does not have a name matching %s', $this->pattern->toString()),
+                $this->pattern->toString()
             ),
         ));
     }

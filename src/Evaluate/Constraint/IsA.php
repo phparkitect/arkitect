@@ -26,7 +26,7 @@ final class IsA implements Constraint
         return match ($classGraph->isA($class->fqcn, $this->target)) {
             Membership::Yes => new Outcome(),
             Membership::No => new Outcome(new Violations(
-                Violation::create($class, self::class, \sprintf('is not a %s', $this->target)),
+                Violation::create($class, self::class, \sprintf('is not a %s', $this->target), $this->target),
             )),
             Membership::Unknown => Outcome::unresolved($class, \sprintf(
                 'cannot be checked against %s: some ancestors were never parsed',

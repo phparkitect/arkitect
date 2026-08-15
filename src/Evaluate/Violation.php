@@ -10,10 +10,15 @@ use Arkitect\Parser\ParsedClass;
 use Arkitect\Parser\TypeReference;
 
 /**
- * Structured, not a rendered sentence: the baseline keys on this data, so
- * nothing downstream has to parse prose back apart. `line` is never null —
- * a constraint that references a specific node uses that node's line,
- * anything purely structural falls back to the class's declaration line.
+ * Structured, not a rendered sentence. `detail` is prose for a human and
+ * may be reworded at any time. `key` is what the violation is about beyond
+ * the class — the forbidden dependency, the interface that is missing, the
+ * namespace expected — and is what identity is built from, so rewording a
+ * message cannot invalidate a baseline. It must come from the rule's own
+ * parameters, never from the message.
+ *
+ * `line` is never null: a constraint pointing at a specific node uses that
+ * node's line, anything structural falls back to the class's own.
  */
 final class Violation
 {
@@ -22,7 +27,8 @@ final class Violation
 
     /**
      * @param class-string<Constraint> $constraint which constraint produced this
-     * @param string                   $detail     what was wrong, without the class name
+     * @param string                   $detail     what was wrong, for a human to read
+     * @param ?string                  $key    what it was about, for identity
      */
     private function __construct(
         public readonly string $fqcn,
@@ -30,6 +36,7 @@ final class Violation
         public readonly int $line,
         string $constraint,
         public readonly string $detail,
+        public readonly ?string $key = null,
     ) {
         // the location comes from an already-valid ParsedClass or
         // TypeReference; these two are what a caller still chooses
@@ -46,14 +53,19 @@ final class Violation
      *
      * @param class-string<Constraint> $constraint
      */
-    public static function create(ParsedClass $class, string $constraint, string $detail): self
-    {
+    public static function create(
+        ParsedClass $class,
+        string $constraint,
+        string $detail,
+        ?string $key = null,
+    ): self {
         return new self(
             fqcn: $class->fqcn,
             filePath: $class->filePath,
             line: $class->line,
             constraint: $constraint,
             detail: $detail,
+            key: $key,
         );
     }
 
@@ -77,6 +89,9 @@ final class Violation
             line: $reference->line,
             constraint: $constraint,
             detail: $detail,
+            // the referenced name is what this violation is about, and the
+            // only thing that tells two of them on one class apart
+            key: $reference->name,
         );
     }
 }
