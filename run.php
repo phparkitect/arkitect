@@ -53,7 +53,12 @@ try {
         ->because('a selector decides what a rule is about and never reports anything'),
 
     Rule::allClasses()
-        ->that(new Selector\ResideInNamespace('Arkitect\Evaluate'))
+        ->that(new Selector\ResideInOneOfTheseNamespaces([
+            'Arkitect\Evaluate',
+            'Arkitect\Resolve',
+            'Arkitect\Report',
+            'Arkitect\FileSystem',
+        ]))
         ->should(new Constraint\NotDependOnTheseNamespaces(['PhpParser']))
         ->because('only the parser adapter knows which library reads PHP source'),
 
