@@ -79,7 +79,7 @@ final class DependOnlyOnTheseNamespacesTest extends TestCase
      * Otherwise every rule would have to whitelist the entire standard
      * library before it could be used at all.
      */
-    public function test_php_core_classes_are_never_violations(): void
+    public function test_internal_classes_are_never_violations(): void
     {
         $class = ParsedClassFixture::create(
             'App\Domain\Order',
@@ -93,9 +93,9 @@ final class DependOnlyOnTheseNamespacesTest extends TestCase
 
     /**
      * A class that happens to be loaded because arkitect itself is running
-     * is not core, and must not get a free pass.
+     * is not internal, and must not get a free pass.
      */
-    public function test_a_loaded_userland_class_is_not_treated_as_core(): void
+    public function test_a_loaded_user_defined_class_is_not_treated_as_internal(): void
     {
         $class = ParsedClassFixture::create(
             'App\Domain\Order',
