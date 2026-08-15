@@ -17,7 +17,7 @@ use PhpParser\PhpVersion;
  * reflection, no autoloading, no call into the PHP runtime being hosted on.
  * See ARCHITECTURE.md, stage 1.
  */
-final class Parser
+final class ClassParser
 {
     public function parse(string $content, string $filePath, TargetPhpVersion $targetPhpVersion): ParseResult
     {

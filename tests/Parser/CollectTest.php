@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Parser;
 
 use Arkitect\Parser\ClassKind;
-use Arkitect\Parser\Parser;
+use Arkitect\Parser\ClassParser;
 use Arkitect\Parser\TargetPhpVersion;
 use PHPUnit\Framework\TestCase;
 
@@ -13,14 +13,14 @@ final class CollectTest extends TestCase
 {
     public function test_a_file_with_no_class_produces_no_classes(): void
     {
-        $result = (new Parser())->parse('<?php $x = 1;', 'test.php', TargetPhpVersion::create('8.5'));
+        $result = (new ClassParser())->parse('<?php $x = 1;', 'test.php', TargetPhpVersion::create('8.5'));
 
         self::assertSame([], $result->classes);
     }
 
     public function test_a_single_class_is_collected_by_its_name(): void
     {
-        $result = (new Parser())->parse('<?php namespace App; class Foo {}', 'test.php', TargetPhpVersion::create('8.5'));
+        $result = (new ClassParser())->parse('<?php namespace App; class Foo {}', 'test.php', TargetPhpVersion::create('8.5'));
 
         self::assertCount(1, $result->classes);
         self::assertSame('App\Foo', $result->classes[0]->fqcn);
@@ -28,7 +28,7 @@ final class CollectTest extends TestCase
 
     public function test_a_constructor_param_type_is_a_dependency_of_its_class(): void
     {
-        $result = (new Parser())->parse(<<<'PHP'
+        $result = (new ClassParser())->parse(<<<'PHP'
             <?php
             namespace App;
             use App\Infra\Db;
@@ -45,7 +45,7 @@ final class CollectTest extends TestCase
 
     public function test_a_top_level_function_parameter_does_not_leak_into_the_next_class(): void
     {
-        $result = (new Parser())->parse(<<<'PHP'
+        $result = (new ClassParser())->parse(<<<'PHP'
             <?php
             namespace App;
             use App\Infra\Alpha;
@@ -64,7 +64,7 @@ final class CollectTest extends TestCase
 
     public function test_extends_and_implements_are_dependencies(): void
     {
-        $result = (new Parser())->parse(<<<'PHP'
+        $result = (new ClassParser())->parse(<<<'PHP'
             <?php
             namespace App;
             use App\Base;
@@ -83,7 +83,7 @@ final class CollectTest extends TestCase
 
     public function test_trait_use_is_a_dependency(): void
     {
-        $result = (new Parser())->parse(<<<'PHP'
+        $result = (new ClassParser())->parse(<<<'PHP'
             <?php
             namespace App;
             use App\Loggable;
@@ -101,7 +101,7 @@ final class CollectTest extends TestCase
 
     public function test_interface_enum_and_trait_are_collected_and_flagged(): void
     {
-        $result = (new Parser())->parse(<<<'PHP'
+        $result = (new ClassParser())->parse(<<<'PHP'
             <?php
             namespace App;
             use App\A;
@@ -129,7 +129,7 @@ final class CollectTest extends TestCase
 
     public function test_anonymous_class_dependencies_attach_to_the_enclosing_class(): void
     {
-        $result = (new Parser())->parse(<<<'PHP'
+        $result = (new ClassParser())->parse(<<<'PHP'
             <?php
             namespace App;
             use App\Contract;
@@ -150,7 +150,7 @@ final class CollectTest extends TestCase
 
     public function test_use_function_and_use_const_are_not_dependencies(): void
     {
-        $result = (new Parser())->parse(<<<'PHP'
+        $result = (new ClassParser())->parse(<<<'PHP'
             <?php
             namespace App;
             use function array_map;
@@ -168,7 +168,7 @@ final class CollectTest extends TestCase
 
     public function test_property_hook_does_not_prevent_the_property_type_from_being_a_dependency(): void
     {
-        $result = (new Parser())->parse(<<<'PHP'
+        $result = (new ClassParser())->parse(<<<'PHP'
             <?php
             namespace App;
             use App\Infra\Money;
@@ -197,7 +197,7 @@ final class CollectTest extends TestCase
 
     public function test_at_throws_with_a_fully_qualified_name_is_a_dependency(): void
     {
-        $result = (new Parser())->parse(<<<'PHP'
+        $result = (new ClassParser())->parse(<<<'PHP'
             <?php
             namespace App;
 
@@ -215,7 +215,7 @@ final class CollectTest extends TestCase
 
     public function test_at_throws_with_a_short_name_resolves_via_the_files_use_import(): void
     {
-        $result = (new Parser())->parse(<<<'PHP'
+        $result = (new ClassParser())->parse(<<<'PHP'
             <?php
             namespace App;
             use App\Infra\DbException;
@@ -234,7 +234,7 @@ final class CollectTest extends TestCase
 
     public function test_at_throws_with_an_unimported_short_name_is_not_guessed(): void
     {
-        $result = (new Parser())->parse(<<<'PHP'
+        $result = (new ClassParser())->parse(<<<'PHP'
             <?php
             namespace App;
 
@@ -252,7 +252,7 @@ final class CollectTest extends TestCase
 
     public function test_at_throws_with_a_union_resolves_each_member(): void
     {
-        $result = (new Parser())->parse(<<<'PHP'
+        $result = (new ClassParser())->parse(<<<'PHP'
             <?php
             namespace App;
             use App\Infra\DbException;
@@ -275,7 +275,7 @@ final class CollectTest extends TestCase
 
     public function test_a_syntax_error_produces_a_parsing_error_instead_of_throwing(): void
     {
-        $result = (new Parser())->parse('<?php class {{{ broken', 'test.php', TargetPhpVersion::create('8.5'));
+        $result = (new ClassParser())->parse('<?php class {{{ broken', 'test.php', TargetPhpVersion::create('8.5'));
 
         self::assertSame([], $result->classes);
         self::assertNotEmpty($result->errors);
@@ -284,7 +284,7 @@ final class CollectTest extends TestCase
 
     public function test_docblock_raw_text_is_captured(): void
     {
-        $result = (new Parser())->parse(<<<'PHP'
+        $result = (new ClassParser())->parse(<<<'PHP'
             <?php
             namespace App;
 

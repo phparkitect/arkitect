@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Resolve;
 
 use Arkitect\FileSystem\FilesystemFileRepository;
+use Arkitect\Parser\RepositoryParser;
 use Arkitect\Parser\TargetPhpVersion;
-use Arkitect\ProjectParser;
 use Arkitect\Resolve\ClassGraph;
 use Arkitect\Resolve\Membership;
 use Arkitect\Resolve\ParsedClassGraph;
@@ -31,9 +31,9 @@ final class ProjectAndVendorTest extends TestCase
             'src/MyVisitor.php',
             "<?php\nnamespace App;\nuse PhpParser\\NodeVisitorAbstract;\nclass MyVisitor extends NodeVisitorAbstract {}\n"
         );
-        $projectResult = (new ProjectParser($project))->parse($version);
+        $projectResult = (new RepositoryParser($project))->parse($version);
 
-        $vendorResult = (new ProjectParser(new FilesystemFileRepository(__DIR__.'/../../vendor/nikic/php-parser')))
+        $vendorResult = (new RepositoryParser(new FilesystemFileRepository(__DIR__.'/../../vendor/nikic/php-parser')))
             ->parse($version);
 
         self::assertNotEmpty($vendorResult->classes, 'sanity check: vendor actually parsed something');

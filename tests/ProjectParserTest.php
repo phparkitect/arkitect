@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests;
 
+use Arkitect\Parser\RepositoryParser;
 use Arkitect\Parser\TargetPhpVersion;
-use Arkitect\ProjectParser;
 use Arkitect\Tests\FileSystem\InMemoryFileRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -13,7 +13,7 @@ final class ProjectParserTest extends TestCase
 {
     public function test_an_empty_repository_produces_no_classes(): void
     {
-        $result = (new ProjectParser(new InMemoryFileRepository()))->parse(TargetPhpVersion::create('8.5'));
+        $result = (new RepositoryParser(new InMemoryFileRepository()))->parse(TargetPhpVersion::create('8.5'));
 
         self::assertSame([], $result->classes);
         self::assertSame([], $result->errors);
@@ -23,7 +23,7 @@ final class ProjectParserTest extends TestCase
     {
         $files = (new InMemoryFileRepository())->withFile('src/Foo.php', "<?php\nnamespace App;\nclass Foo {}\n");
 
-        $result = (new ProjectParser($files))->parse(TargetPhpVersion::create('8.5'));
+        $result = (new RepositoryParser($files))->parse(TargetPhpVersion::create('8.5'));
 
         self::assertCount(1, $result->classes);
         self::assertSame('App\Foo', $result->classes[0]->fqcn);
@@ -36,7 +36,7 @@ final class ProjectParserTest extends TestCase
             ->withFile('src/Domain/Order.php', "<?php\nnamespace App\\Domain;\nclass Order {}\n")
             ->withFile('src/Infra/Db/Connection.php', "<?php\nnamespace App\\Infra\\Db;\nclass Connection {}\n");
 
-        $result = (new ProjectParser($files))->parse(TargetPhpVersion::create('8.5'));
+        $result = (new RepositoryParser($files))->parse(TargetPhpVersion::create('8.5'));
 
         $fqcns = array_map(static fn ($c) => $c->fqcn, $result->classes);
         sort($fqcns);
@@ -49,7 +49,7 @@ final class ProjectParserTest extends TestCase
             ->withFile('src/Broken.php', '<?php class {{{ broken')
             ->withFile('src/Fine.php', "<?php\nnamespace App;\nclass Fine {}\n");
 
-        $result = (new ProjectParser($files))->parse(TargetPhpVersion::create('8.5'));
+        $result = (new RepositoryParser($files))->parse(TargetPhpVersion::create('8.5'));
 
         self::assertCount(1, $result->classes);
         self::assertSame('App\Fine', $result->classes[0]->fqcn);
@@ -61,7 +61,7 @@ final class ProjectParserTest extends TestCase
     {
         $files = (new InMemoryFileRepository())->withUnreadableFile('src/Locked.php');
 
-        $result = (new ProjectParser($files))->parse(TargetPhpVersion::create('8.5'));
+        $result = (new RepositoryParser($files))->parse(TargetPhpVersion::create('8.5'));
 
         self::assertSame([], $result->classes);
         self::assertCount(1, $result->errors);

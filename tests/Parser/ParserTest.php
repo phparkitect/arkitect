@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Parser;
 
 use Arkitect\Parser\ClassKind;
+use Arkitect\Parser\ClassParser;
 use Arkitect\Parser\ParsedClass;
-use Arkitect\Parser\Parser;
 use Arkitect\Parser\ParseResult;
 use Arkitect\Parser\TargetPhpVersion;
 use Arkitect\Parser\TypeReferences;
@@ -558,7 +558,7 @@ final class ParserTest extends TestCase
 
     private function parse(string $code, string $targetPhpVersion = '8.4', string $filePath = 'test.php'): ParseResult
     {
-        return (new Parser())->parse($code, $filePath, TargetPhpVersion::create($targetPhpVersion));
+        return (new ClassParser())->parse($code, $filePath, TargetPhpVersion::create($targetPhpVersion));
     }
 
     /** @return list<ParsedClass> */

@@ -9,8 +9,8 @@ use Arkitect\Evaluate\Constraint;
 use Arkitect\Evaluate\Rule;
 use Arkitect\Evaluate\Rules;
 use Arkitect\Evaluate\Selector;
+use Arkitect\Parser\RepositoryParser;
 use Arkitect\Parser\TargetPhpVersion;
-use Arkitect\ProjectParser;
 use Arkitect\Tests\FileSystem\InMemoryFileRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -88,7 +88,7 @@ final class CheckTest extends TestCase
             $repository = $repository->withFile($path, $contents);
         }
 
-        return (new Check(new ProjectParser($repository)))
+        return (new Check(new RepositoryParser($repository)))
             ->run(new Rules($rule), TargetPhpVersion::create('8.5'));
     }
 }

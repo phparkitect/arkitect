@@ -26,7 +26,7 @@ use Arkitect\Config;
 use Arkitect\FileSystem\FilesystemFileRepository;
 use Arkitect\Parser\TargetPhpVersion;
 use Arkitect\Report\TextReport;
-use Arkitect\ProjectParser;
+use Arkitect\Parser\RepositoryParser;
 
 $root = $argv[1] ?? __DIR__;
 
@@ -50,14 +50,24 @@ try {
     Rule::allClasses()
         ->that(new Selector\ResideInNamespace('Arkitect\Evaluate\Selector'))
         ->should(new Constraint\NotDependOnTheseNamespaces(['Arkitect\Evaluate\Violation*']))
-        ->because('a selector decides what a rule is about and never reports anything'),]);
+        ->because('a selector decides what a rule is about and never reports anything'),
+
+    Rule::allClasses()
+        ->that(new Selector\ResideInNamespace('Arkitect\Evaluate'))
+        ->should(new Constraint\NotDependOnTheseNamespaces(['PhpParser']))
+        ->because('only the parser adapter knows which library reads PHP source'),
+
+    Rule::allClasses()
+        ->that(new Selector\ResideInNamespace('Arkitect\Evaluate'))
+        ->should(new Constraint\NotDependOnTheseNamespaces(['Arkitect\Report']))
+        ->because('the rules do not know who will print their results'),]);
     $files = new FilesystemFileRepository($config->root);
 } catch (InvalidArgumentException $e) {
     fwrite(\STDERR, $e->getMessage()."\n");
     exit(2);
 }
 
-$result = (new Check(new ProjectParser($files)))->run($config->rules, TargetPhpVersion::create(null));
+$result = (new Check(new RepositoryParser($files)))->run($config->rules, TargetPhpVersion::create(null));
 
 echo (new TextReport())->render($result), "\n";
 

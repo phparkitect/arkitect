@@ -15,7 +15,7 @@ use Arkitect\Parser\ParsingErrors;
  * turn into a link, and the order is deterministic because the baseline
  * will depend on it. The rest of the reasoning is in ARCHITECTURE.md.
  */
-final class TextReport
+final class TextReport implements Report
 {
     public function render(CheckResult $check): string
     {
