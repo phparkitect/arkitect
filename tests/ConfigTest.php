@@ -58,9 +58,11 @@ final class ConfigTest extends TestCase
     }
 
     /**
-     * Optional, so it is fluent — and it defaults to the interpreter running
-     * arkitect, which is a different thing from the version the analysed
-     * project targets. #650 is about being able to pin the second.
+     * Optional settings are fluent and mutate; only the root is required, so
+     * only the root is a constructor argument. The default is the
+     * interpreter running arkitect, which is a different thing from the
+     * version the analysed project targets — #650 is about pinning the
+     * second.
      */
     public function test_the_target_php_version_defaults_to_the_running_one(): void
     {

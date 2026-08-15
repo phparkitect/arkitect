@@ -18,20 +18,20 @@ use Arkitect\Parser\TargetPhpVersion;
  */
 final class Config
 {
-    public readonly TargetPhpVersion $targetPhpVersion;
+    public Rules $rules;
 
-    public function __construct(
-        public readonly string $root,
-        public readonly Rules $rules = new Rules(),
-        ?TargetPhpVersion $targetPhpVersion = null,
-    ) {
-        // unset means the interpreter running arkitect, which is what nearly
-        // every project wants and what #650 says to pin when it isn't
-        $this->targetPhpVersion = $targetPhpVersion ?? TargetPhpVersion::current();
+    public TargetPhpVersion $targetPhpVersion;
 
+    public function __construct(public readonly string $root)
+    {
         if (!is_dir($root)) {
             throw new \InvalidArgumentException(\sprintf('"%s" is not a directory.', $root));
         }
+
+        $this->rules = new Rules();
+        // unset means the interpreter running arkitect, which is what nearly
+        // every project wants and what #650 says to pin when it isn't
+        $this->targetPhpVersion = TargetPhpVersion::current();
     }
 
     public static function create(string $root): self
@@ -42,12 +42,16 @@ final class Config
     /** @param list<Rule> $rules array, not a variadic, because this is what a config file writes */
     public function add(array $rules): self
     {
-        return new self($this->root, $this->rules->with(...$rules), $this->targetPhpVersion);
+        $this->rules = $this->rules->with(...$rules);
+
+        return $this;
     }
 
     /** The version of PHP the *analysed* project targets, not the one running us. */
     public function targetPhpVersion(string $version): self
     {
-        return new self($this->root, $this->rules, TargetPhpVersion::create($version));
+        $this->targetPhpVersion = TargetPhpVersion::create($version);
+
+        return $this;
     }
 }
