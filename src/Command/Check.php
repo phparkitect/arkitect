@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Arkitect;
+namespace Arkitect\Command;
 
+use Arkitect\Codebase;
 use Arkitect\Evaluate\RuleResults;
 use Arkitect\Evaluate\Rules;
+use Arkitect\Parser\ParsingErrors;
 use Arkitect\Parser\TargetPhpVersion;
+use Arkitect\ProjectParser;
 
 /**
  * Walks a codebase through the stages and hands back what came out. Knows
@@ -32,7 +35,7 @@ final class Check
 
         return new CheckResult(
             \count($codebase->ownClasses),
-            new Parser\ParsingErrors(...$parsed->errors),
+            new ParsingErrors(...$parsed->errors),
             new RuleResults(...$results),
         );
     }

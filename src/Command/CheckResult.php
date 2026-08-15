@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Arkitect;
+namespace Arkitect\Command;
 
 use Arkitect\Evaluate\RuleResults;
 use Arkitect\Parser\ParsingErrors;

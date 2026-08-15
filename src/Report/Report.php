@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Report;
 
-use Arkitect\CheckResult;
+use Arkitect\Command\CheckResult;
 
 /**
  * How results leave the system. The text one is written for a human reading

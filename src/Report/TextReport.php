@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Report;
 
-use Arkitect\CheckResult;
+use Arkitect\Command\CheckResult;
 use Arkitect\Evaluate\RuleResults;
 use Arkitect\Parser\ParsingErrors;
 

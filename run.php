@@ -21,7 +21,7 @@ require __DIR__.'/vendor/autoload.php';
 use Arkitect\Evaluate\Constraint;
 use Arkitect\Evaluate\Rule;
 use Arkitect\Evaluate\Selector;
-use Arkitect\Check;
+use Arkitect\Command\Check;
 use Arkitect\Config;
 use Arkitect\FileSystem\FilesystemFileRepository;
 use Arkitect\Parser\TargetPhpVersion;

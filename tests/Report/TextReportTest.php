@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Report;
 
-use Arkitect\CheckResult;
+use Arkitect\Command\CheckResult;
 use Arkitect\Evaluate\Constraint;
 use Arkitect\Evaluate\Rule;
 use Arkitect\Evaluate\RuleResults;

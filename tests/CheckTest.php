@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests;
 
-use Arkitect\Check;
+use Arkitect\Command\Check;
 use Arkitect\Evaluate\Constraint;
 use Arkitect\Evaluate\Rule;
 use Arkitect\Evaluate\Rules;
@@ -80,7 +80,7 @@ final class CheckTest extends TestCase
     }
 
     /** @param array<string, string> $files */
-    private function check(array $files, Rule $rule): \Arkitect\CheckResult
+    private function check(array $files, Rule $rule): \Arkitect\Command\CheckResult
     {
         $repository = new InMemoryFileRepository();
 
