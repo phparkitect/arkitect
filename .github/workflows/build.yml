@@ -1,0 +1,42 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: PHP 8.5
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          # the tool requires 8.5; the versions it can analyse are a separate thing
+          php-version: '8.5'
+          tools: composer:v2.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate composer.json
+        run: composer validate --no-check-lock
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Coding standards
+        run: make lint
+
+      - name: Tests
+        run: make test
+
+      # arkitect checking its own architecture: the stage ordering and the
+      # hexagon boundaries are rules, so CI is where they hold
+      - name: Architecture
+        run: make run
