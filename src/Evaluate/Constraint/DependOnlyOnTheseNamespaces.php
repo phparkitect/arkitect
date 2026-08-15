@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Evaluate\Constraint;
 
+use Arkitect\Evaluate\Outcome;
 use Arkitect\Evaluate\Pattern;
 use Arkitect\Evaluate\Violation;
 use Arkitect\Evaluate\Violations;
@@ -25,7 +26,7 @@ final class DependOnlyOnTheseNamespaces implements Constraint
         $this->internal = new InternalClasses();
     }
 
-    public function evaluate(ParsedClass $class, ClassGraph $classGraph): Violations
+    public function evaluate(ParsedClass $class, ClassGraph $classGraph): Outcome
     {
         $violations = [];
 
@@ -42,7 +43,7 @@ final class DependOnlyOnTheseNamespaces implements Constraint
             );
         }
 
-        return new Violations($violations);
+        return new Outcome(new Violations($violations));
     }
 
     private function isAllowed(ParsedClass $class, string $dependency): bool

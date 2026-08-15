@@ -15,11 +15,21 @@ final class RuleResult
     public function __construct(
         public readonly int $checked,
         public readonly Violations $violations,
+        public readonly UnresolvedClasses $unresolved = new UnresolvedClasses(),
     ) {
     }
 
     public function matchedNothing(): bool
     {
         return 0 === $this->checked;
+    }
+
+    /**
+     * A rule with unresolved classes has not passed, even with no
+     * violations: it was unable to look at part of what it was asked about.
+     */
+    public function isConclusive(): bool
+    {
+        return 0 === \count($this->unresolved);
     }
 }

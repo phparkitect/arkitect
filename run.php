@@ -68,12 +68,19 @@ $failed = false;
 
 foreach ($rules as $label => $rule) {
     $result = $rule->check($parsed->classes, $classGraph);
-    $failed = $failed || \count($result->violations) > 0;
+    $failed = $failed || \count($result->violations) > 0 || !$result->isConclusive();
 
     printf("\n%s\n  %s\n", $label, summarize($result));
 
     foreach ($result->violations as $violation) {
         printf("  %s:%d %s %s\n", $violation->filePath, $violation->line, $violation->fqcn, $violation->detail);
+    }
+
+    // kept apart from the violations above on purpose: these are classes the
+    // run could not decide about, which is a gap in what we parsed rather
+    // than something wrong with the code
+    foreach ($result->unresolved as $unresolved) {
+        printf("  ? %s:%d %s %s\n", $unresolved->filePath, $unresolved->line, $unresolved->fqcn, $unresolved->detail);
     }
 }
 
@@ -85,9 +92,11 @@ function summarize(RuleResult $result): string
         return 'matched no classes — the rule checked nothing at all';
     }
 
-    return \sprintf(
-        '%d classes checked, %d violations',
-        $result->checked,
-        \count($result->violations)
-    );
+    $summary = \sprintf('%d classes checked, %d violations', $result->checked, \count($result->violations));
+
+    if (!$result->isConclusive()) {
+        $summary .= \sprintf(', %d unresolved', \count($result->unresolved));
+    }
+
+    return $summary;
 }

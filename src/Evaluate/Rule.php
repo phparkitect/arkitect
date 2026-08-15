@@ -31,6 +31,7 @@ final class Rule
     {
         $checked = 0;
         $violations = [];
+        $unresolved = [];
 
         foreach ($classes as $class) {
             if (!$this->selects($class, $classGraph)) {
@@ -40,13 +41,19 @@ final class Rule
             ++$checked;
 
             foreach ($this->constraints as $constraint) {
-                foreach ($constraint->evaluate($class, $classGraph) as $violation) {
+                $outcome = $constraint->evaluate($class, $classGraph);
+
+                foreach ($outcome->violations as $violation) {
                     $violations[] = $violation;
+                }
+
+                foreach ($outcome->unresolved as $unresolvedClass) {
+                    $unresolved[] = $unresolvedClass;
                 }
             }
         }
 
-        return new RuleResult($checked, new Violations($violations));
+        return new RuleResult($checked, new Violations($violations), new UnresolvedClasses($unresolved));
     }
 
     private function selects(ParsedClass $class, ClassGraph $classGraph): bool

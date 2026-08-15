@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Evaluate\Constraint;
 
+use Arkitect\Evaluate\Outcome;
 use Arkitect\Evaluate\Pattern;
 use Arkitect\Evaluate\Violation;
 use Arkitect\Evaluate\Violations;
@@ -19,15 +20,15 @@ final class ResideInNamespace implements Constraint
         $this->pattern = new Pattern($pattern);
     }
 
-    public function evaluate(ParsedClass $class, ClassGraph $classGraph): Violations
+    public function evaluate(ParsedClass $class, ClassGraph $classGraph): Outcome
     {
         if ($this->matches($class)) {
-            return new Violations();
+            return new Outcome();
         }
 
-        return new Violations([
+        return new Outcome(new Violations([
             Violation::create($class, self::class, \sprintf('does not reside in %s', $this->pattern->toString())),
-        ]);
+        ]));
     }
 
     private function matches(ParsedClass $class): bool

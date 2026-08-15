@@ -13,14 +13,14 @@ final class IsFinalTest extends TestCase
 {
     public function test_a_final_class_produces_no_violations(): void
     {
-        $violations = (new IsFinal())->evaluate(ParsedClassFixture::create('App\Foo', isFinal: true, line: 12), new ClassGraph());
+        $violations = (new IsFinal())->evaluate(ParsedClassFixture::create('App\Foo', isFinal: true, line: 12), new ClassGraph())->violations;
 
         self::assertCount(0, $violations);
     }
 
     public function test_a_non_final_class_produces_one_violation(): void
     {
-        $violations = (new IsFinal())->evaluate(ParsedClassFixture::create('App\Foo', isFinal: false, line: 12), new ClassGraph());
+        $violations = (new IsFinal())->evaluate(ParsedClassFixture::create('App\Foo', isFinal: false, line: 12), new ClassGraph())->violations;
 
         self::assertCount(1, $violations);
     }
@@ -32,7 +32,7 @@ final class IsFinalTest extends TestCase
      */
     public function test_the_violation_points_at_the_class_declaration(): void
     {
-        $violations = (new IsFinal())->evaluate(ParsedClassFixture::create('App\Foo', isFinal: false, line: 12), new ClassGraph());
+        $violations = (new IsFinal())->evaluate(ParsedClassFixture::create('App\Foo', isFinal: false, line: 12), new ClassGraph())->violations;
 
         $violation = iterator_to_array($violations)[0];
 
@@ -43,7 +43,7 @@ final class IsFinalTest extends TestCase
 
     public function test_the_violation_names_the_constraint_that_produced_it(): void
     {
-        $violations = (new IsFinal())->evaluate(ParsedClassFixture::create('App\Foo', isFinal: false, line: 12), new ClassGraph());
+        $violations = (new IsFinal())->evaluate(ParsedClassFixture::create('App\Foo', isFinal: false, line: 12), new ClassGraph())->violations;
 
         $violation = iterator_to_array($violations)[0];
 

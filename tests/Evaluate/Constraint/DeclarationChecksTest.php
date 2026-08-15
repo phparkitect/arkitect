@@ -41,7 +41,7 @@ final class DeclarationChecksTest extends TestCase
         Constraint $constraint,
         ParsedClass $satisfying,
     ): void {
-        self::assertCount(0, $constraint->evaluate($satisfying, new ClassGraph()));
+        self::assertCount(0, $constraint->evaluate($satisfying, new ClassGraph())->violations);
     }
 
     /** @dataProvider checks */
@@ -51,7 +51,7 @@ final class DeclarationChecksTest extends TestCase
         ParsedClass $violating,
         string $detail,
     ): void {
-        $violations = $constraint->evaluate($violating, new ClassGraph());
+        $violations = $constraint->evaluate($violating, new ClassGraph())->violations;
 
         self::assertCount(1, $violations);
         self::assertSame($detail, iterator_to_array($violations)[0]->detail);

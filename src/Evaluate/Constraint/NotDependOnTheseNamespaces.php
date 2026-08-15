@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Evaluate\Constraint;
 
+use Arkitect\Evaluate\Outcome;
 use Arkitect\Evaluate\Pattern;
 use Arkitect\Evaluate\Violation;
 use Arkitect\Evaluate\Violations;
@@ -26,7 +27,7 @@ final class NotDependOnTheseNamespaces implements Constraint
         $this->forbidden = array_map(static fn (string $n) => new Pattern($n), array_values($namespaces));
     }
 
-    public function evaluate(ParsedClass $class, ClassGraph $classGraph): Violations
+    public function evaluate(ParsedClass $class, ClassGraph $classGraph): Outcome
     {
         $violations = [];
 
@@ -43,7 +44,7 @@ final class NotDependOnTheseNamespaces implements Constraint
             );
         }
 
-        return new Violations($violations);
+        return new Outcome(new Violations($violations));
     }
 
     private function isForbidden(string $dependency): bool

@@ -15,7 +15,7 @@ final class DependOnlyOnTheseNamespacesTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Domain\Order', dependencies: ['App\Shared\Money' => 4]);
 
-        $violations = (new DependOnlyOnTheseNamespaces(['App\Shared']))->evaluate($class, new ClassGraph());
+        $violations = (new DependOnlyOnTheseNamespaces(['App\Shared']))->evaluate($class, new ClassGraph())->violations;
 
         self::assertCount(0, $violations);
     }
@@ -24,7 +24,7 @@ final class DependOnlyOnTheseNamespacesTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Domain\Order', dependencies: ['App\Infra\Db' => 4]);
 
-        $violations = (new DependOnlyOnTheseNamespaces(['App\Shared']))->evaluate($class, new ClassGraph());
+        $violations = (new DependOnlyOnTheseNamespaces(['App\Shared']))->evaluate($class, new ClassGraph())->violations;
 
         self::assertCount(1, $violations);
 
@@ -46,7 +46,7 @@ final class DependOnlyOnTheseNamespacesTest extends TestCase
             line: 3,
         );
 
-        $violations = (new DependOnlyOnTheseNamespaces(['App\Shared']))->evaluate($class, new ClassGraph());
+        $violations = (new DependOnlyOnTheseNamespaces(['App\Shared']))->evaluate($class, new ClassGraph())->violations;
 
         self::assertCount(2, $violations);
         self::assertSame([4, 19], array_map(static fn ($v) => $v->line, iterator_to_array($violations)));
@@ -56,7 +56,7 @@ final class DependOnlyOnTheseNamespacesTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Domain\Order', dependencies: ['App\Domain\Money' => 4]);
 
-        $violations = (new DependOnlyOnTheseNamespaces(['App\Shared']))->evaluate($class, new ClassGraph());
+        $violations = (new DependOnlyOnTheseNamespaces(['App\Shared']))->evaluate($class, new ClassGraph())->violations;
 
         self::assertCount(0, $violations);
     }
@@ -70,7 +70,7 @@ final class DependOnlyOnTheseNamespacesTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Domain\Order', dependencies: ['App\Kernel' => 4]);
 
-        $violations = (new DependOnlyOnTheseNamespaces(['App\Shared']))->evaluate($class, new ClassGraph());
+        $violations = (new DependOnlyOnTheseNamespaces(['App\Shared']))->evaluate($class, new ClassGraph())->violations;
 
         self::assertCount(1, $violations);
     }
@@ -86,7 +86,7 @@ final class DependOnlyOnTheseNamespacesTest extends TestCase
             dependencies: ['DateTimeImmutable' => 4, 'InvalidArgumentException' => 9],
         );
 
-        $violations = (new DependOnlyOnTheseNamespaces(['App\Shared']))->evaluate($class, new ClassGraph());
+        $violations = (new DependOnlyOnTheseNamespaces(['App\Shared']))->evaluate($class, new ClassGraph())->violations;
 
         self::assertCount(0, $violations);
     }
@@ -102,7 +102,7 @@ final class DependOnlyOnTheseNamespacesTest extends TestCase
             dependencies: ['PHPUnit\Framework\TestCase' => 4],
         );
 
-        $violations = (new DependOnlyOnTheseNamespaces(['App\Shared']))->evaluate($class, new ClassGraph());
+        $violations = (new DependOnlyOnTheseNamespaces(['App\Shared']))->evaluate($class, new ClassGraph())->violations;
 
         self::assertCount(1, $violations);
     }
@@ -114,7 +114,7 @@ final class DependOnlyOnTheseNamespacesTest extends TestCase
             dependencies: ['App\Shared\Money' => 4, 'App\Events\Bus' => 5],
         );
 
-        $violations = (new DependOnlyOnTheseNamespaces(['App\Shared', 'App\Events']))->evaluate($class, new ClassGraph());
+        $violations = (new DependOnlyOnTheseNamespaces(['App\Shared', 'App\Events']))->evaluate($class, new ClassGraph())->violations;
 
         self::assertCount(0, $violations);
     }
@@ -123,7 +123,7 @@ final class DependOnlyOnTheseNamespacesTest extends TestCase
     {
         $class = ParsedClassFixture::create('Order', dependencies: ['App\Infra\Db' => 4]);
 
-        $violations = (new DependOnlyOnTheseNamespaces(['App\Shared']))->evaluate($class, new ClassGraph());
+        $violations = (new DependOnlyOnTheseNamespaces(['App\Shared']))->evaluate($class, new ClassGraph())->violations;
 
         self::assertCount(1, $violations);
     }

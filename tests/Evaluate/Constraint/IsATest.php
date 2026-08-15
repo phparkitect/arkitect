@@ -16,7 +16,7 @@ final class IsATest extends TestCase
         $child = ParsedClassFixture::create('App\Child', extends: ['App\Base']);
         $classGraph = new ClassGraph($child, ParsedClassFixture::create('App\Base'));
 
-        $violations = (new IsA('App\Base'))->evaluate($child, $classGraph);
+        $violations = (new IsA('App\Base'))->evaluate($child, $classGraph)->violations;
 
         self::assertCount(0, $violations);
     }
@@ -30,7 +30,7 @@ final class IsATest extends TestCase
             ParsedClassFixture::create('App\Contract'),
         );
 
-        $violations = (new IsA('App\Contract'))->evaluate($child, $classGraph);
+        $violations = (new IsA('App\Contract'))->evaluate($child, $classGraph)->violations;
 
         self::assertCount(0, $violations);
     }
@@ -40,7 +40,7 @@ final class IsATest extends TestCase
         $class = ParsedClassFixture::create('App\Loner');
         $classGraph = new ClassGraph($class, ParsedClassFixture::create('App\Base'));
 
-        $violations = (new IsA('App\Base'))->evaluate($class, $classGraph);
+        $violations = (new IsA('App\Base'))->evaluate($class, $classGraph)->violations;
 
         self::assertCount(1, $violations);
 
@@ -51,21 +51,26 @@ final class IsATest extends TestCase
     }
 
     /**
-     * The ancestor exists but was never parsed, so the chain can't be walked
-     * to an answer. Passing silently would hide an incomplete parse scope
-     * (a missing vendor/, usually) behind a green run — see ARCHITECTURE.md,
-     * Open: unknown ancestors are explicit rather than silently false.
+     * The ancestor has source somewhere but wasn't in what we parsed, so the
+     * chain can't be walked to an answer. That is a problem with the input,
+     * not with the class, so it goes to its own channel rather than being
+     * reported as a violation the user could try to fix — and, crucially,
+     * rather than something a baseline could accept and then hide forever.
      */
-    public function test_an_unresolvable_ancestor_chain_is_reported_not_silently_passed(): void
+    public function test_an_unresolvable_ancestor_chain_goes_to_the_unresolved_channel(): void
     {
         $class = ParsedClassFixture::create('App\Child', extends: ['Vendor\NeverParsed']);
-        $classGraph = new ClassGraph($class);
 
-        $violations = (new IsA('App\Base'))->evaluate($class, $classGraph);
+        $outcome = (new IsA('App\Base'))->evaluate($class, new ClassGraph($class));
 
-        self::assertCount(1, $violations);
+        self::assertCount(0, $outcome->violations);
+        self::assertCount(1, $outcome->unresolved);
 
-        $violation = iterator_to_array($violations)[0];
-        self::assertSame('cannot be resolved against App\Base: some ancestors were never parsed', $violation->detail);
+        $unresolved = iterator_to_array($outcome->unresolved)[0];
+        self::assertSame('App\Child', $unresolved->fqcn);
+        self::assertSame(
+            'cannot be checked against App\Base: some ancestors were never parsed',
+            $unresolved->detail
+        );
     }
 }

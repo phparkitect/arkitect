@@ -15,21 +15,21 @@ final class ResideInNamespaceTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Domain\Order');
 
-        self::assertCount(0, (new ResideInNamespace('App\Domain'))->evaluate($class, new ClassGraph()));
+        self::assertCount(0, (new ResideInNamespace('App\Domain'))->evaluate($class, new ClassGraph())->violations);
     }
 
     public function test_a_class_deeper_in_the_namespace_produces_no_violations(): void
     {
         $class = ParsedClassFixture::create('App\Domain\Order\Line');
 
-        self::assertCount(0, (new ResideInNamespace('App\Domain'))->evaluate($class, new ClassGraph()));
+        self::assertCount(0, (new ResideInNamespace('App\Domain'))->evaluate($class, new ClassGraph())->violations);
     }
 
     public function test_a_class_elsewhere_produces_a_violation(): void
     {
         $class = ParsedClassFixture::create('App\Infra\Db\Connection');
 
-        $violations = (new ResideInNamespace('App\Domain'))->evaluate($class, new ClassGraph());
+        $violations = (new ResideInNamespace('App\Domain'))->evaluate($class, new ClassGraph())->violations;
 
         self::assertCount(1, $violations);
 
@@ -42,13 +42,13 @@ final class ResideInNamespaceTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\DomainEvents\OrderPlaced');
 
-        self::assertCount(1, (new ResideInNamespace('App\Domain'))->evaluate($class, new ClassGraph()));
+        self::assertCount(1, (new ResideInNamespace('App\Domain'))->evaluate($class, new ClassGraph())->violations);
     }
 
     public function test_a_wildcard_namespace_is_accepted(): void
     {
         $class = ParsedClassFixture::create('App\Modules\Billing\Domain\Invoice');
 
-        self::assertCount(0, (new ResideInNamespace('App\*\Domain'))->evaluate($class, new ClassGraph()));
+        self::assertCount(0, (new ResideInNamespace('App\*\Domain'))->evaluate($class, new ClassGraph())->violations);
     }
 }

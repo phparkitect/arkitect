@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Evaluate;
 
+use Arkitect\Evaluate\Constraint\IsA;
 use Arkitect\Evaluate\Constraint\IsFinal;
 use Arkitect\Evaluate\Constraint\IsReadonly;
 use Arkitect\Evaluate\Rule;
@@ -92,6 +93,34 @@ final class RuleTest extends TestCase
 
         $details = array_map(static fn ($v) => $v->detail, iterator_to_array($result->violations));
         self::assertSame(['is not final', 'is not readonly'], $details);
+    }
+
+    /**
+     * A rule that couldn't look at part of what it was asked about has not
+     * passed, even with an empty violation list — so the two are carried
+     * separately and `isConclusive()` is what says whether the answer can
+     * be trusted.
+     */
+    public function test_unresolved_classes_are_carried_apart_from_violations(): void
+    {
+        $unresolvable = ParsedClassFixture::create('App\Child', extends: ['Vendor\NeverParsed']);
+
+        $result = (new Rule([], [new IsA('App\Contract')]))
+            ->check([$unresolvable], new ClassGraph($unresolvable));
+
+        self::assertSame(1, $result->checked);
+        self::assertCount(0, $result->violations);
+        self::assertCount(1, $result->unresolved);
+        self::assertFalse($result->isConclusive());
+    }
+
+    public function test_a_rule_that_resolved_everything_is_conclusive(): void
+    {
+        $result = (new Rule([], [new IsFinal()]))
+            ->check([ParsedClassFixture::create('App\Order', isFinal: false)], new ClassGraph());
+
+        self::assertCount(1, $result->violations);
+        self::assertTrue($result->isConclusive());
     }
 
     public function test_an_empty_class_set_matches_nothing(): void

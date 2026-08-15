@@ -16,7 +16,7 @@ final class ExtendTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Child', extends: ['App\Base']);
 
-        $violations = (new Extend('App\Base'))->evaluate($class, new ClassGraph($class));
+        $violations = (new Extend('App\Base'))->evaluate($class, new ClassGraph($class))->violations;
 
         self::assertCount(0, $violations);
     }
@@ -26,7 +26,7 @@ final class ExtendTest extends TestCase
         $class = ParsedClassFixture::create('App\Child', extends: ['App\Middle']);
         $graph = new ClassGraph($class, ParsedClassFixture::create('App\Middle', extends: ['App\Base']));
 
-        $violations = (new Extend('App\Base'))->evaluate($class, $graph);
+        $violations = (new Extend('App\Base'))->evaluate($class, $graph)->violations;
 
         self::assertCount(0, $violations);
     }
@@ -41,7 +41,7 @@ final class ExtendTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Service', implements: ['App\Contract']);
 
-        $violations = (new Extend('App\Contract'))->evaluate($class, new ClassGraph($class));
+        $violations = (new Extend('App\Contract'))->evaluate($class, new ClassGraph($class))->violations;
 
         self::assertCount(1, $violations);
         self::assertSame('does not extend App\Contract', iterator_to_array($violations)[0]->detail);
@@ -52,7 +52,7 @@ final class ExtendTest extends TestCase
         $class = ParsedClassFixture::create('App\Child', extends: ['App\Middle']);
         $graph = new ClassGraph($class, ParsedClassFixture::create('App\Middle', extends: ['App\Base']));
 
-        $violations = (new Extend('App\Base', Depth::Direct))->evaluate($class, $graph);
+        $violations = (new Extend('App\Base', Depth::Direct))->evaluate($class, $graph)->violations;
 
         self::assertCount(1, $violations);
         self::assertSame('does not directly extend App\Base', iterator_to_array($violations)[0]->detail);
@@ -62,7 +62,7 @@ final class ExtendTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Child', extends: ['App\Base']);
 
-        $violations = (new Extend('App\Base', Depth::Direct))->evaluate($class, new ClassGraph());
+        $violations = (new Extend('App\Base', Depth::Direct))->evaluate($class, new ClassGraph())->violations;
 
         self::assertCount(0, $violations);
     }
@@ -75,7 +75,7 @@ final class ExtendTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Base');
 
-        $violations = (new Extend('App\Base'))->evaluate($class, new ClassGraph($class));
+        $violations = (new Extend('App\Base'))->evaluate($class, new ClassGraph($class))->violations;
 
         self::assertCount(1, $violations);
     }
@@ -84,21 +84,22 @@ final class ExtendTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Child', extends: ['Vendor\NeverParsed']);
 
-        $violations = (new Extend('Vendor\NeverParsed'))->evaluate($class, new ClassGraph($class));
+        $violations = (new Extend('Vendor\NeverParsed'))->evaluate($class, new ClassGraph($class))->violations;
 
         self::assertCount(0, $violations);
     }
 
-    public function test_an_unresolvable_chain_is_reported_rather_than_passing(): void
+    public function test_an_unresolvable_chain_goes_to_the_unresolved_channel(): void
     {
         $class = ParsedClassFixture::create('App\Child', extends: ['Vendor\NeverParsed']);
 
-        $violations = (new Extend('App\Base'))->evaluate($class, new ClassGraph($class));
+        $outcome = (new Extend('App\Base'))->evaluate($class, new ClassGraph($class));
 
-        self::assertCount(1, $violations);
+        self::assertCount(0, $outcome->violations);
+        self::assertCount(1, $outcome->unresolved);
         self::assertSame(
-            'cannot be resolved against App\Base: some ancestors were never parsed',
-            iterator_to_array($violations)[0]->detail
+            'cannot be checked against App\Base: some ancestors were never parsed',
+            iterator_to_array($outcome->unresolved)[0]->detail
         );
     }
 }

@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace Arkitect\Evaluate\Constraint;
 
+use Arkitect\Evaluate\Outcome;
 use Arkitect\Evaluate\Violation;
 use Arkitect\Evaluate\Violations;
 use Arkitect\Parser\ParsedClass;
 use Arkitect\Resolve\ClassGraph;
 use Arkitect\Resolve\Membership;
 
+/**
+ * Follows the `extends` chain only: an interface reached through
+ * `implements` is something the class is, not something it extends — that
+ * question belongs to IsA.
+ */
 final class Extend implements Constraint
 {
     public function __construct(
@@ -18,39 +24,37 @@ final class Extend implements Constraint
     ) {
     }
 
-    public function evaluate(ParsedClass $class, ClassGraph $classGraph): Violations
+    public function evaluate(ParsedClass $class, ClassGraph $classGraph): Outcome
     {
-        $detail = Depth::Direct === $this->depth
-            ? $this->checkDeclaration($class)
-            : $this->checkChain($class, $classGraph);
-
-        if (null === $detail) {
-            return new Violations();
+        if (Depth::Direct === $this->depth) {
+            return $this->declares($class)
+                ? new Outcome()
+                : $this->violation($class, \sprintf('does not directly extend %s', $this->target));
         }
 
-        return new Violations([Violation::create($class, self::class, $detail)]);
+        return match ($classGraph->hasAncestor($class->fqcn, $this->target)) {
+            Membership::Yes => new Outcome(),
+            Membership::No => $this->violation($class, \sprintf('does not extend %s', $this->target)),
+            Membership::Unknown => Outcome::unresolved($class, \sprintf(
+                'cannot be checked against %s: some ancestors were never parsed',
+                $this->target
+            )),
+        };
     }
 
-    private function checkDeclaration(ParsedClass $class): ?string
+    private function declares(ParsedClass $class): bool
     {
-        foreach ($class->extends as $parent) {
-            if ($parent->name === $this->target) {
-                return null;
+        foreach ($class->extends as $reference) {
+            if ($reference->name === $this->target) {
+                return true;
             }
         }
 
-        return \sprintf('does not directly extend %s', $this->target);
+        return false;
     }
 
-    private function checkChain(ParsedClass $class, ClassGraph $classGraph): ?string
+    private function violation(ParsedClass $class, string $detail): Outcome
     {
-        return match ($classGraph->hasAncestor($class->fqcn, $this->target)) {
-            Membership::Yes => null,
-            Membership::No => \sprintf('does not extend %s', $this->target),
-            Membership::Unknown => \sprintf(
-                'cannot be resolved against %s: some ancestors were never parsed',
-                $this->target
-            ),
-        };
+        return new Outcome(new Violations([Violation::create($class, self::class, $detail)]));
     }
 }
