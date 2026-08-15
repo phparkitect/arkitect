@@ -81,7 +81,8 @@ It records the *type*, not the spelling, where the two disagree: an enum
 carries `isFinal: true` even though the keyword is a syntax error on an
 enum. This is still language knowledge and needs no runtime call, and the
 alternative is worse — recording `false` would make every "must be final"
-rule report an enum the user cannot fix.
+rule report an enum the user cannot fix. The same "record the value, not the
+syntax" principle governs names: see *Names: one spelling* below.
 
 **Hard constraint on this stage: zero runtime calls.** No `class_exists`,
 no `ReflectionClass`, no `is_a()`. This is what today's
@@ -389,6 +390,11 @@ you wait).
   runtime) rather than reporting `Unknown` for every descendant of an
   exception. Resolve is not cached, so this does not reintroduce the
   cacheability problem that ruled reflection out of parsing.
+- Class names are fully qualified with no leading separator, everywhere.
+  `Fqcn` enforces it and normalizes `\App\Foo` to `App\Foo` rather than
+  rejecting it — the two name the same class, and the second is what
+  php-parser, `Foo::class` and `ClassGraph`'s index all use. Values that
+  aren't names at all are rejected outright, as is a line number below 1.
 - "Could not determine" is never a violation. An unresolvable ancestor
   chain goes to its own channel (`Outcome::$unresolved`,
   `RuleResult::$unresolved`, `Selection::Unresolved`) because it is a gap in
@@ -480,6 +486,45 @@ fixes the leak, but by checking "is the stack empty" at every call site
 rather than by construction: a guard that has to be remembered at each new
 call site, not a state that can't exist. Rejected for that reason; don't
 reintroduce it.
+
+## Names: one spelling, enforced by `Fqcn`
+
+Every class name in the codebase is fully qualified with no leading
+separator. That isn't a style preference: `ClassGraph` indexes classes by
+this exact string, so accepting `App\Foo` and `\App\Foo` both would
+silently make them two unrelated types, and a rule about one would match
+nothing.
+
+The form is also not really a choice — it is what php-parser's `toString()`
+returns, what `namespacedName->toCodeString()` gives for the class's own
+name, and what `Foo::class` evaluates to, which is how people write names
+in rules. The leading `\` belongs to source syntax (`extends \Vendor\Bar`),
+not to the name as a value.
+
+`Fqcn` holds that rule in one place and **normalizes rather than rejects** a
+leading separator, since `\App\Foo` and `App\Foo` name the same class
+beyond any ambiguity and the first is what people write when copying from
+code. Exactly one separator is stripped, so `\\App\Foo` still fails: that
+is not a name anyone meant.
+
+This was found by writing the rule, not by reasoning about it.
+`IsA('\App\Contract')` used to fail in the worst possible direction —
+the target matched nothing stored, so every class in a codebase that
+satisfied the rule was reported as violating it, while
+`ResideInNamespace('\App\Domain')` merely selected nothing at all.
+
+`Fqcn` is used by `TypeReference`, by `ParsedClass` (whose `shortName()`
+and `namespaceName()` are derived from it rather than duplicating the
+string arithmetic), and by every constraint and selector that takes a
+target name. `Pattern` normalizes the same way without using it, since a
+pattern carries wildcards and is not a class name.
+
+`TypeReference` also requires `line >= 1`: php-parser answers `-1` when a
+node has no position, and that value would otherwise travel intact into a
+violation reported at `src/Foo.php:-1`. Both rules were checked against
+real input before being imposed — 26,680 type references and 2,620 FQCNs
+parsed out of this repo's own `vendor/` satisfy them, none with a line
+below 1.
 
 ## Parser component: @throws resolution
 
