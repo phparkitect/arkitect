@@ -385,6 +385,59 @@ nothing and finding nothing must be visibly different outcomes (*Reliable
 first, fast second*: a result you can't trust is worse than one that makes
 you wait).
 
+Built as `Report\TextReport`, and designed around *when* the output is read:
+in CI only when it fails, and often only the last lines; locally over and
+over while fixing; and, on first adoption, as a wall of hundreds of
+violations. So the failing run is what the format is for, and a clean run
+is a single line.
+
+```
+✗ selectors should not know how parsing works
+    Evaluate/Selector/Extend.php:22   depends on Arkitect\Parser\Fqcn
+    Evaluate/Selector/IsA.php:21      depends on Arkitect\Parser\Fqcn
+
+! could not check 1 class
+    src/Api/Controller.php:10   cannot be checked against App\Contract: …
+  vendor/ is probably outside the analysed root
+
+! "a rule about a namespace that does not exist" matched no classes
+
+49 classes, 4 rules, 9 violations in 1 rule
+```
+
+- **`file:line` leads every line**, because that is the part terminals and
+  IDEs turn into a link — the single detail that most changes what using
+  this feels like locally.
+- **The class name is not repeated.** The first draft had it, and running
+  the report against real code rather than a mock killed it immediately:
+  with real paths and namespaces the FQCN was two thirds of the line and
+  said only what `file:line` already said.
+- **Rules that pass are not printed.** With a dozen rules, ten green lines
+  hide the two red ones; the summary says how many ran. A `--verbose` can
+  list them.
+- **Deterministic order** (file, then line) so two runs over the same code
+  produce identical bytes. The baseline will depend on that.
+- **Everything is printed, never truncated** — hiding violations to keep
+  the output short is the baseline's job, not the formatter's.
+- **The three channels carry different weight.** Violations are the point;
+  unresolved classes and unparsable files are setup problems, so they get
+  their own sections and the unresolved one says what to do; not-applicable
+  is silent except when a rule could judge nothing at all.
+
+Exit codes: `0` clean, `1` for violations *and* for anything that went
+unchecked (unresolved classes, unparsable files), `2` for a usage error
+such as a root that isn't a directory. One code for both failure kinds on
+purpose: a run that couldn't check part of the project has not passed, and
+splitting the two would be a distinction CI can't act on differently.
+
+Open, and the first concrete evidence that `root()` has visible
+consequences: file paths are currently relative to the directory that was
+scanned, so scanning `src/` yields `Evaluate/Selector/Extend.php`, which
+does not resolve from the project root and therefore is not clickable. If
+the config's `root()` is the project root, this fixes itself by
+construction — `run.php` scanning `src/` directly is the anomaly, not the
+report.
+
 ## Decided
 
 - Performance is out of scope for this PoC. Correctness and DX come first;
@@ -451,6 +504,8 @@ you wait).
   namespace-based (`that()`) or, exceptionally, path-based
   (`ResideInPath`).
 - Report is rebuilt from scratch against the new structured `Violation`.
+  Exit `1` covers both violations and anything left unchecked: a run that
+  could not look at part of the project has not passed.
 - 2.0 is a hard break for third-party expression authors — no
   compatibility shim. v1 keeps being maintained in parallel.
 - `Not`/`And`/`Or` composable expressions are explicitly out of this
