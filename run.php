@@ -21,33 +21,18 @@ require __DIR__.'/vendor/autoload.php';
 use Arkitect\Evaluate\Constraint;
 use Arkitect\Evaluate\Rule;
 use Arkitect\Evaluate\Selector;
+use Arkitect\Config;
 use Arkitect\FileSystem\FilesystemFileRepository;
+use Arkitect\Parser\ParseResult;
 use Arkitect\Parser\TargetPhpVersion;
 use Arkitect\Report\TextReport;
 use Arkitect\ProjectParser;
 use Arkitect\Resolve\ClassGraph;
 
-$path = $argv[1] ?? 'src';
+$root = $argv[1] ?? __DIR__;
 
 try {
-    $files = new FilesystemFileRepository($path);
-} catch (InvalidArgumentException $e) {
-    // not swallowing it: a stack trace is the wrong answer to a typo, and the
-    // real CLI (stage 4) is where this belongs properly
-    fwrite(\STDERR, $e->getMessage()."\n");
-    exit(2);
-}
-
-$parsed = (new ProjectParser($files))->parse(TargetPhpVersion::create(null));
-
-/**
- * No vendor/ here, so any rule that walks the inheritance chain would hit
- * unresolvable ancestors — see ARCHITECTURE.md, stage 2. The rules below
- * read declarations only, so one parsed set is enough.
- */
-$classGraph = new ClassGraph(...$parsed->classes);
-
-$rules = [
+    $config = Config::create()->root($root)->add([
     Rule::allClasses()
         ->that(new Selector\ResideInNamespace('Arkitect\Parser'))
         ->should(new Constraint\NotDependOnTheseNamespaces(['Arkitect\Resolve', 'Arkitect\Evaluate']))
@@ -66,18 +51,29 @@ $rules = [
     Rule::allClasses()
         ->that(new Selector\ResideInNamespace('Arkitect\Evaluate\Selector'))
         ->should(new Constraint\NotDependOnTheseNamespaces(['Arkitect\Evaluate\Violation*']))
-        ->because('a selector decides what a rule is about and never reports anything'),
-];
+        ->because('a selector decides what a rule is about and never reports anything'),]);
+} catch (InvalidArgumentException $e) {
+    fwrite(\STDERR, $e->getMessage()."\n");
+    exit(2);
+}
+
+$parsed = (new ProjectParser(new FilesystemFileRepository($config->root)))->parse(TargetPhpVersion::create(null));
+
+// one parse, two sets: the graph resolves against everything, the rules only
+// ever see what the config says is the user's own code
+$classGraph = new ClassGraph(...$parsed->classes);
+$checkable = array_values(array_filter(
+    $parsed->classes,
+    static fn ($class) => $config->checks($class->filePath)
+));
 
 $results = array_map(
-    static fn (Rule $rule) => $rule->check($parsed->classes, $classGraph),
-    $rules
+    static fn (Rule $rule) => $rule->check($checkable, $classGraph),
+    $config->rules
 );
 
-echo (new TextReport())->render($parsed, $results), "\n";
+echo (new TextReport())->render(new ParseResult($checkable, $parsed->errors), $results), "\n";
 
-// unresolved classes and unparsable files fail the run too: in both cases
-// something went unchecked, and a green run would say otherwise
 $clean = [] === $parsed->errors;
 
 foreach ($results as $result) {
