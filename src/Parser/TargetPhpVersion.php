@@ -19,9 +19,15 @@ final class TargetPhpVersion
         $this->version = $version;
     }
 
-    public static function create(?string $version): self
+    public static function create(string $version): self
     {
-        return new self($version ?? \PHP_MAJOR_VERSION.'.'.\PHP_MINOR_VERSION);
+        return new self($version);
+    }
+
+    /** What the interpreter running arkitect happens to be. */
+    public static function current(): self
+    {
+        return new self(\PHP_MAJOR_VERSION.'.'.\PHP_MINOR_VERSION);
     }
 
     public function toString(): string

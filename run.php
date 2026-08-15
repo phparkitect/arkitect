@@ -24,7 +24,6 @@ use Arkitect\Evaluate\Selector;
 use Arkitect\Command\Check;
 use Arkitect\Config;
 use Arkitect\FileSystem\FilesystemFileRepository;
-use Arkitect\Parser\TargetPhpVersion;
 use Arkitect\Report\TextReport;
 use Arkitect\Parser\RepositoryParser;
 
@@ -72,7 +71,7 @@ try {
     exit(2);
 }
 
-$result = (new Check(new RepositoryParser($files)))->run($config->rules, TargetPhpVersion::create(null));
+$result = (new Check(new RepositoryParser($files)))->run($config->rules, $config->targetPhpVersion);
 
 echo (new TextReport())->render($result), "\n";
 
