@@ -470,6 +470,73 @@ root that is not a directory. One code for both failure kinds on purpose: a
 run that could not check part of the project has not passed, and splitting
 them would be a distinction CI cannot act on differently.
 
+#### Baseline
+
+The violations a project has decided to live with, so arkitect can be
+adopted without fixing everything first. What decides whether it is any
+good is what identifies a violation across runs, and v1 answers that twice
+badly: it keys on the line number — so much so that it ships an opt-in
+setting to ignore line numbers, a trap you have to learn about before you
+can turn it off — and on the rendered error string.
+
+Identity here is the class, the constraint, and the constraint's own `key`:
+the name the violation is about beyond the class — the forbidden
+dependency, the interface not implemented, the namespace expected. It comes
+from the rule's parameters and never from the message, so rewording a
+message cannot invalidate a baseline in the wild. `Violation::createAt()`
+fills it from the `TypeReference` it already had.
+
+**Everything stored is compared**, which is what keeps the file honest: no
+line, no path, no message, nothing that can go stale without meaning
+anything. Entries are sorted, since the file is committed and read in
+diffs.
+
+Two commands, both running the check with any existing baseline ignored —
+reading the current one would hide from them exactly the violations they
+exist to record. They differ in what they do next, which is why both exist:
+`generate-baseline` accepts what is there now and replaces the file;
+`prune-baseline` only ever shrinks, keeping the entries that still match
+something, so a violation introduced since is left to fail rather than
+quietly accepted. Without pruning, a baseline keeps permission for work
+already done and nobody notices.
+
+A configured path that holds no baseline stops the run rather than
+proceeding with an empty one, which would report every known violation as
+though it were new.
+
+#### The CLI
+
+`bin/arkitect`, with `Cli\Console` as the driving adapter: it translates
+argv and a config file into a run, and a `CheckResult` back into text. It
+holds no decision of its own, and it is the composition root — everything
+concrete is built there. A rule in `run.php` keeps that honest: nothing
+outside `Arkitect\Cli` may depend on it.
+
+The CLI is not a port. The port on the driving side is the commands' own
+API, and an interface between them and their only caller would be ceremony.
+
+**No console library.** `getopt()` looks like the middle ground and is
+unusable: it stops at the first non-option argument, so
+`arkitect check --config=x` returns no options at all, silently. That
+leaves a dependency or thirty lines, and thirty lines is what three
+commands and two flags need — arkitect keeps a single production
+dependency. Two behaviours come from writing it: one accepted spelling
+rather than four synonyms, and an unknown flag is an error rather than an
+option quietly ignored, since a mistyped `--skpi-baseline` should not run
+something other than what was asked.
+
+Surface: `check` (the default), `generate-baseline`, `prune-baseline`;
+`--config=`, `--skip-baseline`, `--help`. `--format` waits for a second
+`Report`, `--stop-on-failure` is pointless with a report that prints
+everything and a baseline that hides what you accepted, and `--autoload`
+until something needs it.
+
+Loading `phparkitect.php` is `require` of a user file that returns a
+`Config` — arbitrary code execution, and inherently "how the user talks to
+us", so it lives on the driving side rather than behind a port. `Console`
+is tested against a real directory and a real config file, the way the
+filesystem adapter is.
+
 ## Ports and adapters, arrived at rather than adopted
 
 `FileRepository` was pulled out first on its own merits: testing the parser
@@ -499,9 +566,8 @@ put two organizing principles in one tree while nesting every name a level
 deeper. The boundary such a directory would document is already *checked*
 by rules in `run.php`, which a directory cannot do.
 
-`Command/` holds `Check` and `CheckResult`, singular like `Constraint/` and
-`Selector/` beside it. `generate-baseline` (`#648`) and `prune-baseline`
-(`#649`) are what will make it hold more than one.
+`Command/` holds `Check`, `GenerateBaseline` and `PruneBaseline`, singular
+like `Constraint/` and `Selector/` beside it.
 
 ## Names: one spelling, enforced by `Fqcn`
 
@@ -554,11 +620,12 @@ same way by anyone starting over.
   skipped a dependency whenever the class sat anywhere beneath the
   dependency's namespace, silently permitting every parent namespace. Here
   only the class's own namespace is implicit.
-- **`that()` only narrows.** Selectors combine with *and*, so "everything
-  except `Arkitect\Parser`" cannot be said;
-  `ResideInOneOfTheseNamespaces` only lets the others be enumerated by
-  hand. A negative selector is the real answer, and brings the twin-class
-  question with it.
+- **`that()` only narrows**, so for a while "everything except
+  `Arkitect\Parser`" could not be said and the rule about php-parser listed
+  the other namespaces by hand — a list that goes quietly out of date the
+  moment a component is added. `Selector\NotResideInNamespace` says it
+  properly, and covers 98 classes where the list covered four namespaces
+  somebody remembered.
 
 Two habits came out of these, both cheap and both in `CLAUDE.md`: check a
 rule against real input before enforcing it — the name and line rules were
@@ -603,9 +670,25 @@ explained where it belongs.
   `composer.lock` rather than per file.
 - **Graph edge cases**: duplicate FQCNs, inheritance cycles, trait
   conflicts, diamond interfaces.
-- **A negative selector**, and with it whether negation is twin classes or
-  something composable.
-- **Baseline and CLI** are not built at all.
+- **Negation on the constraint side.** Nothing has asked for it, so
+  nothing is built. When something does, it is a class named for what it
+  does, like `Selector\NotResideInNamespace` — not a `Not` decorator.
+
+  The decorator is tempting for selectors, where negation is genuinely
+  clean: a selector answers `Yes|No|Unresolved` and produces neither prose
+  nor identity, so negating it is swapping two of three. It does not
+  survive the trip to constraints. A satisfied constraint produces nothing,
+  so a decorator has no message and no `key` to build the violation it now
+  has to report; and a constraint like `DependOnlyOnTheseNamespaces`
+  reports one violation per offending dependency, each on its own line,
+  which negates to a single violation about the class — a different shape,
+  losing what made it useful. Making that work needs a narrower contract
+  with two phrasings per constraint, composed keys, and a rule that
+  negating `Unknown` stays `Unknown`: a small language for saying "not".
+
+  Which leaves the reason it is a class on both sides rather than a
+  decorator on one: users would otherwise learn two ways to negate,
+  depending on which half of a rule they are writing.
 
 ## Working on this branch
 
@@ -614,8 +697,8 @@ explained where it belongs.
 Makefile is for. `CLAUDE.md` carries the conventions that outlive this
 document.
 
-`run.php` is not the CLI. It is throwaway wiring that runs arkitect
-against its own architecture: the stage ordering, that nothing under
+`run.php` is not the CLI — `bin/arkitect` is. It stays because it runs
+arkitect against its own architecture: the stage ordering, that nothing under
 `Evaluate\Selector` references `Violation`, and the two hexagon boundaries
 — no knowledge of which library reads PHP source, none of who prints
 results. Each was verified to fail when inverted, reporting violations by
