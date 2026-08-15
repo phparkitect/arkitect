@@ -23,7 +23,7 @@ final class Outcome
 
     public static function unresolved(ParsedClass $class, string $detail): self
     {
-        return new self(unresolved: new UnresolvedClasses([UnresolvedClass::create($class, $detail)]));
+        return new self(unresolved: new UnresolvedClasses(UnresolvedClass::create($class, $detail)));
     }
 
     /**
@@ -35,6 +35,6 @@ final class Outcome
      */
     public static function notApplicable(ParsedClass $class, string $detail): self
     {
-        return new self(notApplicable: new NotApplicableClasses([NotApplicableClass::create($class, $detail)]));
+        return new self(notApplicable: new NotApplicableClasses(NotApplicableClass::create($class, $detail)));
     }
 }

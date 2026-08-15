@@ -239,9 +239,22 @@ Consequences that fall out of this, not separate work:
   for roughly half of today's expressions.
 - `Violations` can become immutable — previously blocked specifically by
   `evaluate()` requiring a mutable accumulator parameter.
-- All multi-value constructors take `array`, never splat (`#599`) — no
-  inconsistency left to standardize, and no variadic-must-be-last
-  constraint blocking a second constructor argument later.
+- Multi-value constructors take `array`, never splat (`#599`) — **in the
+  classes a user writes in a config**, which is where the inconsistency
+  `#599` reports actually lives: v1's `src/Expression/ForClasses/` has
+  `Extend(string ...$classNames)` next to `MatchOneOfTheseNames(array
+  $names)`. The technical half of the reason points the same way — the two
+  v1 expressions carrying a second argument (`$exclude`) are precisely the
+  ones taking an array, since a variadic must come last. v2 hit it again:
+  `Implement(string $target, Depth $depth)` could not have gained its
+  second argument as a variadic.
+
+  Internal collections were never in scope, and use typed variadics —
+  `Violations`, `TypeReferences`, `ClassGraph`. Nobody constructs those
+  from a config, so there is no API to keep consistent, and the variadic
+  buys something an `array` cannot: PHP checks the element type itself,
+  instead of a `list<X>` docblock and a hand-written loop that can drift
+  from it.
 
 Explicitly **not** part of this rewrite: `Not`/`And`/`Or` composable
 decorators to replace the 17 `Not*`/`IsNot*` twin classes

@@ -99,9 +99,9 @@ final class Rule
         return new RuleResult(
             $selected,
             $checked,
-            new Violations($violations),
-            new UnresolvedClasses($unresolved),
-            new NotApplicableClasses($notApplicable),
+            new Violations(...$violations),
+            new UnresolvedClasses(...$unresolved),
+            new NotApplicableClasses(...$notApplicable),
         );
     }
 

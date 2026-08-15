@@ -54,6 +54,6 @@ final class Implement implements Constraint
 
     private function violation(ParsedClass $class, string $detail): Outcome
     {
-        return new Outcome(new Violations([Violation::create($class, self::class, $detail)]));
+        return new Outcome(new Violations(Violation::create($class, self::class, $detail)));
     }
 }

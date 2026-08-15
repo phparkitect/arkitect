@@ -44,7 +44,7 @@ final class NotDependOnTheseNamespaces implements Constraint
             );
         }
 
-        return new Outcome(new Violations($violations));
+        return new Outcome(new Violations(...$violations));
     }
 
     private function isForbidden(string $dependency): bool

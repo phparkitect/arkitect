@@ -25,9 +25,9 @@ final class IsAbstract implements Constraint
             return new Outcome();
         }
 
-        return new Outcome(new Violations([
+        return new Outcome(new Violations(
             Violation::create($class, self::class, 'is not abstract'),
-        ]));
+        ));
     }
 
     /** The language facts that leave the requirement no way to be satisfied. */

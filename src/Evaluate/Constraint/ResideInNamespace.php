@@ -26,9 +26,9 @@ final class ResideInNamespace implements Constraint
             return new Outcome();
         }
 
-        return new Outcome(new Violations([
+        return new Outcome(new Violations(
             Violation::create($class, self::class, \sprintf('does not reside in %s', $this->pattern->toString())),
-        ]));
+        ));
     }
 
     private function matches(ParsedClass $class): bool

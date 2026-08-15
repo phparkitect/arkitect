@@ -26,13 +26,13 @@ final class HaveNameMatching implements Constraint
             return new Outcome();
         }
 
-        return new Outcome(new Violations([
+        return new Outcome(new Violations(
             Violation::create(
                 $class,
                 self::class,
                 \sprintf('does not have a name matching %s', $this->pattern->toString())
             ),
-        ]));
+        ));
     }
 
     private function matches(ParsedClass $class): bool

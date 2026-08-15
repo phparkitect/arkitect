@@ -12,18 +12,8 @@ final class UnresolvedClasses implements \IteratorAggregate, \Countable
     /** @var list<UnresolvedClass> */
     private array $items;
 
-    /** @param list<UnresolvedClass> $items */
-    public function __construct(array $items = [])
+    public function __construct(UnresolvedClass ...$items)
     {
-        // the list<UnresolvedClass> in the docblock is a promise to the analyser;
-        // this is the one PHP keeps at runtime, since the constructor takes an
-        // array rather than a typed variadic (see #599 in ARCHITECTURE.md)
-        foreach ($items as $item) {
-            if (!$item instanceof UnresolvedClass) {
-                throw new \InvalidArgumentException(\sprintf('Expected an unresolved class, got %s.', get_debug_type($item)));
-            }
-        }
-
         $this->items = array_values($items);
     }
 

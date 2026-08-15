@@ -100,28 +100,30 @@ final class InvalidStatesTest extends TestCase
     }
 
     /**
-     * `list<Violation>` in a docblock is a promise to the analyser; these
-     * collections now keep it at runtime too.
+     * `list<Violation>` in a docblock is a promise to the analyser. These are
+     * typed variadics, so PHP itself keeps it — no hand-written check to get
+     * out of step with the docblock. #599's array-not-splat rule is about the
+     * classes users write in a config, not about collections like this one.
      */
     public function test_a_collection_of_violations_holds_only_violations(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
 
-        new Violations(['not a violation']);
+        new Violations('not a violation'); // @phpstan-ignore-line
     }
 
     public function test_a_collection_of_unresolved_classes_holds_only_those(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
 
-        new UnresolvedClasses([42]);
+        new UnresolvedClasses(42); // @phpstan-ignore-line
     }
 
     public function test_a_collection_of_not_applicable_classes_holds_only_those(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
 
-        new NotApplicableClasses([new \stdClass()]);
+        new NotApplicableClasses(new \stdClass()); // @phpstan-ignore-line
     }
 
     public function test_a_rule_holds_only_selectors(): void

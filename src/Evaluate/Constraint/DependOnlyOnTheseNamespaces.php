@@ -43,7 +43,7 @@ final class DependOnlyOnTheseNamespaces implements Constraint
             );
         }
 
-        return new Outcome(new Violations($violations));
+        return new Outcome(new Violations(...$violations));
     }
 
     private function isAllowed(ParsedClass $class, string $dependency): bool
