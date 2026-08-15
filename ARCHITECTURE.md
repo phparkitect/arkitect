@@ -68,10 +68,10 @@ contained.
 ### 1. Parse — pure, per file, cacheable
 
 ```
-(file content, target-php-version, annotation flag) → ParsedFile
+(file content, target-php-version, annotation flag) → ParsedClass
 ```
 
-A `ParsedFile` declares only what the file says about itself: FQCN and its
+A `ParsedClass` declares only what the file says about itself: FQCN and its
 own declaration line, unresolved `extends`/`implements`/`use trait` names,
 type references, attributes, docblocks — all with line numbers. The class's
 own declaration line matters as much as the others: it's what gives a
@@ -104,7 +104,7 @@ flag + arkitect version. (Not mtime — validation cost is negligible even at
 ### 2. Resolve — in-memory, per run, not cached (and doesn't need to be)
 
 ```
-all ParsedFile (project + vendor) → symbol graph → resolved ClassDescription
+all ParsedClass (project + vendor) → ClassGraph → resolved membership
 ```
 
 Turns names into links: for each class, the transitive ancestor chain
@@ -127,28 +127,71 @@ defining the same class in more than one file), inheritance cycles, trait
 conflicts, diamond interfaces: deliberately not speculatively designed for.
 Handle each when a concrete case surfaces it, see Open.
 
-### 3. Evaluate — the `Expression` contract, rewritten
+### 3. Evaluate — two contracts, not one
 
 ```php
-interface Expression
+namespace Arkitect\Evaluate\Selector;
+
+interface Selector      // what the rule is about — that()
 {
-    public function appliesTo(ClassDescription $class): bool;   // was opt-in via method_exists — #669
-    public function evaluate(ClassDescription $class): Violations; // was void, mutated a param — #670
+    public function matches(ParsedClass $class, ClassGraph $classGraph): bool;
+}
+
+namespace Arkitect\Evaluate\Constraint;
+
+interface Constraint    // what it requires — should(); was void, mutated a param — #670
+{
+    public function evaluate(ParsedClass $class, ClassGraph $classGraph): Violations;
 }
 ```
 
+`Expression` is gone, and so is `appliesTo()` — see "`appliesTo()` resolved
+by decomposition" below, which is what the two contracts are for.
+
+`ClassGraph` is a parameter rather than a constructor dependency: the
+config builds constraints before anything has been parsed, so the graph
+doesn't exist yet when they are constructed.
+
+Selectors and constraints are separate *classes*, not one class
+implementing both interfaces, even where they share a name
+(`ResideInNamespace` exists in both namespaces). Two reasons, both load
+bearing:
+
+- A constraint is strictly richer than a predicate.
+  `DependOnlyOnTheseNamespaces` reports one violation per offending
+  dependency, each on its own line; no boolean expresses that, so it can
+  never be a selector. The type system now rejects
+  `that(new DependOnlyOnTheseNamespaces(...))`, which v1 accepted and did
+  something incoherent with.
+- The same question gets different answers in the two positions. An
+  unresolvable ancestor chain is a violation for a constraint; for a
+  selector it's a decision about whether to include the class at all. One
+  shared class would have forced those to be the same answer.
+
+The duplicated names cost nothing in practice: both `ResideInNamespace`
+classes delegate to the same `Pattern` value object, so the logic lives in
+one place. And nothing under `Evaluate\Selector` references `Violation` —
+checked as a rule in `run.php`, not left as an intention.
+
+Direct vs. transitive is a `Depth` parameter on `Implement`/`Extend`, not
+a second pair of classes: the twin-class route is the wart `#516` already
+flags, and it multiplies as soon as negations arrive. `Depth::Transitive`
+is the default because the alternative is a correctness trap — a class
+inheriting an interface from its parent really does implement it.
+
 Consequences that fall out of this, not separate work:
-- `Violation` identity becomes structured data (class, expression, detail,
-  line) instead of a rendered sentence parsed back with `', but '`/`'
-  because '` string matching — the baseline keys on data, not prose
-  (`#671`). Unlike today (`Violation::$line` is nullable, populated only by
-  dependency-type checks via `ClassDependency`), `line` is never null: an
-  expression that references a specific node (a dependency, an `extends`)
-  uses that node's line; anything purely structural falls back to the
-  class's own declaration line, which `ParsedFile` now carries (see stage
-  1). This is what actually backs the Report requirement below that every
-  violation carries `file:line` — without it, that requirement had nothing
-  guaranteeing it for roughly half of today's expressions.
+- `Violation` identity becomes structured data (fqcn, filePath, line,
+  constraint, detail) instead of a rendered sentence parsed back with
+  `', but '`/`' because '` string matching — the baseline keys on data, not
+  prose (`#671`). Unlike today (`Violation::$line` is nullable, populated
+  only by dependency-type checks via `ClassDependency`), `line` is never
+  null, and there are two named constructors for the two cases:
+  `Violation::createAt()` takes the `TypeReference` and points at that
+  node's line, `Violation::create()` falls back to the class's own
+  declaration line, which `ParsedClass` carries (see stage 1). This is what
+  actually backs the Report requirement below that every violation carries
+  `file:line` — without it, that requirement had nothing guaranteeing it
+  for roughly half of today's expressions.
 - `Violations` can become immutable — previously blocked specifically by
   `evaluate()` requiring a mutable accumulator parameter.
 - All multi-value constructors take `array`, never splat (`#599`) — no
@@ -162,12 +205,30 @@ technically possible, but that's not enough reason on its own — it isn't
 clearly a DX win over the current twin classes, which cause no confusion in
 practice. Left out for now; revisit separately if a real need shows up.
 
-`appliesTo()`'s meaning is not yet settled and needs real design work, not
-just a signature: it means "class excluded from the selector" in `that()`
-but "constraint vacuously holds" in `should()` — same method, two different
-semantics, and it has to interact cleanly with the report requirement below
-that "matched nothing" must be visibly different from "matched everything
-and found no violations." See Open.
+**`appliesTo()` resolved by decomposition.** It was never one problem: it
+meant "excluded from the selector" in `that()` and "constraint vacuously
+holds" in `should()` because a single type occupied both positions and the
+method had to work out at runtime which one it was in. Giving the two
+positions two types removes the ambiguity rather than settling it, so the
+method isn't built at all.
+
+That leaves the two halves it was conflating, each answered separately:
+
+- **Scope.** Handled by `Selector`, and the report requirement that
+  "matched nothing" be visibly different from "matched everything and found
+  no violations" is met by `RuleResult::$checked` — the count of classes the
+  rule actually looked at. Both cases produce zero violations; only the
+  count separates them, so it belongs to whoever runs the rule, not to a
+  method on the checks themselves.
+- **Applicability.** The real case is narrower than v1's opt-in via
+  `method_exists`: `IsFinal` on an interface is not a violation the user
+  can fix, because an interface *cannot* be final. Every genuine instance is
+  determined by `ClassKind`, which `ParsedClass` already carries — so this
+  becomes a narrow declaration ("this constraint judges concrete classes
+  only") that `Rule` enforces and counts, not an arbitrary predicate that
+  would quietly become a second selector. Not built yet; when it is,
+  `RuleResult` grows a third number next to `checked`, which makes the skip
+  visible in the report instead of silent as it is in v1.
 
 ### 4. Config and Report — the two public faces
 
@@ -235,12 +296,12 @@ by default (typically `src/` + `tests/`) — instead of relying purely on
 per-rule `that()` filters. Not decided; needs a concrete case to settle it.
 
 **Migration policy**: 2.0 is a hard break, not a smooth one. There is no
-compatibility shim for third-party `Expression` implementations and no
+compatibility shim for third-party expression implementations and no
 soft-deprecation window within 2.0 itself — the contract changes
-(`evaluate()`'s signature, `appliesTo()` becoming required) are exactly the
-kind of thing a shim can't paper over cleanly. v1 is expected to keep being
-maintained in parallel for users who aren't ready to move, rather than 2.0
-trying to ease everyone across at once.
+(`Expression` split into `Selector` and `Constraint`, `evaluate()`'s
+signature) are exactly the kind of thing a shim can't paper over cleanly.
+v1 is expected to keep being maintained in parallel for users who aren't
+ready to move, rather than 2.0 trying to ease everyone across at once.
 
 **Report** is rewritten from scratch, not ported — unlike the analyzer, it
 holds no accumulated bug-fix knowledge worth preserving. Requirements: every
@@ -257,18 +318,33 @@ you wait).
 - Performance is out of scope for this PoC. Correctness and DX come first;
   optimize only once those are solid.
 - Parse is pure and cacheable. The PHP-core-class check is the one
-  deliberate exception to "no runtime calls" — it may use reflection,
-  confined to resolve/evaluate (never parse), and its implementation can
-  wait, since it's a narrow, contained problem.
+  deliberate exception to "no runtime calls" — it uses reflection, and it
+  lives in evaluate (`Constraint\PhpCoreClasses`), never in parse. It keeps
+  autoloading off: core symbols are present without it, and letting the
+  autoloader run would execute project code just to answer a name lookup.
 - `vendor/` is parsed through the same pipeline as project code — primarily
   because inheritance resolution needs it, not primarily for caching.
 - Inheritance resolution is a graph built at resolve time, over parsed
   data only — never reflection.
-- `Expression::evaluate()` returns `Violations`; `appliesTo()` is a required
-  contract method (its exact semantics are still open, see below).
-- Every `Violation` carries a line — never null. `ClassDescription` stores
-  its own declaration line specifically so structural checks (no specific
+- `Constraint::evaluate()` returns `Violations`. There is no `appliesTo()`:
+  `Selector` and `Constraint` are separate contracts, which is what made
+  the method unnecessary rather than merely hard to specify.
+- Every `Violation` carries a line — never null. `ParsedClass` stores its
+  own declaration line specifically so structural checks (no specific
   referenced node) have a fallback instead of reporting no line at all.
+- A pattern means the same thing whether or not it contains a wildcard: the
+  name itself, or anything beneath it. v1 gave wildcard patterns to
+  `fnmatch` against the whole name and dropped the "beneath" half, so
+  `App\*\Domain` silently matched nothing. Patterns are also validated when
+  constructed, not halfway through a run.
+- In `DependOnlyOnTheseNamespaces`, only the class's *own* namespace is
+  implicitly allowed. v1 skipped a dependency whenever the class sat
+  anywhere beneath the dependency's namespace, which silently permitted
+  every parent namespace too.
+- `DependOnlyOnTheseNamespaces` and `NotDependOnTheseNamespaces` are not
+  negations of each other — one lists what is permitted and forbids the
+  rest, the other lists what is forbidden and says nothing about the rest.
+  Both exist on purpose; this is not the twin-class pattern below.
 - `Config` is a fluent object; the closure-config form is removed, not kept
   as an alternative.
 - `targetPhpVersion()` is optional, defaulting to the running interpreter's
@@ -285,7 +361,7 @@ you wait).
   namespace-based (`that()`) or, exceptionally, path-based
   (`ResideInPath`).
 - Report is rebuilt from scratch against the new structured `Violation`.
-- 2.0 is a hard break for third-party `Expression` authors — no
+- 2.0 is a hard break for third-party expression authors — no
   compatibility shim. v1 keeps being maintained in parallel.
 - `Not`/`And`/`Or` composable expressions are explicitly out of this
   rewrite — not clearly a DX improvement over the existing twin classes.
@@ -307,15 +383,15 @@ you wait).
 - **Cache storage location and invalidation**: project-local directory vs.
   system cache dir; whether `vendor`'s cache invalidates as a block on
   `composer.lock` changes rather than per-file.
-- **Exact shape of "unknown ancestor"** in the resolve graph: decided to be
-  explicit rather than silently `false`, but the API surface (exception?
-  tri-state return? sentinel value on `ClassDescription`?) isn't designed.
-- **`appliesTo()`'s dual meaning** — "excluded by the selector" in `that()`
-  vs. "constraint vacuously holds" in `should()` — is a real, unresolved
-  conceptual problem, not a deferred nice-to-have. Needs an actual answer
-  before the contract in stage 3 is final, and has to reconcile with the
-  report requirement that zero-matched and zero-violations be visibly
-  different outcomes.
+- **What an unknown ancestor means for *selection*.** Settled for
+  constraints: `ClassGraph` answers with the tri-state `Membership`, and
+  `Unknown` produces a violation with its own wording, because a green run
+  must not hide an incomplete parse scope. Unsettled for selectors, which
+  is why `IsA`/`Implement`/`Extend` have no `Selector` counterpart yet:
+  including a class whose ancestry can't be resolved means checking
+  something we're unsure about, excluding it means dropping it in silence.
+  This is the largest remaining gap in stage 3 — "all classes implementing
+  X" is probably the most common selector in real use.
 - **Parse scope vs. check scope**: whether namespace filtering via `that()`
   is enough on its own to keep `vendor/` (parsed, for resolution) out of
   rule checks by default, or whether "what we parse" and "what we check by
@@ -387,14 +463,41 @@ this, every other Resolve test built its `ClassGraph` from a single parsed
 set (synthetic fixtures, or `vendor/` alone) — none of them actually
 exercised combining project and vendor classes into one graph.
 
-Still open: whether `Implement`/`Extend`-family checks (not just `IsA`)
-route through `ClassGraph` too. v1's versions checked the *direct*
-relationship only; `ClassGraph::isA()` is transitive. Unifying them means
-deciding whether
-`Implement` becomes "transitively is-a" (a behavior change from v1) or
-`ClassGraph` grows a direct-only query alongside the transitive one. Not
-decided — matters once stage 3 (Evaluate) exists and those expressions get
-rebuilt.
+Settled since: `Implement`/`Extend` take a `Depth`, defaulting to
+transitive, so both readings are available without a second pair of
+classes. `Depth::Direct` reads the declaration and never consults the
+graph, so it cannot return `Unknown`.
+
+`Extend` transitive needed a second query rather than reusing `isA()`:
+`ClassGraph::hasAncestor()` follows the `extends` chain only, and differs
+from `isA()` in two ways that have tests of their own — an implemented
+interface is a supertype but not an ancestor, and a class is a subtype of
+itself but not its own ancestor. Without that distinction `Extend` would
+just be a synonym for `IsA`. Both queries match a declared parent by name
+before walking into it, so extending a class that was never parsed still
+answers definitively instead of `Unknown`.
+
+## Evaluate component: design note
+
+`Rule` is deliberately smaller than the eventual public rule. It holds
+selectors and constraints and returns a `RuleResult` carrying `checked`
+plus the violations — enough to prove the split works and to answer the
+zero-matched requirement, and nothing more. Missing on purpose:
+
+- **`because()`**. It's the message, and pulling it in opens the whole
+  description/report design, which is stage 4.
+- **Applicability by kind** (see stage 3). It belongs to `Rule::check()`,
+  which is what would do the skipping and the counting.
+- **Graph-backed selectors**, blocked on the `Unknown` question in Open.
+
+`run.php` runs this codebase's own stage ordering as real rules rather
+than as a demo: parsing depends on neither resolving nor evaluating,
+resolving doesn't depend on evaluating, and nothing under
+`Evaluate\Selector` references `Violation`. That last one is the design
+decision from stage 3 kept honest by the tool itself. All of them pass —
+which on its own proves nothing, so each was also verified to fail when
+inverted: pointing the same selector-vs-`Violation` pattern at
+`Evaluate\Constraint` reports 39 violations across 13 classes.
 
 ## PoC exit criteria
 
