@@ -107,7 +107,14 @@ after the first run.
 flag + arkitect version. (Not mtime — validation cost is negligible even at
 2,500 files, see above.)
 
-### 2. Resolve — in-memory, per run, not cached (and doesn't need to be)
+### 2. Resolve — a graph, not a stage
+
+Named a stage here because that was the map before the code existed. There
+is no class that "resolves": there is a `ClassGraph` and the act of
+building one, which `Codebase` does. Worth knowing when reading the four
+stages below as though they were four components — three of them are.
+
+In-memory, per run, not cached (and doesn't need to be).
 
 ```
 all ParsedClass (project + vendor) → ClassGraph → resolved membership
@@ -541,6 +548,17 @@ fixes itself by construction, and it was the first concrete evidence that
   parsed so names can resolve; everything except `vendor/` is checked. The
   rule lives in `Codebase`, not `Config`, because it is our policy rather
   than the user's declaration.
+- `Check` orchestrates: parse, split into a `Codebase`, one `check()` per
+  rule, collect. It takes the parser injected and returns a `CheckResult`,
+  knowing neither where files come from nor where results go. `isClean()`
+  is on the result, since whether a run passed is not presentation.
+- Comments explain why, when the code cannot. A phpdoc that describes a
+  type is a promise to an analyser; prefer real code where PHP can hold it
+  — `Violations`, `Rules`, `Selectors`, `RuleResults`, `ParsingErrors` are
+  typed variadic collections for that reason, and each replaced a
+  hand-written `instanceof` loop or a `list<X>` annotation. What is left
+  is what PHP cannot express: private state behind an already-typed
+  constructor, and lists of scalars.
 - Report is rebuilt from scratch against the new structured `Violation`.
   Exit `1` covers both violations and anything left unchecked: a run that
   could not look at part of the project has not passed.
@@ -640,20 +658,45 @@ than not extracting it, per *Explicit, never ambiguous*. Property hooks
 existing per-node-kind dispatch and the generic recursion already do the
 right thing, confirmed by tests rather than assumed.
 
-## File access: a port, not a filesystem call baked into ProjectParser
+## Ports and adapters, arrived at rather than adopted
 
-`ProjectParser` doesn't touch the filesystem itself. It depends on
-`FileRepository` (`src/FileSystem/`), a two-method interface (`files()`,
-`read()`); `FilesystemFileRepository` is the only production
-implementation. Not adopting a general hexagonal-architecture posture for
-the whole codebase — `Parser` itself is already a pure domain service
-without needing that vocabulary, and nothing else currently reads files —
-this one seam is pulled out because the pain was already concrete: testing
-`ProjectParser` meant real temp directories, `mkdir`/`chmod`/`rmdir` per
-test. `InMemoryFileRepository` (test-only, under `tests/FileSystem/`)
-replaces that with an in-memory fixture; `FilesystemFileRepositoryTest`
-keeps a small, separate suite that exercises the real adapter against real
-disk I/O, so the abstraction itself doesn't go unverified.
+`FileRepository` was pulled out first and on its own merits: testing the
+parser meant real temp directories and `mkdir`/`chmod`/`rmdir` per test.
+The note here used to say explicitly that this was *not* a general
+hexagonal posture. It became one anyway, one seam at a time, each for a
+reason of its own:
+
+- **`FileRepository`** — so parsing is testable without disk.
+  `FilesystemFileRepository` is the production adapter, and
+  `FilesystemFileRepositoryTest` keeps a small suite against real I/O so
+  the abstraction itself isn't unverified. `InMemoryFileRepository`
+  (test-only) replaces temp directories everywhere else, and is what lets
+  `CheckTest` run every stage together in memory.
+- **`ProjectParser`** — the port `Check` depends on, with
+  `Parser\RepositoryParser` reading a `FileRepository` and
+  `Parser\ClassParser` turning one file's source into classes. The cache
+  planned in stage 1 is a decorator on this interface; that is what the
+  port is for, more than swappability nobody wants.
+- **`ClassGraph`** — the questions rules ask (`isA`, `hasAncestor`)
+  separated from `ParsedClassGraph`, the one way of answering them today.
+  Not for a second implementation: the class reached for reflection
+  through `InternalClasses`, so a runtime call was sitting in what was
+  being called domain. Now it sits in an implementation.
+- **`Report`** — how results leave. `TextReport` is written for a human at
+  a terminal; a machine-readable format is a known requirement, which is
+  what makes the interface more than speculation.
+
+What this is *not*: a `Domain/` directory. The tree groups by component
+(`Parser`, `Resolve`, `Evaluate`, `Report`), and layering it as well would
+put two organizing principles in one tree while nesting every name a level
+deeper. The boundary a `Domain/` would document is already *checked*: two
+rules in `run.php` say that nothing under `Evaluate` knows which library
+reads PHP source, or who prints results. A directory cannot enforce that;
+a rule does.
+
+`Command/` holds `Check` and `CheckResult`, singular like `Constraint/`
+and `Selector/` beside it. `generate-baseline` (`#648`) and
+`prune-baseline` (`#649`) are what will make it hold more than one.
 
 ## Resolve component: design note
 
@@ -721,14 +764,20 @@ selectors combine with *and*, so a definite `No` from any of them settles
 the class even when another came back `Unresolved`. The rule isn't about
 that class either way, and reporting it would be noise.
 
-`run.php` runs this codebase's own stage ordering as real rules rather
-than as a demo: parsing depends on neither resolving nor evaluating,
-resolving doesn't depend on evaluating, and nothing under
-`Evaluate\Selector` references `Violation`. That last one is the design
-decision from stage 3 kept honest by the tool itself. All of them pass —
+`run.php` runs this codebase's own architecture as real rules rather than
+as a demo: the stage ordering, that nothing under `Evaluate\Selector`
+references `Violation`, and the two hexagon boundaries — no knowledge of
+which library reads PHP source, none of who prints results. All pass,
 which on its own proves nothing, so each was also verified to fail when
-inverted: pointing the same selector-vs-`Violation` pattern at
-`Evaluate\Constraint` reports 39 violations across 13 classes.
+inverted: the selector-vs-`Violation` pattern aimed at `Evaluate\Constraint`
+reports 39 violations, and the php-parser rule aimed at `Arkitect\Parser`
+reports 45.
+
+Writing them turned up a gap. Selectors combine with *and*, so `that()`
+only narrows: "everything except `Arkitect\Parser`" cannot be said at all,
+and `ResideInOneOfTheseNamespaces` — added for this — only lets the other
+components be enumerated by hand. A negative selector is the real answer,
+and it brings the twin-class question with it.
 
 ## PoC exit criteria
 
