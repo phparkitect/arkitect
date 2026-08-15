@@ -27,9 +27,15 @@ enum TargetPhpVersion: string
         return self::tryFrom($version) ?? throw new \InvalidArgumentException(\sprintf("Invalid target PHP version '%s', expected one of: %s", $version, implode(', ', array_column(self::cases(), 'value'))));
     }
 
-    /** What the interpreter running arkitect happens to be. */
+    /**
+     * What the interpreter running arkitect happens to be. A PHP newer than
+     * any case here fails rather than guessing, and says what to do about
+     * it — the user never typed this version, so "invalid" would be a lie.
+     */
     public static function current(): self
     {
-        return self::create(\PHP_MAJOR_VERSION.'.'.\PHP_MINOR_VERSION);
+        $running = \PHP_MAJOR_VERSION.'.'.\PHP_MINOR_VERSION;
+
+        return self::tryFrom($running) ?? throw new \InvalidArgumentException(\sprintf('arkitect does not know PHP %s yet. Set targetPhpVersion() in your config to the version your project targets.', $running));
     }
 }
