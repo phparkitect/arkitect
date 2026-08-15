@@ -142,15 +142,21 @@ final class TextReport implements Report
             $this->plural(\count($check->ruleResults), 'rule', 'rules')
         );
 
+        // a silenced count only makes sense next to the ones that were not
+        $baselined = $check->baselined > 0
+            ? \sprintf(', %d baselined', $check->baselined)
+            : '';
+
         if (0 === $violations) {
-            return \sprintf('✓ %s, no violations', $counts);
+            return \sprintf('✓ %s, no violations%s', $counts, $baselined);
         }
 
         return \sprintf(
-            '%s, %s in %s',
+            '%s, %s in %s%s',
             $counts,
             $this->plural($violations, 'violation', 'violations'),
-            $this->plural($failingRules, 'rule', 'rules')
+            $this->plural($failingRules, 'rule', 'rules'),
+            $baselined
         );
     }
 

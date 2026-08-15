@@ -22,6 +22,9 @@ final class Config
 
     public TargetPhpVersion $targetPhpVersion;
 
+    /** Relative to the root, and null when the project keeps no baseline. */
+    public ?string $baseline = null;
+
     public function __construct(public readonly string $root)
     {
         if (!is_dir($root)) {
@@ -43,6 +46,13 @@ final class Config
     public function add(array $rules): self
     {
         $this->rules = $this->rules->with(...$rules);
+
+        return $this;
+    }
+
+    public function baseline(string $path): self
+    {
+        $this->baseline = $path;
 
         return $this;
     }

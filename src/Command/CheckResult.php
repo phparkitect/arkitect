@@ -13,6 +13,7 @@ final class CheckResult
         public readonly int $classesChecked,
         public readonly ParsingErrors $parsingErrors,
         public readonly RuleResults $ruleResults,
+        public readonly int $baselined = 0,
     ) {
     }
 

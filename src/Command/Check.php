@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Arkitect\Command;
 
+use Arkitect\Baseline;
+use Arkitect\BaselineRepository;
 use Arkitect\Codebase;
 use Arkitect\Config;
+use Arkitect\Evaluate\RuleResult;
 use Arkitect\Evaluate\RuleResults;
+use Arkitect\Evaluate\Violations;
 use Arkitect\Parser\ParsingErrors;
 use Arkitect\ProjectParser;
 
@@ -17,8 +21,10 @@ use Arkitect\ProjectParser;
  */
 final class Check
 {
-    public function __construct(private readonly ProjectParser $parser)
-    {
+    public function __construct(
+        private readonly ProjectParser $parser,
+        private readonly BaselineRepository $baselines,
+    ) {
     }
 
     public function run(Config $config): CheckResult
@@ -26,16 +32,42 @@ final class Check
         $parsed = $this->parser->parse($config->targetPhpVersion);
         $codebase = Codebase::of($parsed);
 
+        $baseline = null === $config->baseline
+            ? Baseline::empty()
+            : $this->baselines->read($config->baseline);
+
         $results = [];
+        $silenced = 0;
 
         foreach ($config->rules as $rule) {
-            $results[] = $rule->check($codebase->ownClasses, $codebase->graph);
+            $result = $rule->check($codebase->ownClasses, $codebase->graph);
+            $kept = [];
+
+            foreach ($result->violations as $violation) {
+                if ($baseline->contains($violation)) {
+                    ++$silenced;
+
+                    continue;
+                }
+
+                $kept[] = $violation;
+            }
+
+            $results[] = new RuleResult(
+                $result->because,
+                $result->selected,
+                $result->checked,
+                new Violations(...$kept),
+                $result->unresolved,
+                $result->notApplicable,
+            );
         }
 
         return new CheckResult(
             \count($codebase->ownClasses),
             new ParsingErrors(...$parsed->errors),
             new RuleResults(...$results),
+            $silenced,
         );
     }
 }

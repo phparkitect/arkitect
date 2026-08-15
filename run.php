@@ -23,6 +23,7 @@ use Arkitect\Evaluate\Rule;
 use Arkitect\Evaluate\Selector;
 use Arkitect\Command\Check;
 use Arkitect\Config;
+use Arkitect\FileSystem\FilesystemBaselineRepository;
 use Arkitect\FileSystem\FilesystemFileRepository;
 use Arkitect\Report\TextReport;
 use Arkitect\Parser\RepositoryParser;
@@ -71,7 +72,7 @@ try {
     exit(2);
 }
 
-$result = (new Check(new RepositoryParser($files)))->run($config);
+$result = (new Check(new RepositoryParser($files), new FilesystemBaselineRepository($config->root)))->run($config);
 
 echo (new TextReport())->render($result), "\n";
 
