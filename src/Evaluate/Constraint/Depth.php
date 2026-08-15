@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Evaluate;
+namespace Arkitect\Evaluate\Constraint;
+
+use Arkitect\Evaluate\Violations;
 
 /**
  * How far up the inheritance chain a relationship check looks.

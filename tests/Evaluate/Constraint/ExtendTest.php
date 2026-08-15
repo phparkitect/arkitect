@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Tests\Evaluate;
+namespace Arkitect\Tests\Evaluate\Constraint;
 
-use Arkitect\Evaluate\Depth;
-use Arkitect\Evaluate\Extend;
+use Arkitect\Evaluate\Constraint\Depth;
+use Arkitect\Evaluate\Constraint\Extend;
 use Arkitect\Resolve\ClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
 use PHPUnit\Framework\TestCase;

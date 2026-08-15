@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Evaluate;
+namespace Arkitect\Evaluate\Constraint;
 
+use Arkitect\Evaluate\Pattern;
+use Arkitect\Evaluate\Violation;
+use Arkitect\Evaluate\Violations;
 use Arkitect\Parser\ParsedClass;
 use Arkitect\Resolve\ClassGraph;
 
@@ -12,7 +15,7 @@ use Arkitect\Resolve\ClassGraph;
  * permitted and forbids the rest, this one lists what is forbidden and
  * says nothing about the rest. Neither implies the other, so both exist.
  */
-final class NotDependOnTheseNamespaces implements Expression
+final class NotDependOnTheseNamespaces implements Constraint
 {
     /** @var list<Pattern> */
     private readonly array $forbidden;

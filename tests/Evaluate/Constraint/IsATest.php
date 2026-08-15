@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Tests\Evaluate;
+namespace Arkitect\Tests\Evaluate\Constraint;
 
-use Arkitect\Evaluate\IsA;
+use Arkitect\Evaluate\Constraint\IsA;
 use Arkitect\Resolve\ClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
 use PHPUnit\Framework\TestCase;
@@ -46,7 +46,7 @@ final class IsATest extends TestCase
 
         $violation = iterator_to_array($violations)[0];
         self::assertSame('App\Loner', $violation->fqcn);
-        self::assertSame(IsA::class, $violation->expression);
+        self::assertSame(IsA::class, $violation->constraint);
         self::assertSame('is not a App\Base', $violation->detail);
     }
 

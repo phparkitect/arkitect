@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Tests\Evaluate;
+namespace Arkitect\Tests\Evaluate\Constraint;
 
-use Arkitect\Evaluate\IsFinal;
+use Arkitect\Evaluate\Constraint\IsFinal;
 use Arkitect\Resolve\ClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
 use PHPUnit\Framework\TestCase;
@@ -41,13 +41,13 @@ final class IsFinalTest extends TestCase
         self::assertSame(12, $violation->line);
     }
 
-    public function test_the_violation_names_the_expression_that_produced_it(): void
+    public function test_the_violation_names_the_constraint_that_produced_it(): void
     {
         $violations = (new IsFinal())->evaluate(ParsedClassFixture::create('App\Foo', isFinal: false, line: 12), new ClassGraph());
 
         $violation = iterator_to_array($violations)[0];
 
-        self::assertSame(IsFinal::class, $violation->expression);
+        self::assertSame(IsFinal::class, $violation->constraint);
         self::assertSame('is not final', $violation->detail);
     }
 }

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Tests\Evaluate;
+namespace Arkitect\Tests\Evaluate\Constraint;
 
-use Arkitect\Evaluate\HaveNameMatching;
+use Arkitect\Evaluate\Constraint\HaveNameMatching;
 use Arkitect\Resolve\ClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
 use PHPUnit\Framework\TestCase;
@@ -27,7 +27,7 @@ final class HaveNameMatchingTest extends TestCase
         self::assertCount(1, $violations);
 
         $violation = iterator_to_array($violations)[0];
-        self::assertSame(HaveNameMatching::class, $violation->expression);
+        self::assertSame(HaveNameMatching::class, $violation->constraint);
         self::assertSame('does not have a name matching *Controller', $violation->detail);
     }
 

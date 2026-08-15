@@ -18,10 +18,10 @@ declare(strict_types=1);
 
 require __DIR__.'/vendor/autoload.php';
 
-use Arkitect\Evaluate\NotDependOnTheseNamespaces;
-use Arkitect\Evaluate\ResideInNamespace;
+use Arkitect\Evaluate\Constraint;
 use Arkitect\Evaluate\Rule;
 use Arkitect\Evaluate\RuleResult;
+use Arkitect\Evaluate\Selector;
 use Arkitect\FileSystem\FilesystemFileRepository;
 use Arkitect\Parser\TargetPhpVersion;
 use Arkitect\ProjectParser;
@@ -47,16 +47,20 @@ $classGraph = new ClassGraph(...$parsed->classes);
 
 $rules = [
     'parsing depends on neither resolving nor evaluating' => new Rule(
-        [new ResideInNamespace('Arkitect\Parser')],
-        [new NotDependOnTheseNamespaces(['Arkitect\Resolve', 'Arkitect\Evaluate'])]
+        [new Selector\ResideInNamespace('Arkitect\Parser')],
+        [new Constraint\NotDependOnTheseNamespaces(['Arkitect\Resolve', 'Arkitect\Evaluate'])]
     ),
     'resolving does not depend on evaluating' => new Rule(
-        [new ResideInNamespace('Arkitect\Resolve')],
-        [new NotDependOnTheseNamespaces(['Arkitect\Evaluate'])]
+        [new Selector\ResideInNamespace('Arkitect\Resolve')],
+        [new Constraint\NotDependOnTheseNamespaces(['Arkitect\Evaluate'])]
     ),
     'nothing outside the filesystem component touches it directly' => new Rule(
-        [new ResideInNamespace('Arkitect\Evaluate')],
-        [new NotDependOnTheseNamespaces(['Arkitect\FileSystem'])]
+        [new Selector\ResideInNamespace('Arkitect\Evaluate')],
+        [new Constraint\NotDependOnTheseNamespaces(['Arkitect\FileSystem'])]
+    ),
+    'selectors do not know that violations exist' => new Rule(
+        [new Selector\ResideInNamespace('Arkitect\Evaluate\Selector')],
+        [new Constraint\NotDependOnTheseNamespaces(['Arkitect\Evaluate\Violation*'])]
     ),
 ];
 

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Tests\Evaluate;
+namespace Arkitect\Tests\Evaluate\Constraint;
 
-use Arkitect\Evaluate\PhpCoreClasses;
+use Arkitect\Evaluate\Constraint\PhpCoreClasses;
 use PHPUnit\Framework\TestCase;
 
 final class PhpCoreClassesTest extends TestCase

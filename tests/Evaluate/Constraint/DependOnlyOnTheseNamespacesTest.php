@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Tests\Evaluate;
+namespace Arkitect\Tests\Evaluate\Constraint;
 
-use Arkitect\Evaluate\DependOnlyOnTheseNamespaces;
+use Arkitect\Evaluate\Constraint\DependOnlyOnTheseNamespaces;
 use Arkitect\Resolve\ClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
 use PHPUnit\Framework\TestCase;
@@ -29,12 +29,12 @@ final class DependOnlyOnTheseNamespacesTest extends TestCase
         self::assertCount(1, $violations);
 
         $violation = iterator_to_array($violations)[0];
-        self::assertSame(DependOnlyOnTheseNamespaces::class, $violation->expression);
+        self::assertSame(DependOnlyOnTheseNamespaces::class, $violation->constraint);
         self::assertSame('depends on App\Infra\Db', $violation->detail);
     }
 
     /**
-     * The first expression whose violations point somewhere other than the
+     * The first constraint whose violations point somewhere other than the
      * class declaration: each bad dependency is reported on the line it is
      * actually referenced on.
      */

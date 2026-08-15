@@ -2,12 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Evaluate;
+namespace Arkitect\Evaluate\Constraint;
 
+use Arkitect\Evaluate\Pattern;
+use Arkitect\Evaluate\Violation;
+use Arkitect\Evaluate\Violations;
 use Arkitect\Parser\ParsedClass;
 use Arkitect\Resolve\ClassGraph;
 
-final class HaveNameMatching implements Expression, Selector
+final class HaveNameMatching implements Constraint
 {
     private readonly Pattern $pattern;
 
@@ -16,14 +19,9 @@ final class HaveNameMatching implements Expression, Selector
         $this->pattern = new Pattern($pattern);
     }
 
-    public function matches(ParsedClass $class, ClassGraph $classGraph): bool
-    {
-        return $this->pattern->matches($class->shortName());
-    }
-
     public function evaluate(ParsedClass $class, ClassGraph $classGraph): Violations
     {
-        if ($this->matches($class, $classGraph)) {
+        if ($this->matches($class)) {
             return new Violations();
         }
 
@@ -34,5 +32,10 @@ final class HaveNameMatching implements Expression, Selector
                 \sprintf('does not have a name matching %s', $this->pattern->toString())
             ),
         ]);
+    }
+
+    private function matches(ParsedClass $class): bool
+    {
+        return $this->pattern->matches($class->shortName());
     }
 }

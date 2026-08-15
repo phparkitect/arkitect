@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Evaluate;
+namespace Arkitect\Evaluate\Constraint;
 
+use Arkitect\Evaluate\Violation;
+use Arkitect\Evaluate\Violations;
 use Arkitect\Parser\ParsedClass;
 use Arkitect\Resolve\ClassGraph;
 use Arkitect\Resolve\Membership;
 
-final class IsA implements Expression
+final class IsA implements Constraint
 {
     public function __construct(private readonly string $target)
     {

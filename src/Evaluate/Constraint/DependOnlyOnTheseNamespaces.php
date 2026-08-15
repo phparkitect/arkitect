@@ -2,12 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Evaluate;
+namespace Arkitect\Evaluate\Constraint;
 
+use Arkitect\Evaluate\Pattern;
+use Arkitect\Evaluate\Violation;
+use Arkitect\Evaluate\Violations;
 use Arkitect\Parser\ParsedClass;
 use Arkitect\Resolve\ClassGraph;
 
-final class DependOnlyOnTheseNamespaces implements Expression
+final class DependOnlyOnTheseNamespaces implements Constraint
 {
     /** @var list<Pattern> */
     private readonly array $allowed;

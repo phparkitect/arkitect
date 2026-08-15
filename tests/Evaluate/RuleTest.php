@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Evaluate;
 
-use Arkitect\Evaluate\HaveNameMatching;
-use Arkitect\Evaluate\IsFinal;
-use Arkitect\Evaluate\IsReadonly;
-use Arkitect\Evaluate\ResideInNamespace;
+use Arkitect\Evaluate\Constraint\IsFinal;
+use Arkitect\Evaluate\Constraint\IsReadonly;
 use Arkitect\Evaluate\Rule;
+use Arkitect\Evaluate\Selector\HaveNameMatching;
+use Arkitect\Evaluate\Selector\ResideInNamespace;
 use Arkitect\Resolve\ClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
 use PHPUnit\Framework\TestCase;

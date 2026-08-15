@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Evaluate;
+namespace Arkitect\Evaluate\Constraint;
 
 /**
  * The one place allowed to ask the PHP runtime a question. Parsing is

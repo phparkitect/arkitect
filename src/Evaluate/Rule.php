@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Arkitect\Evaluate;
 
+use Arkitect\Evaluate\Constraint\Constraint;
+use Arkitect\Evaluate\Selector\Selector;
 use Arkitect\Parser\ParsedClass;
 use Arkitect\Resolve\ClassGraph;
 
@@ -16,7 +18,7 @@ final class Rule
 {
     /**
      * @param list<Selector>   $selectors
-     * @param list<Expression> $constraints
+     * @param list<Constraint> $constraints
      */
     public function __construct(
         private readonly array $selectors,

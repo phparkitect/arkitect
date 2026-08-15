@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Tests\Evaluate;
+namespace Arkitect\Tests\Evaluate\Constraint;
 
-use Arkitect\Evaluate\Depth;
-use Arkitect\Evaluate\Implement;
+use Arkitect\Evaluate\Constraint\Depth;
+use Arkitect\Evaluate\Constraint\Implement;
 use Arkitect\Resolve\ClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
 use PHPUnit\Framework\TestCase;
@@ -45,7 +45,7 @@ final class ImplementTest extends TestCase
         self::assertCount(1, $violations);
 
         $violation = iterator_to_array($violations)[0];
-        self::assertSame(Implement::class, $violation->expression);
+        self::assertSame(Implement::class, $violation->constraint);
         self::assertSame('does not implement App\Contract', $violation->detail);
     }
 

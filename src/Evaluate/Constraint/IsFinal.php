@@ -2,21 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Evaluate;
+namespace Arkitect\Evaluate\Constraint;
 
+use Arkitect\Evaluate\Violation;
+use Arkitect\Evaluate\Violations;
 use Arkitect\Parser\ParsedClass;
 use Arkitect\Resolve\ClassGraph;
 
-final class IsReadonly implements Expression
+final class IsFinal implements Constraint
 {
     public function evaluate(ParsedClass $class, ClassGraph $classGraph): Violations
     {
-        if ($class->isReadonly) {
+        if ($class->isFinal) {
             return new Violations();
         }
 
         return new Violations([
-            Violation::create($class, self::class, 'is not readonly'),
+            Violation::create($class, self::class, 'is not final'),
         ]);
     }
 }

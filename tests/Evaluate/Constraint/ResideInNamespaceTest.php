@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Tests\Evaluate;
+namespace Arkitect\Tests\Evaluate\Constraint;
 
-use Arkitect\Evaluate\ResideInNamespace;
+use Arkitect\Evaluate\Constraint\ResideInNamespace;
 use Arkitect\Resolve\ClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
 use PHPUnit\Framework\TestCase;
@@ -34,7 +34,7 @@ final class ResideInNamespaceTest extends TestCase
         self::assertCount(1, $violations);
 
         $violation = iterator_to_array($violations)[0];
-        self::assertSame(ResideInNamespace::class, $violation->expression);
+        self::assertSame(ResideInNamespace::class, $violation->constraint);
         self::assertSame('does not reside in App\Domain', $violation->detail);
     }
 
