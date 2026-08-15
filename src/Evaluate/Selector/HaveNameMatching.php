@@ -17,8 +17,9 @@ final class HaveNameMatching implements Selector
         $this->pattern = new Pattern($pattern);
     }
 
-    public function matches(ParsedClass $class, ClassGraph $classGraph): bool
+    public function matches(ParsedClass $class, ClassGraph $classGraph): Selection
     {
-        return $this->pattern->matches($class->shortName());
+        // reads the name only, so it always has a definitive answer
+        return $this->pattern->matches($class->shortName()) ? Selection::Yes : Selection::No;
     }
 }

@@ -9,6 +9,7 @@ use Arkitect\Evaluate\Constraint\IsFinal;
 use Arkitect\Evaluate\Constraint\IsReadonly;
 use Arkitect\Evaluate\Rule;
 use Arkitect\Evaluate\Selector\HaveNameMatching;
+use Arkitect\Evaluate\Selector\Implement;
 use Arkitect\Evaluate\Selector\ResideInNamespace;
 use Arkitect\Resolve\ClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
@@ -120,6 +121,43 @@ final class RuleTest extends TestCase
             ->check([ParsedClassFixture::create('App\Order', isFinal: false)], new ClassGraph());
 
         self::assertCount(1, $result->violations);
+        self::assertTrue($result->isConclusive());
+    }
+
+    /**
+     * A class the selector couldn't decide about is neither checked nor
+     * quietly skipped — the run says it couldn't tell whether the rule was
+     * even about it.
+     */
+    public function test_a_class_the_selector_cannot_decide_about_is_recorded(): void
+    {
+        $undecidable = ParsedClassFixture::create('App\Child', extends: ['Vendor\NeverParsed']);
+
+        $result = (new Rule([new Implement('App\Contract')], [new IsFinal()]))
+            ->check([$undecidable], new ClassGraph($undecidable));
+
+        self::assertSame(0, $result->checked);
+        self::assertCount(0, $result->violations);
+        self::assertCount(1, $result->unresolved);
+        self::assertFalse($result->isConclusive());
+    }
+
+    /**
+     * Selectors are combined with and, so another selector saying No settles
+     * it: the rule isn't about this class either way, and there is nothing
+     * to report.
+     */
+    public function test_a_definite_no_beats_an_undecidable_selector(): void
+    {
+        $undecidable = ParsedClassFixture::create('App\Child', extends: ['Vendor\NeverParsed']);
+
+        $result = (new Rule(
+            [new Implement('App\Contract'), new ResideInNamespace('App\Elsewhere')],
+            [new IsFinal()]
+        ))->check([$undecidable], new ClassGraph($undecidable));
+
+        self::assertSame(0, $result->checked);
+        self::assertCount(0, $result->unresolved);
         self::assertTrue($result->isConclusive());
     }
 

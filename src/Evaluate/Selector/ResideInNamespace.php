@@ -17,8 +17,9 @@ final class ResideInNamespace implements Selector
         $this->pattern = new Pattern($pattern);
     }
 
-    public function matches(ParsedClass $class, ClassGraph $classGraph): bool
+    public function matches(ParsedClass $class, ClassGraph $classGraph): Selection
     {
-        return $this->pattern->matches($class->fqcn);
+        // reads the name only, so it always has a definitive answer
+        return $this->pattern->matches($class->fqcn) ? Selection::Yes : Selection::No;
     }
 }

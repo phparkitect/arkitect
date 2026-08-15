@@ -20,10 +20,11 @@ use Arkitect\Resolve\ClassGraph;
  * "vacuously true" in should(). Here the position has a type.
  *
  * The split also lets the same question have two different answers: an
- * unresolvable ancestor chain is a violation for a constraint, while for a
- * selector it is a decision about whether to include the class at all.
+ * unresolvable ancestor chain is reported per class by a constraint, while
+ * for a selector it decides nothing at all — hence Selection::Unresolved
+ * rather than a bool.
  */
 interface Selector
 {
-    public function matches(ParsedClass $class, ClassGraph $classGraph): bool;
+    public function matches(ParsedClass $class, ClassGraph $classGraph): Selection;
 }

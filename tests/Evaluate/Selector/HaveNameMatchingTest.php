@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Evaluate\Selector;
 
 use Arkitect\Evaluate\Selector\HaveNameMatching;
+use Arkitect\Evaluate\Selector\Selection;
 use Arkitect\Resolve\ClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
 use PHPUnit\Framework\TestCase;
@@ -15,14 +16,14 @@ final class HaveNameMatchingTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Http\UserController');
 
-        self::assertTrue((new HaveNameMatching('*Controller'))->matches($class, new ClassGraph()));
+        self::assertSame(Selection::Yes, (new HaveNameMatching('*Controller'))->matches($class, new ClassGraph()));
     }
 
     public function test_a_name_that_does_not_match_is_not_selected(): void
     {
         $class = ParsedClassFixture::create('App\Http\UserRepository');
 
-        self::assertFalse((new HaveNameMatching('*Controller'))->matches($class, new ClassGraph()));
+        self::assertSame(Selection::No, (new HaveNameMatching('*Controller'))->matches($class, new ClassGraph()));
     }
 
     /**
@@ -33,6 +34,6 @@ final class HaveNameMatchingTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\ControllerSupport\Order');
 
-        self::assertFalse((new HaveNameMatching('*Controller'))->matches($class, new ClassGraph()));
+        self::assertSame(Selection::No, (new HaveNameMatching('*Controller'))->matches($class, new ClassGraph()));
     }
 }
