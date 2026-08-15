@@ -131,6 +131,28 @@ final class ParserTest extends TestCase
         self::assertSame(['App\HasLabel'], $this->names($class->implements));
     }
 
+    /**
+     * The keyword is a syntax error on an enum, but an enum is final all the
+     * same. Recording what the source spells rather than what the type is
+     * would make every "must be final" rule report an enum it cannot fix.
+     */
+    public function test_an_enum_is_final_even_though_it_cannot_say_so(): void
+    {
+        $class = $this->onlyClassOf(<<<'PHP'
+            <?php
+            namespace App;
+
+            enum Status
+            {
+                case Active;
+            }
+            PHP);
+
+        self::assertTrue($class->isFinal);
+        self::assertFalse($class->isAbstract);
+        self::assertFalse($class->isReadonly);
+    }
+
     public function test_typed_property_dependency(): void
     {
         $class = $this->onlyClassOf(<<<'PHP'

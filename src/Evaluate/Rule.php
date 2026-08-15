@@ -36,9 +36,11 @@ final class Rule
     /** @param list<ParsedClass> $classes */
     public function check(array $classes, ClassGraph $classGraph): RuleResult
     {
+        $selected = 0;
         $checked = 0;
         $violations = [];
         $unresolved = [];
+        $notApplicable = [];
 
         foreach ($classes as $class) {
             $selection = $this->select($class, $classGraph);
@@ -58,9 +60,21 @@ final class Rule
                 continue;
             }
 
-            ++$checked;
+            ++$selected;
 
             $outcome = $this->constraint->evaluate($class, $classGraph);
+
+            // selected but never judged: the constraint cannot mean anything
+            // for this class, so it counts towards neither side of the answer
+            if (\count($outcome->notApplicable) > 0) {
+                foreach ($outcome->notApplicable as $skipped) {
+                    $notApplicable[] = $skipped;
+                }
+
+                continue;
+            }
+
+            ++$checked;
 
             foreach ($outcome->violations as $violation) {
                 $violations[] = $violation;
@@ -71,7 +85,13 @@ final class Rule
             }
         }
 
-        return new RuleResult($checked, new Violations($violations), new UnresolvedClasses($unresolved));
+        return new RuleResult(
+            $selected,
+            $checked,
+            new Violations($violations),
+            new UnresolvedClasses($unresolved),
+            new NotApplicableClasses($notApplicable),
+        );
     }
 
     /**

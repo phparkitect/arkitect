@@ -7,6 +7,7 @@ namespace Arkitect\Evaluate\Constraint;
 use Arkitect\Evaluate\Outcome;
 use Arkitect\Evaluate\Violation;
 use Arkitect\Evaluate\Violations;
+use Arkitect\Parser\ClassKind;
 use Arkitect\Parser\ParsedClass;
 use Arkitect\Resolve\ClassGraph;
 
@@ -14,6 +15,12 @@ final class IsReadonly implements Constraint
 {
     public function evaluate(ParsedClass $class, ClassGraph $classGraph): Outcome
     {
+        $impossible = $this->whyImpossible($class);
+
+        if (null !== $impossible) {
+            return Outcome::notApplicable($class, $impossible);
+        }
+
         if ($class->isReadonly) {
             return new Outcome();
         }
@@ -21,5 +28,16 @@ final class IsReadonly implements Constraint
         return new Outcome(new Violations([
             Violation::create($class, self::class, 'is not readonly'),
         ]));
+    }
+
+    /** The language facts that leave the requirement no way to be satisfied. */
+    private function whyImpossible(ParsedClass $class): ?string
+    {
+        return match (true) {
+            ClassKind::Interface === $class->kind => 'an interface cannot be readonly',
+            ClassKind::Trait === $class->kind => 'a trait cannot be readonly',
+            ClassKind::Enum === $class->kind => 'an enum cannot be readonly',
+            default => null,
+        };
     }
 }

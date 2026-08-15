@@ -70,12 +70,18 @@ specifically. It is now implemented, as `Resolve\InternalClasses`.
 (file content, target-php-version, annotation flag) → ParsedClass
 ```
 
-A `ParsedClass` declares only what the file says about itself: FQCN and its
+A `ParsedClass` declares what the file says about itself — FQCN and its
 own declaration line, unresolved `extends`/`implements`/`use trait` names,
 type references, attributes, docblocks — all with line numbers. The class's
 own declaration line matters as much as the others: it's what gives a
 purely structural check (`IsFinal`, `HaveNameMatching`, no specific
 referenced node) something to point at — see `Violation` below.
+
+It records the *type*, not the spelling, where the two disagree: an enum
+carries `isFinal: true` even though the keyword is a syntax error on an
+enum. This is still language knowledge and needs no runtime call, and the
+alternative is worse — recording `false` would make every "must be final"
+rule report an enum the user cannot fix.
 
 **Hard constraint on this stage: zero runtime calls.** No `class_exists`,
 no `ReflectionClass`, no `is_a()`. This is what today's
@@ -258,15 +264,29 @@ That leaves the two halves it was conflating, each answered separately:
   rule actually looked at. Both cases produce zero violations; only the
   count separates them, so it belongs to whoever runs the rule, not to a
   method on the checks themselves.
-- **Applicability.** The real case is narrower than v1's opt-in via
-  `method_exists`: `IsFinal` on an interface is not a violation the user
-  can fix, because an interface *cannot* be final. Every genuine instance is
-  determined by `ClassKind`, which `ParsedClass` already carries — so this
-  becomes a narrow declaration ("this constraint judges concrete classes
-  only") that `Rule` enforces and counts, not an arbitrary predicate that
-  would quietly become a second selector. Not built yet; when it is,
-  `RuleResult` grows a third number next to `checked`, which makes the skip
-  visible in the report instead of silent as it is in v1.
+- **Applicability.** `IsFinal` on an interface is not a violation the user
+  can fix, because an interface *cannot* be final — PHP rejects the keyword
+  outright, as it does on traits and enums, and on abstract classes.
+
+  That last one matters: applicability is **not** determined by `ClassKind`
+  alone. An abstract class is an ordinary class and still cannot be final,
+  so any design keyed on kinds would have looked complete and quietly
+  missed it. The honest boundary is *who decides*: the language, or the
+  user. "An interface cannot be final" is a fact about PHP; "classes in
+  `App\Legacy` are exempt" is intent, and belongs in a selector. Kind and
+  modifiers are both language facts, so the constraint — which knows both,
+  and knows why its requirement is impossible — is what says so, through a
+  third `Outcome` channel.
+
+  It is carried, not printed. Someone who writes "domain objects must be
+  final" means the classes, and is not surprised the interface beside them
+  was skipped; a count on every run would be noise about something they
+  cannot act on, and noise teaches people to ignore output. `RuleResult`
+  keeps the data so a report or a `--verbose` can use it, and surfaces it in
+  the one case where silence would mislead: `judgedNothing()`, a rule that
+  matched classes and could judge none of them. That is the same reasoning
+  as `matchedNothing()`, and deliberately a separate signal, because one is
+  fixed in the `that()` and the other in the `should()`.
 
 ### 4. Config and Report — the two public faces
 
@@ -521,15 +541,13 @@ answers definitively instead of `Unknown`.
 
 ## Evaluate component: design note
 
-`Rule` holds selectors, one constraint and a reason, and returns a
-`RuleResult` carrying three things
-— `checked`, the violations, and the classes it couldn't decide about —
-which is what it takes to answer both the zero-matched requirement and
-"can this answer be trusted at all" (`isConclusive()`). Missing on purpose:
-
-- **Applicability by kind** (see stage 3). It belongs to `Rule::check()`,
-  which is what would do the skipping and the counting. The only design
-  question left open in this stage.
+`Rule` holds selectors, one constraint and a reason. `RuleResult` carries
+`selected` and `checked` separately — they differ when a constraint could
+not mean anything for some of the classes picked — alongside the
+violations, the classes it couldn't decide about, and the ones it couldn't
+judge. That is what it takes to answer "did this rule check anything"
+(`matchedNothing()`, `judgedNothing()`) and "can the answer be trusted"
+(`isConclusive()`).
 
 Rules are written through the DSL, which is the shape v1 established and
 2.0 keeps — with two changes. `Rule::allClasses()` returns a `RuleDraft`

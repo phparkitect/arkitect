@@ -133,6 +133,10 @@ final class ClassCollector
                 attrGroups: $node->attrGroups,
                 kind: ClassKind::Enum,
                 implements: $this->namesToReferences($node->implements),
+                // the keyword can't be written on an enum, but an enum is
+                // final: recording false would describe the syntax while
+                // misstating the type
+                isFinal: true,
             );
         }
 

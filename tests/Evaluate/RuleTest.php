@@ -10,6 +10,7 @@ use Arkitect\Evaluate\Rule;
 use Arkitect\Evaluate\Selector\HaveNameMatching;
 use Arkitect\Evaluate\Selector\Implement;
 use Arkitect\Evaluate\Selector\ResideInNamespace;
+use Arkitect\Parser\ClassKind;
 use Arkitect\Resolve\ClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
 use PHPUnit\Framework\TestCase;
@@ -138,6 +139,41 @@ final class RuleTest extends TestCase
         self::assertSame(0, $result->checked);
         self::assertCount(0, $result->unresolved);
         self::assertTrue($result->isConclusive());
+    }
+
+    /**
+     * The case that has to stay loud, and the reason not-applicable is
+     * counted rather than merely skipped: this rule reads as protecting the
+     * namespace while being unable to judge a single class in it.
+     */
+    public function test_a_rule_that_could_judge_nothing_says_so(): void
+    {
+        $result = Rule::allClasses()->should(new IsFinal())->because('reasons')->check([
+            ParsedClassFixture::create('App\Repo', kind: ClassKind::Interface),
+            ParsedClassFixture::create('App\Loggable', kind: ClassKind::Trait),
+        ], new ClassGraph());
+
+        self::assertSame(2, $result->selected);
+        self::assertSame(0, $result->checked);
+        self::assertCount(0, $result->violations);
+        self::assertTrue($result->judgedNothing());
+
+        // distinct from the selector picking nothing, which is a different fix
+        self::assertFalse($result->matchedNothing());
+    }
+
+    public function test_classes_the_constraint_cannot_judge_do_not_count_as_checked(): void
+    {
+        $result = Rule::allClasses()->should(new IsFinal())->because('reasons')->check([
+            ParsedClassFixture::create('App\Order', isFinal: false),
+            ParsedClassFixture::create('App\Repo', kind: ClassKind::Interface),
+        ], new ClassGraph());
+
+        self::assertSame(2, $result->selected);
+        self::assertSame(1, $result->checked);
+        self::assertCount(1, $result->violations);
+        self::assertCount(1, $result->notApplicable);
+        self::assertFalse($result->judgedNothing());
     }
 
     public function test_an_empty_class_set_matches_nothing(): void

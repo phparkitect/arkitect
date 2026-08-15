@@ -92,7 +92,16 @@ exit($failed ? 1 : 0);
 function summarize(RuleResult $result): string
 {
     if ($result->matchedNothing()) {
-        return 'matched no classes — the rule checked nothing at all';
+        return 'matched no classes — fix the that(), the rule is checking nothing';
+    }
+
+    // the only case where "not applicable" is worth saying out loud: the rule
+    // looks like it protects these classes and cannot judge any of them
+    if ($result->judgedNothing()) {
+        return \sprintf(
+            'matched %d classes and could judge none of them — fix the should()',
+            $result->selected
+        );
     }
 
     $summary = \sprintf('%d classes checked, %d violations', $result->checked, \count($result->violations));
