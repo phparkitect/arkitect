@@ -18,8 +18,13 @@ final class ParsedClass
      *                                     unfiltered, no core-class exclusion
      * @param list<string>   $docBlocks    raw text, unparsed
      */
+    public readonly string $fqcn;
+
+    /** Kept so the derived accessors don't re-validate the name on every call. */
+    private readonly Fqcn $name;
+
     public function __construct(
-        public readonly string $fqcn,
+        string $fqcn,
         public readonly int $line,
         public readonly string $filePath,
         public readonly ClassKind $kind,
@@ -33,17 +38,21 @@ final class ParsedClass
         public readonly bool $isReadonly,
         public readonly bool $isAbstract,
     ) {
+        // the string ClassGraph indexes on, so it gets the same rule and the
+        // same normalization every other name in the codebase gets
+        $this->name = new Fqcn($fqcn);
+        $this->fqcn = $this->name->toString();
     }
 
     /** The declared name without its namespace. */
     public function shortName(): string
     {
-        return (new Fqcn($this->fqcn))->shortName();
+        return $this->name->shortName();
     }
 
     /** Empty for a class declared in the global namespace. */
     public function namespaceName(): string
     {
-        return (new Fqcn($this->fqcn))->namespaceName();
+        return $this->name->namespaceName();
     }
 }

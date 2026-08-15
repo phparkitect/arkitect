@@ -9,6 +9,7 @@ use Arkitect\Parser\ParsedClass;
 use Arkitect\Parser\Parser;
 use Arkitect\Parser\ParseResult;
 use Arkitect\Parser\TargetPhpVersion;
+use Arkitect\Parser\TypeReferences;
 use PHPUnit\Framework\TestCase;
 
 final class ParserTest extends TestCase
@@ -129,6 +130,29 @@ final class ParserTest extends TestCase
         self::assertSame(ClassKind::Enum, $class->kind);
         self::assertSame('App\Status', $class->fqcn);
         self::assertSame(['App\HasLabel'], $this->names($class->implements));
+    }
+
+    public function test_a_class_name_is_stored_in_the_one_spelling_the_codebase_uses(): void
+    {
+        $class = new ParsedClass(
+            fqcn: '\App\Domain\Order',
+            line: 1,
+            filePath: 'src/Order.php',
+            kind: ClassKind::RegularClass,
+            extends: new TypeReferences(),
+            implements: new TypeReferences(),
+            traits: new TypeReferences(),
+            dependencies: new TypeReferences(),
+            attributes: new TypeReferences(),
+            docBlocks: [],
+            isFinal: false,
+            isReadonly: false,
+            isAbstract: false,
+        );
+
+        self::assertSame('App\Domain\Order', $class->fqcn);
+        self::assertSame('Order', $class->shortName());
+        self::assertSame('App\Domain', $class->namespaceName());
     }
 
     /**
