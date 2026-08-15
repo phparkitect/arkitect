@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Arkitect\Tests;
 
 use Arkitect\Config;
-use Arkitect\ConfigDraft;
 use Arkitect\Evaluate\Constraint;
 use Arkitect\Evaluate\Rule;
 use PHPUnit\Framework\TestCase;
@@ -14,7 +13,7 @@ final class ConfigTest extends TestCase
 {
     public function test_a_config_knows_its_root_and_its_rules(): void
     {
-        $config = Config::create()->root(__DIR__)->add([$this->aRule()]);
+        $config = Config::create(__DIR__)->add([$this->aRule()]);
 
         self::assertSame(__DIR__, $config->root);
         self::assertCount(1, $config->rules);
@@ -23,14 +22,15 @@ final class ConfigTest extends TestCase
     /**
      * Not inferred from the working directory or from where the config file
      * happens to sit: a run must mean the same thing wherever it is started
-     * from. The draft is what makes it unskippable — nothing can be added to
-     * a config that has no root, because that object has no add().
+     * from. PHP already refuses to build an object without a required
+     * argument, so the root is one — no builder needed to make it unskippable.
      */
-    public function test_nothing_can_be_added_before_a_root_is_given(): void
+    public function test_a_config_cannot_be_built_without_a_root(): void
     {
-        $offered = array_values(array_diff(get_class_methods(ConfigDraft::class), ['__construct']));
+        $root = (new \ReflectionClass(Config::class))->getConstructor()?->getParameters()[0];
 
-        self::assertSame(['root'], $offered);
+        self::assertSame('root', $root?->getName());
+        self::assertFalse($root?->isOptional());
     }
 
     public function test_a_root_that_is_not_a_directory_is_refused(): void
@@ -38,12 +38,12 @@ final class ConfigTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('/does/not/exist');
 
-        Config::create()->root('/does/not/exist');
+        Config::create('/does/not/exist');
     }
 
     public function test_rules_accumulate_across_calls(): void
     {
-        $config = Config::create()->root(__DIR__)
+        $config = Config::create(__DIR__)
             ->add([$this->aRule()])
             ->add([$this->aRule(), $this->aRule()]);
 
@@ -54,7 +54,7 @@ final class ConfigTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        Config::create()->root(__DIR__)->add(['not a rule']);
+        Config::create(__DIR__)->add(['not a rule']);
     }
 
     private function aRule(): Rule

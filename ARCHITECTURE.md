@@ -307,17 +307,22 @@ That leaves the two halves it was conflating, each answered separately:
 **Config** is a fluent object, not a closure that mutates a parameter:
 
 ```php
-return Config::create()
-    ->root(__DIR__)
+return Config::create(__DIR__)
     ->add($rules);
 ```
 
-`root()` is mandatory *by construction*, not checked afterwards:
-`Config::create()` hands back a `ConfigDraft` whose only method is `root()`,
-so a config without one cannot be built — the same shape as reaching a
-`Rule` only through `because()`. It is never inferred from the working
-directory or from where the config file sits, because a run has to mean the
-same thing wherever it was started from.
+The root is a constructor argument rather than a fluent step, because it is
+required and PHP already refuses to build an object without a required
+argument — a builder to enforce that would be an elaborate way to restate
+it. `Rule` needs one and this does not: there, four steps deep, `because()`
+is genuinely forgettable. The rule that falls out and governs what comes
+next (`targetPhpVersion()`, the baseline path): **mandatory goes in the
+constructor, optional is fluent**, so a config file shows at a glance what
+has to be given.
+
+The root is never inferred from the working directory or from where the
+config file sits, because a run has to mean the same thing wherever it was
+started from.
 
 **Parse scope and check scope are not the same scope**, which is the answer
 to the question that sat in Open until `root()` existed to force it. `vendor/`
@@ -529,9 +534,9 @@ fixes itself by construction, and it was the first concrete evidence that
 - `ClassSet` is removed. A single `root()` replaces it; filtering is
   namespace-based (`that()`) or, exceptionally, path-based
   (`ResideInPath`).
-- `root()` is explicit, single and mandatory by construction — a
-  `ConfigDraft` with no other method leads to it. Never inferred from cwd or
-  from the config file's location.
+- The root is explicit, single and required: a constructor argument, not a
+  fluent step. Never inferred from cwd or from the config file's location.
+  Mandatory settings go in the constructor, optional ones are fluent.
 - Parsing and checking are separate scopes. Everything under the root is
   parsed so names can resolve; everything except `vendor/` is checked. The
   rule lives in `Codebase`, not `Config`, because it is our policy rather

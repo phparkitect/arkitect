@@ -8,8 +8,7 @@ use Arkitect\Evaluate\Rule;
 
 /**
  * What the user writes, and the only place that answers "what is this run
- * about". Reached through `Config::create()->root(...)`, so a config
- * without a root is not representable.
+ * about".
  *
  * Holds what the user declared and nothing else. Everything under the root
  * is parsed; which of those classes rules may judge is `Codebase`'s
@@ -18,22 +17,25 @@ use Arkitect\Evaluate\Rule;
 final class Config
 {
     /**
-     * @param list<Rule> $rules
+     * The root is a constructor argument, not a fluent step: it is required,
+     * and PHP already refuses to build an object without a required
+     * argument. Optional settings are the fluent ones, so a config file
+     * shows at a glance what has to be given and what does not.
      *
-     * @internal use Config::create()->root()
+     * @param list<Rule> $rules
      */
     public function __construct(
         public readonly string $root,
-        public readonly array $rules,
+        public readonly array $rules = [],
     ) {
         if (!is_dir($root)) {
             throw new \InvalidArgumentException(\sprintf('"%s" is not a directory.', $root));
         }
     }
 
-    public static function create(): ConfigDraft
+    public static function create(string $root): self
     {
-        return new ConfigDraft();
+        return new self($root);
     }
 
     /** @param list<Rule> $rules */
