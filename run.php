@@ -21,10 +21,9 @@ require __DIR__.'/vendor/autoload.php';
 use Arkitect\Evaluate\Constraint;
 use Arkitect\Evaluate\Rule;
 use Arkitect\Evaluate\Selector;
-use Arkitect\Codebase;
+use Arkitect\Check;
 use Arkitect\Config;
 use Arkitect\FileSystem\FilesystemFileRepository;
-use Arkitect\Parser\ParseResult;
 use Arkitect\Parser\TargetPhpVersion;
 use Arkitect\Report\TextReport;
 use Arkitect\ProjectParser;
@@ -52,27 +51,14 @@ try {
         ->that(new Selector\ResideInNamespace('Arkitect\Evaluate\Selector'))
         ->should(new Constraint\NotDependOnTheseNamespaces(['Arkitect\Evaluate\Violation*']))
         ->because('a selector decides what a rule is about and never reports anything'),]);
+    $files = new FilesystemFileRepository($config->root);
 } catch (InvalidArgumentException $e) {
     fwrite(\STDERR, $e->getMessage()."\n");
     exit(2);
 }
 
-$parsed = (new ProjectParser(new FilesystemFileRepository($config->root)))->parse(TargetPhpVersion::create(null));
+$result = (new Check(new ProjectParser($files)))->run($config->rules, TargetPhpVersion::create(null));
 
-$codebase = Codebase::of($parsed);
+echo (new TextReport())->render($result), "\n";
 
-$results = [];
-
-foreach ($config->rules as $rule) {
-    $results[] = $rule->check($codebase->ownClasses, $codebase->graph);
-}
-
-echo (new TextReport())->render(new ParseResult($codebase->ownClasses, $parsed->errors), $results), "\n";
-
-$clean = [] === $parsed->errors;
-
-foreach ($results as $result) {
-    $clean = $clean && 0 === \count($result->violations) && $result->isConclusive();
-}
-
-exit($clean ? 0 : 1);
+exit($result->isClean() ? 0 : 1);

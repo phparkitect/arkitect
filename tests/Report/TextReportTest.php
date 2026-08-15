@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Report;
 
+use Arkitect\CheckResult;
 use Arkitect\Evaluate\Constraint;
 use Arkitect\Evaluate\Rule;
+use Arkitect\Evaluate\RuleResults;
 use Arkitect\Evaluate\Selector;
 use Arkitect\Parser\ClassKind;
-use Arkitect\Parser\ParseResult;
 use Arkitect\Parser\ParsingError;
+use Arkitect\Parser\ParsingErrors;
 use Arkitect\Report\TextReport;
 use Arkitect\Resolve\ParsedClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
@@ -126,9 +128,9 @@ final class TextReportTest extends TestCase
 
     public function test_files_that_could_not_be_parsed_are_reported(): void
     {
-        $parsed = new ParseResult([], [new ParsingError('src/Broken.php', 'syntax error')]);
+        $check = new CheckResult(0, new ParsingErrors(new ParsingError('src/Broken.php', 'syntax error')), new RuleResults());
 
-        $report = (new TextReport())->render($parsed, []);
+        $report = (new TextReport())->render($check);
 
         self::assertStringContainsString('! could not parse 1 file', $report);
         self::assertStringContainsString('src/Broken.php', $report);
@@ -140,6 +142,8 @@ final class TextReportTest extends TestCase
         $graph = new ParsedClassGraph(...$classes);
         $results = array_map(static fn (Rule $rule) => $rule->check($classes, $graph), $rules);
 
-        return (new TextReport())->render(new ParseResult($classes, []), $results);
+        return (new TextReport())->render(
+            new CheckResult(\count($classes), new ParsingErrors(), new RuleResults(...$results))
+        );
     }
 }

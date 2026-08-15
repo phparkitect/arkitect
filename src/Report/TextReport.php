@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Arkitect\Report;
 
-use Arkitect\Evaluate\RuleResult;
-use Arkitect\Parser\ParseResult;
+use Arkitect\CheckResult;
+use Arkitect\Evaluate\RuleResults;
+use Arkitect\Parser\ParsingErrors;
 
 /**
  * Written for the run that fails; a clean run is one line.
@@ -16,22 +17,20 @@ use Arkitect\Parser\ParseResult;
  */
 final class TextReport
 {
-    /** @param list<RuleResult> $results */
-    public function render(ParseResult $parsed, array $results): string
+    public function render(CheckResult $check): string
     {
         $sections = array_filter([
-            $this->violations($results),
-            $this->unresolved($results),
-            $this->uselessRules($results),
-            $this->parsingErrors($parsed),
-            $this->summary($parsed, $results),
+            $this->violations($check->ruleResults),
+            $this->unresolved($check->ruleResults),
+            $this->uselessRules($check->ruleResults),
+            $this->parsingErrors($check->parsingErrors),
+            $this->summary($check),
         ], static fn (string $section) => '' !== $section);
 
         return implode("\n\n", $sections);
     }
 
-    /** @param list<RuleResult> $results */
-    private function violations(array $results): string
+    private function violations(RuleResults $results): string
     {
         $groups = [];
 
@@ -56,8 +55,7 @@ final class TextReport
         return implode("\n\n", $groups);
     }
 
-    /** @param list<RuleResult> $results */
-    private function unresolved(array $results): string
+    private function unresolved(RuleResults $results): string
     {
         $lines = [];
 
@@ -85,10 +83,8 @@ final class TextReport
      * The two ways a rule can look like it protects something while
      * protecting nothing. Kept loud for that reason, and separate from each
      * other because one is fixed in the that() and the other in the should().
-     *
-     * @param list<RuleResult> $results
      */
-    private function uselessRules(array $results): string
+    private function uselessRules(RuleResults $results): string
     {
         $lines = [];
 
@@ -111,31 +107,30 @@ final class TextReport
         return implode("\n", $lines);
     }
 
-    private function parsingErrors(ParseResult $parsed): string
+    private function parsingErrors(ParsingErrors $errors): string
     {
-        if ([] === $parsed->errors) {
+        if (0 === \count($errors)) {
             return '';
         }
 
         $lines = [];
-        foreach ($parsed->errors as $error) {
+        foreach ($errors as $error) {
             $lines[] = [$error->filePath, $error->message];
         }
 
         return \sprintf(
             "! could not parse %s\n%s",
-            $this->plural(\count($parsed->errors), 'file', 'files'),
+            $this->plural(\count($errors), 'file', 'files'),
             $this->aligned($lines)
         );
     }
 
-    /** @param list<RuleResult> $results */
-    private function summary(ParseResult $parsed, array $results): string
+    private function summary(CheckResult $check): string
     {
         $violations = 0;
         $failingRules = 0;
 
-        foreach ($results as $result) {
+        foreach ($check->ruleResults as $result) {
             $found = \count($result->violations);
             $violations += $found;
             $failingRules += $found > 0 ? 1 : 0;
@@ -143,8 +138,8 @@ final class TextReport
 
         $counts = \sprintf(
             '%s, %s',
-            $this->plural(\count($parsed->classes), 'class', 'classes'),
-            $this->plural(\count($results), 'rule', 'rules')
+            $this->plural($check->classesChecked, 'class', 'classes'),
+            $this->plural(\count($check->ruleResults), 'rule', 'rules')
         );
 
         if (0 === $violations) {
