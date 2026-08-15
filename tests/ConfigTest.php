@@ -57,32 +57,6 @@ final class ConfigTest extends TestCase
         Config::create()->root(__DIR__)->add(['not a rule']);
     }
 
-    /**
-     * vendor/ is parsed — inheritance can only be resolved if it is — but it
-     * is not yours to fix, so rules do not apply to it. Without this a config
-     * that forgets a namespace selector reports thousands of violations in
-     * code the user cannot touch.
-     */
-    public function test_vendor_is_parsed_but_not_checked(): void
-    {
-        $config = Config::create()->root(__DIR__);
-
-        self::assertFalse($config->checks('vendor/nikic/php-parser/lib/Parser.php'));
-        self::assertTrue($config->checks('src/Domain/Order.php'));
-    }
-
-    /**
-     * The exclusion is a directory, not a prefix: a project of its own called
-     * vendorish/ is the user's code.
-     */
-    public function test_only_the_vendor_directory_itself_is_excluded(): void
-    {
-        $config = Config::create()->root(__DIR__);
-
-        self::assertTrue($config->checks('vendorish/Foo.php'));
-        self::assertTrue($config->checks('src/vendor/Foo.php'));
-    }
-
     private function aRule(): Rule
     {
         return Rule::allClasses()->should(new Constraint\IsFinal())->because('reasons');

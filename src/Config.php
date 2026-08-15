@@ -11,18 +11,12 @@ use Arkitect\Evaluate\Rule;
  * about". Reached through `Config::create()->root(...)`, so a config
  * without a root is not representable.
  *
- * Everything under the root is *parsed*, because inheritance cannot be
- * resolved otherwise — a project class extending a vendor class needs the
- * vendor class's own ancestors (see ARCHITECTURE.md, stage 2). Everything
- * under the root except `vendor/` is *checked*. Those are two different
- * questions, and answering them with one scope is what would make a config
- * that forgets a namespace selector report thousands of violations in code
- * its author cannot change.
+ * Holds what the user declared and nothing else. Everything under the root
+ * is parsed; which of those classes rules may judge is `Codebase`'s
+ * question, not a declaration anyone made here.
  */
 final class Config
 {
-    private const NOT_YOURS = 'vendor/';
-
     /**
      * @param list<Rule> $rules
      *
@@ -52,14 +46,5 @@ final class Config
         }
 
         return new self($this->root, [...$this->rules, ...array_values($rules)]);
-    }
-
-    /**
-     * $path is relative to the root, which is also what a violation reports,
-     * so both agree by construction.
-     */
-    public function checks(string $path): bool
-    {
-        return !str_starts_with($path, self::NOT_YOURS);
     }
 }
