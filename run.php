@@ -28,7 +28,6 @@ use Arkitect\Parser\ParseResult;
 use Arkitect\Parser\TargetPhpVersion;
 use Arkitect\Report\TextReport;
 use Arkitect\ProjectParser;
-use Arkitect\Resolve\ClassGraph;
 
 $root = $argv[1] ?? __DIR__;
 
