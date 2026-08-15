@@ -26,6 +26,17 @@ final class Rule
         private readonly Constraint $constraint,
         public readonly string $because,
     ) {
+        // the DSL makes because() unskippable, but only this makes it say
+        // something: a rule whose report reads "because " explains nothing
+        foreach ($selectors as $selector) {
+            if (!$selector instanceof Selector) {
+                throw new \InvalidArgumentException(\sprintf('Expected a selector, got %s.', get_debug_type($selector)));
+            }
+        }
+
+        if ('' === trim($because)) {
+            throw new \InvalidArgumentException('A rule needs a reason: it is what the report gives someone who has to fix the violation.');
+        }
     }
 
     public static function allClasses(): RuleDraft

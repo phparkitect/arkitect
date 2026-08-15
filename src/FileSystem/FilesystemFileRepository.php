@@ -9,6 +9,11 @@ final class FilesystemFileRepository implements FileRepository
     public function __construct(
         private readonly string $rootPath,
     ) {
+        // a wrong path is the most ordinary mistake there is, and letting the
+        // iterator raise it mid-run turns a typo into a stack trace
+        if (!is_dir($rootPath)) {
+            throw new \InvalidArgumentException(\sprintf('"%s" is not a directory.', $rootPath));
+        }
     }
 
     public function files(): iterable

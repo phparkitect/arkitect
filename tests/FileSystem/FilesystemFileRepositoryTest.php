@@ -54,6 +54,19 @@ final class FilesystemFileRepositoryTest extends TestCase
         }
     }
 
+    /**
+     * The most ordinary mistake there is — a typo, or the wrong working
+     * directory — used to surface as an UnexpectedValueException from inside
+     * an iterator, halfway through a run.
+     */
+    public function test_a_path_that_is_not_a_directory_is_refused_at_construction(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('/does/not/exist');
+
+        new FilesystemFileRepository('/does/not/exist');
+    }
+
     private function removeDir(string $dir): void
     {
         foreach (scandir($dir) as $entry) {

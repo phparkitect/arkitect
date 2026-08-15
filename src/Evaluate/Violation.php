@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Evaluate;
 
 use Arkitect\Evaluate\Constraint\Constraint;
+use Arkitect\Parser\Fqcn;
 use Arkitect\Parser\ParsedClass;
 use Arkitect\Parser\TypeReference;
 
@@ -16,17 +17,28 @@ use Arkitect\Parser\TypeReference;
  */
 final class Violation
 {
+    /** @var class-string<Constraint> */
+    public readonly string $constraint;
+
     /**
      * @param class-string<Constraint> $constraint which constraint produced this
      * @param string                   $detail     what was wrong, without the class name
      */
-    public function __construct(
+    private function __construct(
         public readonly string $fqcn,
         public readonly string $filePath,
         public readonly int $line,
-        public readonly string $constraint,
+        string $constraint,
         public readonly string $detail,
     ) {
+        // fqcn, filePath and line arrive from an already-valid ParsedClass or
+        // TypeReference, which is what the private constructor guarantees;
+        // these two are the only things a caller still chooses freely
+        $this->constraint = (new Fqcn($constraint))->toString();
+
+        if ('' === trim($detail)) {
+            throw new \InvalidArgumentException('A violation has to say what was wrong.');
+        }
     }
 
     /**

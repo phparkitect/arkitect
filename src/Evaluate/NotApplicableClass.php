@@ -21,12 +21,15 @@ use Arkitect\Parser\ParsedClass;
  */
 final class NotApplicableClass
 {
-    public function __construct(
+    private function __construct(
         public readonly string $fqcn,
         public readonly string $filePath,
         public readonly int $line,
         public readonly string $detail,
     ) {
+        if ('' === trim($detail)) {
+            throw new \InvalidArgumentException('A not-applicable class has to name the language fact that rules the requirement out.');
+        }
     }
 
     public static function create(ParsedClass $class, string $detail): self

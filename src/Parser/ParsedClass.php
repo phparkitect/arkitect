@@ -42,6 +42,16 @@ final class ParsedClass
         // same normalization every other name in the codebase gets
         $this->name = new Fqcn($fqcn);
         $this->fqcn = $this->name->toString();
+
+        // php-parser answers -1 for a node with no position, and this line is
+        // the fallback every structural violation is reported at
+        if ($line < 1) {
+            throw new \InvalidArgumentException(\sprintf('%s was given line %d: every class is declared somewhere.', $this->fqcn, $line));
+        }
+
+        if ('' === $filePath) {
+            throw new \InvalidArgumentException(\sprintf('%s was given no file path: every violation reports one.', $this->fqcn));
+        }
     }
 
     /** The declared name without its namespace. */

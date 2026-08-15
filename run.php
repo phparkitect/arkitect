@@ -29,7 +29,15 @@ use Arkitect\Resolve\ClassGraph;
 
 $path = $argv[1] ?? 'src';
 
-$files = new FilesystemFileRepository($path);
+try {
+    $files = new FilesystemFileRepository($path);
+} catch (InvalidArgumentException $e) {
+    // not swallowing it: a stack trace is the wrong answer to a typo, and the
+    // real CLI (stage 4) is where this belongs properly
+    fwrite(\STDERR, $e->getMessage()."\n");
+    exit(2);
+}
+
 $parsed = (new ProjectParser($files))->parse(TargetPhpVersion::create(null));
 
 printf("%s: %d classes, %d errors\n", $path, \count($parsed->classes), \count($parsed->errors));

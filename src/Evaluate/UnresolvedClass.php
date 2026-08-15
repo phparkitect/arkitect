@@ -20,12 +20,15 @@ use Arkitect\Parser\ParsedClass;
  */
 final class UnresolvedClass
 {
-    public function __construct(
+    private function __construct(
         public readonly string $fqcn,
         public readonly string $filePath,
         public readonly int $line,
         public readonly string $detail,
     ) {
+        if ('' === trim($detail)) {
+            throw new \InvalidArgumentException('An unresolved class has to say why it could not be decided.');
+        }
     }
 
     public static function create(ParsedClass $class, string $detail): self
