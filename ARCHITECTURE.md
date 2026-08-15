@@ -147,12 +147,16 @@ the parsed set:
   `vendor/`, an excluded path).
 
 This is the stage that replaces the reflection-based approach `#582`
-originally proposed. Reflection was rejected: it reintroduces a runtime
-dependency and isn't reliably cacheable, i.e. the same problem being removed
-from the parse stage. `IsA`/`IsNotA`/`Implement`/`Extend`-family expressions
-become graph queries here instead of runtime calls (`#169`).
+originally proposed: `IsA`/`Implement`/`Extend` are graph queries over
+parsed data, not runtime calls (`#169`). Reflection as the *answer* was
+rejected because it reintroduces a runtime dependency and isn't reliably
+cacheable — the problem being removed from the parse stage. What survives
+of it is the narrow question above, "is this name internal", which only
+exists because an internal class has no source to parse and so can never
+be answered from parsed data at all.
 
-Cheap enough not to need caching: linking, not parsing — no I/O, no AST.
+Cheap enough not to need caching: linking, not parsing — no file I/O, no
+AST.
 
 Known edge cases not designed for yet — duplicate FQCNs (e.g. polyfills
 defining the same class in more than one file), inheritance cycles, trait
@@ -352,17 +356,25 @@ graph cannot be a constructor dependency of a constraint, since the config
 is read before anything is parsed).
 
 No `ClassSet`. Its job — pairing "what to scan" with "which rules apply" —
-is already handled by the universal root-scan (stage 1) plus per-rule
-`that()` selectors (stage 3); keeping it around would be a second filtering
-vocabulary for the same intent. Filtering is namespace-based
-(`ResideInOneOfTheseNamespaces`, already exists), which covers the near-total
+is split between the root-scan (stage 1), the `vendor/` line drawn by
+`Codebase`, and per-rule `that()` selectors; keeping it would be a second
+filtering vocabulary for the same intent.
+
+This paragraph used to claim the root-scan plus `that()` selectors were
+enough on their own. They are not, and finding out is what settled the
+parse-scope question above: without `Codebase` drawing the line, a rule
+that forgets its selector checks `vendor/`. Selectors narrow what a rule
+is about; they are not a substitute for knowing whose code it is.
+
+Beyond that, filtering is namespace-based
+(`Selector\ResideInOneOfTheseNamespaces`), which covers the near-total
 majority of cases, or, for the rare case where directory and namespace
 disagree (generated code, monorepo packages, legacy trees), a new
-filesystem-based expression:
+filesystem-based selector:
 
 ```php
 Rule::allClasses()
-    ->that(new ResideInPath('packages/legacy'))
+    ->that(new Selector\ResideInPath('packages/legacy'))
     ->should(...)
     ->because('legacy code still needs the old constraints');
 ```
