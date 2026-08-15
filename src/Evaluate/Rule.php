@@ -97,6 +97,7 @@ final class Rule
         }
 
         return new RuleResult(
+            $this->because,
             $selected,
             $checked,
             new Violations(...$violations),

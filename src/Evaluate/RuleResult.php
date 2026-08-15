@@ -17,6 +17,8 @@ namespace Arkitect\Evaluate;
 final class RuleResult
 {
     public function __construct(
+        /** The rule's own reason, so a report can title the group without pairing objects up again. */
+        public readonly string $because,
         public readonly int $selected,
         public readonly int $checked,
         public readonly Violations $violations,

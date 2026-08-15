@@ -20,10 +20,10 @@ require __DIR__.'/vendor/autoload.php';
 
 use Arkitect\Evaluate\Constraint;
 use Arkitect\Evaluate\Rule;
-use Arkitect\Evaluate\RuleResult;
 use Arkitect\Evaluate\Selector;
 use Arkitect\FileSystem\FilesystemFileRepository;
 use Arkitect\Parser\TargetPhpVersion;
+use Arkitect\Report\TextReport;
 use Arkitect\ProjectParser;
 use Arkitect\Resolve\ClassGraph;
 
@@ -39,12 +39,6 @@ try {
 }
 
 $parsed = (new ProjectParser($files))->parse(TargetPhpVersion::create(null));
-
-printf("%s: %d classes, %d errors\n", $path, \count($parsed->classes), \count($parsed->errors));
-
-foreach ($parsed->errors as $error) {
-    printf("  %s: %s\n", $error->filePath, $error->message);
-}
 
 /**
  * No vendor/ here, so any rule that walks the inheritance chain would hit
@@ -75,48 +69,19 @@ $rules = [
         ->because('a selector decides what a rule is about and never reports anything'),
 ];
 
-$failed = false;
+$results = array_map(
+    static fn (Rule $rule) => $rule->check($parsed->classes, $classGraph),
+    $rules
+);
 
-foreach ($rules as $rule) {
-    $result = $rule->check($parsed->classes, $classGraph);
-    $failed = $failed || \count($result->violations) > 0 || !$result->isConclusive();
+echo (new TextReport())->render($parsed, $results), "\n";
 
-    printf("\n%s\n  %s\n", $rule->because, summarize($result));
+// unresolved classes and unparsable files fail the run too: in both cases
+// something went unchecked, and a green run would say otherwise
+$clean = [] === $parsed->errors;
 
-    foreach ($result->violations as $violation) {
-        printf("  %s:%d %s %s\n", $violation->filePath, $violation->line, $violation->fqcn, $violation->detail);
-    }
-
-    // kept apart from the violations above on purpose: these are classes the
-    // run could not decide about, which is a gap in what we parsed rather
-    // than something wrong with the code
-    foreach ($result->unresolved as $unresolved) {
-        printf("  ? %s:%d %s %s\n", $unresolved->filePath, $unresolved->line, $unresolved->fqcn, $unresolved->detail);
-    }
+foreach ($results as $result) {
+    $clean = $clean && 0 === \count($result->violations) && $result->isConclusive();
 }
 
-exit($failed ? 1 : 0);
-
-function summarize(RuleResult $result): string
-{
-    if ($result->matchedNothing()) {
-        return 'matched no classes — fix the that(), the rule is checking nothing';
-    }
-
-    // the only case where "not applicable" is worth saying out loud: the rule
-    // looks like it protects these classes and cannot judge any of them
-    if ($result->judgedNothing()) {
-        return \sprintf(
-            'matched %d classes and could judge none of them — fix the should()',
-            $result->selected
-        );
-    }
-
-    $summary = \sprintf('%d classes checked, %d violations', $result->checked, \count($result->violations));
-
-    if (!$result->isConclusive()) {
-        $summary .= \sprintf(', %d unresolved', \count($result->unresolved));
-    }
-
-    return $summary;
-}
+exit($clean ? 0 : 1);
