@@ -61,10 +61,11 @@ $parsed = (new ProjectParser(new FilesystemFileRepository($config->root)))->pars
 
 $codebase = Codebase::of($parsed);
 
-$results = array_map(
-    static fn (Rule $rule) => $rule->check($codebase->ownClasses, $codebase->graph),
-    $config->rules
-);
+$results = [];
+
+foreach ($config->rules as $rule) {
+    $results[] = $rule->check($codebase->ownClasses, $codebase->graph);
+}
 
 echo (new TextReport())->render(new ParseResult($codebase->ownClasses, $parsed->errors), $results), "\n";
 

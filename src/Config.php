@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arkitect;
 
 use Arkitect\Evaluate\Rule;
+use Arkitect\Evaluate\Rules;
 
 /**
  * What the user writes, and the only place that answers "what is this run
@@ -16,10 +17,9 @@ use Arkitect\Evaluate\Rule;
  */
 final class Config
 {
-    /** @param list<Rule> $rules */
     public function __construct(
         public readonly string $root,
-        public readonly array $rules = [],
+        public readonly Rules $rules = new Rules(),
     ) {
         if (!is_dir($root)) {
             throw new \InvalidArgumentException(\sprintf('"%s" is not a directory.', $root));
@@ -31,15 +31,9 @@ final class Config
         return new self($root);
     }
 
-    /** @param list<Rule> $rules */
+    /** @param list<Rule> $rules array, not a variadic, because this is what a config file writes */
     public function add(array $rules): self
     {
-        foreach ($rules as $rule) {
-            if (!$rule instanceof Rule) {
-                throw new \InvalidArgumentException(\sprintf('Expected a rule, got %s.', get_debug_type($rule)));
-            }
-        }
-
-        return new self($this->root, [...$this->rules, ...array_values($rules)]);
+        return new self($this->root, $this->rules->with(...$rules));
     }
 }

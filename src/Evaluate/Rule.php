@@ -6,7 +6,7 @@ namespace Arkitect\Evaluate;
 
 use Arkitect\Evaluate\Constraint\Constraint;
 use Arkitect\Evaluate\Selector\Selection;
-use Arkitect\Evaluate\Selector\Selector;
+use Arkitect\Evaluate\Selector\Selectors;
 use Arkitect\Parser\ParsedClass;
 use Arkitect\Resolve\ClassGraph;
 
@@ -20,20 +20,13 @@ use Arkitect\Resolve\ClassGraph;
  */
 final class Rule
 {
-    /** @param list<Selector> $selectors */
     public function __construct(
-        private readonly array $selectors,
+        private readonly Selectors $selectors,
         private readonly Constraint $constraint,
         public readonly string $because,
     ) {
         // the DSL makes because() unskippable, but only this makes it say
         // something: a rule whose report reads "because " explains nothing
-        foreach ($selectors as $selector) {
-            if (!$selector instanceof Selector) {
-                throw new \InvalidArgumentException(\sprintf('Expected a selector, got %s.', get_debug_type($selector)));
-            }
-        }
-
         if ('' === trim($because)) {
             throw new \InvalidArgumentException('A rule needs a reason: it is what the report gives someone who has to fix the violation.');
         }

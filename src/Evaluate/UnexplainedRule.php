@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Evaluate;
 
 use Arkitect\Evaluate\Constraint\Constraint;
-use Arkitect\Evaluate\Selector\Selector;
+use Arkitect\Evaluate\Selector\Selectors;
 
 /**
  * A rule that knows what it wants but not why. `because()` is the only way
@@ -18,9 +18,8 @@ use Arkitect\Evaluate\Selector\Selector;
  */
 final class UnexplainedRule
 {
-    /** @param list<Selector> $selectors */
     public function __construct(
-        private readonly array $selectors,
+        private readonly Selectors $selectors,
         private readonly Constraint $constraint,
     ) {
     }

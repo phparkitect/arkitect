@@ -6,6 +6,7 @@ namespace Arkitect\Evaluate;
 
 use Arkitect\Evaluate\Constraint\Constraint;
 use Arkitect\Evaluate\Selector\Selector;
+use Arkitect\Evaluate\Selector\Selectors;
 
 /**
  * A rule being written. It exists so that `Rule` is never a half-built
@@ -14,19 +15,18 @@ use Arkitect\Evaluate\Selector\Selector;
  */
 final class RuleDraft
 {
-    /** @param list<Selector> $selectors */
-    private function __construct(private readonly array $selectors)
+    private function __construct(private readonly Selectors $selectors)
     {
     }
 
     public static function start(): self
     {
-        return new self([]);
+        return new self(new Selectors());
     }
 
     public function that(Selector $selector): self
     {
-        return new self([...$this->selectors, $selector]);
+        return new self($this->selectors->with($selector));
     }
 
     public function andThat(Selector $selector): self

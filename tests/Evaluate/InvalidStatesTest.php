@@ -7,6 +7,7 @@ namespace Arkitect\Tests\Evaluate;
 use Arkitect\Evaluate\Constraint\IsFinal;
 use Arkitect\Evaluate\NotApplicableClasses;
 use Arkitect\Evaluate\Rule;
+use Arkitect\Evaluate\Selector\Selectors;
 use Arkitect\Evaluate\UnresolvedClasses;
 use Arkitect\Evaluate\Violation;
 use Arkitect\Evaluate\Violations;
@@ -128,9 +129,9 @@ final class InvalidStatesTest extends TestCase
 
     public function test_a_rule_holds_only_selectors(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
 
-        new Rule(['App\Domain'], new IsFinal(), 'reasons');
+        new Rule(new Selectors('App\Domain'), new IsFinal(), 'reasons'); // @phpstan-ignore-line
     }
 
     private function classAt(int $line): ParsedClass

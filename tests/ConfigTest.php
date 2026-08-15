@@ -52,9 +52,9 @@ final class ConfigTest extends TestCase
 
     public function test_only_rules_can_be_added(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
 
-        Config::create(__DIR__)->add(['not a rule']);
+        Config::create(__DIR__)->add(['not a rule']); // @phpstan-ignore-line
     }
 
     private function aRule(): Rule
