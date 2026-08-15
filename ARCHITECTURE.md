@@ -312,6 +312,33 @@ return Config::create()
     ->add($rules);
 ```
 
+`root()` is mandatory *by construction*, not checked afterwards:
+`Config::create()` hands back a `ConfigDraft` whose only method is `root()`,
+so a config without one cannot be built — the same shape as reaching a
+`Rule` only through `because()`. It is never inferred from the working
+directory or from where the config file sits, because a run has to mean the
+same thing wherever it was started from.
+
+**Parse scope and check scope are not the same scope**, which is the answer
+to the question that sat in Open until `root()` existed to force it. `vendor/`
+*must* be parsed — inheritance cannot be resolved otherwise. It *must not* be
+checked, or a config that forgets a namespace selector reports thousands of
+violations in code its author cannot change, which is exactly the kind of
+trap namespace filtering alone would leave in place. So everything under the
+root is parsed, and everything except `vendor/` is checked.
+
+`Codebase` is where that lives: one parse, two views of it — `ownClasses`,
+what rules may judge, and `graph`, what names resolve against. Not in
+`Config`, because nobody declared it; it is our policy, and it moves to
+`Config` the day a project can override it. Against this repo the two views
+are 83 classes and 2703.
+
+Nothing downstream had to change to accommodate this: `Rule::check(array
+$classes, ClassGraph $graph)` already took the classes to judge and the
+graph to resolve against as separate arguments, for an unrelated reason (the
+graph cannot be a constructor dependency of a constraint, since the config
+is read before anything is parsed).
+
 No `ClassSet`. Its job — pairing "what to scan" with "which rules apply" —
 is already handled by the universal root-scan (stage 1) plus per-rule
 `that()` selectors (stage 3); keeping it around would be a second filtering
@@ -430,13 +457,12 @@ such as a root that isn't a directory. One code for both failure kinds on
 purpose: a run that couldn't check part of the project has not passed, and
 splitting the two would be a distinction CI can't act on differently.
 
-Open, and the first concrete evidence that `root()` has visible
-consequences: file paths are currently relative to the directory that was
-scanned, so scanning `src/` yields `Evaluate/Selector/Extend.php`, which
-does not resolve from the project root and therefore is not clickable. If
-the config's `root()` is the project root, this fixes itself by
-construction — `run.php` scanning `src/` directly is the anomaly, not the
-report.
+File paths are relative to the scanned root, which is why `root()` being
+the project root matters: scanning `src/` directly yields
+`Evaluate/Selector/Extend.php`, a path that does not resolve from the
+project root and therefore is not clickable. With `Config`'s root that
+fixes itself by construction, and it was the first concrete evidence that
+`root()` had consequences beyond configuration tidiness.
 
 ## Decided
 
@@ -503,6 +529,13 @@ report.
 - `ClassSet` is removed. A single `root()` replaces it; filtering is
   namespace-based (`that()`) or, exceptionally, path-based
   (`ResideInPath`).
+- `root()` is explicit, single and mandatory by construction — a
+  `ConfigDraft` with no other method leads to it. Never inferred from cwd or
+  from the config file's location.
+- Parsing and checking are separate scopes. Everything under the root is
+  parsed so names can resolve; everything except `vendor/` is checked. The
+  rule lives in `Codebase`, not `Config`, because it is our policy rather
+  than the user's declaration.
 - Report is rebuilt from scratch against the new structured `Violation`.
   Exit `1` covers both violations and anything left unchecked: a run that
   could not look at part of the project has not passed.
@@ -513,9 +546,6 @@ report.
 
 ## Open — not yet decided, do not treat as settled
 
-- **Where `root()` comes from**: must be explicit in config, not inferred
-  from cwd or from the config file's location — but the exact API isn't
-  fixed yet.
 - **Multi-root / monorepo case**: parked. Addressed via `ResideInPath` when
   a concrete case shows it's needed, not by reintroducing multiple
   `ClassSet`-like roots. If `ResideInPath` turns out not to be enough in
@@ -528,10 +558,6 @@ report.
 - **Cache storage location and invalidation**: project-local directory vs.
   system cache dir; whether `vendor`'s cache invalidates as a block on
   `composer.lock` changes rather than per-file.
-- **Parse scope vs. check scope**: whether namespace filtering via `that()`
-  is enough on its own to keep `vendor/` (parsed, for resolution) out of
-  rule checks by default, or whether "what we parse" and "what we check by
-  default" need to be separate concepts. See the note under stage 4.
 - **Resolve-graph edge cases** — duplicate FQCNs, inheritance cycles, trait
   conflicts, diamond interfaces: not designed for; handle each when a real
   case surfaces it rather than speculatively now.
