@@ -22,7 +22,7 @@ final class ClassParser
     public function parse(string $content, string $filePath, TargetPhpVersion $targetPhpVersion): ParseResult
     {
         $phpParser = (new ParserFactory())->createForVersion(
-            PhpVersion::fromString($targetPhpVersion->toString())
+            PhpVersion::fromString($targetPhpVersion->value)
         );
 
         $errorHandler = new Collecting();

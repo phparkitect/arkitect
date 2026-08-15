@@ -68,12 +68,12 @@ final class ConfigTest extends TestCase
     {
         $running = \PHP_MAJOR_VERSION.'.'.\PHP_MINOR_VERSION;
 
-        self::assertSame($running, Config::create(__DIR__)->targetPhpVersion->toString());
+        self::assertSame($running, Config::create(__DIR__)->targetPhpVersion->value);
     }
 
     public function test_the_target_php_version_can_be_pinned(): void
     {
-        self::assertSame('8.1', Config::create(__DIR__)->targetPhpVersion('8.1')->targetPhpVersion->toString());
+        self::assertSame('8.1', Config::create(__DIR__)->targetPhpVersion('8.1')->targetPhpVersion->value);
     }
 
     public function test_pinning_it_keeps_the_rules_and_the_root(): void
@@ -88,7 +88,7 @@ final class ConfigTest extends TestCase
     {
         $config = Config::create(__DIR__)->targetPhpVersion('8.1')->add([$this->aRule()]);
 
-        self::assertSame('8.1', $config->targetPhpVersion->toString());
+        self::assertSame('8.1', $config->targetPhpVersion->value);
     }
 
     private function aRule(): Rule

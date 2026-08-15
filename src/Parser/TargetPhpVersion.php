@@ -4,34 +4,32 @@ declare(strict_types=1);
 
 namespace Arkitect\Parser;
 
-final class TargetPhpVersion
+/**
+ * The PHP version the *analysed* project targets, which is not the one
+ * running arkitect: a project on 8.0 is analysed as 8.0 by a tool that
+ * needs 8.5 to run.
+ */
+enum TargetPhpVersion: string
 {
-    private const VALID = ['8.0', '8.1', '8.2', '8.3', '8.4', '8.5'];
+    case Php80 = '8.0';
+    case Php81 = '8.1';
+    case Php82 = '8.2';
+    case Php83 = '8.3';
+    case Php84 = '8.4';
+    case Php85 = '8.5';
 
-    private string $version;
-
-    private function __construct(string $version)
-    {
-        if (!\in_array($version, self::VALID, true)) {
-            throw new \InvalidArgumentException("Invalid target PHP version '$version', expected one of: ".implode(', ', self::VALID));
-        }
-
-        $this->version = $version;
-    }
-
+    /**
+     * `from()` would do, but its ValueError names the enum rather than the
+     * versions, and this value is typed by hand in a config file.
+     */
     public static function create(string $version): self
     {
-        return new self($version);
+        return self::tryFrom($version) ?? throw new \InvalidArgumentException(\sprintf("Invalid target PHP version '%s', expected one of: %s", $version, implode(', ', array_column(self::cases(), 'value'))));
     }
 
     /** What the interpreter running arkitect happens to be. */
     public static function current(): self
     {
-        return new self(\PHP_MAJOR_VERSION.'.'.\PHP_MINOR_VERSION);
-    }
-
-    public function toString(): string
-    {
-        return $this->version;
+        return self::create(\PHP_MAJOR_VERSION.'.'.\PHP_MINOR_VERSION);
     }
 }
