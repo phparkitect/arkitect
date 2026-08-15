@@ -48,6 +48,17 @@ try {
         ->because('reading files is the parser\'s job, and it is already done by now'),
 
     Rule::allClasses()
+        ->that(new Selector\ResideInOneOfTheseNamespaces([
+            'Arkitect\Evaluate',
+            'Arkitect\Command',
+            'Arkitect\Parser',
+            'Arkitect\Resolve',
+            'Arkitect\Report',
+        ]))
+        ->should(new Constraint\NotDependOnTheseNamespaces(['Arkitect\Cli']))
+        ->because('the terminal drives the application, and nothing drives the terminal'),
+
+    Rule::allClasses()
         ->that(new Selector\ResideInNamespace('Arkitect\Evaluate\Selector'))
         ->should(new Constraint\NotDependOnTheseNamespaces(['Arkitect\Evaluate\Violation*']))
         ->because('a selector decides what a rule is about and never reports anything'),
