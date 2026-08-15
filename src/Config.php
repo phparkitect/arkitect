@@ -57,6 +57,15 @@ final class Config
         return $this;
     }
 
+    /** For the commands that need to see what a baseline is currently hiding. */
+    public function withoutBaseline(): self
+    {
+        $copy = clone $this;
+        $copy->baseline = null;
+
+        return $copy;
+    }
+
     /** The version of PHP the *analysed* project targets, not the one running us. */
     public function targetPhpVersion(string $version): self
     {

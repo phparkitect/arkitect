@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Command;
 
 use Arkitect\Evaluate\RuleResults;
+use Arkitect\Evaluate\Violations;
 use Arkitect\Parser\ParsingErrors;
 
 final class CheckResult
@@ -15,6 +16,20 @@ final class CheckResult
         public readonly RuleResults $ruleResults,
         public readonly int $baselined = 0,
     ) {
+    }
+
+    /** Every violation the run found, with the rules they came from flattened away. */
+    public function allViolations(): Violations
+    {
+        $violations = [];
+
+        foreach ($this->ruleResults as $result) {
+            foreach ($result->violations as $violation) {
+                $violations[] = $violation;
+            }
+        }
+
+        return new Violations(...$violations);
     }
 
     /**

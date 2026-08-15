@@ -26,4 +26,9 @@ final class FilesystemBaselineRepository implements BaselineRepository
 
         return Baseline::fromJson((string) file_get_contents($full));
     }
+
+    public function write(string $path, Baseline $baseline): void
+    {
+        file_put_contents($this->rootPath.'/'.$path, $baseline->toJson());
+    }
 }

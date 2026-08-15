@@ -81,6 +81,25 @@ final class Baseline implements \Countable
         return json_encode($entries, \JSON_PRETTY_PRINT | \JSON_THROW_ON_ERROR)."\n";
     }
 
+    /**
+     * Shrink only: the entries that still match something. Nothing is ever
+     * added, so pruning cannot quietly accept work done since.
+     */
+    public function keepOnly(Violations $current): self
+    {
+        $kept = [];
+
+        foreach ($current as $violation) {
+            $identity = self::identify($violation);
+
+            if (isset($this->known[$identity])) {
+                $kept[$identity] = true;
+            }
+        }
+
+        return new self($kept);
+    }
+
     public function count(): int
     {
         return \count($this->known);
