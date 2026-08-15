@@ -2,26 +2,26 @@
 
 declare(strict_types=1);
 
-namespace Arkitect\Tests\Evaluate\Constraint;
+namespace Arkitect\Tests\Resolve;
 
-use Arkitect\Evaluate\Constraint\PhpCoreClasses;
+use Arkitect\Resolve\InternalClasses;
 use PHPUnit\Framework\TestCase;
 
-final class PhpCoreClassesTest extends TestCase
+final class InternalClassesTest extends TestCase
 {
     public function test_an_internal_class_is_recognised(): void
     {
-        self::assertTrue((new PhpCoreClasses())->contains('DateTimeImmutable'));
+        self::assertTrue((new InternalClasses())->contains('DateTimeImmutable'));
     }
 
     public function test_an_internal_interface_is_recognised(): void
     {
-        self::assertTrue((new PhpCoreClasses())->contains('Countable'));
+        self::assertTrue((new InternalClasses())->contains('Countable'));
     }
 
     public function test_a_userland_class_that_happens_to_be_loaded_is_not_core(): void
     {
-        self::assertFalse((new PhpCoreClasses())->contains(self::class));
+        self::assertFalse((new InternalClasses())->contains(self::class));
     }
 
     /**
@@ -31,12 +31,12 @@ final class PhpCoreClassesTest extends TestCase
      */
     public function test_a_name_that_does_not_exist_in_this_process_is_not_core(): void
     {
-        self::assertFalse((new PhpCoreClasses())->contains('App\Domain\NeverLoaded'));
+        self::assertFalse((new InternalClasses())->contains('App\Domain\NeverLoaded'));
     }
 
     public function test_the_answer_is_stable_when_asked_twice(): void
     {
-        $core = new PhpCoreClasses();
+        $core = new InternalClasses();
 
         self::assertTrue($core->contains('DateTimeImmutable'));
         self::assertTrue($core->contains('DateTimeImmutable'));

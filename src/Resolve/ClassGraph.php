@@ -11,12 +11,16 @@ final class ClassGraph
     /** @var array<string, ParsedClass> */
     private array $byFqcn;
 
+    private readonly InternalClasses $internal;
+
     public function __construct(ParsedClass ...$classes)
     {
         $this->byFqcn = [];
         foreach ($classes as $class) {
             $this->byFqcn[$class->fqcn] = $class;
         }
+
+        $this->internal = new InternalClasses();
     }
 
     public function isA(string $fqcn, string $target): Membership
@@ -28,7 +32,7 @@ final class ClassGraph
         $class = $this->byFqcn[$fqcn] ?? null;
 
         if (null === $class) {
-            return Membership::Unknown;
+            return $this->outsideTheParsedSet($fqcn, $target, static fn (string $f, string $t) => is_a($f, $t, true));
         }
 
         $anyUnknown = false;
@@ -59,7 +63,7 @@ final class ClassGraph
         $class = $this->byFqcn[$fqcn] ?? null;
 
         if (null === $class) {
-            return Membership::Unknown;
+            return $this->outsideTheParsedSet($fqcn, $target, self::extendsChainOf(...));
         }
 
         $anyUnknown = false;
@@ -81,5 +85,46 @@ final class ClassGraph
         }
 
         return $anyUnknown ? Membership::Unknown : Membership::No;
+    }
+
+    /**
+     * A name the parsed set doesn't contain. Internal classes are never in
+     * it and never can be — they have no PHP source — so treating them as
+     * Unknown would make every descendant of an exception unanswerable.
+     * They resolve instead: an internal class only ever inherits from other
+     * internal classes, since no extension can name a user-defined type, so
+     * a user-defined target is unreachable through one. An internal target
+     * is a question the runtime can answer, and it is the same answer on
+     * every machine that loaded the same extensions.
+     *
+     * Anything else is genuinely unknown: it has source somewhere, and that
+     * source wasn't in what we parsed.
+     *
+     * @param callable(string, string): bool $reaches
+     */
+    private function outsideTheParsedSet(string $fqcn, string $target, callable $reaches): Membership
+    {
+        if (!$this->internal->contains($fqcn)) {
+            return Membership::Unknown;
+        }
+
+        if (!$this->internal->contains($target)) {
+            return Membership::No;
+        }
+
+        return $reaches($fqcn, $target) ? Membership::Yes : Membership::No;
+    }
+
+    /** Whether $target is in $fqcn's `extends` chain, interfaces excluded. */
+    private static function extendsChainOf(string $fqcn, string $target): bool
+    {
+        $ancestors = class_parents($fqcn) ?: [];
+
+        if ([] === $ancestors && interface_exists($fqcn, false)) {
+            // an interface's `extends` is what class_implements reports
+            $ancestors = class_implements($fqcn) ?: [];
+        }
+
+        return isset($ancestors[$target]);
     }
 }

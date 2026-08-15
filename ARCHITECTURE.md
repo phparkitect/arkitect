@@ -59,9 +59,8 @@ numbers above are kept as evidence the approach isn't obviously too slow,
 not as a target — no throughput or memory number gates this PoC. Per
 *Reliable first, fast second* in the philosophy: get a tool that is correct
 and pleasant to use first, then make it fast. The one deliberate exception
-is the PHP-core-class check (see stage 1) — reflection is acceptable there
-specifically, and even that can be implemented later, since it's narrow and
-contained.
+is the internal-class check (see stage 1) — reflection is acceptable there
+specifically. It is now implemented, as `Resolve\InternalClasses`.
 
 ## The four stages
 
@@ -83,11 +82,11 @@ no `ReflectionClass`, no `is_a()`. This is what today's
 `ClassDescriptionBuilder::isPhpCoreClass()` violates — it makes parse output
 depend on which PHP extensions happen to be loaded on the machine running
 it, which is exactly the kind of "cache that's occasionally wrong" the
-philosophy rules out (*Reliable first, fast second*). The PHP-core-class
-filter moves out of parsing entirely, into resolve or evaluate (stages 2/3,
-neither of which is cached the same way), where a reflection-based check is
-a deliberate, scoped exception to "no runtime calls" — narrow enough that
-its actual implementation can wait.
+philosophy rules out (*Reliable first, fast second*). That filter moves out
+of parsing entirely: it is `Resolve\InternalClasses` (stage 2, not cached),
+the one deliberate, scoped exception to "no runtime calls". It is named for
+what it actually tests — `ReflectionClass::isInternal()`, which is true for
+extension classes like `PDO` too, not only for PHP's core.
 
 Runs over `vendor/` through the identical pipeline — no special-casing.
 This is needed for inheritance resolution to be correct at all: a project
@@ -113,6 +112,25 @@ through `extends`/`implements`/traits, including ancestors that live in
 graph says so explicitly — it does not silently resolve to `false`, which is
 what `IsA`'s current `is_a($fqcn, $allowed, true)` does when the class isn't
 autoloadable.
+
+**Internal classes are the exception, and they had to be.** A class PHP
+compiled in — `RuntimeException`, `ArrayObject`, but equally `PDO` — has no
+source file, so it can never be in the parsed set however much is parsed.
+Treating that dead end as unknown made every descendant of one
+unanswerable: `App\MyEx extends \RuntimeException` came back `Unknown` for
+*every* target, and that is every custom exception in every project, not an
+edge case. So `ClassGraph` consults `InternalClasses` when a name isn't in
+the parsed set:
+
+- internal ancestor, user-defined target → `No`, definitively. An internal
+  class only ever inherits from other internal ones, since no C extension
+  can name a user-defined type, so the target is unreachable through it.
+  This is an inference, not a runtime lookup.
+- internal ancestor, internal target → ask the runtime. Deterministic, and
+  the same answer on any machine with the same extensions loaded.
+- anything else → `Unknown`, which now means only what it should: this name
+  has source somewhere and it wasn't in what we parsed (a missing
+  `vendor/`, an excluded path).
 
 This is the stage that replaces the reflection-based approach `#582`
 originally proposed. Reflection was rejected: it reintroduces a runtime
@@ -317,15 +335,20 @@ you wait).
 
 - Performance is out of scope for this PoC. Correctness and DX come first;
   optimize only once those are solid.
-- Parse is pure and cacheable. The PHP-core-class check is the one
+- Parse is pure and cacheable. The internal-class check is the one
   deliberate exception to "no runtime calls" — it uses reflection, and it
-  lives in evaluate (`Constraint\PhpCoreClasses`), never in parse. It keeps
-  autoloading off: core symbols are present without it, and letting the
+  lives in resolve (`Resolve\InternalClasses`), never in parse. It keeps
+  autoloading off: internal symbols are present without it, and letting the
   autoloader run would execute project code just to answer a name lookup.
 - `vendor/` is parsed through the same pipeline as project code — primarily
   because inheritance resolution needs it, not primarily for caching.
 - Inheritance resolution is a graph built at resolve time, over parsed
-  data only — never reflection.
+  data only — with one scoped exception, added once it turned out to be
+  unavoidable: internal classes have no source to parse, so `ClassGraph`
+  asks `InternalClasses` (and, only when both ends are internal, the
+  runtime) rather than reporting `Unknown` for every descendant of an
+  exception. Resolve is not cached, so this does not reintroduce the
+  cacheability problem that ruled reflection out of parsing.
 - `Constraint::evaluate()` returns `Violations`. There is no `appliesTo()`:
   `Selector` and `Constraint` are separate contracts, which is what made
   the method unnecessary rather than merely hard to specify.
@@ -386,12 +409,14 @@ you wait).
 - **What an unknown ancestor means for *selection*.** Settled for
   constraints: `ClassGraph` answers with the tri-state `Membership`, and
   `Unknown` produces a violation with its own wording, because a green run
-  must not hide an incomplete parse scope. Unsettled for selectors, which
-  is why `IsA`/`Implement`/`Extend` have no `Selector` counterpart yet:
-  including a class whose ancestry can't be resolved means checking
-  something we're unsure about, excluding it means dropping it in silence.
-  This is the largest remaining gap in stage 3 — "all classes implementing
-  X" is probably the most common selector in real use.
+  must not hide an incomplete parse scope. That decision only became
+  defensible once internal classes stopped producing `Unknown` (stage 2) —
+  before that it would have fired on every custom exception. Unsettled for
+  selectors, which is why `IsA`/`Implement`/`Extend` have no `Selector`
+  counterpart yet: including a class whose ancestry can't be resolved means
+  checking something we're unsure about, excluding it means dropping it in
+  silence. This is the largest remaining gap in stage 3 — "all classes
+  implementing X" is probably the most common selector in real use.
 - **Parse scope vs. check scope**: whether namespace filtering via `that()`
   is enough on its own to keep `vendor/` (parsed, for resolution) out of
   rule checks by default, or whether "what we parse" and "what we check by

@@ -9,19 +9,20 @@ use Arkitect\Evaluate\Violation;
 use Arkitect\Evaluate\Violations;
 use Arkitect\Parser\ParsedClass;
 use Arkitect\Resolve\ClassGraph;
+use Arkitect\Resolve\InternalClasses;
 
 final class DependOnlyOnTheseNamespaces implements Constraint
 {
     /** @var list<Pattern> */
     private readonly array $allowed;
 
-    private readonly PhpCoreClasses $core;
+    private readonly InternalClasses $internal;
 
     /** @param list<string> $namespaces */
     public function __construct(array $namespaces)
     {
         $this->allowed = array_map(static fn (string $n) => new Pattern($n), array_values($namespaces));
-        $this->core = new PhpCoreClasses();
+        $this->internal = new InternalClasses();
     }
 
     public function evaluate(ParsedClass $class, ClassGraph $classGraph): Violations
@@ -46,7 +47,7 @@ final class DependOnlyOnTheseNamespaces implements Constraint
 
     private function isAllowed(ParsedClass $class, string $dependency): bool
     {
-        if ($this->core->contains($dependency)) {
+        if ($this->internal->contains($dependency)) {
             return true;
         }
 
