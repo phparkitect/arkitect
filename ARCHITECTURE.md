@@ -333,7 +333,20 @@ has to be given.
 
 The root is never inferred from the working directory or from where the
 config file sits, because a run has to mean the same thing wherever it was
-started from.
+started from. And it is the only constructor argument: `Config` is mutable,
+its fluent setters assigning one field and returning `$this`. Rebuilding an
+immutable config through a constructor taking every field meant `add()`
+naming the root and the PHP version while doing neither — PHP 8.5 has no
+`clone with`, so there is no way to have both, and a config that is written
+once in a file and then read gains little from immutability. The cost, since
+it is real: the two optional properties are publicly assignable, PHP having
+no package-private and a private one forcing a getter whose name would
+collide with its setter.
+
+`Check::run()` takes the whole `Config` rather than the pieces it uses. The
+call site was otherwise unpacking a coherent object, and every option a
+command grows would widen the signature; that `Check` never reads `root` is
+fine, since `root` is what the CLI builds the parser from.
 
 **Parse scope and check scope are not the same scope**, which is the answer
 to the question that sat in Open until `root()` existed to force it. `vendor/`
@@ -392,8 +405,10 @@ config file; the CLI keeps only bootstrap (`--config`, `--autoload`) and
 genuine one-off overrides (`--format`, `--stop-on-failure`,
 `--skip-baseline`).
 
-`targetPhpVersion()` is optional, not required for a working config. When
-unset, it defaults to the running interpreter's own version — this already
+`targetPhpVersion()` is a fluent setting and `TargetPhpVersion` is a backed
+enum — it always was one in disguise, with a const array of valid values and
+a constructor checking membership. When unset, it defaults to the running
+interpreter's own version — this already
 matches today's de facto behavior (`Config`'s own field defaults to
 `TargetPhpVersion::latest()`, but `CheckHandler` unconditionally overwrites
 it with `TargetPhpVersion::create($cliOption)`, which falls back to
@@ -409,14 +424,10 @@ The `Architecture`/`RuleBuilders` DSL is dropped, not carried over — this
 was already the deprecation direction pre-2.0, gated on the philosophy doc
 that's now merged.
 
-Open question worth tracking: with a single `root()`, everything under it
-gets *parsed*, but `that()` namespace filters decide what rules *check* —
-so a config with no namespace filter now implicitly checks `vendor/` too,
-which no config does today. If namespace filtering alone doesn't turn out
-to be enough in practice, the alternative is splitting the concept in two —
-what gets parsed (always everything, for resolution) vs. what gets checked
-by default (typically `src/` + `tests/`) — instead of relying purely on
-per-rule `that()` filters. Not decided; needs a concrete case to settle it.
+This paragraph used to end with the parse-versus-check question as open,
+and it guessed the wrong way: namespace filtering alone was never going to
+be enough. The answer is above — the concept *is* split in two, and
+`Codebase` is where.
 
 **Migration policy**: 2.0 is a hard break, not a smooth one. There is no
 compatibility shim for third-party expression implementations and no
@@ -540,6 +551,9 @@ fixes itself by construction, and it was the first concrete evidence that
   Both exist on purpose; this is not the twin-class pattern below.
 - `Config` is a fluent object; the closure-config form is removed, not kept
   as an alternative.
+- `Config` is mutable and its constructor takes only the root, so
+  "mandatory in the constructor, optional fluent" is literal rather than a
+  convention. `Check::run()` takes the config, not its pieces.
 - `targetPhpVersion()` is optional, defaulting to the running interpreter's
   version — matches today's de facto behavior, made intentional.
 - PHPArkitect 2.0 itself requires PHP `^8.5` to run (`composer.json`). This
@@ -669,6 +683,14 @@ than not extracting it, per *Explicit, never ambiguous*. Property hooks
 (PHP 8.4) and `use function`/`use const` needed no special handling — the
 existing per-node-kind dispatch and the generic recursion already do the
 right thing, confirmed by tests rather than assumed.
+
+## Working on this branch
+
+`make test`, `make lint`, `make fix`, `make run` — there is no
+`phpunit.xml`, so the suite path has to be passed, which is what the
+Makefile is for. `CLAUDE.md` carries the conventions that outlive this
+document: naming, real types over annotations, and checking a rule against
+real input before enforcing it.
 
 ## Ports and adapters, arrived at rather than adopted
 
