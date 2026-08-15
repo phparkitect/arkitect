@@ -7,6 +7,7 @@ namespace Arkitect;
 use Arkitect\Parser\ParsedClass;
 use Arkitect\Parser\ParseResult;
 use Arkitect\Resolve\ClassGraph;
+use Arkitect\Resolve\ParsedClassGraph;
 
 /**
  * One parse, two views of it: names resolve against everything parsed,
@@ -36,6 +37,6 @@ final class Codebase
             static fn (ParsedClass $class) => !str_starts_with($class->filePath, self::DEPENDENCIES)
         ));
 
-        return new self($own, new ClassGraph(...$parsed->classes));
+        return new self($own, new ParsedClassGraph(...$parsed->classes));
     }
 }

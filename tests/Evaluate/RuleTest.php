@@ -11,7 +11,7 @@ use Arkitect\Evaluate\Selector\HaveNameMatching;
 use Arkitect\Evaluate\Selector\Implement;
 use Arkitect\Evaluate\Selector\ResideInNamespace;
 use Arkitect\Parser\ClassKind;
-use Arkitect\Resolve\ClassGraph;
+use Arkitect\Resolve\ParsedClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
 use PHPUnit\Framework\TestCase;
 
@@ -24,7 +24,7 @@ final class RuleTest extends TestCase
         $result = $rule->check([
             ParsedClassFixture::create('App\Domain\Order', isFinal: false),
             ParsedClassFixture::create('App\Infra\Db', isFinal: false),
-        ], new ClassGraph());
+        ], new ParsedClassGraph());
 
         self::assertSame(1, $result->checked);
         self::assertCount(1, $result->violations);
@@ -40,10 +40,10 @@ final class RuleTest extends TestCase
     public function test_matching_nothing_is_distinguishable_from_a_clean_run(): void
     {
         $matchedNothing = Rule::allClasses()->that(new ResideInNamespace('App\Nowhere'))->should(new IsFinal())->because('reasons')
-            ->check([ParsedClassFixture::create('App\Domain\Order', isFinal: true)], new ClassGraph());
+            ->check([ParsedClassFixture::create('App\Domain\Order', isFinal: true)], new ParsedClassGraph());
 
         $clean = Rule::allClasses()->that(new ResideInNamespace('App\Domain'))->should(new IsFinal())->because('reasons')
-            ->check([ParsedClassFixture::create('App\Domain\Order', isFinal: true)], new ClassGraph());
+            ->check([ParsedClassFixture::create('App\Domain\Order', isFinal: true)], new ParsedClassGraph());
 
         self::assertCount(0, $matchedNothing->violations);
         self::assertCount(0, $clean->violations);
@@ -60,7 +60,7 @@ final class RuleTest extends TestCase
             ParsedClassFixture::create('App\Domain\PurchaseOrder', isFinal: false),
             ParsedClassFixture::create('App\Domain\Invoice', isFinal: false),
             ParsedClassFixture::create('App\Infra\StoredOrder', isFinal: false),
-        ], new ClassGraph());
+        ], new ParsedClassGraph());
 
         self::assertSame(1, $result->checked);
         self::assertSame('App\Domain\PurchaseOrder', iterator_to_array($result->violations)[0]->fqcn);
@@ -73,7 +73,7 @@ final class RuleTest extends TestCase
         $result = $rule->check([
             ParsedClassFixture::create('App\Domain\Order', isFinal: false),
             ParsedClassFixture::create('App\Infra\Db', isFinal: true),
-        ], new ClassGraph());
+        ], new ParsedClassGraph());
 
         self::assertSame(2, $result->checked);
         self::assertCount(1, $result->violations);
@@ -90,7 +90,7 @@ final class RuleTest extends TestCase
         $unresolvable = ParsedClassFixture::create('App\Child', extends: ['Vendor\NeverParsed']);
 
         $result = Rule::allClasses()->should(new IsA('App\Contract'))->because('reasons')
-            ->check([$unresolvable], new ClassGraph($unresolvable));
+            ->check([$unresolvable], new ParsedClassGraph($unresolvable));
 
         self::assertSame(1, $result->checked);
         self::assertCount(0, $result->violations);
@@ -101,7 +101,7 @@ final class RuleTest extends TestCase
     public function test_a_rule_that_resolved_everything_is_conclusive(): void
     {
         $result = Rule::allClasses()->should(new IsFinal())->because('reasons')
-            ->check([ParsedClassFixture::create('App\Order', isFinal: false)], new ClassGraph());
+            ->check([ParsedClassFixture::create('App\Order', isFinal: false)], new ParsedClassGraph());
 
         self::assertCount(1, $result->violations);
         self::assertTrue($result->isConclusive());
@@ -117,7 +117,7 @@ final class RuleTest extends TestCase
         $undecidable = ParsedClassFixture::create('App\Child', extends: ['Vendor\NeverParsed']);
 
         $result = Rule::allClasses()->that(new Implement('App\Contract'))->should(new IsFinal())->because('reasons')
-            ->check([$undecidable], new ClassGraph($undecidable));
+            ->check([$undecidable], new ParsedClassGraph($undecidable));
 
         self::assertSame(0, $result->checked);
         self::assertCount(0, $result->violations);
@@ -134,7 +134,7 @@ final class RuleTest extends TestCase
     {
         $undecidable = ParsedClassFixture::create('App\Child', extends: ['Vendor\NeverParsed']);
 
-        $result = Rule::allClasses()->that(new Implement('App\Contract'))->andThat(new ResideInNamespace('App\Elsewhere'))->should(new IsFinal())->because('reasons')->check([$undecidable], new ClassGraph($undecidable));
+        $result = Rule::allClasses()->that(new Implement('App\Contract'))->andThat(new ResideInNamespace('App\Elsewhere'))->should(new IsFinal())->because('reasons')->check([$undecidable], new ParsedClassGraph($undecidable));
 
         self::assertSame(0, $result->checked);
         self::assertCount(0, $result->unresolved);
@@ -151,7 +151,7 @@ final class RuleTest extends TestCase
         $result = Rule::allClasses()->should(new IsFinal())->because('reasons')->check([
             ParsedClassFixture::create('App\Repo', kind: ClassKind::Interface),
             ParsedClassFixture::create('App\Loggable', kind: ClassKind::Trait),
-        ], new ClassGraph());
+        ], new ParsedClassGraph());
 
         self::assertSame(2, $result->selected);
         self::assertSame(0, $result->checked);
@@ -167,7 +167,7 @@ final class RuleTest extends TestCase
         $result = Rule::allClasses()->should(new IsFinal())->because('reasons')->check([
             ParsedClassFixture::create('App\Order', isFinal: false),
             ParsedClassFixture::create('App\Repo', kind: ClassKind::Interface),
-        ], new ClassGraph());
+        ], new ParsedClassGraph());
 
         self::assertSame(2, $result->selected);
         self::assertSame(1, $result->checked);
@@ -178,7 +178,7 @@ final class RuleTest extends TestCase
 
     public function test_an_empty_class_set_matches_nothing(): void
     {
-        $result = Rule::allClasses()->should(new IsFinal())->because('reasons')->check([], new ClassGraph());
+        $result = Rule::allClasses()->should(new IsFinal())->because('reasons')->check([], new ParsedClassGraph());
 
         self::assertTrue($result->matchedNothing());
         self::assertCount(0, $result->violations);

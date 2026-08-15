@@ -8,7 +8,7 @@ use Arkitect\Evaluate\Selector\Extend;
 use Arkitect\Evaluate\Selector\Implement;
 use Arkitect\Evaluate\Selector\IsA;
 use Arkitect\Evaluate\Selector\Selection;
-use Arkitect\Resolve\ClassGraph;
+use Arkitect\Resolve\ParsedClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
 use PHPUnit\Framework\TestCase;
 
@@ -22,7 +22,7 @@ final class GraphSelectorsTest extends TestCase
     public function test_implement_selects_a_class_that_inherits_the_interface(): void
     {
         $class = ParsedClassFixture::create('App\Service', extends: ['App\Base']);
-        $graph = new ClassGraph($class, ParsedClassFixture::create('App\Base', implements: ['App\Contract']));
+        $graph = new ParsedClassGraph($class, ParsedClassFixture::create('App\Base', implements: ['App\Contract']));
 
         self::assertSame(Selection::Yes, (new Implement('App\Contract'))->matches($class, $graph));
     }
@@ -31,13 +31,13 @@ final class GraphSelectorsTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Loner');
 
-        self::assertSame(Selection::No, (new Implement('App\Contract'))->matches($class, new ClassGraph($class)));
+        self::assertSame(Selection::No, (new Implement('App\Contract'))->matches($class, new ParsedClassGraph($class)));
     }
 
     public function test_is_a_selects_through_a_transitive_chain(): void
     {
         $class = ParsedClassFixture::create('App\Child', extends: ['App\Middle']);
-        $graph = new ClassGraph($class, ParsedClassFixture::create('App\Middle', extends: ['App\Base']));
+        $graph = new ParsedClassGraph($class, ParsedClassFixture::create('App\Middle', extends: ['App\Base']));
 
         self::assertSame(Selection::Yes, (new IsA('App\Base'))->matches($class, $graph));
     }
@@ -46,7 +46,7 @@ final class GraphSelectorsTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Service', implements: ['App\Contract']);
 
-        self::assertSame(Selection::No, (new Extend('App\Contract'))->matches($class, new ClassGraph($class)));
+        self::assertSame(Selection::No, (new Extend('App\Contract'))->matches($class, new ParsedClassGraph($class)));
     }
 
     public function test_an_unparsed_ancestor_leaves_the_selection_unresolved(): void
@@ -55,7 +55,7 @@ final class GraphSelectorsTest extends TestCase
 
         self::assertSame(
             Selection::Unresolved,
-            (new Implement('App\Contract'))->matches($class, new ClassGraph($class))
+            (new Implement('App\Contract'))->matches($class, new ParsedClassGraph($class))
         );
     }
 
@@ -67,6 +67,6 @@ final class GraphSelectorsTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\MyEx', extends: ['RuntimeException']);
 
-        self::assertSame(Selection::No, (new Implement('App\Contract'))->matches($class, new ClassGraph($class)));
+        self::assertSame(Selection::No, (new Implement('App\Contract'))->matches($class, new ParsedClassGraph($class)));
     }
 }

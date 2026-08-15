@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Evaluate\Constraint;
 
 use Arkitect\Evaluate\Constraint\HaveNameMatching;
-use Arkitect\Resolve\ClassGraph;
+use Arkitect\Resolve\ParsedClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
 use PHPUnit\Framework\TestCase;
 
@@ -15,14 +15,14 @@ final class HaveNameMatchingTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Http\UserController');
 
-        self::assertCount(0, (new HaveNameMatching('*Controller'))->evaluate($class, new ClassGraph())->violations);
+        self::assertCount(0, (new HaveNameMatching('*Controller'))->evaluate($class, new ParsedClassGraph())->violations);
     }
 
     public function test_a_name_that_does_not_match_produces_a_violation(): void
     {
         $class = ParsedClassFixture::create('App\Http\UserRepository');
 
-        $violations = (new HaveNameMatching('*Controller'))->evaluate($class, new ClassGraph())->violations;
+        $violations = (new HaveNameMatching('*Controller'))->evaluate($class, new ParsedClassGraph())->violations;
 
         self::assertCount(1, $violations);
 
@@ -40,13 +40,13 @@ final class HaveNameMatchingTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\ControllerSupport\Order');
 
-        self::assertCount(1, (new HaveNameMatching('*Controller'))->evaluate($class, new ClassGraph())->violations);
+        self::assertCount(1, (new HaveNameMatching('*Controller'))->evaluate($class, new ParsedClassGraph())->violations);
     }
 
     public function test_a_class_in_the_global_namespace_is_matched_by_its_bare_name(): void
     {
         $class = ParsedClassFixture::create('UserController');
 
-        self::assertCount(0, (new HaveNameMatching('*Controller'))->evaluate($class, new ClassGraph())->violations);
+        self::assertCount(0, (new HaveNameMatching('*Controller'))->evaluate($class, new ParsedClassGraph())->violations);
     }
 }

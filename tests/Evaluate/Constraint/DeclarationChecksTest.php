@@ -8,7 +8,7 @@ use Arkitect\Evaluate\Constraint\Constraint;
 use Arkitect\Evaluate\Constraint\IsAbstract;
 use Arkitect\Evaluate\Constraint\IsReadonly;
 use Arkitect\Parser\ParsedClass;
-use Arkitect\Resolve\ClassGraph;
+use Arkitect\Resolve\ParsedClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
 use PHPUnit\Framework\TestCase;
 
@@ -41,7 +41,7 @@ final class DeclarationChecksTest extends TestCase
         Constraint $constraint,
         ParsedClass $satisfying,
     ): void {
-        self::assertCount(0, $constraint->evaluate($satisfying, new ClassGraph())->violations);
+        self::assertCount(0, $constraint->evaluate($satisfying, new ParsedClassGraph())->violations);
     }
 
     /** @dataProvider checks */
@@ -51,7 +51,7 @@ final class DeclarationChecksTest extends TestCase
         ParsedClass $violating,
         string $detail,
     ): void {
-        $violations = $constraint->evaluate($violating, new ClassGraph())->violations;
+        $violations = $constraint->evaluate($violating, new ParsedClassGraph())->violations;
 
         self::assertCount(1, $violations);
         self::assertSame($detail, iterator_to_array($violations)[0]->detail);

@@ -6,7 +6,7 @@ namespace Arkitect\Tests\Evaluate\Constraint;
 
 use Arkitect\Evaluate\Constraint\Depth;
 use Arkitect\Evaluate\Constraint\Implement;
-use Arkitect\Resolve\ClassGraph;
+use Arkitect\Resolve\ParsedClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
 use PHPUnit\Framework\TestCase;
 
@@ -16,7 +16,7 @@ final class ImplementTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Service', implements: ['App\Contract']);
 
-        $violations = (new Implement('App\Contract'))->evaluate($class, new ClassGraph($class))->violations;
+        $violations = (new Implement('App\Contract'))->evaluate($class, new ParsedClassGraph($class))->violations;
 
         self::assertCount(0, $violations);
     }
@@ -29,7 +29,7 @@ final class ImplementTest extends TestCase
     public function test_an_interface_inherited_from_the_parent_satisfies_the_transitive_check(): void
     {
         $class = ParsedClassFixture::create('App\Service', extends: ['App\Base']);
-        $graph = new ClassGraph($class, ParsedClassFixture::create('App\Base', implements: ['App\Contract']));
+        $graph = new ParsedClassGraph($class, ParsedClassFixture::create('App\Base', implements: ['App\Contract']));
 
         $violations = (new Implement('App\Contract'))->evaluate($class, $graph)->violations;
 
@@ -40,7 +40,7 @@ final class ImplementTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Loner');
 
-        $violations = (new Implement('App\Contract'))->evaluate($class, new ClassGraph($class))->violations;
+        $violations = (new Implement('App\Contract'))->evaluate($class, new ParsedClassGraph($class))->violations;
 
         self::assertCount(1, $violations);
 
@@ -53,7 +53,7 @@ final class ImplementTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Service', implements: ['App\Contract']);
 
-        $violations = (new Implement('App\Contract', Depth::Direct))->evaluate($class, new ClassGraph($class))->violations;
+        $violations = (new Implement('App\Contract', Depth::Direct))->evaluate($class, new ParsedClassGraph($class))->violations;
 
         self::assertCount(0, $violations);
     }
@@ -61,7 +61,7 @@ final class ImplementTest extends TestCase
     public function test_direct_depth_rejects_an_interface_inherited_from_the_parent(): void
     {
         $class = ParsedClassFixture::create('App\Service', extends: ['App\Base']);
-        $graph = new ClassGraph($class, ParsedClassFixture::create('App\Base', implements: ['App\Contract']));
+        $graph = new ParsedClassGraph($class, ParsedClassFixture::create('App\Base', implements: ['App\Contract']));
 
         $violations = (new Implement('App\Contract', Depth::Direct))->evaluate($class, $graph)->violations;
 
@@ -77,7 +77,7 @@ final class ImplementTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Service', implements: ['App\Contract']);
 
-        $violations = (new Implement('App\Contract', Depth::Direct))->evaluate($class, new ClassGraph())->violations;
+        $violations = (new Implement('App\Contract', Depth::Direct))->evaluate($class, new ParsedClassGraph())->violations;
 
         self::assertCount(0, $violations);
     }
@@ -86,7 +86,7 @@ final class ImplementTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Child', extends: ['Vendor\NeverParsed']);
 
-        $outcome = (new Implement('App\Contract'))->evaluate($class, new ClassGraph($class));
+        $outcome = (new Implement('App\Contract'))->evaluate($class, new ParsedClassGraph($class));
 
         self::assertCount(0, $outcome->violations);
         self::assertCount(1, $outcome->unresolved);

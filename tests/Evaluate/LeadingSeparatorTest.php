@@ -8,7 +8,7 @@ use Arkitect\Evaluate\Constraint;
 use Arkitect\Evaluate\Pattern;
 use Arkitect\Evaluate\Rule;
 use Arkitect\Evaluate\Selector;
-use Arkitect\Resolve\ClassGraph;
+use Arkitect\Resolve\ParsedClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
 use PHPUnit\Framework\TestCase;
 
@@ -24,7 +24,7 @@ final class LeadingSeparatorTest extends TestCase
     public function test_a_constraint_target_written_with_a_leading_separator_still_matches(): void
     {
         $service = ParsedClassFixture::create('App\Service', implements: ['App\Contract']);
-        $graph = new ClassGraph($service, ParsedClassFixture::create('App\Contract'));
+        $graph = new ParsedClassGraph($service, ParsedClassFixture::create('App\Contract'));
 
         $result = Rule::allClasses()
             ->should(new Constraint\IsA('\App\Contract'))
@@ -37,7 +37,7 @@ final class LeadingSeparatorTest extends TestCase
     public function test_a_selector_target_written_with_a_leading_separator_still_selects(): void
     {
         $service = ParsedClassFixture::create('App\Service', implements: ['App\Contract']);
-        $graph = new ClassGraph($service, ParsedClassFixture::create('App\Contract'));
+        $graph = new ParsedClassGraph($service, ParsedClassFixture::create('App\Contract'));
 
         self::assertSame(
             Selector\Selection::Yes,
@@ -51,7 +51,7 @@ final class LeadingSeparatorTest extends TestCase
 
         self::assertSame(
             Selector\Selection::Yes,
-            (new Selector\ResideInNamespace('\App\Domain'))->matches($class, new ClassGraph())
+            (new Selector\ResideInNamespace('\App\Domain'))->matches($class, new ParsedClassGraph())
         );
     }
 
@@ -65,7 +65,7 @@ final class LeadingSeparatorTest extends TestCase
         $class = ParsedClassFixture::create('App\Domain\Order', dependencies: ['App\Infra\Db' => 4]);
 
         $violations = (new Constraint\NotDependOnTheseNamespaces(['\App\Infra']))
-            ->evaluate($class, new ClassGraph())
+            ->evaluate($class, new ParsedClassGraph())
             ->violations;
 
         self::assertCount(1, $violations);

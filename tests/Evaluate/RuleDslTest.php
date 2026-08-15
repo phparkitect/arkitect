@@ -8,7 +8,7 @@ use Arkitect\Evaluate\Constraint\IsFinal;
 use Arkitect\Evaluate\Rule;
 use Arkitect\Evaluate\Selector\HaveNameMatching;
 use Arkitect\Evaluate\Selector\ResideInNamespace;
-use Arkitect\Resolve\ClassGraph;
+use Arkitect\Resolve\ParsedClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
 use PHPUnit\Framework\TestCase;
 
@@ -24,7 +24,7 @@ final class RuleDslTest extends TestCase
         $result = $rule->check([
             ParsedClassFixture::create('App\Domain\Order', isFinal: false),
             ParsedClassFixture::create('App\Infra\Db', isFinal: false),
-        ], new ClassGraph());
+        ], new ParsedClassGraph());
 
         self::assertSame(1, $result->checked);
         self::assertSame('App\Domain\Order', iterator_to_array($result->violations)[0]->fqcn);
@@ -45,7 +45,7 @@ final class RuleDslTest extends TestCase
         $result = $rule->check([
             ParsedClassFixture::create('App\Domain\PurchaseOrder', isFinal: false),
             ParsedClassFixture::create('App\Domain\Invoice', isFinal: false),
-        ], new ClassGraph());
+        ], new ParsedClassGraph());
 
         self::assertSame(1, $result->checked);
     }
@@ -59,7 +59,7 @@ final class RuleDslTest extends TestCase
         $result = $rule->check([
             ParsedClassFixture::create('App\Domain\Order', isFinal: false),
             ParsedClassFixture::create('App\Infra\Db', isFinal: true),
-        ], new ClassGraph());
+        ], new ParsedClassGraph());
 
         self::assertSame(2, $result->checked);
         self::assertCount(1, $result->violations);

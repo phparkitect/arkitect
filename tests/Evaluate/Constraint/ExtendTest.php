@@ -6,7 +6,7 @@ namespace Arkitect\Tests\Evaluate\Constraint;
 
 use Arkitect\Evaluate\Constraint\Depth;
 use Arkitect\Evaluate\Constraint\Extend;
-use Arkitect\Resolve\ClassGraph;
+use Arkitect\Resolve\ParsedClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
 use PHPUnit\Framework\TestCase;
 
@@ -16,7 +16,7 @@ final class ExtendTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Child', extends: ['App\Base']);
 
-        $violations = (new Extend('App\Base'))->evaluate($class, new ClassGraph($class))->violations;
+        $violations = (new Extend('App\Base'))->evaluate($class, new ParsedClassGraph($class))->violations;
 
         self::assertCount(0, $violations);
     }
@@ -24,7 +24,7 @@ final class ExtendTest extends TestCase
     public function test_a_grandparent_satisfies_the_transitive_check(): void
     {
         $class = ParsedClassFixture::create('App\Child', extends: ['App\Middle']);
-        $graph = new ClassGraph($class, ParsedClassFixture::create('App\Middle', extends: ['App\Base']));
+        $graph = new ParsedClassGraph($class, ParsedClassFixture::create('App\Middle', extends: ['App\Base']));
 
         $violations = (new Extend('App\Base'))->evaluate($class, $graph)->violations;
 
@@ -41,7 +41,7 @@ final class ExtendTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Service', implements: ['App\Contract']);
 
-        $violations = (new Extend('App\Contract'))->evaluate($class, new ClassGraph($class))->violations;
+        $violations = (new Extend('App\Contract'))->evaluate($class, new ParsedClassGraph($class))->violations;
 
         self::assertCount(1, $violations);
         self::assertSame('does not extend App\Contract', iterator_to_array($violations)[0]->detail);
@@ -50,7 +50,7 @@ final class ExtendTest extends TestCase
     public function test_direct_depth_rejects_a_grandparent(): void
     {
         $class = ParsedClassFixture::create('App\Child', extends: ['App\Middle']);
-        $graph = new ClassGraph($class, ParsedClassFixture::create('App\Middle', extends: ['App\Base']));
+        $graph = new ParsedClassGraph($class, ParsedClassFixture::create('App\Middle', extends: ['App\Base']));
 
         $violations = (new Extend('App\Base', Depth::Direct))->evaluate($class, $graph)->violations;
 
@@ -62,7 +62,7 @@ final class ExtendTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Child', extends: ['App\Base']);
 
-        $violations = (new Extend('App\Base', Depth::Direct))->evaluate($class, new ClassGraph())->violations;
+        $violations = (new Extend('App\Base', Depth::Direct))->evaluate($class, new ParsedClassGraph())->violations;
 
         self::assertCount(0, $violations);
     }
@@ -75,7 +75,7 @@ final class ExtendTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Base');
 
-        $violations = (new Extend('App\Base'))->evaluate($class, new ClassGraph($class))->violations;
+        $violations = (new Extend('App\Base'))->evaluate($class, new ParsedClassGraph($class))->violations;
 
         self::assertCount(1, $violations);
     }
@@ -84,7 +84,7 @@ final class ExtendTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Child', extends: ['Vendor\NeverParsed']);
 
-        $violations = (new Extend('Vendor\NeverParsed'))->evaluate($class, new ClassGraph($class))->violations;
+        $violations = (new Extend('Vendor\NeverParsed'))->evaluate($class, new ParsedClassGraph($class))->violations;
 
         self::assertCount(0, $violations);
     }
@@ -93,7 +93,7 @@ final class ExtendTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Child', extends: ['Vendor\NeverParsed']);
 
-        $outcome = (new Extend('App\Base'))->evaluate($class, new ClassGraph($class));
+        $outcome = (new Extend('App\Base'))->evaluate($class, new ParsedClassGraph($class));
 
         self::assertCount(0, $outcome->violations);
         self::assertCount(1, $outcome->unresolved);

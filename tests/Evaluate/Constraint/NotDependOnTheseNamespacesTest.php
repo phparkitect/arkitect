@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Evaluate\Constraint;
 
 use Arkitect\Evaluate\Constraint\NotDependOnTheseNamespaces;
-use Arkitect\Resolve\ClassGraph;
+use Arkitect\Resolve\ParsedClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
 use PHPUnit\Framework\TestCase;
 
@@ -15,7 +15,7 @@ final class NotDependOnTheseNamespacesTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Domain\Order', dependencies: ['App\Infra\Db' => 12]);
 
-        $violations = (new NotDependOnTheseNamespaces(['App\Infra']))->evaluate($class, new ClassGraph())->violations;
+        $violations = (new NotDependOnTheseNamespaces(['App\Infra']))->evaluate($class, new ParsedClassGraph())->violations;
 
         self::assertCount(1, $violations);
 
@@ -29,7 +29,7 @@ final class NotDependOnTheseNamespacesTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Domain\Order', dependencies: ['App\Shared\Money' => 4]);
 
-        $violations = (new NotDependOnTheseNamespaces(['App\Infra']))->evaluate($class, new ClassGraph())->violations;
+        $violations = (new NotDependOnTheseNamespaces(['App\Infra']))->evaluate($class, new ParsedClassGraph())->violations;
 
         self::assertCount(0, $violations);
     }
@@ -43,7 +43,7 @@ final class NotDependOnTheseNamespacesTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Infra\Repo', dependencies: ['App\Infra\Db' => 4]);
 
-        $violations = (new NotDependOnTheseNamespaces(['App\Infra']))->evaluate($class, new ClassGraph())->violations;
+        $violations = (new NotDependOnTheseNamespaces(['App\Infra']))->evaluate($class, new ParsedClassGraph())->violations;
 
         self::assertCount(1, $violations);
     }
@@ -55,7 +55,7 @@ final class NotDependOnTheseNamespacesTest extends TestCase
             dependencies: ['App\Infra\Db' => 4, 'App\Http\Request' => 8, 'App\Shared\Money' => 9],
         );
 
-        $violations = (new NotDependOnTheseNamespaces(['App\Infra', 'App\Http']))->evaluate($class, new ClassGraph())->violations;
+        $violations = (new NotDependOnTheseNamespaces(['App\Infra', 'App\Http']))->evaluate($class, new ParsedClassGraph())->violations;
 
         self::assertCount(2, $violations);
         self::assertSame([4, 8], array_map(static fn ($v) => $v->line, iterator_to_array($violations)));

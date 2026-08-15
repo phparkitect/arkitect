@@ -11,7 +11,7 @@ use Arkitect\Parser\ClassKind;
 use Arkitect\Parser\ParseResult;
 use Arkitect\Parser\ParsingError;
 use Arkitect\Report\TextReport;
-use Arkitect\Resolve\ClassGraph;
+use Arkitect\Resolve\ParsedClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
 use PHPUnit\Framework\TestCase;
 
@@ -137,7 +137,7 @@ final class TextReportTest extends TestCase
     /** @param list<\Arkitect\Parser\ParsedClass> $classes */
     private function render(array $classes, array $rules): string
     {
-        $graph = new ClassGraph(...$classes);
+        $graph = new ParsedClassGraph(...$classes);
         $results = array_map(static fn (Rule $rule) => $rule->check($classes, $graph), $rules);
 
         return (new TextReport())->render(new ParseResult($classes, []), $results);

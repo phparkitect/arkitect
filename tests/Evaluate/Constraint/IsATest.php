@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Evaluate\Constraint;
 
 use Arkitect\Evaluate\Constraint\IsA;
-use Arkitect\Resolve\ClassGraph;
+use Arkitect\Resolve\ParsedClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
 use PHPUnit\Framework\TestCase;
 
@@ -14,7 +14,7 @@ final class IsATest extends TestCase
     public function test_a_class_that_extends_the_target_produces_no_violations(): void
     {
         $child = ParsedClassFixture::create('App\Child', extends: ['App\Base']);
-        $classGraph = new ClassGraph($child, ParsedClassFixture::create('App\Base'));
+        $classGraph = new ParsedClassGraph($child, ParsedClassFixture::create('App\Base'));
 
         $violations = (new IsA('App\Base'))->evaluate($child, $classGraph)->violations;
 
@@ -24,7 +24,7 @@ final class IsATest extends TestCase
     public function test_a_class_that_reaches_the_target_transitively_produces_no_violations(): void
     {
         $child = ParsedClassFixture::create('App\Child', extends: ['App\Middle']);
-        $classGraph = new ClassGraph(
+        $classGraph = new ParsedClassGraph(
             $child,
             ParsedClassFixture::create('App\Middle', implements: ['App\Contract']),
             ParsedClassFixture::create('App\Contract'),
@@ -38,7 +38,7 @@ final class IsATest extends TestCase
     public function test_a_class_unrelated_to_the_target_produces_a_violation(): void
     {
         $class = ParsedClassFixture::create('App\Loner');
-        $classGraph = new ClassGraph($class, ParsedClassFixture::create('App\Base'));
+        $classGraph = new ParsedClassGraph($class, ParsedClassFixture::create('App\Base'));
 
         $violations = (new IsA('App\Base'))->evaluate($class, $classGraph)->violations;
 
@@ -61,7 +61,7 @@ final class IsATest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Child', extends: ['Vendor\NeverParsed']);
 
-        $outcome = (new IsA('App\Base'))->evaluate($class, new ClassGraph($class));
+        $outcome = (new IsA('App\Base'))->evaluate($class, new ParsedClassGraph($class));
 
         self::assertCount(0, $outcome->violations);
         self::assertCount(1, $outcome->unresolved);

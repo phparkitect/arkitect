@@ -9,6 +9,7 @@ use Arkitect\Parser\TargetPhpVersion;
 use Arkitect\ProjectParser;
 use Arkitect\Resolve\ClassGraph;
 use Arkitect\Resolve\Membership;
+use Arkitect\Resolve\ParsedClassGraph;
 use Arkitect\Tests\FileSystem\InMemoryFileRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -37,7 +38,7 @@ final class ProjectAndVendorTest extends TestCase
 
         self::assertNotEmpty($vendorResult->classes, 'sanity check: vendor actually parsed something');
 
-        $classGraph = new ClassGraph(...$projectResult->classes, ...$vendorResult->classes);
+        $classGraph = new ParsedClassGraph(...$projectResult->classes, ...$vendorResult->classes);
 
         // direct: App\MyVisitor extends PhpParser\NodeVisitorAbstract
         self::assertSame(

@@ -8,7 +8,7 @@ use Arkitect\Evaluate\Constraint\IsAbstract;
 use Arkitect\Evaluate\Constraint\IsFinal;
 use Arkitect\Evaluate\Constraint\IsReadonly;
 use Arkitect\Parser\ClassKind;
-use Arkitect\Resolve\ClassGraph;
+use Arkitect\Resolve\ParsedClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
 use PHPUnit\Framework\TestCase;
 
@@ -34,7 +34,7 @@ final class ApplicabilityTest extends TestCase
     ): void {
         $class = ParsedClassFixture::create('App\Thing', kind: $kind);
 
-        $outcome = (new IsFinal())->evaluate($class, new ClassGraph());
+        $outcome = (new IsFinal())->evaluate($class, new ParsedClassGraph());
 
         self::assertCount(0, $outcome->violations);
         self::assertCount(1, $outcome->notApplicable);
@@ -49,7 +49,7 @@ final class ApplicabilityTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Base', isAbstract: true);
 
-        $outcome = (new IsFinal())->evaluate($class, new ClassGraph());
+        $outcome = (new IsFinal())->evaluate($class, new ParsedClassGraph());
 
         self::assertCount(0, $outcome->violations);
         self::assertSame(
@@ -67,7 +67,7 @@ final class ApplicabilityTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Status', kind: ClassKind::Enum, isFinal: true);
 
-        $outcome = (new IsFinal())->evaluate($class, new ClassGraph());
+        $outcome = (new IsFinal())->evaluate($class, new ParsedClassGraph());
 
         self::assertCount(0, $outcome->violations);
         self::assertCount(0, $outcome->notApplicable);
@@ -77,7 +77,7 @@ final class ApplicabilityTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Thing', isFinal: true);
 
-        $outcome = (new IsAbstract())->evaluate($class, new ClassGraph());
+        $outcome = (new IsAbstract())->evaluate($class, new ParsedClassGraph());
 
         self::assertCount(0, $outcome->violations);
         self::assertSame(
@@ -90,7 +90,7 @@ final class ApplicabilityTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Repo', kind: ClassKind::Interface);
 
-        $outcome = (new IsAbstract())->evaluate($class, new ClassGraph());
+        $outcome = (new IsAbstract())->evaluate($class, new ParsedClassGraph());
 
         self::assertCount(1, $outcome->notApplicable);
         self::assertSame(
@@ -103,7 +103,7 @@ final class ApplicabilityTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Status', kind: ClassKind::Enum);
 
-        $outcome = (new IsReadonly())->evaluate($class, new ClassGraph());
+        $outcome = (new IsReadonly())->evaluate($class, new ParsedClassGraph());
 
         self::assertCount(0, $outcome->violations);
         self::assertCount(1, $outcome->notApplicable);
@@ -113,7 +113,7 @@ final class ApplicabilityTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Order', isFinal: false);
 
-        $outcome = (new IsFinal())->evaluate($class, new ClassGraph());
+        $outcome = (new IsFinal())->evaluate($class, new ParsedClassGraph());
 
         self::assertCount(1, $outcome->violations);
         self::assertCount(0, $outcome->notApplicable);

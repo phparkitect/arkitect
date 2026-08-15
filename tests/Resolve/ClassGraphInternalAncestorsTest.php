@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Resolve;
 
-use Arkitect\Resolve\ClassGraph;
 use Arkitect\Resolve\Membership;
+use Arkitect\Resolve\ParsedClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
 use PHPUnit\Framework\TestCase;
 
@@ -24,28 +24,28 @@ final class ClassGraphInternalAncestorsTest extends TestCase
 {
     public function test_a_user_defined_target_is_unreachable_through_an_internal_ancestor(): void
     {
-        $graph = new ClassGraph(ParsedClassFixture::create('App\MyEx', extends: ['RuntimeException']));
+        $graph = new ParsedClassGraph(ParsedClassFixture::create('App\MyEx', extends: ['RuntimeException']));
 
         self::assertSame(Membership::No, $graph->isA('App\MyEx', 'App\Marker'));
     }
 
     public function test_an_internal_target_reached_through_an_internal_ancestor_is_resolved(): void
     {
-        $graph = new ClassGraph(ParsedClassFixture::create('App\MyEx', extends: ['RuntimeException']));
+        $graph = new ParsedClassGraph(ParsedClassFixture::create('App\MyEx', extends: ['RuntimeException']));
 
         self::assertSame(Membership::Yes, $graph->isA('App\MyEx', 'Throwable'));
     }
 
     public function test_an_interface_implemented_by_an_internal_ancestor_is_resolved(): void
     {
-        $graph = new ClassGraph(ParsedClassFixture::create('App\MyList', extends: ['ArrayObject']));
+        $graph = new ParsedClassGraph(ParsedClassFixture::create('App\MyList', extends: ['ArrayObject']));
 
         self::assertSame(Membership::Yes, $graph->isA('App\MyList', 'Countable'));
     }
 
     public function test_an_unrelated_internal_target_is_still_a_no(): void
     {
-        $graph = new ClassGraph(ParsedClassFixture::create('App\MyEx', extends: ['RuntimeException']));
+        $graph = new ParsedClassGraph(ParsedClassFixture::create('App\MyEx', extends: ['RuntimeException']));
 
         self::assertSame(Membership::No, $graph->isA('App\MyEx', 'ArrayObject'));
     }
@@ -57,14 +57,14 @@ final class ClassGraphInternalAncestorsTest extends TestCase
      */
     public function test_an_unparsed_user_defined_ancestor_is_still_unknown(): void
     {
-        $graph = new ClassGraph(ParsedClassFixture::create('App\Child', extends: ['Vendor\NeverParsed']));
+        $graph = new ParsedClassGraph(ParsedClassFixture::create('App\Child', extends: ['Vendor\NeverParsed']));
 
         self::assertSame(Membership::Unknown, $graph->isA('App\Child', 'App\Marker'));
     }
 
     public function test_an_internal_ancestor_chain_answers_has_ancestor_too(): void
     {
-        $graph = new ClassGraph(ParsedClassFixture::create('App\MyEx', extends: ['RuntimeException']));
+        $graph = new ParsedClassGraph(ParsedClassFixture::create('App\MyEx', extends: ['RuntimeException']));
 
         self::assertSame(Membership::Yes, $graph->hasAncestor('App\MyEx', 'Exception'));
         self::assertSame(Membership::No, $graph->hasAncestor('App\MyEx', 'App\Base'));
@@ -76,7 +76,7 @@ final class ClassGraphInternalAncestorsTest extends TestCase
      */
     public function test_an_interface_of_an_internal_ancestor_is_not_an_ancestor(): void
     {
-        $graph = new ClassGraph(ParsedClassFixture::create('App\MyList', extends: ['ArrayObject']));
+        $graph = new ParsedClassGraph(ParsedClassFixture::create('App\MyList', extends: ['ArrayObject']));
 
         self::assertSame(Membership::No, $graph->hasAncestor('App\MyList', 'Countable'));
     }
