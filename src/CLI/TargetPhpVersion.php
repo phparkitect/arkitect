@@ -14,6 +14,7 @@ class TargetPhpVersion
     public const PHP_8_3 = '8.3';
     public const PHP_8_4 = '8.4';
     public const PHP_8_5 = '8.5';
+    public const PHP_8_6 = '8.6';
 
     public const VALID_PHP_VERSIONS = [
         '8.0',
@@ -22,6 +23,7 @@ class TargetPhpVersion
         '8.3',
         '8.4',
         '8.5',
+        '8.6',
     ];
 
     private string $version;
@@ -42,7 +44,7 @@ class TargetPhpVersion
 
     public static function latest(): self
     {
-        return new self(self::PHP_8_5);
+        return new self(self::PHP_8_6);
     }
 
     public static function create(?string $version): self

@@ -13,10 +13,17 @@ permissions:
 jobs:
   build:
     runs-on: "ubuntu-22.04"
+    # PHP 8.6 is still in development: report its failures without blocking the build
+    continue-on-error: ${{ matrix.php-versions == '8.6' }}
     strategy:
       fail-fast: false
       matrix:
-        php-versions: [ '8.0', '8.1', '8.2', '8.3', '8.4', '8.5' ]
+        php-versions: [ '8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6' ]
+        include:
+          # Dependencies do not declare support for the unreleased 8.6 yet,
+          # so relax composer's upper platform bound on that job only.
+          - php-versions: '8.6'
+            composer-flags: '--ignore-platform-req=php+'
 
     steps:
     - uses: actions/checkout@v7
@@ -45,7 +52,7 @@ jobs:
           ${{ runner.os }}-php-
 
     - name: Install dependencies
-      run: composer install --prefer-dist
+      run: composer install --prefer-dist ${{ matrix.composer-flags }}
 
     # Psalm 6 needs PHP >= 8.1 to run; the analysis target stays 8.0 (phpVersion in psalm.xml)
     - name: Static Analysis
@@ -113,9 +120,12 @@ jobs:
   smoke-test-phar:
     needs: phar
     runs-on: "ubuntu-22.04"
+    # PHP 8.6 is still in development: report its failures without blocking the build
+    continue-on-error: ${{ matrix.php-versions == '8.6' }}
     strategy:
+      fail-fast: false
       matrix:
-        php-versions: [ '8.0', '8.1', '8.2', '8.3', '8.4', '8.5' ]
+        php-versions: [ '8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6' ]
     steps:
       - uses: actions/checkout@v7
 
