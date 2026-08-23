@@ -31,6 +31,14 @@ class TargetPhpVersionTest extends TestCase
         self::assertEquals('8.0', $targetPhpVersion->get());
     }
 
+    public function test_it_should_accept_the_latest_supported_php_version(): void
+    {
+        $targetPhpVersion = TargetPhpVersion::create('8.6');
+
+        self::assertEquals('8.6', $targetPhpVersion->get());
+        self::assertEquals('8.6', TargetPhpVersion::latest()->get());
+    }
+
     public function test_it_should_throw_exception_if_not_valid_php_version(): void
     {
         $this->expectException(PhpVersionNotValidException::class);
