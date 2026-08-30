@@ -12,7 +12,7 @@ Shout out to our top contributors!
 - [sebastianstucke87](https://api.github.com/users/sebastianstucke87)
 - [szepeviktor](https://api.github.com/users/szepeviktor)
 - [ricfio](https://api.github.com/users/ricfio)
-- [JulienRAVIA](https://api.github.com/users/JulienRAVIA)
+- [JulianosDeLaMancha](https://api.github.com/users/JulianosDeLaMancha)
 - [helyakin](https://api.github.com/users/helyakin)
 - [hgraca](https://api.github.com/users/hgraca)
 - [ben-challis](https://api.github.com/users/ben-challis)
