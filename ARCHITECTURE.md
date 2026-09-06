@@ -146,12 +146,28 @@ the first line of the docblock it sits in.
 A name is taken only where the file determines it: fully qualified after a
 leading `\`, or with a first segment the file imports — which is what
 resolves `@Assert\NotBlank` through `use ... as Assert`. A short name with
-no matching import is left alone, deliberately not guessed as "probably the
-same namespace": without redoing full namespace resolution there is no
-reliable way to tell a same-namespace class from a typo, and being silently
-wrong is worse than not extracting it. That one rule doubles as the filter —
-`int`, `list` and `@deprecated` fall out of it, so no keyword list exists to
-be kept up to date.
+no matching import is left alone, and not resolved into the file's own
+namespace the way v1 does it and the way PHP does it for code.
+
+Three reasons, measured on `vendor/` rather than argued. Resolving would add
+8,320 references, of which 6,845 — 83% — name nothing that exists:
+`PhpParser\string`, `PhpParser\int`, `PhpParser\Builder\this`. Getting them
+back out takes the keyword list this rule makes unnecessary, and no list can
+be complete, because `@template` names a type per class (44 in `vendor/`:
+`T`, `TRejected`, `TFixerInputConfig`) that only its author knows. And the
+1,454 real ones cannot change a verdict: a name resolved in the file's own
+namespace lands in the namespace of the class that wrote it, where no
+"depends only on" or "nothing outside" rule can be tripped by it.
+
+The open case is a *multi-segment* short name — `@param Sub\Thing` written
+inside `App\Domain` — which lands below the class's namespace rather than in
+it, and could cross a boundary. Reopen this when a real one shows up.
+
+There is no keyword list for code either, and never was: only a
+`Node\Name\FullyQualified` becomes a dependency, so `int` and `array` fall
+out as `Node\Identifier` and `self`/`static`/`parent` as unqualified names.
+The AST tells types from keywords structurally; a docblock is text, and the
+import rule is what stands in for that structure.
 
 `use function` and `use const` are kept out of the import map for the same
 reason: they name things no type expression can mean, and `use function

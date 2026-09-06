@@ -829,7 +829,17 @@ final class EdgeCasesFromV1Test extends TestCase
         );
     }
 
-    public function test_a_throws_tag_with_an_unimported_short_name_resolves_in_the_files_own_namespace(): void
+    /**
+     * v1 resolves `BarException` into the file's own namespace, as PHP
+     * would for code. Measured on `vendor/`, doing that here would add
+     * 8,320 references of which 83% name nothing that exists
+     * (`PhpParser\string`, `PhpParser\Builder\this`), and getting those out
+     * needs a keyword list that cannot be complete while `@template` lets
+     * every class invent type names of its own. The real ones it would add
+     * land in the namespace of the class that wrote them, where no
+     * boundary rule can be tripped by them.
+     */
+    public function test_a_short_name_with_no_import_is_left_alone_where_v1_resolves_it(): void
     {
         $class = $this->onlyClassOf(<<<'PHP'
             <?php
@@ -849,10 +859,8 @@ final class EdgeCasesFromV1Test extends TestCase
             }
             PHP);
 
-        $names = $this->dependencyNames($class);
-
-        self::assertContains('Domain\FooException', $names);
-        self::assertContains('App\Services\BarException', $names);
+        // \Exception survives here and is filtered in Resolve, not at parse time
+        self::assertSame(['Exception', 'Domain\FooException'], $this->dependencyNames($class));
     }
 
     private function parse(string $code, string $targetPhpVersion = '8.4'): ParseResult
