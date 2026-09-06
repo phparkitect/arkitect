@@ -89,6 +89,17 @@ enum. This is language knowledge and needs no runtime call, and the
 alternative is worse — recording `false` makes every "must be final" rule
 report an enum nobody can fix. The same principle governs names, below.
 
+**An attribute belongs to what it is written on.** `$attributes` holds the
+declaration's own; one written on a method is in `$dependencies` like any
+other name and nowhere else. v1 answers both, which is what makes
+`HaveAttribute('Entity')` true of a class whose *method* carries it — nobody
+asked for that: #263 added the rule when only declarations were collected,
+and #444/#461 widened collection to close a dependency gap, taking the rule
+with it because `addAttribute()` files an attribute under both lists. PHP
+keeps them apart too: `ReflectionClass::getAttributes()` does not return a
+method's, and an attribute on the wrong target is an `Error` the moment
+anyone instantiates it.
+
 **Hard constraint: zero runtime calls in this stage.** No `class_exists`,
 no `ReflectionClass`, no `is_a()`. This is what v1's
 `ClassDescriptionBuilder::isPhpCoreClass()` violates — it makes parse

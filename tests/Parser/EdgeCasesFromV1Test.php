@@ -15,6 +15,8 @@ use PHPUnit\Framework\TestCase;
  * v1's parser test suite, ported onto the v2 API with v1's expectations
  * kept as they were. A failure here is a behaviour v1 guarantees and v2
  * does not — a regression to fix or a divergence to accept on purpose.
+ * Where one has been accepted, the test asserts v2's answer instead and
+ * says what v1 answers and why it stopped being the right question.
  */
 final class EdgeCasesFromV1Test extends TestCase
 {
@@ -517,7 +519,16 @@ final class EdgeCasesFromV1Test extends TestCase
         self::assertSame(['Bar\FooAttr', 'Baz'], $this->names($class->attributes));
     }
 
-    public function test_attributes_of_a_trait_include_the_ones_on_its_methods(): void
+    /**
+     * v1 answers both, and `HaveAttribute('Baz')` is true of this trait as
+     * a result. That was never asked for: #263 introduced the rule when
+     * only a declaration's own attributes were collected, and #444/#461
+     * widened collection to close a *dependency* gap — `addAttribute()`
+     * files what it sees under both lists, so the rule widened with it.
+     * PHP keeps the two apart as well: `ReflectionClass::getAttributes()`
+     * does not return a method's.
+     */
+    public function test_an_attribute_on_a_member_is_a_dependency_and_not_the_declarations_own(): void
     {
         $class = $this->onlyClassOf(<<<'PHP'
             <?php
@@ -534,7 +545,8 @@ final class EdgeCasesFromV1Test extends TestCase
             }
             PHP);
 
-        self::assertSame(['Bar\FooAttr', 'Root\Cars\Baz'], $this->names($class->attributes));
+        self::assertSame(['Bar\FooAttr'], $this->names($class->attributes));
+        self::assertContains('Root\Cars\Baz', $this->dependencyNames($class));
     }
 
     public function test_attributes_of_an_enum(): void
@@ -558,7 +570,7 @@ final class EdgeCasesFromV1Test extends TestCase
         self::assertSame(['Bar\FooAttr', 'Root\Cars\Baz'], $this->names($class->attributes));
     }
 
-    public function test_attributes_of_an_interface_include_the_ones_on_its_methods(): void
+    public function test_an_attribute_on_an_interface_method_is_read_the_same_way(): void
     {
         $class = $this->onlyClassOf(<<<'PHP'
             <?php
@@ -575,7 +587,8 @@ final class EdgeCasesFromV1Test extends TestCase
             }
             PHP);
 
-        self::assertSame(['Bar\FooAttr', 'Root\Cars\Baz'], $this->names($class->attributes));
+        self::assertSame(['Bar\FooAttr'], $this->names($class->attributes));
+        self::assertContains('Root\Cars\Baz', $this->dependencyNames($class));
     }
 
     /** @dataProvider provide_enums */
