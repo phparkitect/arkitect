@@ -124,18 +124,41 @@ but by checking "is the stack empty" at every call site: a guard to
 remember rather than a state that cannot exist. Rejected for that reason;
 do not reintroduce it.
 
-#### `@throws` resolution
+#### Docblock resolution
 
-`@throws` tags become dependencies two ways: a leading-`\` name is already
-fully qualified, and a single-segment short name resolves through the
-file's own `use` imports (collected by a separate walk of the same shape).
-A short name with no matching import is left unresolved, deliberately not
-guessed as "probably the same namespace": without redoing full namespace
-resolution there is no reliable way to tell a same-namespace class from a
-typo, and being silently wrong is worse than not extracting it. Property
-hooks (8.4) and `use function`/`use const` needed no special handling — the
-per-node dispatch and generic recursion already do the right thing,
-confirmed by tests rather than assumed.
+Docblocks carry types PHP does not: `@var`, `@param`, `@return` and
+`@throws` open with a type expression, and a Doctrine-style annotation
+(`@Assert\NotBlank`) is a class reference in the tag name itself. Both are
+read, and each name is reported at the line of its own tag rather than at
+the first line of the docblock it sits in.
+
+A name is taken only where the file determines it: fully qualified after a
+leading `\`, or with a first segment the file imports — which is what
+resolves `@Assert\NotBlank` through `use ... as Assert`. A short name with
+no matching import is left alone, deliberately not guessed as "probably the
+same namespace": without redoing full namespace resolution there is no
+reliable way to tell a same-namespace class from a typo, and being silently
+wrong is worse than not extracting it. That one rule doubles as the filter —
+`int`, `list` and `@deprecated` fall out of it, so no keyword list exists to
+be kept up to date.
+
+`use function` and `use const` are kept out of the import map for the same
+reason: they name things no type expression can mean, and `use function
+assert` was enough to make `@param assert` a dependency on a class named
+`assert`.
+
+Checked against `vendor/` before being believed: 2,663 files, 0 parsing
+errors, and 1,198 type references found that the code alone does not state
+(+5%). One of them is wrong — `@param list<\SIG*>` in symfony/process, a
+glob written where a type goes — and it stays wrong rather than being
+special-cased, until a real case makes that ratio worth code.
+
+v1's `parseCustomAnnotations` switch has no equivalent yet: annotations are
+always read.
+
+Property hooks (8.4) needed no special handling — the per-node dispatch and
+generic recursion already do the right thing, confirmed by tests rather than
+assumed.
 
 ### 2. The class graph
 

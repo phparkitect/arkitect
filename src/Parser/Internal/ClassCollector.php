@@ -15,6 +15,11 @@ use PhpParser\Node;
  */
 final class ClassCollector
 {
+    /** The docblock tags whose text opens with a type expression. */
+    private const TYPE_TAGS = ['var', 'param', 'return', 'throws'];
+
+    private const NAME_SEGMENT = '[A-Za-z_\x80-\xff][A-Za-z0-9_\x80-\xff]*';
+
     /**
      * @param list<Node> $stmts
      *
@@ -33,7 +38,7 @@ final class ClassCollector
      * code path that could hand it a scope to attach to.
      *
      * @param list<Node>          $nodes
-     * @param array<string,string> $imports short name => FQCN, for resolving @throws tags
+     * @param array<string,string> $imports short name => FQCN, for resolving docblock names
      *
      * @return list<ParsedClass>
      */
@@ -63,7 +68,7 @@ final class ClassCollector
                         ...$traits,
                         ...$ownAttributes,
                         ...$this->collectDependencies($declaration->stmts),
-                        ...$this->collectThrowsDependencies($declaration->stmts, $imports),
+                        ...$this->collectDocBlockDependencies($declaration->stmts, $imports),
                     ),
                     attributes: new TypeReferences(...$ownAttributes),
                     docBlocks: array_merge($ownDocBlock, $this->collectDocBlocks($declaration->stmts)),
@@ -263,22 +268,26 @@ final class ClassCollector
     }
 
     /**
-     * Docblock `@throws` tags are resolved two ways: a leading-`\` name is
-     * already fully qualified; a single-segment short name resolves via the
-     * file's own `use` imports. Anything else (multi-segment but not fully
-     * qualified, or an unimported short name) is left alone: without
-     * redoing full namespace resolution there's no reliable way to tell
-     * "same-namespace class" from "typo", and guessing wrong is worse than
-     * not extracting it at all.
+     * Type names written in docblocks: the type expression of `@var`,
+     * `@param`, `@return` and `@throws`, and the name of a Doctrine-style
+     * annotation, where `@Assert\NotBlank` is itself a class reference.
      *
-     * @param list<Node>            $nodes
-     * @param array<string,string>  $imports short name => FQCN
+     * A name is taken only when the file determines it: fully qualified,
+     * or with a first segment the file imports. An unimported short name
+     * is left alone rather than assumed to live in the file's own
+     * namespace — there is no reliable way to tell that from a typo, and
+     * being silently wrong is worse than not extracting it. The same rule
+     * is what keeps `int`, `list` and `@deprecated` out, so none of them
+     * needs a keyword list to exclude it.
+     *
+     * @param list<Node>           $nodes
+     * @param array<string,string> $imports short name => FQCN
      *
      * @return list<TypeReference>
      */
-    private function collectThrowsDependencies(array $nodes, array $imports): array
+    private function collectDocBlockDependencies(array $nodes, array $imports): array
     {
-        return $this->walk($nodes, fn (Node $node) => $this->throwsTagsOf($node, $imports));
+        return $this->walk($nodes, fn (Node $node) => $this->docBlockTypesOf($node, $imports));
     }
 
     /**
@@ -286,31 +295,84 @@ final class ClassCollector
      *
      * @return list<TypeReference>
      */
-    private function throwsTagsOf(Node $node, array $imports): array
+    private function docBlockTypesOf(Node $node, array $imports): array
     {
         $docComment = $node->getDocComment();
 
-        if (null === $docComment || !preg_match_all('/@throws\s+(\S+)/', $docComment->getText(), $matches)) {
+        if (null === $docComment) {
+            return [];
+        }
+
+        $text = $docComment->getText();
+
+        if (!preg_match_all('/@([^\s(*]+)([^\r\n]*)/', $text, $tags, \PREG_OFFSET_CAPTURE)) {
             return [];
         }
 
         $dependencies = [];
 
-        foreach ($matches[1] as $tag) {
-            foreach (explode('|', $tag) as $name) {
-                $fqcn = match (true) {
-                    str_starts_with($name, '\\') => substr($name, 1),
-                    isset($imports[$name]) => $imports[$name],
-                    default => null,
-                };
+        foreach ($tags[1] as $i => [$tag, $offset]) {
+            $written = \in_array($tag, self::TYPE_TAGS, true)
+                ? $this->typeExpression($tags[2][$i][0])
+                : $tag;
+
+            // a docblock spans lines, and the tag's own is the one worth reporting
+            $line = $docComment->getStartLine() + substr_count(substr($text, 0, $offset), "\n");
+
+            foreach ($this->namesIn($written) as $name) {
+                $fqcn = $this->resolveDocBlockName($name, $imports);
 
                 if (null !== $fqcn) {
-                    $dependencies[] = new TypeReference($fqcn, $docComment->getStartLine());
+                    $dependencies[] = new TypeReference($fqcn, $line);
                 }
             }
         }
 
         return $dependencies;
+    }
+
+    /**
+     * What a tag opens with, before the parameter name or the prose:
+     * `array<int, MyDto> $list the list` is `array<int,MyDto>`. The spaces
+     * a type is allowed to contain are closed up first, so the expression
+     * survives them and the description still stops it.
+     */
+    private function typeExpression(string $tagText): string
+    {
+        $closedUp = preg_replace(['/\s*([|&,<])\s*/', '/\s+>/'], ['$1', '>'], trim($tagText));
+
+        return preg_split('/\s/', (string) $closedUp)[0];
+    }
+
+    /**
+     * Every name-shaped run in a type expression, which is more than the
+     * expression means: `array<int, MyDto>` yields all three. What isn't a
+     * type falls out at resolution, so this doesn't have to know.
+     *
+     * @return list<string>
+     */
+    private function namesIn(string $expression): array
+    {
+        preg_match_all('/\\\\?'.self::NAME_SEGMENT.'(?:\\\\'.self::NAME_SEGMENT.')*/', $expression, $names);
+
+        return $names[0];
+    }
+
+    /** @param array<string,string> $imports short name => FQCN */
+    private function resolveDocBlockName(string $name, array $imports): ?string
+    {
+        if (str_starts_with($name, '\\')) {
+            return substr($name, 1);
+        }
+
+        $segments = explode('\\', $name);
+        $alias = array_shift($segments);
+
+        if (!isset($imports[$alias])) {
+            return null;
+        }
+
+        return implode('\\', [$imports[$alias], ...$segments]);
     }
 
     /**
@@ -325,13 +387,17 @@ final class ClassCollector
         foreach ($nodes as $node) {
             if ($node instanceof Node\Stmt\Use_) {
                 foreach ($node->uses as $item) {
-                    $imports[$item->alias?->toString() ?? $item->name->getLast()] = $item->name->toString();
+                    if ($this->importsAType($node, $item)) {
+                        $imports[$item->alias?->toString() ?? $item->name->getLast()] = $item->name->toString();
+                    }
                 }
             }
 
             if ($node instanceof Node\Stmt\GroupUse) {
                 foreach ($node->uses as $item) {
-                    $imports[$item->alias?->toString() ?? $item->name->getLast()] = $node->prefix->toString().'\\'.$item->name->toString();
+                    if ($this->importsAType($node, $item)) {
+                        $imports[$item->alias?->toString() ?? $item->name->getLast()] = $node->prefix->toString().'\\'.$item->name->toString();
+                    }
                 }
             }
 
@@ -339,6 +405,15 @@ final class ClassCollector
         }
 
         return $imports;
+    }
+
+    /**
+     * `use function` and `use const` import names that no type expression
+     * can mean, and a group use states the kind per item.
+     */
+    private function importsAType(Node\Stmt\Use_|Node\Stmt\GroupUse $use, Node\UseItem $item): bool
+    {
+        return Node\Stmt\Use_::TYPE_NORMAL === ($item->type ?: $use->type);
     }
 
     /**

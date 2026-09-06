@@ -273,6 +273,54 @@ final class CollectTest extends TestCase
         );
     }
 
+    public function test_a_docblock_type_is_reported_at_the_line_of_its_own_tag(): void
+    {
+        $result = (new ClassParser())->parse(<<<'PHP'
+            <?php
+            namespace App;
+            use App\Infra\DbException;
+            use App\Infra\Row;
+
+            class Repo
+            {
+                /**
+                 * Saves the thing.
+                 *
+                 * @param list<Row> $rows
+                 * @throws DbException
+                 */
+                public function save(array $rows): void {}
+            }
+            PHP, 'test.php', TargetPhpVersion::create('8.5'));
+
+        self::assertSame(
+            ['App\Infra\Row:11', 'App\Infra\DbException:12'],
+            array_map(
+                static fn ($t) => $t->name.':'.$t->line,
+                [...$result->classes[0]->dependencies]
+            )
+        );
+    }
+
+    public function test_a_use_function_import_does_not_resolve_a_docblock_name(): void
+    {
+        $result = (new ClassParser())->parse(<<<'PHP'
+            <?php
+            namespace App;
+            use function App\Infra\assert;
+
+            class Repo
+            {
+                /**
+                 * @param assert $thing
+                 */
+                public function save($thing): void {}
+            }
+            PHP, 'test.php', TargetPhpVersion::create('8.5'));
+
+        self::assertCount(0, $result->classes[0]->dependencies);
+    }
+
     public function test_a_syntax_error_produces_a_parsing_error_instead_of_throwing(): void
     {
         $result = (new ClassParser())->parse('<?php class {{{ broken', 'test.php', TargetPhpVersion::create('8.5'));
