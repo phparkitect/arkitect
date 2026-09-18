@@ -39,7 +39,9 @@ class DependsOnlyOnTheseNamespaces implements Expression
 
         /** @var ClassDependency $dependency */
         foreach ($dependencies as $dependency) {
-            if ($theClass->namespaceMatches($dependency->getFQCN()->namespace())) {
+            // dependencies living in the very same namespace are always allowed:
+            // a parent namespace is a different namespace, so it must be whitelisted explicitly
+            if ($theClass->namespaceMatchesExactly($dependency->getFQCN()->namespace())) {
                 continue;
             }
 
