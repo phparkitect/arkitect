@@ -10,24 +10,20 @@ PHPArkitect, ordered from the most recent version to the oldest.
 
 ### `DependsOnlyOnTheseNamespaces` no longer allows parent namespaces implicitly
 
-The rule has always allowed a class to depend on classes living in its own
-namespace without listing that namespace. That check was too loose: it also
-allowed every **ancestor** namespace, so a class in `App\Domain\Order` could
-depend on anything under `App\Domain` or `App` and no violation was reported.
-
-Only the **exact same** namespace is allowed implicitly now, so the rule may
-report violations it used to hide. Allow the namespaces you actually want:
+The rule exempts dependencies living in the class' own namespace, so that
+namespace need not be whitelisted. The check was too loose and exempted every
+**ancestor** namespace too: a class in `App\Domain\Order` could depend on
+anything under `App\Domain` or `App` without a violation. Only the exact same
+namespace is exempt now, so the rule reports violations it used to hide — allow
+the namespaces you actually want, or baseline them with `generate-baseline`:
 
 ```diff
-  $rules[] = Rule::allClasses()
-      ->that(new ResideInOneOfTheseNamespaces('App\Domain\Order'))
 -     ->should(new DependsOnlyOnTheseNamespaces(['Ramsey\Uuid']))
 +     ->should(new DependsOnlyOnTheseNamespaces(['App\Domain', 'Ramsey\Uuid']))
-      ->because('we want to protect our domain from external dependencies');
 ```
 
-Alternatively, add the newly reported violations to your baseline with
-`phparkitect generate-baseline`.
+Conversely, a class in the root namespace depending on another root-namespace
+class is no longer reported: both sit in the same (empty) namespace.
 
 ## 1.3.0
 
