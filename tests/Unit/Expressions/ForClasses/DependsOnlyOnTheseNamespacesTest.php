@@ -118,7 +118,7 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
         );
     }
 
-    public function test_it_should_not_report_a_root_namespace_dependency_of_a_root_namespace_class(): void
+    public function test_it_should_report_a_root_namespace_dependency_as_the_root_namespace_is_never_implicitly_allowed(): void
     {
         $dependOnClasses = new DependsOnlyOnTheseNamespaces(['FizzBuzz']);
 
@@ -130,7 +130,7 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
         $violations = new Violations();
         $dependOnClasses->evaluate($classDescription, $violations, $because);
 
-        self::assertEquals(0, $violations->count());
+        self::assertEquals(1, $violations->count());
     }
 
     public function test_it_should_return_false_if_namespace_is_excluded(): void

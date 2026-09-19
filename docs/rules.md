@@ -115,7 +115,7 @@ new NotDependsOnTheseNamespaces(array $namespaces, array $exclude = [])
 - `$namespaces` — the allowed (resp. forbidden) namespaces.
 - `$exclude` — namespaces/classes whose dependencies are **not** checked by this rule (an escape hatch for known exceptions).
 
-`DependsOnlyOnTheseNamespaces` always allows dependencies that live in the **exact same namespace** as the class under check, without you having to list that namespace. Parent and child namespaces are different namespaces: a class in `App\Domain\Order` depending on `App\Domain\Clock` or on `App\Domain\Order\Item` is a violation unless you allow those namespaces explicitly.
+`DependsOnlyOnTheseNamespaces` always allows dependencies that live in the **exact same namespace** as the class under check, without you having to list that namespace. Parent and child namespaces are different namespaces: a class in `App\Domain\Order` depending on `App\Domain\Clock` or on `App\Domain\Order\Item` is a violation unless you allow those namespaces explicitly. The root namespace is never implicitly allowed — user-defined classes sitting there are evaluated like any other.
 
 ```php
 // Allow only specific external dependencies in the domain
