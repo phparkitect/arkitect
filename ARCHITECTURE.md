@@ -21,10 +21,11 @@ where old and new implementations coexist.
 The one thing that crosses over is not code: it is *knowledge* of which
 PHP-syntax edge cases must not regress, six years of "someone's real code
 broke the parser", encoded in `main`'s
-`tests/Unit/Analyzer/FileParser/CanParseClassTest.php` and E2E fixtures.
-The plan was to extract that into a checklist first; that step was skipped
-by decision, and coverage was rebuilt from scratch instead (see *PoC exit
-criteria*). Those files remain the place to look if a gap ever surfaces.
+`tests/Unit/Analyzer/FileParser/` and E2E fixtures. The parser tests cross
+over as `tests/Parser/EdgeCasesFromV1Test.php`: v1's cases on the v2 API,
+with v1's expectations kept wherever v2 agrees, and v2's answer asserted
+with the reason wherever it diverges on purpose. The E2E fixtures were not
+ported.
 
 ## Evidence gathered before writing code
 
@@ -807,13 +808,10 @@ seen to bite.
 Set before writing implementation code, so the PoC has a defined end rather
 than expanding into "the whole 2.0".
 
-1. **Partially met, differently than planned.** The formal extraction of
-   `CanParseClassTest.php` and the E2E fixtures into a checklist was
-   skipped by decision. Coverage was rebuilt instead: `ParserTest` and
-   `CollectTest` together cover nullable/union/intersection/DNF types,
-   attributes, docblocks, property hooks, anonymous classes and `@throws`
-   resolution — a broad set, just not verified against the old test names.
-   Recover from `main` if a gap surfaces.
+1. **Met for the parser.** v1's parser suite runs against v2 in
+   `EdgeCasesFromV1Test` (45 cases, green), each either matching v1 or
+   asserting a deliberate divergence. The E2E fixtures were not ported;
+   recover from `main` if a gap surfaces there.
 2. **Met.** The state leak is fixed structurally, with a regression test.
 3. **Met.** `ClassGraph` answers from the parsed set, with the one scoped
    exception above: no `is_a()`, no autoloading, and reflection only for
