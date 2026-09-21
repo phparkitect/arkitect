@@ -104,10 +104,6 @@ class ClassDescription
         return $this->filePath;
     }
 
-    /**
-     * Whether the class resides in the namespace the pattern denotes, at any
-     * depth. See FullyQualifiedClassName::matches().
-     */
     public function residesIn(string $namespace): bool
     {
         return $this->FQCN->matches($namespace);
@@ -118,10 +114,6 @@ class ClassDescription
         return $this->FQCN->matchesOneOf(...$namespaces);
     }
 
-    /**
-     * Whether the class sits directly in the namespace, with no sub-namespace
-     * in between.
-     */
     public function residesInExactly(string $namespace): bool
     {
         return $this->FQCN->namespace() === $namespace;
@@ -138,20 +130,20 @@ class ClassDescription
         return false;
     }
 
-    /** the name residesIn() had before it said what it does; kept for custom expressions */
+    /** @deprecated use residesIn() */
     public function namespaceMatches(string $pattern): bool
     {
         return $this->residesIn($pattern);
     }
 
-    /** the name residesInExactly() had before it said what it does; kept for custom expressions */
+    /** @deprecated use residesInExactly() */
     public function namespaceMatchesExactly(string $namespace): bool
     {
         return $this->residesInExactly($namespace);
     }
 
     /**
-     * the name residesInOneOf() had before it said what it does; kept for custom expressions.
+     * @deprecated use residesInOneOf()
      *
      * @param array<string> $namespaces
      */

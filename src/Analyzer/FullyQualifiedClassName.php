@@ -23,24 +23,15 @@ class FullyQualifiedClassName
         return $this->fqcn;
     }
 
-    /**
-     * Whether the short class name matches the pattern, e.g. '*Controller'.
-     */
     public function classMatches(string $pattern): bool
     {
         return Pattern::fromString($pattern)->matches($this->className);
     }
 
     /**
-     * Whether the class is the one the pattern denotes, or resides in a
-     * namespace it denotes.
-     *
-     * Matching is recursive: the pattern is tried against the class itself and
-     * then against every namespace the class lives in, so 'App\Domain' matches
-     * 'App\Domain\Event\UserRegistered' through its namespace 'App\Domain', and
-     * 'App\*\Infrastructure' matches 'App\Billing\Infrastructure\Repository'
-     * the same way. A pattern only ever matches a whole name, so 'App\Foo'
-     * does not reach into 'App\FooBar'.
+     * Matching is recursive: the pattern is tried against the class and against
+     * every namespace it resides in, so 'App\*\Infrastructure' matches
+     * 'App\Billing\Infrastructure\Repository' through 'App\Billing\Infrastructure'.
      */
     public function matches(string $pattern): bool
     {
@@ -98,13 +89,7 @@ class FullyQualifiedClassName
         return new self($fqcn, $namespace, $className);
     }
 
-    /**
-     * Every namespace the class resides in, from the closest one to the root:
-     * 'App\Billing\Domain\Invoice' lives in 'App\Billing\Domain', in
-     * 'App\Billing' and in 'App'.
-     *
-     * @return list<string>
-     */
+    /** @return list<string> from the closest namespace to the root */
     private function namespaces(): array
     {
         $namespaces = [];

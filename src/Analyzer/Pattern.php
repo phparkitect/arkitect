@@ -6,19 +6,16 @@ namespace Arkitect\Analyzer;
 use Arkitect\Exceptions\InvalidPatternException;
 
 /**
- * A class or namespace pattern, as the user writes it in a rule.
- *
- * Only '*' and '?' are wildcards: a regex is rejected instead of being matched
- * literally, so that a stray '.' is reported as a mistake rather than silently
- * never matching.
+ * Only '*' and '?' are wildcards: a regex is rejected rather than matched
+ * literally, so a stray '.' is reported instead of silently never matching.
  */
 class Pattern
 {
     private const VALID_PATTERN = '/^([a-zA-Z0-9_\x80-\xff]|\\\\|\*|\?)*$/';
 
     /**
-     * Patterns come from the rules, so the same handful of them is matched
-     * against every class in the codebase: they are parsed once and shared.
+     * The same handful of patterns is matched against every class in the
+     * codebase, so they are parsed once and shared.
      *
      * @var array<string, self>
      */
@@ -48,13 +45,7 @@ class Pattern
         return self::$parsed[$pattern] = new self(rtrim($pattern, '\\'));
     }
 
-    /**
-     * Whether the pattern denotes exactly this name, end to end.
-     *
-     * This is a match on one name: it says nothing about what the name contains,
-     * so 'App\Foo' does not match the class 'App\Foo\Bar'. Containment is asked
-     * of the name itself, through FullyQualifiedClassName::matches().
-     */
+    /** Matches one whole name: 'App\Foo' does not match 'App\Foo\Bar'. */
     public function matches(string $subject): bool
     {
         if ('' === $this->pattern) {
