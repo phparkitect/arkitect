@@ -109,6 +109,7 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
             'a namespace never reaches into a longer name' => ['App\FooBar\Baz', 'App\Foo', false],
             'a wildcard never reaches into a longer name' => ['App\Foo\InfrastructureLegacy\Bar', 'App\*\Infrastructure', false],
             'a different namespace does not match' => ['App\Foo\Domain\Bar', 'App\*\Infrastructure', false],
+            'an empty namespace names nowhere, so it selects nothing' => ['App\Foo\Domain\Bar', '', false],
         ];
     }
 }
