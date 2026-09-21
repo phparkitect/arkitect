@@ -28,6 +28,33 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
         ];
     }
 
+    public static function shouldNotMatchNamespacesProvider(): array
+    {
+        return [
+            ['Food\\Vegetables', 'Food\\VegetablesRotten\\Carrot', 'does not match a sibling namespace sharing a prefix'],
+            ['Food\\Veg',        'Food\\Vegetables\\Carrot', 'does not match a namespace the pattern is only a prefix of'],
+            ['Food\\*\\Roots',    'Food\\Vegetables\\RootsAndTubers\\Carrot', 'does not match a sibling namespace sharing a prefix, with a wildcard'],
+        ];
+    }
+
+    /**
+     * @dataProvider shouldNotMatchNamespacesProvider
+     *
+     * @param mixed $expectedNamespace
+     * @param mixed $actualFQCN
+     * @param mixed $explanation
+     */
+    public function test_it_should_not_match_a_namespace_that_merely_shares_a_prefix($expectedNamespace, $actualFQCN, $explanation): void
+    {
+        $resideInNamespace = new ResideInOneOfTheseNamespaces($expectedNamespace);
+
+        $classDesc = ClassDescription::getBuilder($actualFQCN, 'src/Foo.php')->build();
+        $violations = new Violations();
+        $resideInNamespace->evaluate($classDesc, $violations, 'we want to add this rule for our software');
+
+        self::assertEquals(1, $violations->count(), $explanation);
+    }
+
     /**
      * @dataProvider shouldMatchNamespacesProvider
      *

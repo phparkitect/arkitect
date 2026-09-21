@@ -51,14 +51,14 @@ The snippets assume you are inside the config callback, appending to a `$rules` 
 
 ### ResideInOneOfTheseNamespaces / NotResideInTheseNamespaces
 
-`ResideInOneOfTheseNamespaces` raises a violation when a class does **not** live in any of the given namespaces; `NotResideInTheseNamespaces` raises one when it lives in any of them. Matching is **recursive** — `App\Domain` also matches `App\Domain\Event\UserRegistered`.
+`ResideInOneOfTheseNamespaces` raises a violation when a class does **not** live in any of the given namespaces; `NotResideInTheseNamespaces` raises one when it lives in any of them. Matching is **recursive** — `App\Domain` also matches `App\Domain\Event\UserRegistered`. It descends at namespace boundaries rather than by string prefix, so `App\Domain` does **not** match a sibling namespace such as `App\DomainEvents`.
 
 ```php
 new ResideInOneOfTheseNamespaces(string ...$namespaces)
 new NotResideInTheseNamespaces(string ...$namespaces)
 ```
 
-- `$namespaces` — one or more namespace prefixes (variadic).
+- `$namespaces` — one or more namespaces (variadic).
 
 ```php
 // Enforce that all handlers live in the application layer
