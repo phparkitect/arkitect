@@ -128,4 +128,55 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
 
         self::assertEquals(0, $violations->count());
     }
+
+    /**
+     * A class may always use what sits next to it, so its own namespace does not
+     * have to be whitelisted. "Its own" means exactly that namespace: a parent,
+     * a child and a sibling are all somebody else's, and have to be allowed
+     * explicitly like any other dependency.
+     *
+     * @dataProvider provideDependenciesOfAClassInFooBar
+     */
+    public function test_only_the_namespace_the_class_sits_in_needs_no_whitelisting(
+        string $dependency,
+        bool $isAllowed,
+    ): void {
+        $dependsOnlyOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['FizzBuzz']);
+
+        $classDescription = ClassDescription::getBuilder('Foo\Bar\FooBar', 'src/FooBar.php')
+            ->addDependency(new ClassDependency($dependency, 10))
+            ->build();
+
+        $violations = new Violations();
+        $dependsOnlyOnTheseNamespaces->evaluate($classDescription, $violations, 'we want to control our dependencies');
+
+        self::assertEquals($isAllowed ? 0 : 1, $violations->count());
+    }
+
+    public static function provideDependenciesOfAClassInFooBar(): array
+    {
+        return [
+            'a class in the same namespace' => ['Foo\Bar\Collaborator', true],
+            'a class in the whitelisted namespace' => ['FizzBuzz\Collaborator', true],
+            'a class in a parent namespace' => ['Foo\Collaborator', false],
+            'a class in a child namespace' => ['Foo\Bar\Baz\Collaborator', false],
+            'a class in a sibling namespace' => ['Foo\Qux\Collaborator', false],
+            'a class in an unrelated namespace' => ['Other\Collaborator', false],
+            'a class in the global namespace' => ['Collaborator', false],
+        ];
+    }
+
+    public function test_a_class_in_the_global_namespace_does_not_own_it(): void
+    {
+        $dependsOnlyOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['FizzBuzz']);
+
+        $classDescription = ClassDescription::getBuilder('FooBar', 'src/FooBar.php')
+            ->addDependency(new ClassDependency('Collaborator', 10))
+            ->build();
+
+        $violations = new Violations();
+        $dependsOnlyOnTheseNamespaces->evaluate($classDescription, $violations, 'we want to control our dependencies');
+
+        self::assertEquals(1, $violations->count());
+    }
 }

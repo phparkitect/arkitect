@@ -126,6 +126,8 @@ new NotDependsOnTheseNamespaces(array $namespaces, array $exclude = [])
 - `$namespaces` — the allowed (resp. forbidden) namespaces.
 - `$exclude` — namespaces/classes whose dependencies are **not** checked by this rule (an escape hatch for known exceptions).
 
+`DependsOnlyOnTheseNamespaces` always allows a dependency sitting in the **same namespace** as the class being checked, so you do not have to whitelist it. "Same" is exact: for `App\Billing\Invoice`, a class in `App\Billing` is allowed, while one in `App` (parent), in `App\Billing\Tax` (child) or in `App\Shipping` (sibling) is not, and has to be listed like any other dependency.
+
 ```php
 // Allow only specific external dependencies in the domain
 $rules[] = Rule::allClasses()
