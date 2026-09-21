@@ -16,6 +16,7 @@ The people who use this tool are developers writing rules and reading failures, 
 - **Violation output is the product.** When a rule fails, the message (class, broken rule, the `because(...)` reason) must make the cause obvious. Keep it actionable and don't regress its clarity.
 - **The config DSL is a public API.** The fluent `Rule`/`Expression`/`Architecture` API and expression class names are how users express intent — favour readable, discoverable, backwards-compatible naming. Breaking it breaks every consumer's `phparkitect.php`.
 - **Document user-facing changes** in `README.md` and `docs/rules.md` in the same change; a new rule nobody can find isn't done.
+- **`UPGRADE.md` is for breaking changes only** — never for bugfixes. A rule that behaved wrongly and now behaves correctly does not get an entry, even when a suite that was green turns red: nobody relied on the broken behaviour deliberately. Document the corrected behaviour in `docs/rules.md` instead, where someone goes to learn how to write a rule.
 - **Fail gracefully.** Confusing errors, crashes on valid PHP, or noisy output are DX bugs — treat them as such.
 
 ## Commands
