@@ -776,6 +776,11 @@ explained where it belongs.
   `composer.lock` rather than per file.
 - **Graph edge cases**: duplicate FQCNs, inheritance cycles, trait
   conflicts, diamond interfaces.
+- **Stale baseline entries on `check`.** Entries nothing matched are
+  known once `Check` has consumed its occurrences, but only
+  `prune-baseline` acts on them, and only if someone knows to run it. v1
+  prints the count on every check (`BaselineResult::getStaleBaselineEntriesCount()`);
+  one line naming `prune-baseline` would make the command discoverable.
 - **Negation on the constraint side.** Nothing has asked for it, so
   nothing is built. When something does, it is a class named for what it
   does, like `Selector\NotResideInNamespace` — not a `Not` decorator.
