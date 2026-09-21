@@ -6,6 +6,33 @@ PHPArkitect, ordered from the most recent version to the oldest.
 > If a release is **not** listed here, it contains no breaking changes and you
 > can upgrade to it without modifying your configuration.
 
+## 1.4.0
+
+### `NotResideInTheseNamespaces` now matches sub-namespaces of a wildcard namespace
+
+`ResideInOneOfTheseNamespaces` and `NotResideInTheseNamespaces` are documented
+as a pair that matches **recursively**, but a namespace with a wildcard in the
+middle only worked that way for the positive rule. `NotResideInTheseNamespaces`
+required the pattern to match the whole class name, so this rule could never
+report a violation:
+
+```php
+$rules[] = Rule::allClasses()
+    ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
+    ->should(new NotResideInTheseNamespaces('App\*\Infrastructure'))
+    ->because('the domain must not know about infrastructure');
+```
+
+`App\Billing\Infrastructure\DoctrineInvoiceRepository` was not considered to
+be in `App\*\Infrastructure`, so the suite stayed green while the constraint
+was not enforced. `NotResideInTheseNamespaces` now descends into sub-namespaces
+the same way its positive counterpart already did.
+
+**This can surface violations that were silently ignored before.** If a rule of
+yours starts failing, the violations it reports were always there — the rule was
+not checking them. Nothing changes for namespaces without a wildcard, or for
+patterns already ending in `\*`.
+
 ## 1.3.0
 
 ### `--ignore-baseline-linenumbers` is deprecated

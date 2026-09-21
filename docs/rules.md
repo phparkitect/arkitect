@@ -53,6 +53,8 @@ The snippets assume you are inside the config callback, appending to a `$rules` 
 
 `ResideInOneOfTheseNamespaces` raises a violation when a class does **not** live in any of the given namespaces; `NotResideInTheseNamespaces` raises one when it lives in any of them. Matching is **recursive** — `App\Domain` also matches `App\Domain\Event\UserRegistered`.
 
+Namespaces accept `*` as a wildcard, and matching stays recursive there too — `App\*\Infrastructure` matches `App\Billing\Infrastructure\DoctrineInvoiceRepository`.
+
 ```php
 new ResideInOneOfTheseNamespaces(string ...$namespaces)
 new NotResideInTheseNamespaces(string ...$namespaces)

@@ -60,4 +60,36 @@ class NotResideInTheseNamespacesTest extends TestCase
         $haveNameMatching->evaluate($classDesc, $violations, $because);
         self::assertEquals(1, $violations->count());
     }
+
+    /**
+     * @dataProvider provideWildcardNamespaces
+     */
+    public function test_it_should_match_sub_namespaces_of_a_wildcard_namespace(
+        string $fqcn,
+        string $namespace,
+        bool $shouldMatch,
+    ): void {
+        $notResideInTheseNamespaces = new NotResideInTheseNamespaces($namespace);
+
+        $classDesc = ClassDescription::getBuilder($fqcn, 'src/Foo.php')->build();
+        $violations = new Violations();
+        $notResideInTheseNamespaces->evaluate($classDesc, $violations, 'we want to add this rule for our software');
+
+        self::assertEquals($shouldMatch ? 1 : 0, $violations->count());
+    }
+
+    public static function provideWildcardNamespaces(): array
+    {
+        return [
+            'wildcard in the middle matches a sub namespace' => ['App\Foo\Infrastructure\Bar', 'App\*\Infrastructure', true],
+            'wildcard in the middle matches the namespace itself' => ['App\Foo\Infrastructure', 'App\*\Infrastructure', true],
+            'wildcard in the middle matches a nested sub namespace' => ['App\Foo\Infrastructure\Doctrine\Bar', 'App\*\Infrastructure', true],
+            'trailing wildcard keeps matching a sub namespace' => ['App\Foo\Infrastructure\Bar', 'App\*\Infrastructure\*', true],
+            'a longer namespace name is not a sub namespace' => ['App\Foo\InfrastructureLegacy\Bar', 'App\*\Infrastructure', false],
+            'a different namespace does not match' => ['App\Foo\Domain\Bar', 'App\*\Infrastructure', false],
+            'leading wildcard matches a sub namespace' => ['App\Foo\Infrastructure\Bar', '*\Infrastructure', true],
+            'namespace without wildcard still matches a sub namespace' => ['App\Infrastructure\Doctrine\Bar', 'App\Infrastructure', true],
+            'namespace with a trailing separator still matches a sub namespace' => ['App\Infrastructure\Doctrine\Bar', 'App\Infrastructure\\', true],
+        ];
+    }
 }
