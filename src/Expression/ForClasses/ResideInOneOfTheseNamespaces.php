@@ -32,9 +32,7 @@ class ResideInOneOfTheseNamespaces implements Expression
     {
         $resideInNamespace = false;
         foreach ($this->namespaces as $namespace) {
-            // the class either is the namespace itself, or lives below it. Descending has to
-            // cross a separator, otherwise a pattern would also select the namespaces that
-            // merely share a prefix with it: 'Food\Vegetables' is not 'Food\VegetablesRotten'.
+            // descending has to cross a separator, or 'Food\Vegetables' would also select 'Food\VegetablesRotten'
             $descendants = rtrim($namespace, '\\').'\\*';
 
             if ($theClass->namespaceMatches($namespace) || $theClass->namespaceMatches($descendants)) {

@@ -41,10 +41,7 @@ class DependsOnlyOnTheseNamespaces implements Expression
         foreach ($dependencies as $dependency) {
             $dependencyNamespace = $dependency->getFQCN()->namespace();
 
-            // dependencies living in the very same namespace are always allowed, but a parent
-            // namespace is a different namespace and must be whitelisted explicitly. The root
-            // namespace is never implicitly allowed: user-defined classes sitting there are
-            // evaluated like any other, as they have been since 1.0.0.
+            // the root namespace is not implicitly allowed: classes sitting there are evaluated like any other
             if ('' !== $dependencyNamespace && $theClass->namespaceMatchesExactly($dependencyNamespace)) {
                 continue;
             }
