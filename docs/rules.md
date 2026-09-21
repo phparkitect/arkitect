@@ -53,8 +53,6 @@ The snippets assume you are inside the config callback, appending to a `$rules` 
 
 `ResideInOneOfTheseNamespaces` raises a violation when a class does **not** live in any of the given namespaces; `NotResideInTheseNamespaces` raises one when it lives in any of them. Matching is **recursive** — `App\Domain` also matches `App\Domain\Event\UserRegistered` — and descends at namespace boundaries rather than by string prefix, so `App\Domain` does **not** match a sibling namespace such as `App\DomainEvents`.
 
-> ⚠️ The two rules diverge when a wildcard sits in the **middle** of a pattern: `ResideInOneOfTheseNamespaces('App\*\Infrastructure')` matches `App\Foo\Infrastructure\Bar`, while `NotResideInTheseNamespaces('App\*\Infrastructure')` does not match it and can therefore never fail. End the pattern with a wildcard — `App\*\Infrastructure\*` — when you need the negative rule to descend.
-
 ```php
 new ResideInOneOfTheseNamespaces(string ...$namespaces)
 new NotResideInTheseNamespaces(string ...$namespaces)
