@@ -114,4 +114,18 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
 
         self::assertEquals(0, $violations->count());
     }
+
+    public function test_the_escape_hatch_takes_a_pattern_like_every_other_namespace(): void
+    {
+        $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('App', ['Vendor\*\Legacy']);
+
+        $classDescription = ClassDescription::getBuilder('App\Billing\Domain\Invoice', 'src/Invoice.php')
+            ->addDependency(new ClassDependency('Vendor\Acme\Legacy\Thing', 10))
+            ->build();
+
+        $violations = new Violations();
+        $notHaveDependencyOutsideNamespace->evaluate($classDescription, $violations, 'we accept this known exception');
+
+        self::assertEquals(0, $violations->count());
+    }
 }
