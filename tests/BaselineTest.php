@@ -129,6 +129,32 @@ final class BaselineTest extends TestCase
         ));
     }
 
+    public function test_an_entry_accepts_one_occurrence(): void
+    {
+        $db = $this->violation('App\Order', key: 'App\Infra\Db');
+        $baseline = Baseline::of(new Violations($db, $db));
+
+        self::assertCount(2, $baseline);
+        self::assertTrue($baseline->without($db)->contains($db));
+        self::assertFalse($baseline->without($db)->without($db)->contains($db));
+    }
+
+    public function test_repeated_entries_survive_a_round_trip_through_json(): void
+    {
+        $db = $this->violation('App\Order', key: 'App\Infra\Db');
+
+        self::assertCount(2, Baseline::fromJson(Baseline::of(new Violations($db, $db))->toJson()));
+    }
+
+    public function test_pruning_keeps_no_more_occurrences_than_remain(): void
+    {
+        $db = $this->violation('App\Order', key: 'App\Infra\Db');
+        $baseline = Baseline::of(new Violations($db, $db));
+
+        self::assertCount(1, $baseline->keepOnly(new Violations($db)));
+        self::assertCount(2, $baseline->keepOnly(new Violations($db, $db, $db)));
+    }
+
     private function violation(
         string $fqcn,
         string $constraint = IsFinal::class,

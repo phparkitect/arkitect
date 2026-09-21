@@ -45,6 +45,7 @@ final class Check
 
             foreach ($result->violations as $violation) {
                 if ($baseline->contains($violation)) {
+                    $baseline = $baseline->without($violation);
                     ++$silenced;
 
                     continue;

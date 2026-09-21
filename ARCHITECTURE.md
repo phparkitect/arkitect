@@ -581,6 +581,14 @@ from the rule's parameters and never from the message, so rewording a
 message cannot invalidate a baseline in the wild. `Violation::createAt()`
 fills it from the `TypeReference` it already had.
 
+An identity is **counted**, not just recorded. A class referencing a
+forbidden name three times has three violations with one identity, and a
+baseline that only knew the identity would cover the fourth added next
+month. Each entry accepts one occurrence, written as a repeated line in the
+file rather than a `count` field, so a diff still reads one violation per
+line. Which of several identical violations counts as the new one is
+arbitrary; how many are new is not.
+
 **Everything stored is compared**, which is what keeps the file honest: no
 line, no path, no message, nothing that can go stale without meaning
 anything. Entries are sorted, since the file is committed and read in

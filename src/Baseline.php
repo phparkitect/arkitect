@@ -16,13 +16,17 @@ use Arkitect\Evaluate\Violations;
  * message. A line moves whenever anything above it does, and a message is
  * prose we may reword; keying on either means a file that goes stale for
  * reasons that have nothing to do with the code it describes.
+ *
+ * Identities are counted, not just recorded: one class can reference a
+ * forbidden name many times, one violation each, and an entry accepts one
+ * of them, so a new reference is reported rather than covered by an old one.
  */
 final class Baseline implements \Countable
 {
-    /** @var array<string, true> */
+    /** @var array<string, int> */
     private readonly array $known;
 
-    /** @param array<string, true> $known */
+    /** @param array<string, int> $known */
     private function __construct(array $known)
     {
         $this->known = $known;
@@ -38,7 +42,8 @@ final class Baseline implements \Countable
         $known = [];
 
         foreach ($violations as $violation) {
-            $known[self::identify($violation)] = true;
+            $identity = self::identify($violation);
+            $known[$identity] = ($known[$identity] ?? 0) + 1;
         }
 
         return new self($known);
@@ -52,7 +57,8 @@ final class Baseline implements \Countable
         $known = [];
 
         foreach ($entries as $entry) {
-            $known[self::identityOf($entry['class'], $entry['constraint'], $entry['key'])] = true;
+            $identity = self::identityOf($entry['class'], $entry['constraint'], $entry['key']);
+            $known[$identity] = ($known[$identity] ?? 0) + 1;
         }
 
         return new self($known);
@@ -63,6 +69,21 @@ final class Baseline implements \Countable
         return isset($this->known[self::identify($violation)]);
     }
 
+    /** One occurrence fewer, so the same entry cannot accept a second violation. */
+    public function without(Violation $violation): self
+    {
+        $known = $this->known;
+        $identity = self::identify($violation);
+
+        if (1 < ($known[$identity] ?? 0)) {
+            --$known[$identity];
+        } else {
+            unset($known[$identity]);
+        }
+
+        return new self($known);
+    }
+
     /**
      * Sorted, because the file is committed and read in diffs: two runs over
      * the same violations have to produce the same bytes.
@@ -71,9 +92,10 @@ final class Baseline implements \Countable
     {
         $entries = [];
 
-        foreach (array_keys($this->known) as $identity) {
+        foreach ($this->known as $identity => $occurrences) {
             [$class, $constraint, $key] = explode("\0", $identity);
-            $entries[] = ['class' => $class, 'constraint' => $constraint, 'key' => '' === $key ? null : $key];
+            $entry = ['class' => $class, 'constraint' => $constraint, 'key' => '' === $key ? null : $key];
+            array_push($entries, ...array_fill(0, $occurrences, $entry));
         }
 
         usort($entries, static fn (array $a, array $b) => array_values($a) <=> array_values($b));
@@ -92,8 +114,8 @@ final class Baseline implements \Countable
         foreach ($current as $violation) {
             $identity = self::identify($violation);
 
-            if (isset($this->known[$identity])) {
-                $kept[$identity] = true;
+            if (($kept[$identity] ?? 0) < ($this->known[$identity] ?? 0)) {
+                $kept[$identity] = ($kept[$identity] ?? 0) + 1;
             }
         }
 
@@ -102,7 +124,7 @@ final class Baseline implements \Countable
 
     public function count(): int
     {
-        return \count($this->known);
+        return array_sum($this->known);
     }
 
     private static function identify(Violation $violation): string

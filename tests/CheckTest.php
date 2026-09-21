@@ -125,6 +125,21 @@ final class CheckTest extends TestCase
         self::assertSame(1, $result->baselined);
     }
 
+    public function test_one_more_use_of_an_accepted_dependency_is_reported(): void
+    {
+        $rule = Rule::allClasses()
+            ->should(new Constraint\NotDependOnTheseNamespaces(['App\Infra']))
+            ->because('the domain does not reach into infrastructure');
+        $before = ['src/Order.php' => "<?php\nnamespace App;\nuse App\\Infra\\Db;\nclass Order {\n    function load(Db \$db): Db { return \$db; }\n}\n"];
+        $after = ['src/Order.php' => "<?php\nnamespace App;\nuse App\\Infra\\Db;\nclass Order {\n    function load(Db \$db): Db { return \$db; }\n    function save(Db \$db): void {}\n}\n"];
+
+        $known = Baseline::of(iterator_to_array($this->check($before, $rule)->ruleResults)[0]->violations);
+        $result = $this->check($after, $rule, $known);
+
+        self::assertSame(2, $result->baselined);
+        self::assertCount(1, iterator_to_array($result->ruleResults)[0]->violations);
+    }
+
     /** @param array<string, string> $files */
     private function check(array $files, Rule $rule, ?Baseline $baseline = null): CheckResult
     {
