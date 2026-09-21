@@ -8,13 +8,13 @@ PHPArkitect, ordered from the most recent version to the oldest.
 
 ## 1.4.0
 
-### `NotResideInTheseNamespaces` now matches sub-namespaces of a wildcard namespace
+### Namespaces with a wildcard now match sub-namespaces
 
-`ResideInOneOfTheseNamespaces` and `NotResideInTheseNamespaces` are documented
-as a pair that matches **recursively**, but a namespace with a wildcard in the
-middle only worked that way for the positive rule. `NotResideInTheseNamespaces`
-required the pattern to match the whole class name, so this rule could never
-report a violation:
+Namespace matching is documented as **recursive**: `App\Domain` matches
+`App\Domain\Event\UserRegistered`. That only held for a namespace without
+wildcards. A namespace like `App\*\Infrastructure` had to match a class name
+to its end, so `App\Billing\Infrastructure\InvoiceRepository` was not
+considered to be in it, and a rule written against it could not fail:
 
 ```php
 $rules[] = Rule::allClasses()
@@ -23,15 +23,26 @@ $rules[] = Rule::allClasses()
     ->because('the domain must not know about infrastructure');
 ```
 
-`App\Billing\Infrastructure\DoctrineInvoiceRepository` was not considered to
-be in `App\*\Infrastructure`, so the suite stayed green while the constraint
-was not enforced. `NotResideInTheseNamespaces` now descends into sub-namespaces
-the same way its positive counterpart already did.
+The suite stayed green while the constraint was not enforced, and nothing in
+the output distinguished "no violations" from "this rule can never report one".
 
-**This can surface violations that were silently ignored before.** If a rule of
-yours starts failing, the violations it reports were always there — the rule was
-not checking them. Nothing changes for namespaces without a wildcard, or for
-patterns already ending in `\*`.
+Every rule that takes a namespace now matches it the same way, so a namespace
+with a wildcard reaches into its sub-namespaces. **You no longer need to end a
+namespace with `\*`**, and doing so keeps working.
+
+What this changes, per rule:
+
+| Rule | Effect of the fix |
+|---|---|
+| `NotResideInTheseNamespaces` | reports violations it used to miss |
+| `NotDependsOnTheseNamespaces` | reports violations it used to miss |
+| `DependsOnlyOnTheseNamespaces` | stops reporting dependencies that were inside the allowed namespace all along |
+| `NotHaveDependencyOutsideNamespace` | stops reporting dependencies that were inside the namespace all along |
+| `except()` | actually excludes the classes you asked it to exclude |
+
+**Rules of yours may start failing.** The violations they report were always
+there — the rule was not checking them. Nothing changes for a namespace without
+a wildcard, which is the common case.
 
 ## 1.3.0
 

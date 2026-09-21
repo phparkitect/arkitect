@@ -19,6 +19,7 @@ The snippets assume you are inside the config callback, appending to a `$rules` 
 ## Table of contents
 
 - [Namespace rules](#namespace-rules)
+  - [How a namespace is matched](#how-a-namespace-is-matched)
   - [ResideInOneOfTheseNamespaces / NotResideInTheseNamespaces](#resideinoneofthesenamespaces--notresideinthesenamespaces)
   - [ResideInOneOfTheseNamespacesExactly / NotResideInOneOfTheseNamespacesExactly](#resideinoneofthesenamespacesexactly--notresideinoneofthesenamespacesexactly)
   - [DependsOnlyOnTheseNamespaces / NotDependsOnTheseNamespaces](#dependsonlyonthesenamespaces--notdependsonthesenamespaces)
@@ -49,11 +50,19 @@ The snippets assume you are inside the config callback, appending to a `$rules` 
 
 `Rule::namespace('App\Controller')` is a shortcut for `Rule::allClasses()->that(new ResideInOneOfTheseNamespaces('App\Controller'))`. It accepts multiple namespaces: `Rule::namespace('App\Controller', 'App\Service')`.
 
+### How a namespace is matched
+
+Every rule on this page that takes a namespace matches it the same way, so it is worth reading once.
+
+A class matches a namespace when it **is** that class, or when it **resides in** it at any depth. `App\Domain` therefore matches `App\Domain\Event\UserRegistered`, and so does `App\Domain\Event`.
+
+Namespaces accept `*` and `?` as wildcards, and matching stays recursive: `App\*\Infrastructure` matches `App\Billing\Infrastructure\DoctrineInvoiceRepository`. You never need to end a namespace with `\*` to reach into it.
+
+A wildcard matches **whole names** only, never part of one: `App\Foo` does not match `App\FooBar\Baz`, and `App\*\Infrastructure` does not match `App\Billing\InfrastructureLegacy\Repository`. Anything that is not `*`, `?`, a letter, a digit, `_` or `\` is rejected with an `InvalidPatternException` — patterns are not regular expressions, so a stray `.` is reported as a mistake instead of silently matching nothing.
+
 ### ResideInOneOfTheseNamespaces / NotResideInTheseNamespaces
 
-`ResideInOneOfTheseNamespaces` raises a violation when a class does **not** live in any of the given namespaces; `NotResideInTheseNamespaces` raises one when it lives in any of them. Matching is **recursive** — `App\Domain` also matches `App\Domain\Event\UserRegistered`.
-
-Namespaces accept `*` as a wildcard, and matching stays recursive there too — `App\*\Infrastructure` matches `App\Billing\Infrastructure\DoctrineInvoiceRepository`.
+`ResideInOneOfTheseNamespaces` raises a violation when a class does **not** live in any of the given namespaces; `NotResideInTheseNamespaces` raises one when it lives in any of them, following the matching rules above.
 
 ```php
 new ResideInOneOfTheseNamespaces(string ...$namespaces)

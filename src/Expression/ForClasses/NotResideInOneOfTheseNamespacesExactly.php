@@ -30,14 +30,7 @@ class NotResideInOneOfTheseNamespacesExactly implements Expression
 
     public function evaluate(ClassDescription $theClass, Violations $violations, string $because): void
     {
-        $resideInNamespace = false;
-        foreach ($this->namespaces as $namespace) {
-            if ($theClass->namespaceMatchesExactly($namespace)) {
-                $resideInNamespace = true;
-            }
-        }
-
-        if ($resideInNamespace) {
+        if ($theClass->residesInExactlyOneOf(...$this->namespaces)) {
             $violation = Violation::create(
                 $theClass->getFQCN(),
                 ViolationMessage::selfExplanatory($this->describe($theClass, $because)),

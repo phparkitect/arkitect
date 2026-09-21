@@ -114,4 +114,18 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
 
         self::assertEquals(0, $violations->count());
     }
+
+    public function test_a_dependency_in_a_sub_namespace_of_a_wildcard_namespace_is_allowed(): void
+    {
+        $dependsOnlyOnTheseNamespaces = new DependsOnlyOnTheseNamespaces(['App\*\Infrastructure']);
+
+        $classDescription = ClassDescription::getBuilder('App\Billing\Domain\Invoice', 'src/Invoice.php')
+            ->addDependency(new ClassDependency('App\Billing\Infrastructure\DoctrineInvoiceRepository', 10))
+            ->build();
+
+        $violations = new Violations();
+        $dependsOnlyOnTheseNamespaces->evaluate($classDescription, $violations, 'the domain may only use infrastructure');
+
+        self::assertEquals(0, $violations->count());
+    }
 }

@@ -3,54 +3,81 @@ declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
 
-use Arkitect\Exceptions\InvalidPatternException;
-
 class FullyQualifiedClassName
 {
-    private PatternString $fqcnString;
+    private string $fqcn;
 
-    private PatternString $namespace;
+    private string $namespace;
 
-    private PatternString $class;
+    private string $className;
 
-    private function __construct(PatternString $fqcnString, PatternString $namespace, PatternString $class)
+    private function __construct(string $fqcn, string $namespace, string $className)
     {
-        $this->fqcnString = $fqcnString;
+        $this->fqcn = $fqcn;
         $this->namespace = $namespace;
-        $this->class = $class;
+        $this->className = $className;
     }
 
     public function toString(): string
     {
-        return $this->fqcnString->toString();
+        return $this->fqcn;
     }
 
+    /**
+     * Whether the short class name matches the pattern, e.g. '*Controller'.
+     */
     public function classMatches(string $pattern): bool
     {
-        if ($this->isNotAValidPattern($pattern)) {
-            throw new InvalidPatternException("'$pattern' is not a valid class or namespace pattern. Regex are not allowed, only * and ? wildcard.");
-        }
-
-        return $this->class->matches($pattern);
+        return Pattern::fromString($pattern)->matches($this->className);
     }
 
+    /**
+     * Whether the class is the one the pattern denotes, or resides in a
+     * namespace it denotes.
+     *
+     * Matching is recursive: the pattern is tried against the class itself and
+     * then against every namespace the class lives in, so 'App\Domain' matches
+     * 'App\Domain\Event\UserRegistered' through its namespace 'App\Domain', and
+     * 'App\*\Infrastructure' matches 'App\Billing\Infrastructure\Repository'
+     * the same way. A pattern only ever matches a whole name, so 'App\Foo'
+     * does not reach into 'App\FooBar'.
+     */
     public function matches(string $pattern): bool
     {
-        if ($this->isNotAValidPattern($pattern)) {
-            throw new InvalidPatternException("'$pattern' is not a valid class or namespace pattern. Regex are not allowed, only * and ? wildcard.");
+        $pattern = Pattern::fromString($pattern);
+
+        if ($pattern->matches($this->fqcn)) {
+            return true;
         }
 
-        return $this->fqcnString->matches($pattern);
+        foreach ($this->namespaces() as $namespace) {
+            if ($pattern->matches($namespace)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function matchesOneOf(string ...$patterns): bool
+    {
+        foreach ($patterns as $pattern) {
+            if ($this->matches($pattern)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function className(): string
     {
-        return $this->class->toString();
+        return $this->className;
     }
 
     public function namespace(): string
     {
-        return $this->namespace->toString();
+        return $this->namespace;
     }
 
     public static function fromString(string $fqcn): self
@@ -68,15 +95,28 @@ class FullyQualifiedClassName
 
         // $className can't be null: the regex above rejects an empty or trailing-backslash $fqcn
         /** @psalm-suppress PossiblyNullArgument */
-        return new self(new PatternString($fqcn), new PatternString($namespace), new PatternString($className));
+        return new self($fqcn, $namespace, $className);
     }
 
-    public function isNotAValidPattern(string $pattern): bool
+    /**
+     * Every namespace the class resides in, from the closest one to the root:
+     * 'App\Billing\Domain\Invoice' lives in 'App\Billing\Domain', in
+     * 'App\Billing' and in 'App'.
+     *
+     * @return list<string>
+     */
+    private function namespaces(): array
     {
-        $validClassNameCharacters = '[a-zA-Z0-9_\x80-\xff]';
-        $or = '|';
-        $backslash = '\\\\';
+        $namespaces = [];
+        $namespace = $this->namespace;
 
-        return 0 === preg_match('/^('.$validClassNameCharacters.$or.$backslash.$or.'\*'.$or.'\?)*$/', $pattern);
+        while ('' !== $namespace) {
+            $namespaces[] = $namespace;
+
+            $lastSeparator = strrpos($namespace, '\\');
+            $namespace = false === $lastSeparator ? '' : substr($namespace, 0, $lastSeparator);
+        }
+
+        return $namespaces;
     }
 }

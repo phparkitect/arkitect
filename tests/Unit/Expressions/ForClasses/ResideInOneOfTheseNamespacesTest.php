@@ -84,4 +84,31 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
         $haveNameMatching->evaluate($classDesc, $violations, $because);
         self::assertNotEquals(0, $violations->count());
     }
+
+    /**
+     * @dataProvider provideNamespaces
+     */
+    public function test_it_should_match_the_namespace_a_class_resides_in(string $fqcn, string $namespace, bool $shouldMatch): void
+    {
+        $resideInOneOfTheseNamespaces = new ResideInOneOfTheseNamespaces($namespace);
+
+        $classDesc = ClassDescription::getBuilder($fqcn, 'src/Foo.php')->build();
+        $violations = new Violations();
+        $resideInOneOfTheseNamespaces->evaluate($classDesc, $violations, 'we want to add this rule for our software');
+
+        self::assertEquals($shouldMatch ? 0 : 1, $violations->count());
+    }
+
+    public static function provideNamespaces(): array
+    {
+        return [
+            'a wildcard in the middle reaches a sub namespace' => ['App\Foo\Infrastructure\Bar', 'App\*\Infrastructure', true],
+            'a wildcard in the middle reaches a nested sub namespace' => ['App\Foo\Infrastructure\Doctrine\Bar', 'App\*\Infrastructure', true],
+            'a trailing wildcard keeps working' => ['App\Foo\Infrastructure\Bar', 'App\*\Infrastructure\*', true],
+            'a namespace without wildcards reaches a sub namespace' => ['App\Infrastructure\Doctrine\Bar', 'App\Infrastructure', true],
+            'a namespace never reaches into a longer name' => ['App\FooBar\Baz', 'App\Foo', false],
+            'a wildcard never reaches into a longer name' => ['App\Foo\InfrastructureLegacy\Bar', 'App\*\Infrastructure', false],
+            'a different namespace does not match' => ['App\Foo\Domain\Bar', 'App\*\Infrastructure', false],
+        ];
+    }
 }

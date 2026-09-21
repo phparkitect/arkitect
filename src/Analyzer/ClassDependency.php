@@ -22,13 +22,7 @@ class ClassDependency
 
     public function matchesOneOf(string ...$patterns): bool
     {
-        foreach ($patterns as $pattern) {
-            if ($this->FQCN->matches($pattern)) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->FQCN->matchesOneOf(...$patterns);
     }
 
     public function getLine(): int

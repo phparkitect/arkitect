@@ -104,25 +104,60 @@ class ClassDescription
         return $this->filePath;
     }
 
-    public function namespaceMatches(string $pattern): bool
+    /**
+     * Whether the class resides in the namespace the pattern denotes, at any
+     * depth. See FullyQualifiedClassName::matches().
+     */
+    public function residesIn(string $namespace): bool
     {
-        return $this->FQCN->matches($pattern);
+        return $this->FQCN->matches($namespace);
     }
 
-    public function namespaceMatchesExactly(string $namespace): bool
+    public function residesInOneOf(string ...$namespaces): bool
+    {
+        return $this->FQCN->matchesOneOf(...$namespaces);
+    }
+
+    /**
+     * Whether the class sits directly in the namespace, with no sub-namespace
+     * in between.
+     */
+    public function residesInExactly(string $namespace): bool
     {
         return $this->FQCN->namespace() === $namespace;
     }
 
-    public function namespaceMatchesOneOfTheseNamespaces(array $classesToBeExcluded): bool
+    public function residesInExactlyOneOf(string ...$namespaces): bool
     {
-        foreach ($classesToBeExcluded as $classToBeExcluded) {
-            if ($this->namespaceMatches($classToBeExcluded)) {
+        foreach ($namespaces as $namespace) {
+            if ($this->residesInExactly($namespace)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /** the name residesIn() had before it said what it does; kept for custom expressions */
+    public function namespaceMatches(string $pattern): bool
+    {
+        return $this->residesIn($pattern);
+    }
+
+    /** the name residesInExactly() had before it said what it does; kept for custom expressions */
+    public function namespaceMatchesExactly(string $namespace): bool
+    {
+        return $this->residesInExactly($namespace);
+    }
+
+    /**
+     * the name residesInOneOf() had before it said what it does; kept for custom expressions.
+     *
+     * @param array<string> $namespaces
+     */
+    public function namespaceMatchesOneOfTheseNamespaces(array $namespaces): bool
+    {
+        return $this->residesInOneOf(...$namespaces);
     }
 
     /**
