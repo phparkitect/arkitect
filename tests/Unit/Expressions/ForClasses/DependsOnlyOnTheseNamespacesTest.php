@@ -118,6 +118,21 @@ class DependsOnlyOnTheseNamespacesTest extends TestCase
         );
     }
 
+    public function test_it_should_report_a_dependency_living_in_a_child_namespace(): void
+    {
+        $dependOnClasses = new DependsOnlyOnTheseNamespaces(['FizzBuzz']);
+
+        $classDescription = ClassDescription::getBuilder('Foo\\Bar\\FooBar', 'src/Foo/Bar/FooBar.php')
+            ->addDependency(new ClassDependency('Foo\\Bar\\Baz\\Collaborator', 3))
+            ->build();
+
+        $because = 'we want to add this rule for our software';
+        $violations = new Violations();
+        $dependOnClasses->evaluate($classDescription, $violations, $because);
+
+        self::assertEquals(1, $violations->count());
+    }
+
     public function test_it_should_report_a_root_namespace_dependency_as_the_root_namespace_is_never_implicitly_allowed(): void
     {
         $dependOnClasses = new DependsOnlyOnTheseNamespaces(['FizzBuzz']);

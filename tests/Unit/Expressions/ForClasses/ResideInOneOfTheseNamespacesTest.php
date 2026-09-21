@@ -14,6 +14,7 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
     public static function shouldMatchNamespacesProvider(): array
     {
         return [
+            ['Food\Vegetables', 'Food\Vegetables', 'matches a class whose FQCN is the namespace itself'],
             ['Food\Vegetables', 'Food\Vegetables\Carrot', 'matches a class in the root namespace'],
             ['Food\Vegetables', 'Food\Vegetables\Roots\Carrot', 'matches a class in a child namespace'],
             ['Food\Vegetables', 'Food\Vegetables\Roots\Orange\Carrot', 'matches a class in a child of a child namespace'],
@@ -72,6 +73,17 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
         $haveNameMatching->evaluate($classDesc, $violations, $because);
 
         self::assertEquals(0, $violations->count(), $explanation);
+    }
+
+    public function test_it_should_match_nothing_when_given_an_empty_namespace(): void
+    {
+        $resideInNamespace = new ResideInOneOfTheseNamespaces('');
+
+        $classDesc = ClassDescription::getBuilder('Food\\Vegetables\\Carrot', 'src/Foo.php')->build();
+        $violations = new Violations();
+        $resideInNamespace->evaluate($classDesc, $violations, 'we want to add this rule for our software');
+
+        self::assertEquals(1, $violations->count(), 'an empty namespace selects no class, rather than every class');
     }
 
     public function test_it_should_return_false_if_not_reside_in_namespace(): void
