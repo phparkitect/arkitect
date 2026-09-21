@@ -33,6 +33,6 @@ final class ResideInNamespace implements Constraint
 
     private function matches(ParsedClass $class): bool
     {
-        return $this->pattern->matches($class->fqcn);
+        return $this->pattern->contains($class->fqcn);
     }
 }

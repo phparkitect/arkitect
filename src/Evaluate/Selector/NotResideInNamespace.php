@@ -25,6 +25,6 @@ final class NotResideInNamespace implements Selector
     public function matches(ParsedClass $class, ClassGraph $classGraph): Selection
     {
         // reads the name only, so it always has a definitive answer
-        return $this->pattern->matches($class->fqcn) ? Selection::No : Selection::Yes;
+        return $this->pattern->contains($class->fqcn) ? Selection::No : Selection::Yes;
     }
 }

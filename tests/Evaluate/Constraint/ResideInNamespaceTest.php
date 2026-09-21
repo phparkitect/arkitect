@@ -49,6 +49,6 @@ final class ResideInNamespaceTest extends TestCase
     {
         $class = ParsedClassFixture::create('App\Modules\Billing\Domain\Invoice');
 
-        self::assertCount(0, (new ResideInNamespace('App\*\Domain'))->evaluate($class, new ParsedClassGraph())->violations);
+        self::assertCount(0, (new ResideInNamespace('App\**\Domain'))->evaluate($class, new ParsedClassGraph())->violations);
     }
 }

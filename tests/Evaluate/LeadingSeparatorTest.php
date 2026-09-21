@@ -57,7 +57,7 @@ final class LeadingSeparatorTest extends TestCase
 
     public function test_a_pattern_written_with_a_leading_separator_still_matches(): void
     {
-        self::assertTrue((new Pattern('\App\Domain'))->matches('App\Domain\Order'));
+        self::assertTrue((new Pattern('\App\Domain'))->contains('App\Domain\Order'));
     }
 
     public function test_a_dependency_namespace_written_with_a_leading_separator_still_matches(): void

@@ -22,7 +22,7 @@ final class ResideInOneOfTheseNamespaces implements Selector
     public function matches(ParsedClass $class, ClassGraph $classGraph): Selection
     {
         foreach ($this->patterns as $pattern) {
-            if ($pattern->matches($class->fqcn)) {
+            if ($pattern->contains($class->fqcn)) {
                 return Selection::Yes;
             }
         }

@@ -14,63 +14,83 @@ final class PatternTest extends TestCase
         self::assertTrue((new Pattern('App\Domain\Order'))->matches('App\Domain\Order'));
     }
 
-    public function test_a_pattern_without_wildcards_matches_everything_beneath_it(): void
+    public function test_matching_a_name_does_not_reach_beneath_it(): void
     {
-        $pattern = new Pattern('App\Domain');
-
-        self::assertTrue($pattern->matches('App\Domain\Order'));
-        self::assertTrue($pattern->matches('App\Domain\Deeply\Nested\Thing'));
+        self::assertFalse((new Pattern('App\Domain'))->matches('App\Domain\Order'));
     }
 
-    /**
-     * The separator matters: without it, a namespace pattern would swallow
-     * every sibling namespace that merely starts with the same letters.
-     */
-    public function test_a_namespace_does_not_match_a_sibling_sharing_its_prefix(): void
-    {
-        self::assertFalse((new Pattern('App\Domain'))->matches('App\DomainEvents\Something'));
-    }
-
-    public function test_a_trailing_separator_is_accepted_and_means_the_same(): void
-    {
-        self::assertTrue((new Pattern('App\Domain\\'))->matches('App\Domain\Order'));
-    }
-
-    public function test_a_star_matches_any_run_of_characters_including_separators(): void
+    public function test_a_star_stays_inside_one_segment(): void
     {
         $pattern = new Pattern('App\*\Order');
 
         self::assertTrue($pattern->matches('App\Domain\Order'));
+        self::assertFalse($pattern->matches('App\Domain\Nested\Order'));
+    }
+
+    public function test_a_double_star_stands_for_any_number_of_segments_including_none(): void
+    {
+        $pattern = new Pattern('App\**\Order');
+
+        self::assertTrue($pattern->matches('App\Order'));
+        self::assertTrue($pattern->matches('App\Domain\Order'));
         self::assertTrue($pattern->matches('App\Domain\Nested\Order'));
     }
 
+    public function test_a_star_can_stand_for_part_of_a_segment(): void
+    {
+        $pattern = new Pattern('Arkitect\Evaluate\Violation*');
+
+        self::assertTrue($pattern->matches('Arkitect\Evaluate\Violation'));
+        self::assertTrue($pattern->matches('Arkitect\Evaluate\Violations'));
+        self::assertFalse($pattern->matches('Arkitect\Evaluate\Violation\Thing'));
+    }
+
+    public function test_a_name_suffix_anywhere_takes_a_double_star(): void
+    {
+        self::assertFalse((new Pattern('*Controller'))->matches('App\Http\UserController'));
+        self::assertTrue((new Pattern('**\*Controller'))->matches('App\Http\UserController'));
+    }
+
+    public function test_a_namespace_contains_the_classes_declared_in_it_and_beneath_it(): void
+    {
+        $pattern = new Pattern('App\Domain');
+
+        self::assertTrue($pattern->contains('App\Domain\Order'));
+        self::assertTrue($pattern->contains('App\Domain\Deeply\Nested\Thing'));
+    }
+
     /**
-     * A wildcard pattern keeps the "anything beneath it" half too, so the
-     * meaning of a pattern doesn't quietly change with the presence of a *.
+     * PHP lets a class and a namespace share a name, and a rule about
+     * namespaces means the namespace.
      */
-    public function test_a_wildcard_pattern_also_matches_everything_beneath_it(): void
+    public function test_a_namespace_does_not_contain_the_class_that_shares_its_name(): void
+    {
+        self::assertFalse((new Pattern('App\Domain'))->contains('App\Domain'));
+    }
+
+    public function test_a_namespace_does_not_contain_a_sibling_sharing_its_prefix(): void
+    {
+        self::assertFalse((new Pattern('App\Domain'))->contains('App\DomainEvents\Something'));
+    }
+
+    public function test_a_wildcard_namespace_contains_what_is_beneath_it_too(): void
     {
         $pattern = new Pattern('App\*\Domain');
 
-        self::assertTrue($pattern->matches('App\Modules\Billing\Domain\Invoice'));
-        self::assertTrue($pattern->matches('App\Modules\Billing\Domain'));
-        self::assertFalse($pattern->matches('App\Modules\Billing\Infra\Db'));
+        self::assertTrue($pattern->contains('App\Billing\Domain\Invoice'));
+        self::assertTrue($pattern->contains('App\Billing\Domain\Model\Invoice'));
+        self::assertFalse($pattern->contains('App\Modules\Billing\Domain\Invoice'));
     }
 
-    public function test_a_suffix_pattern_matches_by_name(): void
+    public function test_a_star_namespace_does_not_contain_what_is_declared_directly_above_it(): void
     {
-        $pattern = new Pattern('*Controller');
-
-        self::assertTrue($pattern->matches('App\Http\UserController'));
-        self::assertFalse($pattern->matches('App\Http\UserRepository'));
+        self::assertFalse((new Pattern('App\*'))->contains('App\Kernel'));
+        self::assertTrue((new Pattern('App\*'))->contains('App\Http\Kernel'));
     }
 
-    public function test_a_question_mark_matches_exactly_one_character(): void
+    public function test_a_trailing_separator_is_accepted_and_means_the_same(): void
     {
-        $pattern = new Pattern('App\V?\Thing');
-
-        self::assertTrue($pattern->matches('App\V1\Thing'));
-        self::assertFalse($pattern->matches('App\V10\Thing'));
+        self::assertTrue((new Pattern('App\Domain\\'))->contains('App\Domain\Order'));
     }
 
     /**
@@ -84,15 +104,25 @@ final class PatternTest extends TestCase
         new Pattern('');
     }
 
-    /**
-     * Rejected at construction rather than deep inside a run: the only
-     * wildcards are * and ?, so a regex is a mistake worth naming early.
-     */
     public function test_a_regex_is_rejected_as_a_pattern(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 
         new Pattern('/^App\\\\.*/');
+    }
+
+    public function test_a_question_mark_is_not_a_wildcard(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        new Pattern('App\V?\Thing');
+    }
+
+    public function test_a_double_star_inside_a_segment_is_rejected(): void
+    {
+        $this->expectExceptionMessage('** stands for whole segments');
+
+        new Pattern('App\Foo**');
     }
 
     public function test_the_rejection_names_the_offending_pattern(): void

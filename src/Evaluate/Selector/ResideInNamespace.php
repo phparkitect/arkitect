@@ -20,6 +20,6 @@ final class ResideInNamespace implements Selector
     public function matches(ParsedClass $class, ClassGraph $classGraph): Selection
     {
         // reads the name only, so it always has a definitive answer
-        return $this->pattern->matches($class->fqcn) ? Selection::Yes : Selection::No;
+        return $this->pattern->contains($class->fqcn) ? Selection::Yes : Selection::No;
     }
 }

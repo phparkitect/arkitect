@@ -33,7 +33,7 @@ final class ResideInOneOfTheseNamespacesTest extends TestCase
 
     public function test_the_namespaces_keep_the_matching_rules_of_a_single_one(): void
     {
-        $selector = new ResideInOneOfTheseNamespaces(['App\Domain', 'App\*\Http']);
+        $selector = new ResideInOneOfTheseNamespaces(['App\Domain', 'App\**\Http']);
 
         self::assertSame(Selection::Yes, $this->select($selector, 'App\Modules\Billing\Http\Controller'));
         self::assertSame(Selection::No, $this->select($selector, 'App\DomainEvents\Placed'));

@@ -60,7 +60,7 @@ try {
 
     Rule::allClasses()
         ->that(new Selector\ResideInNamespace('Arkitect\Evaluate\Selector'))
-        ->should(new Constraint\NotDependOnTheseNamespaces(['Arkitect\Evaluate\Violation*']))
+        ->should(new Constraint\NotDependOnTheseClasses(['Arkitect\Evaluate\Violation*']))
         ->because('a selector decides what a rule is about and never reports anything'),
 
     Rule::allClasses()

@@ -336,12 +336,56 @@ separately: **scope** by `Selector` plus `RuleResult::$checked`, and
 a rule that selected nothing is fixed in the `that()`, a rule that could
 judge nothing in the `should()`.
 
+#### Patterns
+
+One grammar, written the way path globs already are: `*` stands for part of
+a single segment and never crosses a separator, and `**`, as a whole
+segment, stands for any number of segments, none included. v1 used the same
+`*` for opposite things — `fnmatch` on namespaces, where it crossed `\`, and
+Symfony's `Glob` on paths, where it stops at `/` — so `App\*\Domain` and
+`src/*/Domain` looked alike and meant different depths. The path meaning is
+the one kept because it can say both: with a `*` that crosses separators,
+"exactly one level down" cannot be written at all.
+
+There are no path patterns yet — the one path rule is the `vendor/` prefix
+in `Codebase` — and when they arrive they take this grammar with `/` as the
+separator, not a second one.
+
+`?` is not a wildcard. Nothing asks for it, and it is rejected rather than
+read literally, so a pattern carried over from a v1 config fails when it is
+built instead of quietly matching nothing.
+
+A pattern answers one of two questions, and the rule decides which.
+`matches()` is about a name: the pattern is the name, wildcards aside.
+`contains()` is about a namespace: the name is declared in the namespace
+written, or beneath it. A rule whose name says namespace only ever asks
+`contains()`, so its argument is always read as a namespace:
+`ResideInNamespace('App\Domain')` does not select the class `App\Domain`,
+and `DependOnlyOnTheseNamespaces(['App\Clock'])` does not allow the class
+`App\Clock`. It is not an error either: PHP lets a class and a namespace
+share a name, so the string alone cannot say which was meant, and a rule is
+built before anything is parsed.
+
+It follows that `App\*` contains the classes of `App`'s sub-namespaces and
+not the ones declared in `App` itself; `App` says both.
+
+`NotDependOnTheseClasses` is the rule for what a namespace rule can no
+longer express, forbidding particular classes. `run.php` uses it to keep
+selectors away from `Violation` and `Violations`: written as a namespace
+rule, that check matches nothing and stays green. Moving the two classes
+into a namespace of their own would have made it expressible too, and is
+the wrong trade: forbidding a dependency on one particular class is an
+ordinary thing to want, moving a class is an expensive refactoring, and a
+project should not have to reshape its code to fit the tool that checks it.
+It has no selector twin and no `DependOnlyOnTheseClasses`, since nothing
+has asked.
+
 #### The rule DSL
 
 ```php
 Rule::allClasses()
     ->that(new Selector\ResideInNamespace('Arkitect\Evaluate\Selector'))
-    ->should(new Constraint\NotDependOnTheseNamespaces(['Arkitect\Evaluate\Violation*']))
+    ->should(new Constraint\NotDependOnTheseClasses(['Arkitect\Evaluate\Violation*']))
     ->because('a selector decides what a rule is about and never reports anything');
 ```
 
@@ -641,8 +685,9 @@ reach a violation reported at `src/Foo.php:-1`.
 
 `Fqcn` is used by `TypeReference`, by `ParsedClass` (whose `shortName()`
 and `namespaceName()` derive from it), and by every constraint and selector
-taking a target name. `Pattern` normalizes the same way without using it,
-since a pattern carries wildcards and is not a class name.
+taking a target name. `Pattern` normalizes its own string the same way
+without being one, since it carries wildcards, and uses `Fqcn` only to find
+the namespace of the name it is asked about.
 
 ## Traps found by building it
 
@@ -655,9 +700,11 @@ same way by anyone starting over.
   A rule that treats `Unknown` as a violation then fires on ordinary code.
 - **A pattern must mean one thing.** v1 gave wildcard patterns to `fnmatch`
   against the whole name and dropped the "anything beneath it" half that
-  wildcard-free patterns get, so `App\*\Domain` silently matched nothing.
-  Here a pattern means the same thing either way, and is validated when
-  constructed rather than halfway through a run.
+  wildcard-free patterns get, so `App\*\Domain` silently matched nothing;
+  and its `*` crossed namespace separators while the same `*` in a path did
+  not. Here there is one grammar, the rule chooses between a name and a
+  namespace, and a pattern is validated when constructed rather than
+  halfway through a run.
 - **A leading separator fails in the worst direction.**
   `IsA('\App\Contract')` matched nothing stored, so every class in a
   codebase that satisfied the rule was reported as violating it;

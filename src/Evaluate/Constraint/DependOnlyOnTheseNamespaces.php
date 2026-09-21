@@ -56,12 +56,12 @@ final class DependOnlyOnTheseNamespaces implements Constraint
         // name it in every rule that constrains it
         $ownNamespace = $class->namespaceName();
 
-        if ('' !== $ownNamespace && (new Pattern($ownNamespace))->matches($dependency)) {
+        if ('' !== $ownNamespace && (new Pattern($ownNamespace))->contains($dependency)) {
             return true;
         }
 
         foreach ($this->allowed as $pattern) {
-            if ($pattern->matches($dependency)) {
+            if ($pattern->contains($dependency)) {
                 return true;
             }
         }
