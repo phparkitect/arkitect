@@ -45,10 +45,24 @@ class PatternTest extends TestCase
         ];
     }
 
-    public function test_an_empty_pattern_matches_nothing(): void
+    /**
+     * @dataProvider providePatternsNamingNothing
+     */
+    public function test_a_pattern_that_names_nothing_is_rejected(string $pattern): void
     {
-        self::assertFalse(Pattern::fromString('')->matches(''));
-        self::assertFalse(Pattern::fromString('')->matches('Food\Carrot'));
+        $this->expectException(InvalidPatternException::class);
+        $this->expectExceptionMessage('names no class and no namespace');
+
+        Pattern::fromString($pattern);
+    }
+
+    public static function providePatternsNamingNothing(): array
+    {
+        return [
+            'an empty pattern' => [''],
+            'a lone separator' => ['\\'],
+            'nothing but separators' => ['\\\\\\'],
+        ];
     }
 
     public function test_a_trailing_separator_denotes_the_same_namespace(): void

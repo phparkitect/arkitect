@@ -42,16 +42,18 @@ class Pattern
         }
 
         // a trailing separator denotes the same namespace: 'App\Foo\' is 'App\Foo'
-        return self::$parsed[$pattern] = new self(rtrim($pattern, '\\'));
+        $named = rtrim($pattern, '\\');
+
+        if ('' === $named) {
+            throw new InvalidPatternException("'$pattern' names no class and no namespace. Use '*' to mean every class.");
+        }
+
+        return self::$parsed[$pattern] = new self($named);
     }
 
     /** Matches one whole name: 'App\Foo' does not match 'App\Foo\Bar'. */
     public function matches(string $subject): bool
     {
-        if ('' === $this->pattern) {
-            return false;
-        }
-
         if (!$this->hasWildcard) {
             return $this->pattern === $subject;
         }

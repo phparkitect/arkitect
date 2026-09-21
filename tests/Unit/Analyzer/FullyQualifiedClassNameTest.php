@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Unit\Analyzer;
 
 use Arkitect\Analyzer\FullyQualifiedClassName;
+use Arkitect\Exceptions\InvalidPatternException;
 use PHPUnit\Framework\TestCase;
 
 class FullyQualifiedClassNameTest extends TestCase
@@ -16,7 +17,6 @@ class FullyQualifiedClassNameTest extends TestCase
             ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables', true],
             ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables\\', true],
             ['Food\Vegetables\Fruits\Banana', 'Food\Vegetables\*', true],
-            ['Food\Vegetables\Fruits\Mango', '', false],
             ['Food\Veg', 'Food\Vegetables', false],
             ['Food\Vegetables', 'Food\Veg', false],
 
@@ -81,6 +81,15 @@ class FullyQualifiedClassNameTest extends TestCase
         $fqcn = FullyQualifiedClassName::fromString($fqcn);
 
         self::assertEquals($shouldMatch, $fqcn->matches($pattern), "{$fqcn->toString()} should ".($shouldMatch ? '' : 'not ')."match $pattern");
+    }
+
+    public function test_an_empty_namespace_is_rejected_rather_than_matching_nothing(): void
+    {
+        $fqcn = FullyQualifiedClassName::fromString('Food\Vegetables\Fruits\Mango');
+
+        $this->expectException(InvalidPatternException::class);
+
+        $fqcn->matches('');
     }
 
     public function test_should_throw_if_invalid_namespace_is_passed(): void

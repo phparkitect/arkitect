@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
 use Arkitect\Analyzer\ClassDescription;
+use Arkitect\Exceptions\InvalidPatternException;
 use Arkitect\Expression\ForClasses\ResideInOneOfTheseNamespaces;
 use Arkitect\Rules\Violations;
 use PHPUnit\Framework\TestCase;
@@ -99,6 +100,15 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
         self::assertEquals($shouldMatch ? 0 : 1, $violations->count());
     }
 
+    public function test_an_empty_namespace_is_rejected_rather_than_silently_selecting(): void
+    {
+        $classDesc = ClassDescription::getBuilder('App\Foo\Domain\Bar', 'src/Foo.php')->build();
+
+        $this->expectException(InvalidPatternException::class);
+
+        (new ResideInOneOfTheseNamespaces(''))->evaluate($classDesc, new Violations(), 'because');
+    }
+
     public static function provideNamespaces(): array
     {
         return [
@@ -109,7 +119,6 @@ class ResideInOneOfTheseNamespacesTest extends TestCase
             'a namespace never reaches into a longer name' => ['App\FooBar\Baz', 'App\Foo', false],
             'a wildcard never reaches into a longer name' => ['App\Foo\InfrastructureLegacy\Bar', 'App\*\Infrastructure', false],
             'a different namespace does not match' => ['App\Foo\Domain\Bar', 'App\*\Infrastructure', false],
-            'an empty namespace names nowhere, so it selects nothing' => ['App\Foo\Domain\Bar', '', false],
         ];
     }
 }

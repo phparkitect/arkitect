@@ -58,7 +58,7 @@ A class matches a namespace when it **is** that class, or when it **resides in**
 
 Namespaces accept `*` and `?` as wildcards, and matching stays recursive: `App\*\Infrastructure` matches `App\Billing\Infrastructure\DoctrineInvoiceRepository`. You never need to end a namespace with `\*` to reach into it.
 
-A wildcard matches **whole names** only, never part of one: `App\Foo` does not match `App\FooBar\Baz`, and `App\*\Infrastructure` does not match `App\Billing\InfrastructureLegacy\Repository`. Anything that is not `*`, `?`, a letter, a digit, `_` or `\` is rejected with an `InvalidPatternException` — patterns are not regular expressions, so a stray `.` is reported as a mistake instead of silently matching nothing.
+A wildcard matches **whole names** only, never part of one: `App\Foo` does not match `App\FooBar\Baz`, and `App\*\Infrastructure` does not match `App\Billing\InfrastructureLegacy\Repository`. An empty namespace, or one made of separators alone, is rejected too: it names nowhere, and a rule built on it would quietly check nothing — write `*` if you mean every class. Anything that is not `*`, `?`, a letter, a digit, `_` or `\` is rejected with an `InvalidPatternException` — patterns are not regular expressions, so a stray `.` is reported as a mistake instead of silently matching nothing.
 
 ### ResideInOneOfTheseNamespaces / NotResideInTheseNamespaces
 
