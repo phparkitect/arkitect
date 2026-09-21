@@ -6,44 +6,6 @@ PHPArkitect, ordered from the most recent version to the oldest.
 > If a release is **not** listed here, it contains no breaking changes and you
 > can upgrade to it without modifying your configuration.
 
-## 1.4.0
-
-### Namespaces with a wildcard now match sub-namespaces
-
-Namespace matching is documented as **recursive**: `App\Domain` matches
-`App\Domain\Event\UserRegistered`. That only held for a namespace without
-wildcards. A namespace like `App\*\Infrastructure` had to match a class name
-to its end, so `App\Billing\Infrastructure\InvoiceRepository` was not
-considered to be in it, and a rule written against it could not fail:
-
-```php
-$rules[] = Rule::allClasses()
-    ->that(new ResideInOneOfTheseNamespaces('App\Domain'))
-    ->should(new NotResideInTheseNamespaces('App\*\Infrastructure'))
-    ->because('the domain must not know about infrastructure');
-```
-
-The suite stayed green while the constraint was not enforced, and nothing in
-the output distinguished "no violations" from "this rule can never report one".
-
-Every rule that takes a namespace now matches it the same way, so a namespace
-with a wildcard reaches into its sub-namespaces. **You no longer need to end a
-namespace with `\*`**, and doing so keeps working.
-
-What this changes, per rule:
-
-| Rule | Effect of the fix |
-|---|---|
-| `NotResideInTheseNamespaces` | reports violations it used to miss |
-| `NotDependsOnTheseNamespaces` | reports violations it used to miss |
-| `DependsOnlyOnTheseNamespaces` | stops reporting dependencies that were inside the allowed namespace all along |
-| `NotHaveDependencyOutsideNamespace` | stops reporting dependencies that were inside the namespace all along |
-| `except()` | actually excludes the classes you asked it to exclude |
-
-**Rules of yours may start failing.** The violations they report were always
-there — the rule was not checking them. Nothing changes for a namespace without
-a wildcard, which is the common case.
-
 ## 1.3.0
 
 ### `--ignore-baseline-linenumbers` is deprecated
