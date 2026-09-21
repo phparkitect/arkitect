@@ -87,7 +87,7 @@ $rules[] = Rule::allClasses()
 
 ### ResideInOneOfTheseNamespacesExactly / NotResideInOneOfTheseNamespacesExactly
 
-Like the rules above, but matching is **not** recursive: only classes sitting *directly* in the given namespace match, not those in child namespaces.
+Like the rules above, but matching is **not** recursive: only classes sitting *directly* in the given namespace match, not those in child namespaces. Depth is the only difference — wildcards work here too, and pick *which* namespace rather than how far down the rule reaches, so `App\*\Entity` matches `App\Domain\Entity\User` but not `App\Domain\Entity\ValueObject\Email`.
 
 ```php
 new ResideInOneOfTheseNamespacesExactly(string ...$namespaces)

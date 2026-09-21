@@ -114,16 +114,20 @@ class ClassDescription
         return $this->FQCN->matchesOneOf(...$namespacePatterns);
     }
 
-    /** Takes a namespace, not a pattern: a wildcard in it would match nothing. */
-    public function residesInExactly(string $namespace): bool
+    public function residesInExactly(string $namespacePattern): bool
     {
-        return $this->FQCN->namespace() === $namespace;
+        // here '' is a place, the root namespace, not an absent pattern
+        if ('' === $namespacePattern) {
+            return '' === $this->FQCN->namespace();
+        }
+
+        return Pattern::fromString($namespacePattern)->matches($this->FQCN->namespace());
     }
 
-    public function residesInExactlyOneOf(string ...$namespaces): bool
+    public function residesInExactlyOneOf(string ...$namespacePatterns): bool
     {
-        foreach ($namespaces as $namespace) {
-            if ($this->residesInExactly($namespace)) {
+        foreach ($namespacePatterns as $namespacePattern) {
+            if ($this->residesInExactly($namespacePattern)) {
                 return true;
             }
         }
