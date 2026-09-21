@@ -40,9 +40,9 @@ Both methods receive a `ClassDescription`, the parsed model of the class under a
 | `isAbstract()` / `isFinal()` / `isReadonly()` | `bool` | Class modifiers |
 | `isInterface()` / `isTrait()` / `isEnum()` | `bool` | Type of declaration |
 | `hasTrait(string $pattern)` / `hasAttribute(string $pattern)` | `bool` | Membership checks (pattern supports `*`) |
-| `residesIn(string $namespace)` | `bool` | Whether the class lives in the namespace, at any depth (pattern supports `*`) |
-| `residesInOneOf(string ...$namespaces)` | `bool` | The same, against several namespaces |
-| `residesInExactly(string $namespace)` | `bool` | Whether the class sits *directly* in the namespace, with no sub-namespace in between |
+| `residesIn(string $namespacePattern)` | `bool` | Whether the class lives in the namespace, at any depth (supports `*`) |
+| `residesInOneOf(string ...$namespacePatterns)` | `bool` | The same, against several namespaces |
+| `residesInExactly(string $namespace)` | `bool` | Whether the class sits *directly* in the namespace. Takes a namespace, **not** a pattern |
 
 ## A minimal example: `IsFinal`
 

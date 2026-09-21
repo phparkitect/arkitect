@@ -104,16 +104,17 @@ class ClassDescription
         return $this->filePath;
     }
 
-    public function residesIn(string $namespace): bool
+    public function residesIn(string $namespacePattern): bool
     {
-        return $this->FQCN->matches($namespace);
+        return $this->FQCN->matches($namespacePattern);
     }
 
-    public function residesInOneOf(string ...$namespaces): bool
+    public function residesInOneOf(string ...$namespacePatterns): bool
     {
-        return $this->FQCN->matchesOneOf(...$namespaces);
+        return $this->FQCN->matchesOneOf(...$namespacePatterns);
     }
 
+    /** Takes a namespace, not a pattern: a wildcard in it would match nothing. */
     public function residesInExactly(string $namespace): bool
     {
         return $this->FQCN->namespace() === $namespace;
