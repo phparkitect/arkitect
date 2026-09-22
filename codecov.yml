@@ -29,13 +29,27 @@ comment:
   layout: "reach, diff, flags, files"
   behavior: default
   require_changes: false
+  # Same reason as codecov.notify.after_n_builds below.
+  after_n_builds: 2
 
-# Wait for the (single) coverage upload before computing the status, so the
-# check doesn't run against a partial report.
+# Wait for both coverage uploads before computing the status, so the check
+# doesn't run against a partial report. The build uploads one report per
+# dependency set (see the `flags` below): the code supporting one version of a
+# dependency is dead code under the other, so only the merge of the two reports
+# describes the coverage of src.
 codecov:
   require_ci_to_pass: true
   notify:
     wait_for_ci: true
+    after_n_builds: 2
+
+# The flags exist to tell the two uploads apart, not to gate them separately:
+# neither dependency set covers src on its own, so a per-flag status would be
+# meaningless. Nothing is carried forward from older commits either, both
+# reports are uploaded on every build.
+flag_management:
+  default_rules:
+    carryforward: false
 
 ignore:
   - "tests"

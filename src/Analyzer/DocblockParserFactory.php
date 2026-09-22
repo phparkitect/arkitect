@@ -12,7 +12,11 @@ use PHPStan\PhpDocParser\ParserConfig;
 class DocblockParserFactory
 {
     /**
+     * Psalm only ever sees one of the two installed versions of phpstan/phpdoc-parser,
+     * so the constructor calls of the other branch always look wrong to it.
+     *
      * @psalm-suppress TooFewArguments
+     * @psalm-suppress TooManyArguments
      * @psalm-suppress InvalidArgument
      */
     public static function create(): DocblockParser
@@ -20,7 +24,7 @@ class DocblockParserFactory
         $phpDocParser = null;
         $phpDocLexer = null;
 
-        // this if is to allow using v 1.2 or v2
+        // this if is to allow using v1 or v2
         if (class_exists(ParserConfig::class)) {
             $parserConfig = new ParserConfig(['lines' => true]);
             $constExprParser = new ConstExprParser($parserConfig);
@@ -30,7 +34,10 @@ class DocblockParserFactory
         } else {
             $typeParser = new TypeParser();
             $constExprParser = new ConstExprParser();
-            $phpDocParser = new PhpDocParser($typeParser, $constExprParser);
+            // on v1 line numbers are opt-in through $usedAttributes, the 5th constructor
+            // argument: without it every node reports no line and violations would be
+            // reported on the wrong line
+            $phpDocParser = new PhpDocParser($typeParser, $constExprParser, false, false, ['lines' => true]);
             $phpDocLexer = new Lexer();
         }
 
