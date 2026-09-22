@@ -16,13 +16,20 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-versions: [ '8.0', '8.1', '8.2', '8.3', '8.4', '8.5' ]
+        php-versions: [ '8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6' ]
         dependencies: [ 'highest' ]
         include:
           # The lowest allowed dependency set needs to be verified only once, and the
           # oldest supported PHP is where consumers are most likely to end up with it.
           - php-versions: '8.0'
             dependencies: 'lowest'
+          # phpspec/prophecy enumerates the PHP versions it supports one by
+          # one (php 8.2.* || 8.3.* || 8.4.* || 8.5.*) instead of using a
+          # caret range, so it excludes 8.6 until it tags a release that adds
+          # it, and composer cannot resolve at all without relaxing the upper
+          # platform bound. It is the only dependency that needs this.
+          - php-versions: '8.6'
+            composer-flags: '--ignore-platform-req=php+'
 
     name: "PHP ${{ matrix.php-versions }} (${{ matrix.dependencies }} deps)"
 
@@ -57,7 +64,7 @@ jobs:
 
     - name: Install dependencies
       if: ${{ matrix.dependencies == 'highest' }}
-      run: composer install --prefer-dist
+      run: composer install --prefer-dist ${{ matrix.composer-flags }}
 
     # Without a committed composer.lock every other job resolves to the newest
     # allowed release, so the lower bounds declared in composer.json are never
@@ -138,8 +145,9 @@ jobs:
     needs: phar
     runs-on: "ubuntu-22.04"
     strategy:
+      fail-fast: false
       matrix:
-        php-versions: [ '8.0', '8.1', '8.2', '8.3', '8.4', '8.5' ]
+        php-versions: [ '8.0', '8.1', '8.2', '8.3', '8.4', '8.5', '8.6' ]
     steps:
       - uses: actions/checkout@v7
 
