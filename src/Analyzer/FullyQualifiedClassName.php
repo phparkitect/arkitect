@@ -3,54 +3,72 @@ declare(strict_types=1);
 
 namespace Arkitect\Analyzer;
 
-use Arkitect\Exceptions\InvalidPatternException;
-
 class FullyQualifiedClassName
 {
-    private PatternString $fqcnString;
+    private string $fqcn;
 
-    private PatternString $namespace;
+    private string $namespace;
 
-    private PatternString $class;
+    private string $className;
 
-    private function __construct(PatternString $fqcnString, PatternString $namespace, PatternString $class)
+    private function __construct(string $fqcn, string $namespace, string $className)
     {
-        $this->fqcnString = $fqcnString;
+        $this->fqcn = $fqcn;
         $this->namespace = $namespace;
-        $this->class = $class;
+        $this->className = $className;
     }
 
     public function toString(): string
     {
-        return $this->fqcnString->toString();
+        return $this->fqcn;
     }
 
     public function classMatches(string $pattern): bool
     {
-        if ($this->isNotAValidPattern($pattern)) {
-            throw new InvalidPatternException("'$pattern' is not a valid class or namespace pattern. Regex are not allowed, only * and ? wildcard.");
-        }
-
-        return $this->class->matches($pattern);
+        return Pattern::fromString($pattern)->matches($this->className);
     }
 
+    /**
+     * Matching is recursive: the pattern is tried against the class and against
+     * every namespace it resides in, so 'App\*\Infrastructure' matches
+     * 'App\Billing\Infrastructure\Repository' through 'App\Billing\Infrastructure'.
+     */
     public function matches(string $pattern): bool
     {
-        if ($this->isNotAValidPattern($pattern)) {
-            throw new InvalidPatternException("'$pattern' is not a valid class or namespace pattern. Regex are not allowed, only * and ? wildcard.");
+        $pattern = Pattern::fromString($pattern);
+
+        if ($pattern->matches($this->fqcn)) {
+            return true;
         }
 
-        return $this->fqcnString->matches($pattern);
+        foreach ($this->namespaces() as $namespace) {
+            if ($pattern->matches($namespace)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function matchesOneOf(string ...$patterns): bool
+    {
+        foreach ($patterns as $pattern) {
+            if ($this->matches($pattern)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function className(): string
     {
-        return $this->class->toString();
+        return $this->className;
     }
 
     public function namespace(): string
     {
-        return $this->namespace->toString();
+        return $this->namespace;
     }
 
     public static function fromString(string $fqcn): self
@@ -68,15 +86,22 @@ class FullyQualifiedClassName
 
         // $className can't be null: the regex above rejects an empty or trailing-backslash $fqcn
         /** @psalm-suppress PossiblyNullArgument */
-        return new self(new PatternString($fqcn), new PatternString($namespace), new PatternString($className));
+        return new self($fqcn, $namespace, $className);
     }
 
-    public function isNotAValidPattern(string $pattern): bool
+    /** @return list<string> from the closest namespace to the root */
+    private function namespaces(): array
     {
-        $validClassNameCharacters = '[a-zA-Z0-9_\x80-\xff]';
-        $or = '|';
-        $backslash = '\\\\';
+        $namespaces = [];
+        $namespace = $this->namespace;
 
-        return 0 === preg_match('/^('.$validClassNameCharacters.$or.$backslash.$or.'\*'.$or.'\?)*$/', $pattern);
+        while ('' !== $namespace) {
+            $namespaces[] = $namespace;
+
+            $lastSeparator = strrpos($namespace, '\\');
+            $namespace = false === $lastSeparator ? '' : substr($namespace, 0, $lastSeparator);
+        }
+
+        return $namespaces;
     }
 }

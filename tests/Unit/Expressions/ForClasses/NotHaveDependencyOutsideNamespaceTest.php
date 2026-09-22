@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Unit\Expressions\ForClasses;
 
 use Arkitect\Analyzer\ClassDependency;
+use Arkitect\Analyzer\ClassDescription;
 use Arkitect\Analyzer\ClassDescriptionBuilder;
 use Arkitect\Expression\ForClasses\NotHaveDependencyOutsideNamespace;
 use Arkitect\Rules\Violations;
@@ -98,5 +99,33 @@ class NotHaveDependencyOutsideNamespaceTest extends TestCase
         $notHaveDependencyOutsideNamespace->evaluate($classDescription, $violations, $because);
 
         self::assertEquals(1, $violations->count());
+    }
+
+    public function test_a_dependency_in_a_sub_namespace_of_a_wildcard_namespace_is_inside(): void
+    {
+        $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('App\*\Infrastructure');
+
+        $classDescription = ClassDescription::getBuilder('App\Billing\Domain\Invoice', 'src/Invoice.php')
+            ->addDependency(new ClassDependency('App\Billing\Infrastructure\DoctrineInvoiceRepository', 10))
+            ->build();
+
+        $violations = new Violations();
+        $notHaveDependencyOutsideNamespace->evaluate($classDescription, $violations, 'it must stay inside infrastructure');
+
+        self::assertEquals(0, $violations->count());
+    }
+
+    public function test_the_escape_hatch_takes_a_pattern_like_every_other_namespace(): void
+    {
+        $notHaveDependencyOutsideNamespace = new NotHaveDependencyOutsideNamespace('App', ['Vendor\*\Legacy']);
+
+        $classDescription = ClassDescription::getBuilder('App\Billing\Domain\Invoice', 'src/Invoice.php')
+            ->addDependency(new ClassDependency('Vendor\Acme\Legacy\Thing', 10))
+            ->build();
+
+        $violations = new Violations();
+        $notHaveDependencyOutsideNamespace->evaluate($classDescription, $violations, 'we accept this known exception');
+
+        self::assertEquals(0, $violations->count());
     }
 }

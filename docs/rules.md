@@ -19,6 +19,7 @@ The snippets assume you are inside the config callback, appending to a `$rules` 
 ## Table of contents
 
 - [Namespace rules](#namespace-rules)
+  - [How a namespace is matched](#how-a-namespace-is-matched)
   - [ResideInOneOfTheseNamespaces / NotResideInTheseNamespaces](#resideinoneofthesenamespaces--notresideinthesenamespaces)
   - [ResideInOneOfTheseNamespacesExactly / NotResideInOneOfTheseNamespacesExactly](#resideinoneofthesenamespacesexactly--notresideinoneofthesenamespacesexactly)
   - [DependsOnlyOnTheseNamespaces / NotDependsOnTheseNamespaces](#dependsonlyonthesenamespaces--notdependsonthesenamespaces)
@@ -49,9 +50,19 @@ The snippets assume you are inside the config callback, appending to a `$rules` 
 
 `Rule::namespace('App\Controller')` is a shortcut for `Rule::allClasses()->that(new ResideInOneOfTheseNamespaces('App\Controller'))`. It accepts multiple namespaces: `Rule::namespace('App\Controller', 'App\Service')`.
 
+### How a namespace is matched
+
+Every rule on this page that takes a namespace matches it the same way, so it is worth reading once.
+
+A class matches a namespace when it **is** that class, or when it **resides in** it at any depth. `App\Domain` therefore matches `App\Domain\Event\UserRegistered`, and so does `App\Domain\Event`.
+
+Namespaces accept `*` and `?` as wildcards, and matching stays recursive: `App\*\Infrastructure` matches `App\Billing\Infrastructure\DoctrineInvoiceRepository`. You never need to end a namespace with `\*` to reach into it.
+
+A wildcard matches **whole names** only, never part of one: `App\Foo` does not match `App\FooBar\Baz`, and `App\*\Infrastructure` does not match `App\Billing\InfrastructureLegacy\Repository`. An empty namespace, or one made of separators alone, is rejected too: it names nowhere, and a rule built on it would quietly check nothing — write `*` if you mean every class. Anything that is not `*`, `?`, a letter, a digit, `_` or `\` is rejected with an `InvalidPatternException` — patterns are not regular expressions, so a stray `.` is reported as a mistake instead of silently matching nothing.
+
 ### ResideInOneOfTheseNamespaces / NotResideInTheseNamespaces
 
-`ResideInOneOfTheseNamespaces` raises a violation when a class does **not** live in any of the given namespaces; `NotResideInTheseNamespaces` raises one when it lives in any of them. Matching is **recursive** — `App\Domain` also matches `App\Domain\Event\UserRegistered`.
+`ResideInOneOfTheseNamespaces` raises a violation when a class does **not** live in any of the given namespaces; `NotResideInTheseNamespaces` raises one when it lives in any of them, following the matching rules above.
 
 ```php
 new ResideInOneOfTheseNamespaces(string ...$namespaces)
@@ -76,7 +87,7 @@ $rules[] = Rule::allClasses()
 
 ### ResideInOneOfTheseNamespacesExactly / NotResideInOneOfTheseNamespacesExactly
 
-Like the rules above, but matching is **not** recursive: only classes sitting *directly* in the given namespace match, not those in child namespaces.
+Like the rules above, but matching is **not** recursive: only classes sitting *directly* in the given namespace match, not those in child namespaces. Depth is the only difference — wildcards work here too, and pick *which* namespace rather than how far down the rule reaches, so `App\*\Entity` matches `App\Domain\Entity\User` but not `App\Domain\Entity\ValueObject\Email`.
 
 ```php
 new ResideInOneOfTheseNamespacesExactly(string ...$namespaces)
@@ -114,6 +125,8 @@ new NotDependsOnTheseNamespaces(array $namespaces, array $exclude = [])
 
 - `$namespaces` — the allowed (resp. forbidden) namespaces.
 - `$exclude` — namespaces/classes whose dependencies are **not** checked by this rule (an escape hatch for known exceptions).
+
+`DependsOnlyOnTheseNamespaces` always allows a dependency sitting in the **same namespace** as the class being checked, so you do not have to whitelist it. "Same" is exact: for `App\Billing\Invoice`, a class in `App\Billing` is allowed, while one in `App` (parent), in `App\Billing\Tax` (child) or in `App\Shipping` (sibling) is not, and has to be listed like any other dependency.
 
 ```php
 // Allow only specific external dependencies in the domain

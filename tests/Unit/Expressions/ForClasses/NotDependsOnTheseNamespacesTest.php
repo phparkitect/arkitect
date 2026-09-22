@@ -100,4 +100,46 @@ class NotDependsOnTheseNamespacesTest extends TestCase
 
         self::assertEquals(1, $violations->count());
     }
+
+    public function test_a_namespace_with_a_wildcard_matches_a_dependency_in_a_sub_namespace(): void
+    {
+        $notDependsOnTheseNamespaces = new NotDependsOnTheseNamespaces(['App\*\Infrastructure']);
+
+        $classDescription = ClassDescription::getBuilder('App\Billing\Domain\Invoice', 'src/Invoice.php')
+            ->addDependency(new ClassDependency('App\Billing\Infrastructure\DoctrineInvoiceRepository', 10))
+            ->build();
+
+        $violations = new Violations();
+        $notDependsOnTheseNamespaces->evaluate($classDescription, $violations, 'the domain must not know about infrastructure');
+
+        self::assertEquals(1, $violations->count());
+    }
+
+    public function test_a_namespace_with_a_wildcard_does_not_match_a_longer_name(): void
+    {
+        $notDependsOnTheseNamespaces = new NotDependsOnTheseNamespaces(['App\*\Infrastructure']);
+
+        $classDescription = ClassDescription::getBuilder('App\Billing\Domain\Invoice', 'src/Invoice.php')
+            ->addDependency(new ClassDependency('App\Billing\InfrastructureLegacy\Repository', 10))
+            ->build();
+
+        $violations = new Violations();
+        $notDependsOnTheseNamespaces->evaluate($classDescription, $violations, 'the domain must not know about infrastructure');
+
+        self::assertEquals(0, $violations->count());
+    }
+
+    public function test_the_escape_hatch_takes_a_pattern_like_every_other_namespace(): void
+    {
+        $notDependsOnTheseNamespaces = new NotDependsOnTheseNamespaces(['Vendor'], ['Vendor\*\Legacy']);
+
+        $classDescription = ClassDescription::getBuilder('App\Billing\Domain\Invoice', 'src/Invoice.php')
+            ->addDependency(new ClassDependency('Vendor\Acme\Legacy\Thing', 10))
+            ->build();
+
+        $violations = new Violations();
+        $notDependsOnTheseNamespaces->evaluate($classDescription, $violations, 'we accept this known exception');
+
+        self::assertEquals(0, $violations->count());
+    }
 }

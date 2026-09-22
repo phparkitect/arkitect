@@ -104,25 +104,57 @@ class ClassDescription
         return $this->filePath;
     }
 
-    public function namespaceMatches(string $pattern): bool
+    public function residesIn(string $namespacePattern): bool
     {
-        return $this->FQCN->matches($pattern);
+        return $this->FQCN->matches($namespacePattern);
     }
 
-    public function namespaceMatchesExactly(string $namespace): bool
+    public function residesInOneOf(string ...$namespacePatterns): bool
     {
-        return $this->FQCN->namespace() === $namespace;
+        return $this->FQCN->matchesOneOf(...$namespacePatterns);
     }
 
-    public function namespaceMatchesOneOfTheseNamespaces(array $classesToBeExcluded): bool
+    public function residesInExactly(string $namespacePattern): bool
     {
-        foreach ($classesToBeExcluded as $classToBeExcluded) {
-            if ($this->namespaceMatches($classToBeExcluded)) {
+        // here '' is a place, the root namespace, not an absent pattern
+        if ('' === $namespacePattern) {
+            return '' === $this->FQCN->namespace();
+        }
+
+        return Pattern::fromString($namespacePattern)->matches($this->FQCN->namespace());
+    }
+
+    public function residesInExactlyOneOf(string ...$namespacePatterns): bool
+    {
+        foreach ($namespacePatterns as $namespacePattern) {
+            if ($this->residesInExactly($namespacePattern)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /** @deprecated use residesIn() */
+    public function namespaceMatches(string $pattern): bool
+    {
+        return $this->residesIn($pattern);
+    }
+
+    /** @deprecated use residesInExactly() */
+    public function namespaceMatchesExactly(string $namespace): bool
+    {
+        return $this->residesInExactly($namespace);
+    }
+
+    /**
+     * @deprecated use residesInOneOf()
+     *
+     * @param array<string> $namespaces
+     */
+    public function namespaceMatchesOneOfTheseNamespaces(array $namespaces): bool
+    {
+        return $this->residesInOneOf(...$namespaces);
     }
 
     /**

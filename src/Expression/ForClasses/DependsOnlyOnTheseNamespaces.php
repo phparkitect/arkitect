@@ -39,7 +39,11 @@ class DependsOnlyOnTheseNamespaces implements Expression
 
         /** @var ClassDependency $dependency */
         foreach ($dependencies as $dependency) {
-            if ($theClass->namespaceMatches($dependency->getFQCN()->namespace())) {
+            $dependencyNamespace = $dependency->getFQCN()->namespace();
+
+            // a class may always use what sits next to it, so its own namespace
+            // needs no whitelisting; the global one is nobody's own namespace
+            if ('' !== $dependencyNamespace && $theClass->residesInExactly($dependencyNamespace)) {
                 continue;
             }
 
