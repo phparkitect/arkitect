@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Arkitect\Evaluate\Constraint;
 
+use Arkitect\Evaluate\NamespacePattern;
 use Arkitect\Evaluate\Outcome;
-use Arkitect\Evaluate\Pattern;
 use Arkitect\Evaluate\Violation;
 use Arkitect\Evaluate\Violations;
 use Arkitect\Parser\ParsedClass;
@@ -14,7 +14,7 @@ use Arkitect\Resolve\InternalClasses;
 
 final class DependOnlyOnTheseNamespaces implements Constraint
 {
-    /** @var list<Pattern> */
+    /** @var list<NamespacePattern> */
     private readonly array $allowed;
 
     private readonly InternalClasses $internal;
@@ -22,7 +22,7 @@ final class DependOnlyOnTheseNamespaces implements Constraint
     /** @param list<string> $namespaces */
     public function __construct(array $namespaces)
     {
-        $this->allowed = array_map(static fn (string $n) => new Pattern($n), array_values($namespaces));
+        $this->allowed = array_map(static fn (string $n) => new NamespacePattern($n), array_values($namespaces));
         $this->internal = new InternalClasses();
     }
 
@@ -56,7 +56,7 @@ final class DependOnlyOnTheseNamespaces implements Constraint
         // name it in every rule that constrains it
         $ownNamespace = $class->namespaceName();
 
-        if ('' !== $ownNamespace && (new Pattern($ownNamespace))->contains($dependency)) {
+        if ('' !== $ownNamespace && (new NamespacePattern($ownNamespace))->contains($dependency)) {
             return true;
         }
 

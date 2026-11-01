@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Evaluate\Selector;
 
-use Arkitect\Evaluate\Pattern;
+use Arkitect\Evaluate\NamespacePattern;
 use Arkitect\Parser\ParsedClass;
 use Arkitect\Resolve\ClassGraph;
 
@@ -15,11 +15,11 @@ use Arkitect\Resolve\ClassGraph;
  */
 final class NotResideInNamespace implements Selector
 {
-    private readonly Pattern $pattern;
+    private readonly NamespacePattern $pattern;
 
     public function __construct(string $pattern)
     {
-        $this->pattern = new Pattern($pattern);
+        $this->pattern = new NamespacePattern($pattern);
     }
 
     public function matches(ParsedClass $class, ClassGraph $classGraph): Selection

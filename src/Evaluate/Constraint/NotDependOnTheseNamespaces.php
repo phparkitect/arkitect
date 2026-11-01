@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Arkitect\Evaluate\Constraint;
 
+use Arkitect\Evaluate\NamespacePattern;
 use Arkitect\Evaluate\Outcome;
-use Arkitect\Evaluate\Pattern;
 use Arkitect\Evaluate\Violation;
 use Arkitect\Evaluate\Violations;
 use Arkitect\Parser\ParsedClass;
@@ -18,13 +18,13 @@ use Arkitect\Resolve\ClassGraph;
  */
 final class NotDependOnTheseNamespaces implements Constraint
 {
-    /** @var list<Pattern> */
+    /** @var list<NamespacePattern> */
     private readonly array $forbidden;
 
     /** @param list<string> $namespaces */
     public function __construct(array $namespaces)
     {
-        $this->forbidden = array_map(static fn (string $n) => new Pattern($n), array_values($namespaces));
+        $this->forbidden = array_map(static fn (string $n) => new NamespacePattern($n), array_values($namespaces));
     }
 
     public function evaluate(ParsedClass $class, ClassGraph $classGraph): Outcome

@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Arkitect\Evaluate;
 
 /**
- * A pattern over a file path, relative to the project root and written with
- * `/`. The wildcards are the ones `Pattern` uses — `*` stands for part of
- * one segment and never crosses a separator, `**` written as a whole
- * segment stands for any number of segments, none included — so a rule
- * reads the same whether it talks about namespaces or about directories.
+ * A pattern over a file path, relative to the project root and written
+ * with `/`. The wildcards are the ones `NamespacePattern` uses — `*` stands
+ * for part of one segment and never crosses a separator, `**` written as a
+ * whole segment stands for any number of segments, none included — so a
+ * rule reads the same whether it talks about namespaces or directories.
  *
- * Separate from `Pattern` because a path is not a name: it carries an
- * extension, `.` and `-` are ordinary characters in it, and its separator
- * is `/`.
+ * Separate from `NamespacePattern` because a path is not a name: it carries
+ * an extension, `.` and `-` are ordinary characters in it, and its
+ * separator is `/`.
  */
 final class PathPattern
 {

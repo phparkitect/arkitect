@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace Arkitect\Evaluate\Selector;
 
-use Arkitect\Evaluate\Pattern;
+use Arkitect\Evaluate\NamespacePattern;
 use Arkitect\Parser\ParsedClass;
 use Arkitect\Resolve\ClassGraph;
 
 final class ResideInOneOfTheseNamespaces implements Selector
 {
-    /** @var list<Pattern> */
+    /** @var list<NamespacePattern> */
     private readonly array $patterns;
 
     /** @param list<string> $namespaces */
     public function __construct(array $namespaces)
     {
-        $this->patterns = array_map(static fn (string $n) => new Pattern($n), array_values($namespaces));
+        $this->patterns = array_map(static fn (string $n) => new NamespacePattern($n), array_values($namespaces));
     }
 
     public function matches(ParsedClass $class, ClassGraph $classGraph): Selection

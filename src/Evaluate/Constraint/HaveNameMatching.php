@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Arkitect\Evaluate\Constraint;
 
+use Arkitect\Evaluate\NamespacePattern;
 use Arkitect\Evaluate\Outcome;
-use Arkitect\Evaluate\Pattern;
 use Arkitect\Evaluate\Violation;
 use Arkitect\Evaluate\Violations;
 use Arkitect\Parser\ParsedClass;
@@ -13,11 +13,11 @@ use Arkitect\Resolve\ClassGraph;
 
 final class HaveNameMatching implements Constraint
 {
-    private readonly Pattern $pattern;
+    private readonly NamespacePattern $pattern;
 
     public function __construct(string $pattern)
     {
-        $this->pattern = new Pattern($pattern);
+        $this->pattern = new NamespacePattern($pattern);
     }
 
     public function evaluate(ParsedClass $class, ClassGraph $classGraph): Outcome

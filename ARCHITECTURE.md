@@ -287,7 +287,7 @@ bearing:
   than a bool. One shared class would have forced one answer.
 
 The duplicated names cost nothing: both `ResideInNamespace` classes
-delegate to the same `Pattern`, so the logic lives once. Nothing under
+delegate to the same `NamespacePattern`, so the logic lives once. Nothing under
 `Evaluate\Selector` references `Violation`, which `run.php` checks as a
 rule rather than leaving as an intention.
 
@@ -349,13 +349,15 @@ the one kept because it can say both: with a `*` that crosses separators,
 "exactly one level down" cannot be written at all.
 
 Path patterns take this same grammar with `/` as the separator, in
-`PathPattern`. One grammar, two classes: a path is not a name, so `Pattern`
-could not take it without accepting `.`, `-` and `/` as ordinary characters
-and without a second meaning for "the thing that contains this one" — the
-namespace of a class in one case, a file's directory in the other. The
-duplication is the regex building, and it is the cheaper half; the day a
-third kind of pattern appears, that is when the shared half is worth
-extracting.
+`PathPattern`. One grammar, two classes, because only the grammar is
+shared. A path is not a name: `.` and `-` are ordinary characters in it, a
+leading separator is stripped at both ends rather than at the front only,
+and "the thing that contains this one" is a file's directory where for a
+class it is its namespace — which is also why `contains()` has a case
+`PathPattern` cannot have, a class and a namespace being allowed to share a
+name while a file and a directory are not. What repeats is the regex
+building, the cheaper half; the day a third kind of pattern appears, that is
+when the shared half is worth extracting.
 
 `?` is not a wildcard. Nothing asks for it, and it is rejected rather than
 read literally, so a pattern carried over from a v1 config fails when it is
@@ -701,7 +703,7 @@ reach a violation reported at `src/Foo.php:-1`.
 
 `Fqcn` is used by `TypeReference`, by `ParsedClass` (whose `shortName()`
 and `namespaceName()` derive from it), and by every constraint and selector
-taking a target name. `Pattern` normalizes its own string the same way
+taking a target name. `NamespacePattern` normalizes its own string the same way
 without being one, since it carries wildcards, and uses `Fqcn` only to find
 the namespace of the name it is asked about.
 

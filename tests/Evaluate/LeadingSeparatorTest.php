@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Evaluate;
 
 use Arkitect\Evaluate\Constraint;
-use Arkitect\Evaluate\Pattern;
+use Arkitect\Evaluate\NamespacePattern;
 use Arkitect\Evaluate\Rule;
 use Arkitect\Evaluate\Selector;
 use Arkitect\Resolve\ParsedClassGraph;
@@ -57,7 +57,7 @@ final class LeadingSeparatorTest extends TestCase
 
     public function test_a_pattern_written_with_a_leading_separator_still_matches(): void
     {
-        self::assertTrue((new Pattern('\App\Domain'))->contains('App\Domain\Order'));
+        self::assertTrue((new NamespacePattern('\App\Domain'))->contains('App\Domain\Order'));
     }
 
     public function test_a_dependency_namespace_written_with_a_leading_separator_still_matches(): void

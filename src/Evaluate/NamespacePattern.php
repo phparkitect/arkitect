@@ -18,7 +18,7 @@ use Arkitect\Parser\Fqcn;
  * namespaces only ever asks the second, so the class `App\Domain` is not
  * in the namespace `App\Domain`.
  */
-final class Pattern
+final class NamespacePattern
 {
     private const ALLOWED = '/^([a-zA-Z0-9_\x80-\xff]|\\\\|\*)+$/';
 
