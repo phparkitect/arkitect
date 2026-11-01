@@ -502,10 +502,13 @@ No `ClassSet`: its job is split between the root scan, the `vendor/` line,
 and per-rule selectors. Filtering is namespace-based
 (`Selector\ResideInOneOfTheseNamespaces`). For the rare case where directory
 and namespace disagree — generated code, monorepo packages, legacy trees —
-the answer is `Selector\ResideInPath`, which selects on the file's path
-relative to the root. It is the one thing v1's `ClassSet` could express that
-namespace selectors cannot: `packages/*/src` is one rule over every package
-in a monorepo, whatever namespace each publishes.
+the answer is `Selector\ResideInPath` and `Selector\NotResideInPath`,
+which select on the file's path relative to the root. Together they are the
+one thing v1's `ClassSet` could express that namespace selectors cannot:
+`packages/*/src` is one rule over every package in a monorepo whatever
+namespace each publishes, and `NotResideInPath('src/Generated')` is v1's
+`excludePath()` — `that()` only narrows, so a rule about everything but one
+tree cannot be written by naming the rest.
 
 The closure-config form is removed rather than kept as an alternative:
 accepting both means every tutorial shows a different shape (*one way to do
@@ -777,10 +780,6 @@ explained where it belongs.
 - **Multi-root / monorepo**: `ResideInPath` is built and covers selecting
   per package. Still parked: whether anything needs more than one root for
   the scan itself. Not to be answered by reintroducing `ClassSet`-like roots.
-- **`NotResideInPath`**: not built. `that()` only narrows, which is the
-  argument that earned `NotResideInNamespace` its place, and excluding a
-  generated or legacy tree is the case users reach for first — v1's
-  `excludePath()` was an exclusion. Add it when a rule needs it.
 - **Default exclusions for the root scan** (`.git`, build and cache
   directories, deliberately broken parse-error fixtures): deferred by
   product decision, not a blocker. Revisit when it is a real problem.
