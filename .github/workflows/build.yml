@@ -9,8 +9,13 @@ permissions:
 
 jobs:
   build:
-    name: PHP 8.5
+    name: "PHP ${{ matrix.php-versions }}"
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php-versions: [ '8.1', '8.2', '8.3', '8.4', '8.5' ]
 
     steps:
       - uses: actions/checkout@v7
@@ -18,8 +23,8 @@ jobs:
       - name: Install PHP
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
-          # the tool requires 8.5; the versions it can analyse are a separate thing
-          php-version: '8.5'
+          # the PHP that runs the tool; the versions it can analyse are a separate thing
+          php-version: ${{ matrix.php-versions }}
           tools: composer:v2.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
