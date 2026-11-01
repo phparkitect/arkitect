@@ -348,9 +348,14 @@ Symfony's `Glob` on paths, where it stops at `/` — so `App\*\Domain` and
 the one kept because it can say both: with a `*` that crosses separators,
 "exactly one level down" cannot be written at all.
 
-There are no path patterns yet — the one path rule is the `vendor/` prefix
-in `Codebase` — and when they arrive they take this grammar with `/` as the
-separator, not a second one.
+Path patterns take this same grammar with `/` as the separator, in
+`PathPattern`. One grammar, two classes: a path is not a name, so `Pattern`
+could not take it without accepting `.`, `-` and `/` as ordinary characters
+and without a second meaning for "the thing that contains this one" — the
+namespace of a class in one case, a file's directory in the other. The
+duplication is the regex building, and it is the cheaper half; the day a
+third kind of pattern appears, that is when the shared half is worth
+extracting.
 
 `?` is not a wildcard. Nothing asks for it, and it is rejected rather than
 read literally, so a pattern carried over from a v1 config fails when it is
@@ -495,8 +500,10 @@ No `ClassSet`: its job is split between the root scan, the `vendor/` line,
 and per-rule selectors. Filtering is namespace-based
 (`Selector\ResideInOneOfTheseNamespaces`). For the rare case where directory
 and namespace disagree — generated code, monorepo packages, legacy trees —
-the intended answer is a path-based selector, `ResideInPath`, **which is not
-built**: no case has needed it yet.
+the answer is `Selector\ResideInPath`, which selects on the file's path
+relative to the root. It is the one thing v1's `ClassSet` could express that
+namespace selectors cannot: `packages/*/src` is one rule over every package
+in a monorepo, whatever namespace each publishes.
 
 The closure-config form is removed rather than kept as an alternative:
 accepting both means every tutorial shows a different shape (*one way to do
@@ -765,9 +772,13 @@ explained where it belongs.
 
 ## Open — not decided, do not treat as settled
 
-- **Multi-root / monorepo**: parked. Addressed via `ResideInPath` when a
-  concrete case shows it is needed, not by reintroducing `ClassSet`-like
-  roots. Revisit if `ResideInPath` turns out not to be enough.
+- **Multi-root / monorepo**: `ResideInPath` is built and covers selecting
+  per package. Still parked: whether anything needs more than one root for
+  the scan itself. Not to be answered by reintroducing `ClassSet`-like roots.
+- **`NotResideInPath`**: not built. `that()` only narrows, which is the
+  argument that earned `NotResideInNamespace` its place, and excluding a
+  generated or legacy tree is the case users reach for first — v1's
+  `excludePath()` was an exclusion. Add it when a rule needs it.
 - **Default exclusions for the root scan** (`.git`, build and cache
   directories, deliberately broken parse-error fixtures): deferred by
   product decision, not a blocker. Revisit when it is a real problem.
