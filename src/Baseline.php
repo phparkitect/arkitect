@@ -129,13 +129,12 @@ final class Baseline implements \Countable
 
     private static function identify(Violation $violation): string
     {
-        return self::identityOf($violation->fqcn, $violation->constraint, $violation->key);
+        return $violation->identity();
     }
 
+    /** The same identity built from a stored entry, which has no Violation. */
     private static function identityOf(string $class, string $constraint, ?string $key): string
     {
-        // NUL cannot occur in any of the three, so it cannot be confused
-        // with a separator inside one of them
         return implode("\0", [$class, $constraint, $key ?? '']);
     }
 }

@@ -685,6 +685,43 @@ root that is not a directory. One code for both failure kinds on purpose: a
 run that could not check part of the project has not passed, and splitting
 them would be a distinction CI cannot act on differently.
 
+##### The machine-readable format
+
+Two formats, `--format=text` and `--format=gitlab`, and an unknown name is
+a usage error rather than an empty report.
+
+`GitlabReport` writes GitLab's Code Quality report: one JSON array, the
+CodeClimate format reduced to the fields GitLab reads. It is named for
+GitLab because that is what it is. v1 also shipped a `json` format, a
+home-grown shape nested by class with a total, advertised in the README as
+suitable for GitHub Actions and SonarQube — while omitting the file path
+entirely, so a consumer could not locate a single violation. That one is
+not carried over, and the name is not reused: GitHub reads SARIF for code
+scanning and workflow commands for inline annotations, so a `json` format
+would send someone there away with a file nothing reads. The tools that
+serve both CIs ship two formats rather than one. A `github` format is a
+third thing, the day someone asks for it.
+
+Three choices the format forces, which the text report never had to make:
+
+- **`check_name` is the constraint's class name**, naming the check and
+  never the finding, so it is the same string across every occurrence and
+  GitLab can filter by it. v1 built it from the class plus the kebab-cased
+  message, which named the finding instead and changed whenever the wording
+  did.
+- **`fingerprint` carries `Violation::identity()`** — the class, the
+  constraint, and what the violation was about. GitLab groups findings by
+  it across commits, which is the same notion the baseline keys on, so it is
+  defined once on `Violation` and used by both. Not the message, which is
+  prose; not the line, which moves whenever anything above it does.
+- **One severity for every entry.** The tool makes one judgement,
+  `isClean()`, and a scale it does not have would be invented here.
+
+Parsing errors and unresolved classes are entries too. They make the run
+exit non-zero, so a report leaving them out would show a clean merge request
+for a failed run — and `location.path` is the one thing a reviewer needs to
+act on them.
+
 #### Baseline
 
 The violations a project has decided to live with, so arkitect can be

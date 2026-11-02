@@ -16,7 +16,7 @@ final class Arguments
 {
     public const COMMANDS = ['check', 'generate-baseline', 'prune-baseline'];
 
-    private const OPTIONS = ['config' => true, 'skip-baseline' => false, 'help' => false];
+    private const OPTIONS = ['config' => true, 'format' => true, 'skip-baseline' => false, 'help' => false];
 
     /** @param array<string, string|true> $options */
     private function __construct(

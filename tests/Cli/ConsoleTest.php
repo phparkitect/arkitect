@@ -109,6 +109,43 @@ final class ConsoleTest extends TestCase
         self::assertStringContainsString('generate-baseline', $out);
     }
 
+    public function test_the_gitlab_format_prints_a_code_quality_array(): void
+    {
+        $this->write('arch.php', $this->config());
+        $this->write('Order.php', "<?php\nnamespace App;\nclass Order {}\n");
+
+        [$code, $out] = $this->arkitect('--format=gitlab');
+
+        self::assertSame(1, $code);
+
+        $entries = json_decode($out, true, flags: \JSON_THROW_ON_ERROR);
+
+        self::assertCount(1, $entries);
+        self::assertSame('Order.php', $entries[0]['location']['path']);
+    }
+
+    /**
+     * A format nobody implements is a misuse, not an empty report: the run
+     * would otherwise exit as if it had said something.
+     */
+    public function test_an_unknown_format_is_refused(): void
+    {
+        $this->write('arch.php', $this->config());
+
+        [$code, , $err] = $this->arkitect('--format=json');
+
+        self::assertSame(2, $code);
+        self::assertStringContainsString('Unknown format "json"', $err);
+    }
+
+    public function test_the_help_lists_the_formats(): void
+    {
+        [, $out] = $this->arkitect('--help');
+
+        self::assertStringContainsString('--format', $out);
+        self::assertStringContainsString('gitlab', $out);
+    }
+
     /** @return array{int, string, string} */
     private function arkitect(string ...$arguments): array
     {

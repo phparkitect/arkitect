@@ -11,6 +11,7 @@ use Arkitect\Config;
 use Arkitect\FileSystem\FilesystemBaselineRepository;
 use Arkitect\FileSystem\FilesystemFileRepository;
 use Arkitect\Parser\RepositoryParser;
+use Arkitect\Report\GitlabReport;
 use Arkitect\Report\Report;
 use Arkitect\Report\TextReport;
 
@@ -24,11 +25,6 @@ final class Console
     private const CLEAN = 0;
     private const FAILED = 1;
     private const MISUSED = 2;
-
-    public function __construct(
-        private readonly Report $report = new TextReport(),
-    ) {
-    }
 
     /**
      * @param list<string> $argv
@@ -46,6 +42,7 @@ final class Console
                 return self::CLEAN;
             }
 
+            $report = $this->reportFor($arguments->value('format', 'text'));
             $config = $this->configFrom($arguments->value('config', 'phparkitect.php'));
         } catch (\InvalidArgumentException|\RuntimeException $e) {
             fwrite($err, $e->getMessage()."\n");
@@ -72,7 +69,7 @@ final class Console
                     $out,
                     \sprintf("dropped %d entries that no longer matched\n", (new PruneBaseline($check, $baselines))->run($config))
                 ),
-                default => $this->check($check, $config, $out),
+                default => $this->check($check, $config, $report, $out),
             };
         } catch (\RuntimeException $e) {
             fwrite($err, $e->getMessage()."\n");
@@ -81,11 +78,11 @@ final class Console
         }
     }
 
-    private function check(Check $check, Config $config, mixed $out): int
+    private function check(Check $check, Config $config, Report $report, mixed $out): int
     {
         $result = $check->run($config);
 
-        fwrite($out, $this->report->render($result)."\n");
+        fwrite($out, $report->render($result)."\n");
 
         return $result->isClean() ? self::CLEAN : self::FAILED;
     }
@@ -95,6 +92,15 @@ final class Console
         fwrite($out, $message);
 
         return self::CLEAN;
+    }
+
+    private function reportFor(string $format): Report
+    {
+        return match ($format) {
+            'text' => new TextReport(),
+            'gitlab' => new GitlabReport(),
+            default => throw new \InvalidArgumentException(\sprintf('Unknown format "%s". Expected text or gitlab.', $format)),
+        };
     }
 
     /**
@@ -127,6 +133,7 @@ final class Console
               prune-baseline      drop entries that no longer match anything
 
               --config=PATH       where the config is (default: phparkitect.php)
+              --format=NAME       text (the default) or gitlab
               --skip-baseline     report what the baseline is hiding
               --help              this
 

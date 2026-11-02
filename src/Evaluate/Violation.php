@@ -48,6 +48,19 @@ final class Violation
     }
 
     /**
+     * What makes two violations the same one: the class, the constraint
+     * that judged it, and what it was about. Never the message, so
+     * rewording cannot turn one finding into two — the baseline keys on
+     * this, and so does the fingerprint a Code Quality report groups by.
+     */
+    public function identity(): string
+    {
+        // NUL cannot occur in any of the three, so it cannot be confused
+        // with a separator inside one of them
+        return implode("\0", [$this->fqcn, $this->constraint, $this->key ?? '']);
+    }
+
+    /**
      * For a constraint with no specific node to point at: the violation
      * lands on the class's own declaration line.
      *
