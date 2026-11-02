@@ -774,7 +774,13 @@ point: a path someone named must exist, a name we guessed need not.
 a command, because "a file at the conventional place" is a fact about the
 filesystem, and a caller using the commands directly says what it wants.
 
-`check` says how many entries matched nothing and names `prune-baseline`.
+`check` says how many violations in the baseline look fixed and names
+`prune-baseline`. It reports what the count means rather than how it was
+arrived at — "matched nothing" is how the baseline found out — and hedges
+with *look*, since what is known is that the violation no longer occurs:
+the rule may have changed, or the file may be gone. v1 appends the baseline
+filename to the suggested command when it is not the default one; here
+`prune-baseline` reads the config, so there is nothing to append.
 The count is only knowable there — each match takes its entry out, so what
 is left over at the end is permission for work already done — and nobody
 runs a command they have never heard of. It is a line, not a failure: the

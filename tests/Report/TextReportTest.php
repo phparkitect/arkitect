@@ -144,14 +144,14 @@ final class TextReportTest extends TestCase
 
         $report = (new TextReport())->render($check);
 
-        self::assertStringContainsString('! 3 baseline entries matched nothing — run prune-baseline', $report);
+        self::assertStringContainsString('! 3 violations in the baseline look fixed — run prune-baseline to remove them', $report);
     }
 
     public function test_one_stale_entry_is_said_in_the_singular(): void
     {
         $report = (new TextReport())->render(new CheckResult(1, new ParsingErrors(), new RuleResults(), 0, 1));
 
-        self::assertStringContainsString('! 1 baseline entry matched nothing', $report);
+        self::assertStringContainsString('! 1 violation in the baseline looks fixed — run prune-baseline to remove it', $report);
     }
 
     public function test_a_baseline_with_nothing_stale_says_nothing(): void

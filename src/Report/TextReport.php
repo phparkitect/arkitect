@@ -121,17 +121,26 @@ final class TextReport implements Report
      * A baseline keeps permission for work already done until someone
      * prunes it, and nobody runs a command they have not heard of. Said on
      * every check, which is the only moment the count is known.
+     *
+     * It says what the count means and not how it was arrived at: "matched
+     * nothing" is how the baseline found out, "look fixed" is what the
+     * reader has to act on. `look` and not `are`, because what is known is
+     * that the violation no longer occurs — the rule may have changed, or
+     * the file may be gone.
      */
     private function staleBaseline(CheckResult $check): string
     {
-        if (0 === $check->staleBaselineEntries) {
+        $count = $check->staleBaselineEntries;
+
+        if (0 === $count) {
             return '';
         }
 
-        return \sprintf(
-            '! %s matched nothing — run prune-baseline',
-            $this->plural($check->staleBaselineEntries, 'baseline entry', 'baseline entries')
-        );
+        // written out rather than inflected: two sentences read better than
+        // one with three conditional words in it
+        return 1 === $count
+            ? '! 1 violation in the baseline looks fixed — run prune-baseline to remove it'
+            : \sprintf('! %d violations in the baseline look fixed — run prune-baseline to remove them', $count);
     }
 
     private function parsingErrors(ParsingErrors $errors): string
