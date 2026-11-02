@@ -337,6 +337,42 @@ separately: **scope** by `Selector` plus `RuleResult::$checked`, and
 a rule that selected nothing is fixed in the `that()`, a rule that could
 judge nothing in the `should()`.
 
+#### Negation is a class, not a decorator
+
+A negated check is a class named for what it does, like
+`Selector\NotResideInNamespace`. There is no `Not` combinator, on either
+side, and there will not be one.
+
+On selectors a decorator would in fact work: a selector answers
+`Yes|No|Unresolved` and produces neither prose nor identity, so negating it
+is swapping two of three. It is rejected there for uniformity, not because
+it is hard — users would otherwise learn two ways to negate depending on
+which half of a rule they are writing.
+
+On constraints it does not work at all. A satisfied constraint produces
+nothing, so a decorator has no message and no `key` to build the violation
+it now has to report; and `DependOnlyOnTheseNamespaces` reports one
+violation per offending dependency, each on its own line, which negates to
+a single violation about the class — a different shape, losing what made it
+useful. Making that work needs a narrower contract with two phrasings per
+constraint, composed keys, and a rule that negating `Unknown` stays
+`Unknown`: a small language for saying "not", in exchange for a word.
+
+**Which negated classes exist is decided one at a time, by someone asking.**
+Full symmetry would be 14 more classes today, and every one nobody writes is
+a name in autocomplete with nothing behind it. Waiting is free because the
+remedy is additive: there is no registry of known checks, so a class added
+in 2.1 breaks no config written for 2.0. The decorator would not have been
+free that way, which is why its half of this is settled now and the
+inventory is not.
+
+One constraint on the name, learned from `NotDependOnTheseNamespaces` and
+`DependOnlyOnTheseNamespaces`, which look like negations of each other and
+are not: a negated class is written only when its name says without
+ambiguity what it reports. When the name cannot, that is the signal the
+capability is missing rather than badly named — a known limitation over an
+ambiguous one.
+
 #### Patterns
 
 One grammar, written the way path globs already are: `*` stands for part of
@@ -832,25 +868,6 @@ explained where it belongs.
   `prune-baseline` acts on them, and only if someone knows to run it. v1
   prints the count on every check (`BaselineResult::getStaleBaselineEntriesCount()`);
   one line naming `prune-baseline` would make the command discoverable.
-- **Negation on the constraint side.** Nothing has asked for it, so
-  nothing is built. When something does, it is a class named for what it
-  does, like `Selector\NotResideInNamespace` — not a `Not` decorator.
-
-  The decorator is tempting for selectors, where negation is genuinely
-  clean: a selector answers `Yes|No|Unresolved` and produces neither prose
-  nor identity, so negating it is swapping two of three. It does not
-  survive the trip to constraints. A satisfied constraint produces nothing,
-  so a decorator has no message and no `key` to build the violation it now
-  has to report; and a constraint like `DependOnlyOnTheseNamespaces`
-  reports one violation per offending dependency, each on its own line,
-  which negates to a single violation about the class — a different shape,
-  losing what made it useful. Making that work needs a narrower contract
-  with two phrasings per constraint, composed keys, and a rule that
-  negating `Unknown` stays `Unknown`: a small language for saying "not".
-
-  Which leaves the reason it is a class on both sides rather than a
-  decorator on one: users would otherwise learn two ways to negate,
-  depending on which half of a rule they are writing.
 
 ## Working on this branch
 
