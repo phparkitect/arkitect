@@ -36,6 +36,6 @@ enum TargetPhpVersion: string
     {
         $running = \PHP_MAJOR_VERSION.'.'.\PHP_MINOR_VERSION;
 
-        return self::tryFrom($running) ?? throw new \InvalidArgumentException(\sprintf('arkitect does not know PHP %s yet. Set targetPhpVersion() in your config to the version your project targets.', $running));
+        return self::tryFrom($running) ?? throw new \InvalidArgumentException(\sprintf('arkitect does not know PHP %s yet. Set withTargetPhpVersion() in your config to the version your project targets.', $running));
     }
 }

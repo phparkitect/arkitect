@@ -85,7 +85,9 @@ final class BaselineCommandsTest extends TestCase
     public function test_a_config_without_a_baseline_path_says_so(): void
     {
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('add baseline()');
+        // the method the message names, so a rename cannot leave it pointing
+        // at something a user cannot call
+        $this->expectExceptionMessage('add '.(new \ReflectionMethod(Config::class, 'withBaseline'))->getName().'()');
 
         $baselines = new InMemoryBaselineRepository();
 

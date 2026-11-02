@@ -786,10 +786,10 @@ option quietly ignored, since a mistyped `--skpi-baseline` should not run
 something other than what was asked.
 
 Surface: `check` (the default), `generate-baseline`, `prune-baseline`;
-`--config=`, `--skip-baseline`, `--help`. `--format` waits for a second
-`Report`, `--stop-on-failure` is pointless with a report that prints
-everything and a baseline that hides what you accepted, and `--autoload`
-until something needs it.
+`--config=`, `--format=`, `--skip-baseline`, `--help`.
+`--stop-on-failure` is pointless with a report that prints everything and a
+baseline that hides what you accepted, and `--autoload` waits until
+something needs it.
 
 Loading `phparkitect.php` is `require` of a user file that returns a
 `Config` — arbitrary code execution, and inherently "how the user talks to
