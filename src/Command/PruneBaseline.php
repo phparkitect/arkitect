@@ -26,7 +26,7 @@ final class PruneBaseline
     /** @return int how many entries were dropped */
     public function run(Config $config): int
     {
-        $path = $config->baseline ?? throw new \RuntimeException('No baseline path in the config: there is nothing to prune.');
+        $path = $config->baseline() ?? throw new \RuntimeException('No baseline path in the config: there is nothing to prune.');
 
         $baseline = $this->baselines->read($path);
         $pruned = $baseline->keepOnly($this->check->run($config->withoutBaseline())->allViolations());

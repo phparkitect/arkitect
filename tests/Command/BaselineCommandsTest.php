@@ -118,7 +118,7 @@ final class BaselineCommandsTest extends TestCase
 
     private function config(): Config
     {
-        return Config::create(__DIR__)->add([$this->aRule()])->baseline('baseline.json');
+        return Config::create(__DIR__)->add([$this->aRule()])->withBaseline('baseline.json');
     }
 
     private function aRule(): Rule

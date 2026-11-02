@@ -141,7 +141,7 @@ final class ConsoleTest extends TestCase
             ."        ->because('everything is final'),\n"
             ."]);\n",
             $this->root,
-            null === $baseline ? '' : \sprintf("->baseline('%s')", $baseline)
+            null === $baseline ? '' : \sprintf("->withBaseline('%s')", $baseline)
         );
     }
 }

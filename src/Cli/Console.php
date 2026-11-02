@@ -58,8 +58,8 @@ final class Console
         }
 
         $check = new Check(
-            new RepositoryParser(new FilesystemFileRepository($config->root)),
-            $baselines = new FilesystemBaselineRepository($config->root),
+            new RepositoryParser(new FilesystemFileRepository($config->root())),
+            $baselines = new FilesystemBaselineRepository($config->root()),
         );
 
         try {

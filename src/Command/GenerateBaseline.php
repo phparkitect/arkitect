@@ -27,7 +27,7 @@ final class GenerateBaseline
     /** @return int how many violations were accepted */
     public function run(Config $config): int
     {
-        $path = $config->baseline ?? throw new \RuntimeException('No baseline path in the config: add baseline() to say where it goes.');
+        $path = $config->baseline() ?? throw new \RuntimeException('No baseline path in the config: add baseline() to say where it goes.');
 
         $baseline = Baseline::of($this->check->run($config->withoutBaseline())->allViolations());
 

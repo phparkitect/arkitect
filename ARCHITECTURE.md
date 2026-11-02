@@ -502,10 +502,11 @@ named constructors for the two cases: `createAt()` takes the
 class's own declaration line.
 
 Explicitly **not** part of this rewrite: `Not`/`And`/`Or` composable
-decorators replacing the 17 `Not*`/`IsNot*` twin classes
+decorators replacing the `Not*`/`IsNot*` twin classes
 (`#516`/`#394`/`#395`/`#387`). A returning `evaluate()` makes them
-technically possible, which is not on its own a reason; they are not
-clearly a DX win over twin classes that cause no confusion in practice.
+technically possible, which is not on its own a reason. Why it is a class
+on both sides, and why which ones exist is decided one at a time, is under
+*Negation is a class, not a decorator* above.
 
 Note that `DependOnlyOnTheseNamespaces` and `NotDependOnTheseNamespaces`
 are *not* negations of each other — one lists what is permitted and forbids
@@ -516,7 +517,7 @@ the rest, the other lists what is forbidden and says nothing about the rest.
 ```php
 return Config::create(__DIR__)
     ->add($rules)
-    ->targetPhpVersion('8.1');
+    ->withTargetPhpVersion('8.1');
 ```
 
 The root is a constructor argument and everything optional is fluent, which
@@ -524,13 +525,20 @@ makes a config file show at a glance what has to be given. It is never
 inferred from the working directory or from where the config file sits: a
 run has to mean the same thing wherever it was started from.
 
-`Config` is mutable, its setters assigning one field and returning `$this`.
-Rebuilding an immutable config through a constructor taking every field
-meant `add()` naming the root and the PHP version while doing neither, and
-PHP 8.5 has no `clone with`. A config is written once in a file and then
-read, so immutability buys little here. The cost, since it is real: the
-optional properties are publicly assignable, PHP having no package-private
-and a private one forcing a getter whose name would collide with its setter.
+`Config` is immutable, with private fields and a private constructor: each
+`with*` builds a new one, and what it carries over is named rather than
+copied, so a setter reads as "the same, except this". It was mutable first,
+assigning one field and returning `$this`, which left the optional
+properties publicly assignable — anything could reach past the setters, and
+it was the only class here that mutated itself while `Selectors`,
+`RuleDraft`, `Baseline` and the test doubles all returned new instances.
+
+What had blocked it was a name: a private field forces an accessor, and
+`baseline()` cannot be both the reader and the writer. The `with` prefix
+settles that, and the class had already started using it:
+`withoutBaseline()` was there before any of this. The price is five named
+arguments per setter, paid once per method and visible at the call site as
+nothing at all.
 
 `TargetPhpVersion` is a backed enum — it always was one in disguise, a
 const array of valid values and a constructor checking membership. Unset,

@@ -28,21 +28,21 @@ final class Check
 
     public function run(Config $config): CheckResult
     {
-        $parsed = $this->parser->parse($config->targetPhpVersion);
+        $parsed = $this->parser->parse($config->targetPhpVersion());
 
         // one parse, two views of it: names resolve against everything read,
         // while rules may only judge what the project itself wrote
         $graph = new ParsedClassGraph(...$parsed->classes);
-        $ownClasses = $config->dependencies->ownClassesIn($parsed->classes);
+        $ownClasses = $config->dependencies()->ownClassesIn($parsed->classes);
 
-        $baseline = null === $config->baseline
+        $baseline = null === $config->baseline()
             ? Baseline::empty()
-            : $this->baselines->read($config->baseline);
+            : $this->baselines->read($config->baseline());
 
         $results = [];
         $silenced = 0;
 
-        foreach ($config->rules as $rule) {
+        foreach ($config->rules() as $rule) {
             $result = $rule->check($ownClasses, $graph);
             $kept = [];
 

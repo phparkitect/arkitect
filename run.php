@@ -72,13 +72,13 @@ try {
         ->that(new Selector\ResideInNamespace('Arkitect\Evaluate'))
         ->should(new Constraint\NotDependOnTheseNamespaces(['Arkitect\Report']))
         ->because('the rules do not know who will print their results'),]);
-    $files = new FilesystemFileRepository($config->root);
+    $files = new FilesystemFileRepository($config->root());
 } catch (InvalidArgumentException $e) {
     fwrite(\STDERR, $e->getMessage()."\n");
     exit(2);
 }
 
-$result = (new Check(new RepositoryParser($files), new FilesystemBaselineRepository($config->root)))->run($config);
+$result = (new Check(new RepositoryParser($files), new FilesystemBaselineRepository($config->root())))->run($config);
 
 echo (new TextReport())->render($result), "\n";
 

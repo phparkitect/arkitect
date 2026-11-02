@@ -178,11 +178,11 @@ final class CheckTest extends TestCase
             $repository = $repository->withFile($path, $contents);
         }
 
-        $config = Config::create(__DIR__)->add([$rule])->targetPhpVersion('8.5');
+        $config = Config::create(__DIR__)->add([$rule])->withTargetPhpVersion('8.5');
         $storage = new InMemoryBaselineRepository();
 
         if (null !== $baseline) {
-            $config = $config->baseline('known.json');
+            $config = $config->withBaseline('known.json');
             $storage = new InMemoryBaselineRepository(['known.json' => $baseline]);
         }
 
