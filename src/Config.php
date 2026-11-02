@@ -23,6 +23,13 @@ use Arkitect\Parser\TargetPhpVersion;
  */
 final class Config
 {
+    /**
+     * Where a baseline goes when nobody says: `generate-baseline` writes
+     * here, and a `check` with none declared uses this one if it is there.
+     * A declared path is still required to exist — a guess is not.
+     */
+    public const DEFAULT_BASELINE = 'phparkitect-baseline.json';
+
     private function __construct(
         private readonly string $root,
         private readonly Rules $rules,

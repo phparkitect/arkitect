@@ -82,16 +82,30 @@ final class BaselineCommandsTest extends TestCase
         self::assertFalse($this->check($this->files($files), $baselines)->run($config)->isClean());
     }
 
-    public function test_a_config_without_a_baseline_path_says_so(): void
+    /**
+     * The first command someone runs on a project full of violations, with
+     * nothing in the config yet. It has to land somewhere rather than ask.
+     */
+    public function test_generating_with_nothing_declared_writes_to_the_conventional_name(): void
+    {
+        $baselines = new InMemoryBaselineRepository();
+        $files = $this->files(['src/Order.php' => "<?php\nnamespace App;\nclass Order {}\n"]);
+
+        $accepted = (new GenerateBaseline($this->check($files, $baselines), $baselines))
+            ->run(Config::create(__DIR__)->add([$this->aRule()]));
+
+        self::assertSame(1, $accepted);
+        self::assertNotNull($baselines->read(Config::DEFAULT_BASELINE));
+    }
+
+    public function test_pruning_with_no_baseline_anywhere_says_so(): void
     {
         $this->expectException(\RuntimeException::class);
-        // the method the message names, so a rename cannot leave it pointing
-        // at something a user cannot call
-        $this->expectExceptionMessage('add '.(new \ReflectionMethod(Config::class, 'withBaseline'))->getName().'()');
+        $this->expectExceptionMessage(Config::DEFAULT_BASELINE);
 
         $baselines = new InMemoryBaselineRepository();
 
-        (new GenerateBaseline($this->check($this->files([]), $baselines), $baselines))
+        (new PruneBaseline($this->check($this->files([]), $baselines), $baselines))
             ->run(Config::create(__DIR__)->add([$this->aRule()]));
     }
 

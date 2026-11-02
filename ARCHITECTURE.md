@@ -762,7 +762,17 @@ already done and nobody notices.
 
 A configured path that holds no baseline stops the run rather than
 proceeding with an empty one, which would report every known violation as
-though it were new.
+though it were new. So does a write that could not land: being told the
+violations were accepted while the file was never written is the same
+failure one step earlier.
+
+With nothing declared, `generate-baseline` writes to
+`Config::DEFAULT_BASELINE` and `check` uses a file sitting there, so the
+adoption path is two commands and no config edit. The asymmetry is the
+point: a path someone named must exist, a name we guessed need not.
+`--skip-baseline` ignores either. The lookup is in `Console` rather than in
+a command, because "a file at the conventional place" is a fact about the
+filesystem, and a caller using the commands directly says what it wants.
 
 #### The CLI
 

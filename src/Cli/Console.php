@@ -43,7 +43,7 @@ final class Console
             }
 
             $report = $this->reportFor($arguments->value('format', 'text'));
-            $config = $this->configFrom($arguments->value('config', 'phparkitect.php'));
+            $config = $this->withBaselineFound($this->configFrom($arguments->value('config', 'phparkitect.php')));
         } catch (\InvalidArgumentException|\RuntimeException $e) {
             fwrite($err, $e->getMessage()."\n");
 
@@ -94,6 +94,23 @@ final class Console
         return self::CLEAN;
     }
 
+    /**
+     * A baseline sitting at the conventional name is used without being
+     * declared, which is what makes `generate-baseline` then `check` work
+     * with nothing in between. Only when it is actually there: a path in
+     * the config must exist, a convention is allowed not to.
+     */
+    private function withBaselineFound(Config $config): Config
+    {
+        if (null !== $config->baseline()) {
+            return $config;
+        }
+
+        return is_file($config->root().'/'.Config::DEFAULT_BASELINE)
+            ? $config->withBaseline(Config::DEFAULT_BASELINE)
+            : $config;
+    }
+
     private function reportFor(string $format): Report
     {
         return match ($format) {
@@ -134,7 +151,7 @@ final class Console
 
               --config=PATH       where the config is (default: phparkitect.php)
               --format=NAME       text (the default) or gitlab
-              --skip-baseline     report what the baseline is hiding
+              --skip-baseline     ignore the baseline, default one included
               --help              this
 
             HELP;

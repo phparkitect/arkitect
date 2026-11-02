@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Tests\Cli;
 
 use Arkitect\Cli\Console;
+use Arkitect\Config;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -144,6 +145,39 @@ final class ConsoleTest extends TestCase
 
         self::assertStringContainsString('--format', $out);
         self::assertStringContainsString('gitlab', $out);
+    }
+
+    /**
+     * The adoption path, end to end and with nothing in the config: accept
+     * what is there, then pass.
+     */
+    public function test_a_generated_baseline_is_picked_up_without_being_declared(): void
+    {
+        $this->write('arch.php', $this->config());
+        $this->write('Order.php', "<?php\nnamespace App;\nclass Order {}\n");
+
+        [$code, $out] = $this->arkitect('generate-baseline');
+
+        self::assertSame(0, $code);
+        self::assertStringContainsString('accepted 1 violations', $out);
+        self::assertFileExists($this->root.'/'.Config::DEFAULT_BASELINE);
+
+        [$code] = $this->arkitect();
+
+        self::assertSame(0, $code);
+    }
+
+    public function test_skip_baseline_ignores_the_one_it_found(): void
+    {
+        $this->write('arch.php', $this->config());
+        $this->write('Order.php', "<?php\nnamespace App;\nclass Order {}\n");
+
+        $this->arkitect('generate-baseline');
+
+        [$code, $out] = $this->arkitect('--skip-baseline');
+
+        self::assertSame(1, $code);
+        self::assertStringContainsString('is not final', $out);
     }
 
     /** @return array{int, string, string} */
