@@ -608,6 +608,23 @@ each thing*), and it removes the footgun where a `phparkitect.php` builds
 `Architecture`/`RuleBuilders` DSL is dropped too, which was already the
 deprecation direction pre-2.0.
 
+The PHPUnit integration is not carried over. v1 ships one class for it,
+`PHPUnit\ArchRuleCheckerConstraintAdapter`, and three things are true of it
+at once: the README and every page under `docs/` mention PHPUnit zero
+times, the ergonomic part users would actually write —
+`assertArchRule()`, on an `ArchRuleTestCase` base class — lives under
+`tests/E2E/` and was never published, and the class extends
+`PHPUnit\Framework\Constraint\Constraint` while `phpunit/phpunit` sits in
+`require-dev`, so a shipped type inherits from one the package does not
+depend on. Its own docblock says as much, under a
+`@psalm-suppress UndefinedClass`.
+
+So what would be ported is an undocumented surface whose usable half is
+missing and whose base class may not exist at runtime. A rule asserted in a
+test suite is `Rule::check()` against a parsed set, which this codebase does
+in 43 places; the day someone asks for the assertion wrapper, it is a few
+lines over a contract that no longer needs a suppression to compile.
+
 **Migration policy**: 2.0 is a hard break. No compatibility shim for
 third-party expression authors and no soft-deprecation window within 2.0 —
 the contract changes (`Expression` split into `Selector` and `Constraint`,
