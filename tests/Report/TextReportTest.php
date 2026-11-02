@@ -126,6 +126,18 @@ final class TextReportTest extends TestCase
         self::assertStringContainsString('! "all final" matched 1 class and judged none', $report);
     }
 
+    public function test_an_exclusion_no_class_answers_to_is_called_out(): void
+    {
+        $report = $this->render([ParsedClassFixture::create('App\\Order', isFinal: true)], [
+            Rule::allClasses()
+                ->except('App\\Ordr')
+                ->should(new Constraint\IsFinal())
+                ->because('all final'),
+        ]);
+
+        self::assertStringContainsString('! "all final" excludes App\\Ordr, which no class answers to', $report);
+    }
+
     public function test_files_that_could_not_be_parsed_are_reported(): void
     {
         $check = new CheckResult(0, new ParsingErrors(new ParsingError('src/Broken.php', 'syntax error')), new RuleResults());

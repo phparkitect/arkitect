@@ -17,6 +17,7 @@ use Arkitect\Resolve\ClassGraph;
  *
  * Written through the DSL — `Rule::allClasses()->that(...)->should(...)
  * ->because(...)` — which is what guarantees every instance has all three.
+ * `except()` takes named classes away from the rule before any of that.
  */
 final class Rule
 {
@@ -24,6 +25,7 @@ final class Rule
         private readonly Selectors $selectors,
         private readonly Constraint $constraint,
         public readonly string $because,
+        private readonly ExcludedClasses $excluded = new ExcludedClasses(),
     ) {
         // the DSL makes because() unskippable, but only this makes it say
         // something: a rule whose report reads "because " explains nothing
@@ -32,9 +34,9 @@ final class Rule
         }
     }
 
-    public static function allClasses(): RuleDraft
+    public static function allClasses(): AllClasses
     {
-        return RuleDraft::start();
+        return new AllClasses();
     }
 
     /** @param list<ParsedClass> $classes */
@@ -45,8 +47,17 @@ final class Rule
         $violations = [];
         $unresolved = [];
         $notApplicable = [];
+        $present = [];
 
         foreach ($classes as $class) {
+            $present[] = $class->fqcn;
+
+            // before everything else, including the unresolved branch: a
+            // class the rule was written not to be about has nothing to say
+            if ($this->excluded->contains($class->fqcn)) {
+                continue;
+            }
+
             $selection = $this->select($class, $classGraph);
 
             if (Selection::Unresolved === $selection) {
@@ -96,6 +107,7 @@ final class Rule
             new Violations(...$violations),
             new UnresolvedClasses(...$unresolved),
             new NotApplicableClasses(...$notApplicable),
+            $this->excluded->findMissingFrom($present),
         );
     }
 

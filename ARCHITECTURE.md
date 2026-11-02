@@ -397,7 +397,7 @@ Rule::allClasses()
     ->because('a selector decides what a rule is about and never reports anything');
 ```
 
-v1's shape, with two changes. `Rule::allClasses()` returns a `RuleDraft`
+v1's shape, with two changes. `Rule::allClasses()` returns an `AllClasses`
 rather than a half-built `Rule`: the incomplete states have their own types,
 and `because()` is the only way to reach a `Rule`, so a rule cannot exist
 without a constraint or without a reason to give when it fails.
@@ -407,15 +407,43 @@ good test makes one assertion — two requirements are two rules, each with
 its own reason, which is also what keeps a reason honest. Selectors
 accumulate one at a time through `that()` and `andThat()`.
 
+`except()` takes named classes out of a rule:
+
+```php
+Rule::allClasses()
+    ->except('Arkitect\Parser\ClassParser')
+    ->should(new Constraint\NotDependOnTheseNamespaces(['PhpParser']))
+    ->because('only the parser adapter knows which library reads PHP source');
+```
+
+It exists only on `AllClasses`, before anything has narrowed the rule, which
+is the only place the word can be read: after a `that()` it would be read
+against whatever the selectors happen to be, and what it took away would
+depend on the rule it was written in. `RuleDraft` has no `except()`, so the
+ambiguous spelling does not typecheck.
+
+It takes whole class names and nothing else — no patterns, no namespaces.
+That is what makes the step verifiable rather than decorative: a pattern may
+legitimately match nothing, so a pattern that excludes nothing cannot be
+told apart from a typo, while a name no class in the codebase answers to is
+always a mistake. Those names come back on `RuleResult::$missingExclusions`
+and the report prints them beside the two other ways a rule can look like it
+protects something while protecting nothing.
+
+A class is the unit rather than a file because the rule is about classes:
+`allClasses()->except('src/Foo.php')` reads across two levels, and one class
+per file is the norm PSR-4 requires anyway. A file holding several classes
+is named one class at a time, or by its directory.
+
 Selectors combine with *and*, so a definite `No` from any of them settles
 the class even when another came back `Unresolved`: the rule is not about
 it either way, and reporting that would be noise.
 
-`Rule` holds selectors, one constraint and a reason. `RuleResult` carries
-`selected` and `checked` separately — they differ when a constraint could
-not mean anything for some of the classes picked — alongside the
-violations, the classes it could not decide about, and the ones it could
-not judge.
+`Rule` holds selectors, one constraint, a reason and the excluded names.
+`RuleResult` carries `selected` and `checked` separately — they differ when
+a constraint could not mean anything for some of the classes picked —
+alongside the violations, the classes it could not decide about, the ones it
+could not judge, and the excluded names nothing answered to.
 
 Direct versus transitive is a `Depth` parameter on `Implement`/`Extend`,
 not a second pair of classes: twin classes are the wart `#516` flags, and
@@ -744,6 +772,12 @@ same way by anyone starting over.
   moment a component is added. `Selector\NotResideInNamespace` says it
   properly, and covers 98 classes where the list covered four namespaces
   somebody remembered.
+- **v1's `except()` took patterns**, matched with `residesInOneOf()`, which
+  tries the FQCN and then every namespace enclosing it. So one argument
+  could mean a class, a namespace or a wildcard, and the three cases were
+  indistinguishable in the config and in the output. Here it takes whole
+  class names, which is what lets a name matching nothing be reported
+  instead of silently excluding nothing.
 
 Two habits came out of these, both cheap and both in `CLAUDE.md`: check a
 rule against real input before enforcing it — the name and line rules were

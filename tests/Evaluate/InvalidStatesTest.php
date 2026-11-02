@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Evaluate;
 
+use Arkitect\Evaluate\AllClasses;
 use Arkitect\Evaluate\Constraint\IsFinal;
 use Arkitect\Evaluate\NotApplicableClasses;
 use Arkitect\Evaluate\Rule;
+use Arkitect\Evaluate\RuleDraft;
 use Arkitect\Evaluate\Selector\Selectors;
 use Arkitect\Evaluate\UnresolvedClasses;
 use Arkitect\Evaluate\Violation;
@@ -132,6 +134,17 @@ final class InvalidStatesTest extends TestCase
         $this->expectException(\TypeError::class);
 
         new Rule(new Selectors('App\Domain'), new IsFinal(), 'reasons'); // @phpstan-ignore-line
+    }
+
+    /**
+     * `except()` is read against all classes, so it only exists before a
+     * that() narrows them. The guarantee is the type, not a check at run
+     * time, and this is what says so out loud.
+     */
+    public function test_a_rule_cannot_be_narrowed_and_then_have_classes_taken_out(): void
+    {
+        self::assertTrue(method_exists(AllClasses::class, 'except'));
+        self::assertFalse(method_exists(RuleDraft::class, 'except'));
     }
 
     private function classAt(int $line): ParsedClass

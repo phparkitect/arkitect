@@ -14,6 +14,7 @@ namespace Arkitect\Evaluate;
  */
 final class RuleResult
 {
+    /** @param list<string> $missingExclusions names except() was given that no class answers to */
     public function __construct(
         public readonly string $because,
         public readonly int $selected,
@@ -21,7 +22,26 @@ final class RuleResult
         public readonly Violations $violations,
         public readonly UnresolvedClasses $unresolved = new UnresolvedClasses(),
         public readonly NotApplicableClasses $notApplicable = new NotApplicableClasses(),
+        public readonly array $missingExclusions = [],
     ) {
+    }
+
+    /**
+     * The same result with its violations replaced, which is how `Check`
+     * applies the baseline. It exists so that filtering cannot quietly drop
+     * one of the other channels by rebuilding the object without it.
+     */
+    public function withViolations(Violations $violations): self
+    {
+        return new self(
+            $this->because,
+            $this->selected,
+            $this->checked,
+            $violations,
+            $this->unresolved,
+            $this->notApplicable,
+            $this->missingExclusions,
+        );
     }
 
     /** The selectors picked nothing: the `that()` is the thing to fix. */

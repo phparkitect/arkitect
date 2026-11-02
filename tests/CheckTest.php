@@ -140,6 +140,35 @@ final class CheckTest extends TestCase
         self::assertCount(1, iterator_to_array($result->ruleResults)[0]->violations);
     }
 
+    public function test_an_excluded_class_is_left_out_of_a_whole_run(): void
+    {
+        $result = $this->check(
+            [
+                'src/Order.php' => "<?php\nnamespace App;\nclass Order {}\n",
+                'src/Invoice.php' => "<?php\nnamespace App;\nclass Invoice {}\n",
+            ],
+            Rule::allClasses()->except('App\Order')->should(new Constraint\IsFinal())->because('reasons')
+        );
+
+        self::assertCount(1, $result->allViolations());
+        self::assertSame('App\Invoice', iterator_to_array($result->allViolations())[0]->fqcn);
+    }
+
+    /**
+     * `Check` rebuilds each RuleResult to apply the baseline, and a rebuild
+     * that forgets a channel loses it on every real run while every unit
+     * test on Rule still passes.
+     */
+    public function test_a_missing_exclusion_survives_the_baseline_pass(): void
+    {
+        $result = $this->check(
+            ['src/Order.php' => "<?php\nnamespace App;\nfinal class Order {}\n"],
+            Rule::allClasses()->except('App\Ordr')->should(new Constraint\IsFinal())->because('reasons')
+        );
+
+        self::assertSame(['App\Ordr'], iterator_to_array($result->ruleResults)[0]->missingExclusions);
+    }
+
     /** @param array<string, string> $files */
     private function check(array $files, Rule $rule, ?Baseline $baseline = null): CheckResult
     {

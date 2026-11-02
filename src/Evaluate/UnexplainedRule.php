@@ -21,11 +21,12 @@ final class UnexplainedRule
     public function __construct(
         private readonly Selectors $selectors,
         private readonly Constraint $constraint,
+        private readonly ExcludedClasses $excluded = new ExcludedClasses(),
     ) {
     }
 
     public function because(string $reason): Rule
     {
-        return new Rule($this->selectors, $this->constraint, $reason);
+        return new Rule($this->selectors, $this->constraint, $reason, $this->excluded);
     }
 }

@@ -80,15 +80,24 @@ final class TextReport implements Report
     }
 
     /**
-     * The two ways a rule can look like it protects something while
+     * The three ways a rule can look like it protects something while
      * protecting nothing. Kept loud for that reason, and separate from each
-     * other because one is fixed in the that() and the other in the should().
+     * other because each one is fixed somewhere else: the that(), the
+     * should(), the except().
      */
     private function uselessRules(RuleResults $results): string
     {
         $lines = [];
 
         foreach ($results as $result) {
+            if ([] !== $result->missingExclusions) {
+                $lines[] = \sprintf(
+                    '! "%s" excludes %s, which no class answers to',
+                    $result->because,
+                    implode(', ', $result->missingExclusions)
+                );
+            }
+
             if ($result->matchedNothing()) {
                 $lines[] = \sprintf('! "%s" matched no classes', $result->because);
 

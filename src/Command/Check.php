@@ -8,7 +8,6 @@ use Arkitect\Baseline;
 use Arkitect\BaselineRepository;
 use Arkitect\Codebase;
 use Arkitect\Config;
-use Arkitect\Evaluate\RuleResult;
 use Arkitect\Evaluate\RuleResults;
 use Arkitect\Evaluate\Violations;
 use Arkitect\Parser\ParsingErrors;
@@ -54,14 +53,7 @@ final class Check
                 $kept[] = $violation;
             }
 
-            $results[] = new RuleResult(
-                $result->because,
-                $result->selected,
-                $result->checked,
-                new Violations(...$kept),
-                $result->unresolved,
-                $result->notApplicable,
-            );
+            $results[] = $result->withViolations(new Violations(...$kept));
         }
 
         return new CheckResult(

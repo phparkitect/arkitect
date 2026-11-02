@@ -15,18 +15,20 @@ use Arkitect\Evaluate\Selector\Selectors;
  */
 final class RuleDraft
 {
-    private function __construct(private readonly Selectors $selectors)
-    {
+    private function __construct(
+        private readonly Selectors $selectors,
+        private readonly ExcludedClasses $excluded,
+    ) {
     }
 
-    public static function start(): self
+    public static function start(ExcludedClasses $excluded): self
     {
-        return new self(new Selectors());
+        return new self(new Selectors(), $excluded);
     }
 
     public function that(Selector $selector): self
     {
-        return new self($this->selectors->with($selector));
+        return new self($this->selectors->with($selector), $this->excluded);
     }
 
     public function andThat(Selector $selector): self
@@ -36,6 +38,6 @@ final class RuleDraft
 
     public function should(Constraint $constraint): UnexplainedRule
     {
-        return new UnexplainedRule($this->selectors, $constraint);
+        return new UnexplainedRule($this->selectors, $constraint, $this->excluded);
     }
 }
