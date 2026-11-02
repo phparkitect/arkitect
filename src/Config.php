@@ -12,15 +12,17 @@ use Arkitect\Parser\TargetPhpVersion;
  * What the user writes, and the only place that answers "what is this run
  * about".
  *
- * Holds what the user declared and nothing else. Everything under the root
- * is parsed; which of those classes rules may judge is `Codebase`'s
- * question, not a declaration anyone made here.
+ * Holds what the user declared. Everything under the root is parsed; which
+ * of those classes rules may judge is `$dependencies`, `vendor` unless the
+ * project says otherwise.
  */
 final class Config
 {
     public Rules $rules;
 
     public TargetPhpVersion $targetPhpVersion;
+
+    public DependencyDirectories $dependencies;
 
     /** Relative to the root, and null when the project keeps no baseline. */
     public ?string $baseline = null;
@@ -32,6 +34,7 @@ final class Config
         }
 
         $this->rules = new Rules();
+        $this->dependencies = new DependencyDirectories('vendor');
         // unset means the interpreter running arkitect, which is what nearly
         // every project wants and what #650 says to pin when it isn't
         $this->targetPhpVersion = TargetPhpVersion::current();
@@ -64,6 +67,19 @@ final class Config
         $copy->baseline = null;
 
         return $copy;
+    }
+
+    /**
+     * The directories holding code the project did not write. Replaces the
+     * default rather than adding to it, so `vendor` is written out again
+     * when a monorepo adds its per-package one beside it: a list that reads
+     * as the whole answer is one a reader can check against the tree.
+     */
+    public function dependencies(string ...$directories): self
+    {
+        $this->dependencies = new DependencyDirectories(...$directories);
+
+        return $this;
     }
 
     /** The version of PHP the *analysed* project targets, not the one running us. */

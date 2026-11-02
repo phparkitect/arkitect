@@ -550,25 +550,39 @@ code its author cannot change. Namespace filtering via `that()` was never
 enough on its own: selectors narrow what a rule is about, they are not a
 substitute for knowing whose code it is.
 
-`Codebase` is where the line is drawn: one parse, two views of it —
-`ownClasses`, what rules may judge, and `graph`, what names resolve
-against. Not in `Config`, because nobody declared it; it is our policy, and
-it moves to `Config` the day a project can override it. Against this repo,
-the two views differ by roughly 2,600 classes.
+`Config::$dependencies` is where the line is drawn: the directories holding
+code the project did not write, `vendor` by default. What rules may judge is
+everything parsed minus those; what names resolve against is everything
+parsed. Against this repo the two differ by roughly 2,600 classes.
 
-Nothing downstream had to change for this: `Rule::check(array $classes,
-ClassGraph $graph)` already took the classes to judge and the graph to
-resolve against as separate arguments, for the unrelated reason that a
-constraint cannot hold the graph as a constructor dependency.
+The two views are built side by side in `Check`, not held together by an
+object. There was a `Codebase` for that and it earned nothing: `Rule::check(
+array $classes, ClassGraph $graph)` already takes the classes to judge and
+the graph to resolve against as separate arguments — for the unrelated
+reason that a constraint cannot hold the graph as a constructor dependency —
+so the pair was taken apart one call after being assembled, by its only
+caller. The decision worth a type of its own is which directories hold
+dependencies, and that one is `DependencyDirectories`: it owns the criterion
+and the matching, and it reuses `DirectoryPattern`, so "inside this
+directory" means the same thing here as it does in a selector.
 
-`Command\Check` orchestrates — parse, split into a `Codebase`, one
-`check()` per rule, collect — taking the parser injected and `Config` as its
-argument, and returning a `CheckResult`. It knows neither where files come
-from nor where results go. `isClean()` is on the result, because whether a
-run passed is not presentation.
+A pattern is anchored at the root, which makes `vendor` the project's own
+and not a nested one. A monorepo package's vendor, or composer-bin-plugin's,
+is `Config::dependencies('vendor', 'packages/*/vendor')` — the declaration
+replaces the default rather than adding to it, so the list in a config reads
+as the whole answer and can be checked against the tree. The default does
+not find a nested vendor on its own, and three real layouts need the
+declaration: a monorepo's per-package vendor, composer-bin-plugin's
+`vendor-bin/*/vendor`, and a renamed `config.vendor-dir`.
 
-No `ClassSet`: its job is split between the root scan, the `vendor/` line,
-and per-rule selectors. Filtering is namespace-based
+`Command\Check` orchestrates — parse, split what is judged from what
+resolves, one `check()` per rule, collect — taking the parser injected and
+`Config` as its argument, and returning a `CheckResult`. It knows neither
+where files come from nor where results go. `isClean()` is on the result,
+because whether a run passed is not presentation.
+
+No `ClassSet`: its job is split between the root scan,
+`Config::$dependencies`, and per-rule selectors. Filtering is namespace-based
 (`Selector\ResideInOneOfTheseNamespaces`). For the rare case where directory
 and namespace disagree — generated code, monorepo packages, legacy trees —
 the answer is `Selector\ResideInDirectory` and `Selector\NotResideInDirectory`,
@@ -853,8 +867,11 @@ explained where it belongs.
 ## Open — not decided, do not treat as settled
 
 - **Multi-root / monorepo**: `ResideInDirectory` is built and covers selecting
-  per package. Still parked: whether anything needs more than one root for
-  the scan itself. Not to be answered by reintroducing `ClassSet`-like roots.
+  per package, and `Config::$dependencies` takes `packages/*/vendor` for the
+  per-package dependencies. Still parked: whether anything needs more than
+  one root for the scan itself, and whether the default should find a nested
+  vendor rather than wait to be told about it. Not to be answered by
+  reintroducing `ClassSet`-like roots.
 - **Default exclusions for the root scan** (`.git`, build and cache
   directories, deliberately broken parse-error fixtures): deferred by
   product decision, not a blocker. Revisit when it is a real problem.

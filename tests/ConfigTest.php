@@ -91,6 +91,26 @@ final class ConfigTest extends TestCase
         self::assertSame('8.1', $config->targetPhpVersion->value);
     }
 
+    public function test_the_dependency_directories_default_to_vendor(): void
+    {
+        $config = Config::create(__DIR__);
+
+        self::assertTrue($config->dependencies->contains('vendor/acme/Base.php'));
+        self::assertFalse($config->dependencies->contains('src/Order.php'));
+    }
+
+    /**
+     * Declaring replaces the default rather than adding to it, so a config
+     * that names only its monorepo packages stops excluding the root vendor.
+     */
+    public function test_declaring_dependency_directories_replaces_the_default(): void
+    {
+        $config = Config::create(__DIR__)->dependencies('packages/*/vendor');
+
+        self::assertTrue($config->dependencies->contains('packages/billing/vendor/acme/Dep.php'));
+        self::assertFalse($config->dependencies->contains('vendor/acme/Base.php'));
+    }
+
     private function aRule(): Rule
     {
         return Rule::allClasses()->should(new Constraint\IsFinal())->because('reasons');
