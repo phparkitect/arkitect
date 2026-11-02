@@ -78,6 +78,28 @@ final class ArgumentsTest extends TestCase
         self::assertSame('a=b.php', $this->parse('--config=a=b.php')->value('config', ''));
     }
 
+    /**
+     * v1's two other ways to point at a baseline, refused rather than
+     * ignored: between a path in the config and the conventional name
+     * there is already one spelling, and someone typing a v1 one has to
+     * hear about it instead of getting a run that did something else.
+     */
+    public function test_v1s_use_baseline_option_is_refused(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown option "--use-baseline"');
+
+        $this->parse('--use-baseline=ba.json');
+    }
+
+    public function test_a_path_after_a_baseline_command_is_refused(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown command "my-baseline.json"');
+
+        $this->parse('generate-baseline', 'my-baseline.json');
+    }
+
     private function parse(string ...$arguments): Arguments
     {
         return Arguments::fromArgv(['bin/arkitect', ...$arguments]);

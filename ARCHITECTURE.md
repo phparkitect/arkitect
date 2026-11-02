@@ -808,6 +808,19 @@ Surface: `check` (the default), `generate-baseline`, `prune-baseline`;
 baseline that hides what you accepted, and `--autoload` waits until
 something needs it.
 
+Two of v1's ways to point at a baseline are gone, and together: `check
+--use-baseline=PATH`, and the optional path after `generate-baseline` and
+`prune-baseline`. v1 needs them as a pair — the argument writes a baseline
+somewhere unusual and the option is how a later `check` finds it again.
+Keep only the argument and it writes a file nothing will read; keep only the
+option and there is no way to make the file. So either both come over or
+neither does, and neither is the answer: between a path in the config and
+the conventional name, every project already has one spelling, and a third
+and fourth would be two more ways to say the same thing in a tool whose
+stated aim is one way to do each thing. Someone whose baseline lives
+somewhere unusual writes it in the config, which is the file that says what
+the run is about.
+
 Loading `phparkitect.php` is `require` of a user file that returns a
 `Config` — arbitrary code execution, and inherently "how the user talks to
 us", so it lives on the driving side rather than behind a port. `Console`
