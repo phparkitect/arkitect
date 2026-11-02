@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Evaluate\Selector;
 
-use Arkitect\Evaluate\PathPattern;
+use Arkitect\Evaluate\DirectoryPattern;
 use Arkitect\Parser\ParsedClass;
 use Arkitect\Resolve\ClassGraph;
 
@@ -14,13 +14,13 @@ use Arkitect\Resolve\ClassGraph;
  * selector cannot reach those, since the thing that tells them apart is
  * not in the name.
  */
-final class ResideInPath implements Selector
+final class ResideInDirectory implements Selector
 {
-    private readonly PathPattern $pattern;
+    private readonly DirectoryPattern $pattern;
 
     public function __construct(string $pattern)
     {
-        $this->pattern = new PathPattern($pattern);
+        $this->pattern = new DirectoryPattern($pattern);
     }
 
     public function matches(ParsedClass $class, ClassGraph $classGraph): Selection

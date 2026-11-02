@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Arkitect\Tests\Evaluate\Selector;
 
-use Arkitect\Evaluate\Selector\NotResideInPath;
+use Arkitect\Evaluate\Selector\NotResideInDirectory;
 use Arkitect\Evaluate\Selector\Selection;
 use Arkitect\Resolve\ParsedClassGraph;
 use Arkitect\Tests\ParsedClassFixture;
 use PHPUnit\Framework\TestCase;
 
-final class NotResideInPathTest extends TestCase
+final class NotResideInDirectoryTest extends TestCase
 {
     public function test_a_class_written_outside_the_directory_is_selected(): void
     {
@@ -28,7 +28,7 @@ final class NotResideInPathTest extends TestCase
      */
     public function test_everything_except_a_generated_tree(): void
     {
-        $selector = new NotResideInPath('src/Generated');
+        $selector = new NotResideInDirectory('src/Generated');
 
         self::assertSame(Selection::Yes, $this->selectWith($selector, 'src/Domain/Order.php'));
         self::assertSame(Selection::Yes, $this->selectWith($selector, 'src/Infra/Db.php'));
@@ -57,19 +57,19 @@ final class NotResideInPathTest extends TestCase
 
     public function test_one_pattern_excludes_the_same_directory_in_every_package(): void
     {
-        $selector = new NotResideInPath('packages/*/tests');
+        $selector = new NotResideInDirectory('packages/*/tests');
 
         self::assertSame(Selection::Yes, $this->selectWith($selector, 'packages/billing/src/Invoice.php'));
         self::assertSame(Selection::No, $this->selectWith($selector, 'packages/billing/tests/InvoiceTest.php'));
         self::assertSame(Selection::No, $this->selectWith($selector, 'packages/shipping/tests/LabelTest.php'));
     }
 
-    private function select(string $path, string $filePath): Selection
+    private function select(string $directory, string $filePath): Selection
     {
-        return $this->selectWith(new NotResideInPath($path), $filePath);
+        return $this->selectWith(new NotResideInDirectory($directory), $filePath);
     }
 
-    private function selectWith(NotResideInPath $selector, string $filePath): Selection
+    private function selectWith(NotResideInDirectory $selector, string $filePath): Selection
     {
         return $selector->matches(
             ParsedClassFixture::create('App\Thing', filePath: $filePath),

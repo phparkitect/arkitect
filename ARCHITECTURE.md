@@ -348,16 +348,21 @@ Symfony's `Glob` on paths, where it stops at `/` — so `App\*\Domain` and
 the one kept because it can say both: with a `*` that crosses separators,
 "exactly one level down" cannot be written at all.
 
-Path patterns take this same grammar with `/` as the separator, in
-`PathPattern`. One grammar, two classes, because only the grammar is
-shared. A path is not a name: `.` and `-` are ordinary characters in it, a
-leading separator is stripped at both ends rather than at the front only,
-and "the thing that contains this one" is a file's directory where for a
-class it is its namespace — which is also why `contains()` has a case
-`PathPattern` cannot have, a class and a namespace being allowed to share a
-name while a file and a directory are not. What repeats is the regex
+`DirectoryPattern` takes this same grammar with `/` as the separator. One
+grammar, two classes, because only the grammar is shared. A path is not a
+name: `.` and `-` are ordinary characters in it, a leading separator is
+stripped at both ends rather than at the front only, and "the thing that
+contains this one" is a file's directory where for a class it is its
+namespace — which is also why `NamespacePattern::contains()` has a case
+`DirectoryPattern` cannot have, a class and a namespace being allowed to
+share a name while a file and a directory are not. What repeats is the regex
 building, the cheaper half; the day a third kind of pattern appears, that is
 when the shared half is worth extracting.
+
+The class names say directory rather than path on purpose: what the pattern
+spells is a directory, `contains()` asks which directory a file sits in, and
+a pattern naming a file in full is a directory nothing is written inside. A
+name saying "path" invited exactly that reading.
 
 `?` is not a wildcard. Nothing asks for it, and it is rejected rather than
 read literally, so a pattern carried over from a v1 config fails when it is
@@ -530,11 +535,11 @@ No `ClassSet`: its job is split between the root scan, the `vendor/` line,
 and per-rule selectors. Filtering is namespace-based
 (`Selector\ResideInOneOfTheseNamespaces`). For the rare case where directory
 and namespace disagree — generated code, monorepo packages, legacy trees —
-the answer is `Selector\ResideInPath` and `Selector\NotResideInPath`,
+the answer is `Selector\ResideInDirectory` and `Selector\NotResideInDirectory`,
 which select on the file's path relative to the root. Together they are the
 one thing v1's `ClassSet` could express that namespace selectors cannot:
 `packages/*/src` is one rule over every package in a monorepo whatever
-namespace each publishes, and `NotResideInPath('src/Generated')` is v1's
+namespace each publishes, and `NotResideInDirectory('src/Generated')` is v1's
 `excludePath()` — `that()` only narrows, so a rule about everything but one
 tree cannot be written by naming the rest.
 
@@ -811,7 +816,7 @@ explained where it belongs.
 
 ## Open — not decided, do not treat as settled
 
-- **Multi-root / monorepo**: `ResideInPath` is built and covers selecting
+- **Multi-root / monorepo**: `ResideInDirectory` is built and covers selecting
   per package. Still parked: whether anything needs more than one root for
   the scan itself. Not to be answered by reintroducing `ClassSet`-like roots.
 - **Default exclusions for the root scan** (`.git`, build and cache

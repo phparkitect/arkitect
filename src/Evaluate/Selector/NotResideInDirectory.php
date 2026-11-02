@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Arkitect\Evaluate\Selector;
 
-use Arkitect\Evaluate\PathPattern;
+use Arkitect\Evaluate\DirectoryPattern;
 use Arkitect\Parser\ParsedClass;
 use Arkitect\Resolve\ClassGraph;
 
@@ -15,13 +15,13 @@ use Arkitect\Resolve\ClassGraph;
  * is what tells generated and legacy code apart when the namespace does
  * not.
  */
-final class NotResideInPath implements Selector
+final class NotResideInDirectory implements Selector
 {
-    private readonly PathPattern $pattern;
+    private readonly DirectoryPattern $pattern;
 
     public function __construct(string $pattern)
     {
-        $this->pattern = new PathPattern($pattern);
+        $this->pattern = new DirectoryPattern($pattern);
     }
 
     public function matches(ParsedClass $class, ClassGraph $classGraph): Selection

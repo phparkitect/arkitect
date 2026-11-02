@@ -5,17 +5,22 @@ declare(strict_types=1);
 namespace Arkitect\Evaluate;
 
 /**
- * A pattern over a file path, relative to the project root and written
- * with `/`. The wildcards are the ones `NamespacePattern` uses — `*` stands
- * for part of one segment and never crosses a separator, `**` written as a
- * whole segment stands for any number of segments, none included — so a
- * rule reads the same whether it talks about namespaces or directories.
+ * A directory, written relative to the project root with `/` and matched
+ * against the file paths the parser produces. The wildcards are the ones
+ * `NamespacePattern` uses — `*` stands for part of one segment and never
+ * crosses a separator, `**` written as a whole segment stands for any
+ * number of segments, none included — so a rule reads the same whether it
+ * talks about namespaces or directories.
+ *
+ * What it names is a directory and never a file: `contains()` asks which
+ * directory a path sits in, so a pattern spelling a file out in full is a
+ * directory nothing is ever written inside.
  *
  * Separate from `NamespacePattern` because a path is not a name: it carries
  * an extension, `.` and `-` are ordinary characters in it, and its
  * separator is `/`.
  */
-final class PathPattern
+final class DirectoryPattern
 {
     private const ALLOWED = '/^([a-zA-Z0-9_\x80-\xff.\-]|\/|\*)+$/';
 
@@ -32,20 +37,20 @@ final class PathPattern
         $this->value = $value;
 
         if (1 !== preg_match(self::ALLOWED, $value)) {
-            throw new \InvalidArgumentException(\sprintf("'%s' is not a valid path pattern: only * and ** are wildcards.", $value));
+            throw new \InvalidArgumentException(\sprintf("'%s' is not a valid directory pattern: only * and ** are wildcards.", $value));
         }
 
         $segments = explode('/', $value);
 
         foreach ($segments as $segment) {
             if ('**' !== $segment && str_contains($segment, '**')) {
-                throw new \InvalidArgumentException(\sprintf("'%s' is not a valid path pattern: ** stands for whole segments, as in src/**/Domain.", $value));
+                throw new \InvalidArgumentException(\sprintf("'%s' is not a valid directory pattern: ** stands for whole segments, as in src/**/Domain.", $value));
             }
 
             // a relative step can never occur in a root-relative path, so a
             // pattern carrying one would match nothing without saying why
             if ('.' === $segment || '..' === $segment) {
-                throw new \InvalidArgumentException(\sprintf("'%s' is not a valid path pattern: it is matched against paths relative to the project root, which contain no '%s' step.", $value, $segment));
+                throw new \InvalidArgumentException(\sprintf("'%s' is not a valid directory pattern: it is matched against paths relative to the project root, which contain no '%s' step.", $value, $segment));
             }
         }
 
