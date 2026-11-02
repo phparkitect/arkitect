@@ -138,6 +138,29 @@ final class TextReportTest extends TestCase
         self::assertStringContainsString('! "all final" excludes App\\Ordr, which no class answers to', $report);
     }
 
+    public function test_stale_baseline_entries_name_the_command_that_drops_them(): void
+    {
+        $check = new CheckResult(1, new ParsingErrors(), new RuleResults(), 0, 3);
+
+        $report = (new TextReport())->render($check);
+
+        self::assertStringContainsString('! 3 baseline entries matched nothing — run prune-baseline', $report);
+    }
+
+    public function test_one_stale_entry_is_said_in_the_singular(): void
+    {
+        $report = (new TextReport())->render(new CheckResult(1, new ParsingErrors(), new RuleResults(), 0, 1));
+
+        self::assertStringContainsString('! 1 baseline entry matched nothing', $report);
+    }
+
+    public function test_a_baseline_with_nothing_stale_says_nothing(): void
+    {
+        $report = (new TextReport())->render(new CheckResult(1, new ParsingErrors(), new RuleResults(), 2, 0));
+
+        self::assertStringNotContainsString('prune-baseline', $report);
+    }
+
     public function test_files_that_could_not_be_parsed_are_reported(): void
     {
         $check = new CheckResult(0, new ParsingErrors(new ParsingError('src/Broken.php', 'syntax error')), new RuleResults());

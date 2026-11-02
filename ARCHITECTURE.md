@@ -774,6 +774,13 @@ point: a path someone named must exist, a name we guessed need not.
 a command, because "a file at the conventional place" is a fact about the
 filesystem, and a caller using the commands directly says what it wants.
 
+`check` says how many entries matched nothing and names `prune-baseline`.
+The count is only knowable there — each match takes its entry out, so what
+is left over at the end is permission for work already done — and nobody
+runs a command they have never heard of. It is a line, not a failure: the
+code is fine, the file is behind. The machine-readable report leaves it
+out, since it is housekeeping rather than a finding about the code.
+
 #### The CLI
 
 `bin/arkitect`, with `Cli\Console` as the driving adapter: it translates
@@ -952,11 +959,6 @@ explained where it belongs.
   `composer.lock` rather than per file.
 - **Graph edge cases**: duplicate FQCNs, inheritance cycles, trait
   conflicts, diamond interfaces.
-- **Stale baseline entries on `check`.** Entries nothing matched are
-  known once `Check` has consumed its occurrences, but only
-  `prune-baseline` acts on them, and only if someone knows to run it. v1
-  prints the count on every check (`BaselineResult::getStaleBaselineEntriesCount()`);
-  one line naming `prune-baseline` would make the command discoverable.
 
 ## Working on this branch
 

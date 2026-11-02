@@ -65,6 +65,10 @@ final class Check
             new ParsingErrors(...$parsed->errors),
             new RuleResults(...$results),
             $silenced,
+            // every entry that matched nothing is still in here: each match
+            // took one out, so what is left is permission for work already
+            // done
+            \count($baseline),
         );
     }
 }

@@ -169,6 +169,33 @@ final class CheckTest extends TestCase
         self::assertSame(['App\Ordr'], iterator_to_array($result->ruleResults)[0]->missingExclusions);
     }
 
+    /**
+     * An entry that matched nothing is permission for work already done,
+     * and the count is only knowable here — once every violation has been
+     * offered to the baseline.
+     */
+    public function test_baseline_entries_that_matched_nothing_are_counted(): void
+    {
+        $rule = Rule::allClasses()->should(new Constraint\IsFinal())->because('reasons');
+        $before = ['src/Order.php' => "<?php\nnamespace App;\nclass Order {}\n"];
+        $fixed = ['src/Order.php' => "<?php\nnamespace App;\nfinal class Order {}\n"];
+
+        $known = Baseline::of(iterator_to_array($this->check($before, $rule)->ruleResults)[0]->violations);
+
+        self::assertSame(0, $this->check($before, $rule, $known)->staleBaselineEntries);
+        self::assertSame(1, $this->check($fixed, $rule, $known)->staleBaselineEntries);
+    }
+
+    public function test_no_baseline_means_nothing_is_stale(): void
+    {
+        $result = $this->check(
+            ['src/Order.php' => "<?php\nnamespace App;\nclass Order {}\n"],
+            Rule::allClasses()->should(new Constraint\IsFinal())->because('reasons')
+        );
+
+        self::assertSame(0, $result->staleBaselineEntries);
+    }
+
     /** @param array<string, string> $files */
     private function check(array $files, Rule $rule, ?Baseline $baseline = null): CheckResult
     {

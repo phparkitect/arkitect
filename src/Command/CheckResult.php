@@ -15,6 +15,7 @@ final class CheckResult
         public readonly ParsingErrors $parsingErrors,
         public readonly RuleResults $ruleResults,
         public readonly int $baselined = 0,
+        public readonly int $staleBaselineEntries = 0,
     ) {
     }
 

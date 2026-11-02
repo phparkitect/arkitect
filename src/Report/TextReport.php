@@ -23,6 +23,7 @@ final class TextReport implements Report
             $this->violations($check->ruleResults),
             $this->unresolved($check->ruleResults),
             $this->uselessRules($check->ruleResults),
+            $this->staleBaseline($check),
             $this->parsingErrors($check->parsingErrors),
             $this->summary($check),
         ], static fn (string $section) => '' !== $section);
@@ -114,6 +115,23 @@ final class TextReport implements Report
         }
 
         return implode("\n", $lines);
+    }
+
+    /**
+     * A baseline keeps permission for work already done until someone
+     * prunes it, and nobody runs a command they have not heard of. Said on
+     * every check, which is the only moment the count is known.
+     */
+    private function staleBaseline(CheckResult $check): string
+    {
+        if (0 === $check->staleBaselineEntries) {
+            return '';
+        }
+
+        return \sprintf(
+            '! %s matched nothing — run prune-baseline',
+            $this->plural($check->staleBaselineEntries, 'baseline entry', 'baseline entries')
+        );
     }
 
     private function parsingErrors(ParsingErrors $errors): string
