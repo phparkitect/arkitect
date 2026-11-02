@@ -42,7 +42,7 @@ final class Console
                 return self::CLEAN;
             }
 
-            $report = $this->reportFor($arguments->value('format', 'text'));
+            $report = $this->reportFor($arguments->value('format', 'text'), $this->invocation($argv, $arguments));
             $config = $this->withBaselineFound($this->configFrom($arguments->value('config', 'phparkitect.php')));
         } catch (\InvalidArgumentException|\RuntimeException $e) {
             fwrite($err, $e->getMessage()."\n");
@@ -111,10 +111,27 @@ final class Console
             : $config;
     }
 
-    private function reportFor(string $format): Report
+    /**
+     * How to invoke arkitect again, for a suggested command the reader can
+     * copy out of the output: argv[0] as it was typed, and `--config` when
+     * it was given, since a run that needed it needs it again. The grammar
+     * takes options in any order, so this goes in front of a subcommand.
+     *
+     * @param list<string> $argv
+     */
+    private function invocation(array $argv, Arguments $arguments): string
+    {
+        $invocation = $argv[0] ?? 'arkitect';
+
+        return $arguments->has('config')
+            ? \sprintf('%s --config=%s', $invocation, $arguments->value('config', ''))
+            : $invocation;
+    }
+
+    private function reportFor(string $format, string $invocation): Report
     {
         return match ($format) {
-            'text' => new TextReport(),
+            'text' => new TextReport($invocation),
             'gitlab' => new GitlabReport(),
             default => throw new \InvalidArgumentException(\sprintf('Unknown format "%s". Expected text or gitlab.', $format)),
         };

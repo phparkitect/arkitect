@@ -17,6 +17,15 @@ use Arkitect\Parser\ParsingErrors;
  */
 final class TextReport implements Report
 {
+    /**
+     * How arkitect was invoked, so a suggested command can be copied out of
+     * the output and run. `vendor/bin/arkitect` for a composer install, a
+     * path for a phar — guessing one name would be wrong for the others.
+     */
+    public function __construct(private readonly string $invocation = 'arkitect')
+    {
+    }
+
     public function render(CheckResult $check): string
     {
         $sections = array_filter([
@@ -139,8 +148,8 @@ final class TextReport implements Report
         // written out rather than inflected: two sentences read better than
         // one with three conditional words in it
         return 1 === $count
-            ? '! 1 violation in the baseline looks fixed — run prune-baseline to remove it'
-            : \sprintf('! %d violations in the baseline look fixed — run prune-baseline to remove them', $count);
+            ? \sprintf('! 1 violation in the baseline looks fixed — run `%s prune-baseline` to remove it', $this->invocation)
+            : \sprintf('! %d violations in the baseline look fixed — run `%s prune-baseline` to remove them', $count, $this->invocation);
     }
 
     private function parsingErrors(ParsingErrors $errors): string

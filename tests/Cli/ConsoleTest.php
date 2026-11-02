@@ -180,6 +180,25 @@ final class ConsoleTest extends TestCase
         self::assertStringContainsString('is not final', $out);
     }
 
+    /**
+     * The suggested command is the one that was just run, so it can be
+     * copied out of the output. A hardcoded name would be wrong for a
+     * composer install, a phar, or a global bin.
+     */
+    public function test_the_suggested_command_is_the_one_that_was_invoked(): void
+    {
+        $this->write('arch.php', $this->config());
+        $this->write('Order.php', "<?php\nnamespace App;\nclass Order {}\n");
+
+        $this->arkitect('generate-baseline');
+        $this->write('Order.php', "<?php\nnamespace App;\nfinal class Order {}\n");
+
+        [, $out] = $this->arkitect();
+
+        // the helper always passes --config, so the suggestion has to carry it
+        self::assertStringContainsString('run `bin/arkitect --config='.$this->root.'/arch.php prune-baseline`', $out);
+    }
+
     /** @return array{int, string, string} */
     private function arkitect(string ...$arguments): array
     {

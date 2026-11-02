@@ -778,9 +778,18 @@ filesystem, and a caller using the commands directly says what it wants.
 `prune-baseline`. It reports what the count means rather than how it was
 arrived at — "matched nothing" is how the baseline found out — and hedges
 with *look*, since what is known is that the violation no longer occurs:
-the rule may have changed, or the file may be gone. v1 appends the baseline
-filename to the suggested command when it is not the default one; here
-`prune-baseline` reads the config, so there is nothing to append.
+the rule may have changed, or the file may be gone.
+
+The command it names is the one that was just run — `argv[0]` as it was
+typed, plus `--config` when it was given — so it can be copied out of the
+output and run. A hardcoded name is wrong for three of the four ways
+arkitect is installed, and dropping a `--config` the run needed produces a
+suggestion that fails. `TextReport` takes it as a constructor argument,
+which is also why the report knowing how it was invoked is not a layering
+problem: it is the adapter for a terminal, and that is terminal knowledge.
+v1 instead hardcodes its own binary name and appends the baseline filename
+when it is not the default; here the filename is in the config the
+suggestion already carries.
 The count is only knowable there — each match takes its entry out, so what
 is left over at the end is permission for work already done — and nobody
 runs a command they have never heard of. It is a line, not a failure: the
