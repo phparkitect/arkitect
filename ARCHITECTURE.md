@@ -1054,9 +1054,9 @@ a migration guide from 1.x, and a `README.md` that is the tool's.
 
 **Surface still to build**: the negated twin of each constraint, one at a
 time by request rather than in a sweep (`#### Negation is a class, not a
-decorator`); the phar build; `init`; a `Progress` for long runs; Psalm back
-in the pipeline; the E2E fixtures recovered from `main`; and a measurement
-of performance, deferred but not dropped.
+decorator`); the phar build; `init`; a `Progress` for long runs; the E2E
+fixtures recovered from `main`; and a measurement of performance, deferred
+but not dropped.
 
 `debug:expression` is not among them. It took a constraint's class name and
 its constructor arguments as strings, so running it meant knowing the inside
@@ -1069,6 +1069,10 @@ for a shape that is not that one.
 - `Cli\Console` does not inflect plurals: "dropped 1 entries", "accepted 1
   violations". `TextReport::plural()` already does it, but is private to the
   report.
+- `tools/psalm/vendor` makes the deferred root-scan exclusions concrete:
+  `DependencyDirectories` keeps those 2,600 classes from being judged, but
+  everything under the root is still parsed, so `run.php` needs a raised
+  memory limit to check 126 of its own.
 - The GitLab artifact can carry byte-identical entries when a type is
   referenced twice on one line (`function load(Db $db): Db`). GitLab groups
   by fingerprint, and the two reports have to agree on the count, so they

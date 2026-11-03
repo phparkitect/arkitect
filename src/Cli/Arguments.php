@@ -47,7 +47,9 @@ final class Arguments
                 continue;
             }
 
-            [$name, $value] = array_pad(explode('=', substr($argument, 2), 2), 2, null);
+            $parts = explode('=', substr($argument, 2), 2);
+            $name = $parts[0];
+            $value = $parts[1] ?? null;
 
             if (!\array_key_exists($name, self::OPTIONS)) {
                 throw new \InvalidArgumentException(\sprintf('Unknown option "--%s".', $name));

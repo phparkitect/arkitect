@@ -236,7 +236,7 @@ final class TextReport implements Report
      * same on every run. Padded to the widest entry in this group only —
      * one long path elsewhere shouldn't push every other line across.
      *
-     * @param list<array{string, string}> $lines
+     * @param non-empty-list<array{string, string}> $lines
      */
     private function aligned(array $lines): string
     {

@@ -31,7 +31,7 @@ use Arkitect\Parser\RepositoryParser;
 $root = $argv[1] ?? __DIR__;
 
 try {
-    $config = Config::create($root)->add([
+    $config = Config::create($root)->withDependencies('vendor', 'tools')->add([
     Rule::allClasses()
         ->that(new Selector\ResideInNamespace('Arkitect\Parser'))
         ->should(new Constraint\NotDependOnTheseNamespaces(['Arkitect\Resolve', 'Arkitect\Evaluate']))

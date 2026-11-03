@@ -22,7 +22,7 @@ final class DependOnlyOnTheseNamespaces implements Constraint
     /** @param list<string> $namespaces */
     public function __construct(array $namespaces)
     {
-        $this->allowed = array_map(static fn (string $n) => new NamespacePattern($n), array_values($namespaces));
+        $this->allowed = array_map(static fn (string $n) => new NamespacePattern($n), $namespaces);
         $this->internal = new InternalClasses();
     }
 

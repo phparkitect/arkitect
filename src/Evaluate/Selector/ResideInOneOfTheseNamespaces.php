@@ -16,7 +16,7 @@ final class ResideInOneOfTheseNamespaces implements Selector
     /** @param list<string> $namespaces */
     public function __construct(array $namespaces)
     {
-        $this->patterns = array_map(static fn (string $n) => new NamespacePattern($n), array_values($namespaces));
+        $this->patterns = array_map(static fn (string $n) => new NamespacePattern($n), $namespaces);
     }
 
     public function matches(ParsedClass $class, ClassGraph $classGraph): Selection

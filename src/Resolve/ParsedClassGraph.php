@@ -38,6 +38,7 @@ final class ParsedClassGraph implements ClassGraph
         $class = $this->byFqcn[$fqcn] ?? null;
 
         if (null === $class) {
+            /** @psalm-suppress ArgumentTypeCoercion a target that no class answers to is a No, which is what is_a returns */
             return $this->outsideTheParsedSet($fqcn, $target, static fn (string $f, string $t) => is_a($f, $t, true));
         }
 

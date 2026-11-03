@@ -23,7 +23,7 @@ final class NotDependOnTheseClasses implements Constraint
     /** @param list<string> $classes */
     public function __construct(array $classes)
     {
-        $this->forbidden = array_map(static fn (string $c) => new NamespacePattern($c), array_values($classes));
+        $this->forbidden = array_map(static fn (string $c) => new NamespacePattern($c), $classes);
     }
 
     public function evaluate(ParsedClass $class, ClassGraph $classGraph): Outcome

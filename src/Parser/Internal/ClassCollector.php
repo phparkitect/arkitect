@@ -50,13 +50,14 @@ final class ClassCollector
             $declaration = $this->declarationOf($node);
 
             if (null !== $declaration) {
-                $ownDocBlock = null !== $node->getDocComment() ? [$node->getDocComment()->getText()] : [];
+                $docComment = $node->getDocComment();
+                $ownDocBlock = null !== $docComment ? [$docComment->getText()] : [];
                 $ownAttributes = $this->collectDependencies($declaration->attrGroups);
                 $traits = $this->collectTraits($declaration->stmts);
 
                 $classes[] = new ParsedClass(
                     fqcn: $declaration->fqcn,
-                    line: $node->getLine(),
+                    line: $node->getStartLine(),
                     filePath: $filePath,
                     kind: $declaration->kind,
                     extends: new TypeReferences(...$declaration->extends),
@@ -104,7 +105,7 @@ final class ClassCollector
                 // doc comment needs separate handling from collectDocBlocks($stmts)
                 attrGroups: $node->attrGroups,
                 kind: ClassKind::RegularClass,
-                extends: null !== $node->extends ? [new TypeReference($node->extends->toString(), $node->extends->getLine())] : [],
+                extends: null !== $node->extends ? [new TypeReference($node->extends->toString(), $node->extends->getStartLine())] : [],
                 implements: $this->namesToReferences($node->implements),
                 isFinal: $node->isFinal(),
                 isReadonly: $node->isReadonly(),
@@ -156,7 +157,7 @@ final class ClassCollector
     private function namesToReferences(array $names): array
     {
         return array_map(
-            static fn (Node\Name $name) => new TypeReference($name->toString(), $name->getLine()),
+            static fn (Node\Name $name) => new TypeReference($name->toString(), $name->getStartLine()),
             $names
         );
     }
@@ -171,7 +172,7 @@ final class ClassCollector
     private function collectDependencies(array $nodes): array
     {
         return $this->walk($nodes, fn (Node $node) => array_map(
-            static fn (Node\Name\FullyQualified $type) => new TypeReference($type->toString(), $node->getLine()),
+            static fn (Node\Name\FullyQualified $type) => new TypeReference($type->toString(), $node->getStartLine()),
             $this->typesReferencedBy($node)
         ));
     }
@@ -263,7 +264,11 @@ final class ClassCollector
     {
         return $this->walk(
             $nodes,
-            static fn (Node $node) => null !== $node->getDocComment() ? [$node->getDocComment()->getText()] : []
+            static function (Node $node): array {
+                $docComment = $node->getDocComment();
+
+                return null !== $docComment ? [$docComment->getText()] : [];
+            }
         );
     }
 
@@ -341,6 +346,7 @@ final class ClassCollector
     {
         $closedUp = preg_replace(['/\s*([|&,<])\s*/', '/\s+>/'], ['$1', '>'], trim($tagText));
 
+        /** @psalm-suppress PossiblyInvalidArrayAccess the pattern is a literal, so the split cannot fail */
         return preg_split('/\s/', (string) $closedUp)[0];
     }
 

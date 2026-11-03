@@ -24,7 +24,7 @@ final class NotDependOnTheseNamespaces implements Constraint
     /** @param list<string> $namespaces */
     public function __construct(array $namespaces)
     {
-        $this->forbidden = array_map(static fn (string $n) => new NamespacePattern($n), array_values($namespaces));
+        $this->forbidden = array_map(static fn (string $n) => new NamespacePattern($n), $namespaces);
     }
 
     public function evaluate(ParsedClass $class, ClassGraph $classGraph): Outcome

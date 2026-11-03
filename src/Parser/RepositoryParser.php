@@ -14,7 +14,7 @@ final class RepositoryParser implements ProjectParser
     ) {
     }
 
-    public function parse(TargetPhpVersion $targetPhpVersion): ParseResult
+    public function parse(TargetPhpVersion $version): ParseResult
     {
         $parser = new ClassParser();
         $classes = [];
@@ -28,7 +28,7 @@ final class RepositoryParser implements ProjectParser
                 continue;
             }
 
-            $result = $parser->parse($content, $relativePath, $targetPhpVersion);
+            $result = $parser->parse($content, $relativePath, $version);
             $classes = [...$classes, ...$result->classes];
             $errors = [...$errors, ...$result->errors];
         }

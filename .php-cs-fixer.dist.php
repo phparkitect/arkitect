@@ -23,6 +23,8 @@ return (new PhpCsFixer\Config())
         'ordered_imports' => ['sort_algorithm' => 'alpha'],
         'php_unit_method_casing' => ['case' => 'snake_case'],
         'php_unit_test_case_static_method_calls' => ['call_type' => 'self'],
+        // @psalm-suppress needs a real docblock to be read; a plain comment is ignored
+        'phpdoc_to_comment' => ['ignored_tags' => ['psalm-suppress']],
         'phpdoc_align' => false,
         'yoda_style' => false,
     ])

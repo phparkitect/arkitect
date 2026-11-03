@@ -40,6 +40,7 @@ final class Violation
     ) {
         // the location comes from an already-valid ParsedClass or
         // TypeReference; these two are what a caller still chooses
+        /** @psalm-suppress PropertyTypeCoercion Fqcn normalises the name it was given; the constructor already types it */
         $this->constraint = (new Fqcn($constraint))->toString();
 
         if ('' === trim($detail)) {
