@@ -335,7 +335,14 @@ separately: **scope** by `Selector` plus `RuleResult::$checked`, and
 
 `matchedNothing()` and `judgedNothing()` are deliberately separate signals:
 a rule that selected nothing is fixed in the `that()`, a rule that could
-judge nothing in the `should()`.
+judge nothing in the `should()` — and each says so, naming the part of the
+config that has to change rather than the stage that noticed.
+
+The second one prints the `NotApplicableClass` reasons under it. They are
+carried and not printed anywhere else on purpose, since a rule about final
+classes skipping the interface beside them is nothing anyone can act on;
+this is the one case that type names as worth saying, because the language
+facts are the whole explanation of why the rule protects nothing.
 
 #### Negation is a class, not a decorator
 
@@ -650,6 +657,10 @@ the format is for, and a clean run is one line.
 ! could not check 1 class
     src/Api/Controller.php:10   cannot be checked against App\Contract: …
   vendor/ is probably outside the analysed root
+
+! "everything is final" matched 2 classes its should() cannot apply to
+    src/Repo.php:3    an interface cannot be final
+    src/Store.php:3   an abstract class cannot be final
 
 ! "a rule about a namespace that does not exist" matched no classes
 

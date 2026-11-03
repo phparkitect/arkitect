@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arkitect\Report;
 
 use Arkitect\Command\CheckResult;
+use Arkitect\Evaluate\RuleResult;
 use Arkitect\Evaluate\RuleResults;
 use Arkitect\Parser\ParsingErrors;
 
@@ -115,15 +116,37 @@ final class TextReport implements Report
             }
 
             if ($result->judgedNothing()) {
-                $lines[] = \sprintf(
-                    '! "%s" matched %s and judged none',
-                    $result->because,
-                    $this->plural($result->selected, 'class', 'classes')
-                );
+                $lines[] = $this->nothingToCheck($result);
             }
         }
 
         return implode("\n", $lines);
+    }
+
+    /**
+     * The reasons are carried and not printed everywhere, on purpose: a
+     * rule about final classes skipping the interface next to them is
+     * nothing anyone can act on. This is the one case `NotApplicableClass`
+     * names as worth saying — the rule protects nothing, and the language
+     * facts are the whole explanation of why.
+     */
+    private function nothingToCheck(RuleResult $result): string
+    {
+        $lines = [];
+
+        foreach ($result->notApplicable as $skipped) {
+            $lines[] = [\sprintf('%s:%d', $skipped->filePath, $skipped->line), $skipped->detail];
+        }
+
+        // the reasons below carry the why, so the head does not have to —
+        // which keeps it near the length of the line above it
+        $head = \sprintf(
+            '! "%s" matched %s its should() cannot apply to',
+            $result->because,
+            $this->plural($result->selected, 'class', 'classes')
+        );
+
+        return [] === $lines ? $head : $head."\n".$this->aligned($lines);
     }
 
     /**

@@ -117,13 +117,42 @@ final class TextReportTest extends TestCase
         self::assertStringContainsString('! "nothing lives here" matched no classes', $report);
     }
 
-    public function test_a_rule_that_judged_nothing_is_called_out(): void
+    public function test_a_rule_that_could_check_nothing_is_called_out(): void
     {
         $report = $this->render([ParsedClassFixture::create('App\Repo', kind: ClassKind::Interface)], [
             Rule::allClasses()->should(new Constraint\IsFinal())->because('all final'),
         ]);
 
-        self::assertStringContainsString('! "all final" matched 1 class and judged none', $report);
+        self::assertStringContainsString('! "all final" matched 1 class its should() cannot apply to', $report);
+    }
+
+    /**
+     * The language fact is the whole explanation, and the report already
+     * had it: without it the reader is told a rule is useless and left to
+     * work out why.
+     */
+    public function test_it_says_which_language_fact_rules_the_requirement_out(): void
+    {
+        $report = $this->render([
+            ParsedClassFixture::create('App\Repo', kind: ClassKind::Interface, filePath: 'src/Repo.php', line: 3),
+        ], [
+            Rule::allClasses()->should(new Constraint\IsFinal())->because('all final'),
+        ]);
+
+        self::assertStringContainsString('src/Repo.php:3', $report);
+        self::assertStringContainsString('an interface cannot be final', $report);
+    }
+
+    public function test_several_classes_it_cannot_apply_to_are_said_in_the_plural(): void
+    {
+        $report = $this->render([
+            ParsedClassFixture::create('App\Repo', kind: ClassKind::Interface),
+            ParsedClassFixture::create('App\Store', kind: ClassKind::Interface),
+        ], [
+            Rule::allClasses()->should(new Constraint\IsFinal())->because('all final'),
+        ]);
+
+        self::assertStringContainsString('matched 2 classes its should() cannot apply to', $report);
     }
 
     public function test_an_exclusion_no_class_answers_to_is_called_out(): void
