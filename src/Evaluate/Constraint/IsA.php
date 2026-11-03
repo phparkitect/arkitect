@@ -29,7 +29,7 @@ final class IsA implements Constraint
                 Violation::create($class, self::class, \sprintf('is not a %s', $this->target), $this->target),
             )),
             Membership::Unknown => Outcome::unresolved($class, \sprintf(
-                'cannot be checked against %s: some ancestors were never parsed',
+                'cannot be checked against %s',
                 $this->target
             )),
         };

@@ -654,9 +654,9 @@ the format is for, and a clean run is one line.
     Evaluate/Selector/Extend.php:22   depends on Arkitect\Parser\Fqcn
     Evaluate/Selector/IsA.php:21      depends on Arkitect\Parser\Fqcn
 
-! could not check 1 class
-    src/Api/Controller.php:10   cannot be checked against App\Contract: …
-  vendor/ is probably outside the analysed root
+! could not check 1 class, each inheriting from one that was not among
+  the files read — usually because vendor/ is outside the analysed root
+    src/Api/Controller.php:10   cannot be checked against App\Contract
 
 ! "everything is final" matched 2 classes its should() cannot apply to
     src/Repo.php:3    an interface cannot be final
@@ -667,6 +667,12 @@ the format is for, and a clean run is one line.
 49 classes, 4 rules, 9 violations in 1 rule
 ```
 
+- **The reason an unresolved class is unresolved is said once**, in the
+  head, because it is the same answer every time — it is what the type
+  means, not something an instance carries. `UnresolvedClass::REASON` holds
+  it, and the GitLab report puts it on every entry instead, since one entry
+  is read on its own. What stays on the line is the part that varies, the
+  target the class could not be checked against.
 - **`file:line` leads every line**, because that is the part terminals and
   IDEs turn into a link — the detail that most changes how this feels
   locally. Paths are relative to the root, which is why the root being the

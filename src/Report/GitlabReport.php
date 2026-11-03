@@ -76,7 +76,9 @@ final class GitlabReport implements Report
     private function fromUnresolved(UnresolvedClass $unresolved): array
     {
         return $this->entry(
-            $unresolved->detail,
+            // one entry is read on its own, so it carries the reason the
+            // text report says once at the top
+            $unresolved->detail.': '.UnresolvedClass::REASON,
             UnresolvedClass::class,
             $unresolved->fqcn,
             $unresolved->filePath,

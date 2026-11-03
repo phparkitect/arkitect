@@ -69,7 +69,7 @@ final class IsATest extends TestCase
         $unresolved = iterator_to_array($outcome->unresolved)[0];
         self::assertSame('App\Child', $unresolved->fqcn);
         self::assertSame(
-            'cannot be checked against App\Base: some ancestors were never parsed',
+            'cannot be checked against App\Base',
             $unresolved->detail
         );
     }

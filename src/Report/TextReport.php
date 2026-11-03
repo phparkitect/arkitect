@@ -83,8 +83,11 @@ final class TextReport implements Report
             return '';
         }
 
+        // the reason is the same for all of them, so it is said once in the
+        // head rather than repeated on every line
         return \sprintf(
-            "! could not check %s\n%s\n  vendor/ is probably outside the analysed root",
+            "! could not check %s, each inheriting from one that was not among\n"
+            ."  the files read — usually because vendor/ is outside the analysed root\n%s",
             $this->plural(\count($lines), 'class', 'classes'),
             $this->aligned($lines)
         );

@@ -40,7 +40,7 @@ final class Extend implements Constraint
             Membership::Yes => new Outcome(),
             Membership::No => $this->violation($class, \sprintf('does not extend %s', $this->target)),
             Membership::Unknown => Outcome::unresolved($class, \sprintf(
-                'cannot be checked against %s: some ancestors were never parsed',
+                'cannot be checked against %s',
                 $this->target
             )),
         };

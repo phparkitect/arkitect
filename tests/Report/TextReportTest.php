@@ -102,7 +102,28 @@ final class TextReportTest extends TestCase
 
         self::assertStringContainsString('! could not check 1 class', $report);
         self::assertStringContainsString('src/Api/Controller.php:10', $report);
-        self::assertStringContainsString('vendor/ is probably outside the analysed root', $report);
+        self::assertStringContainsString('vendor/ is outside', $report);
+    }
+
+    /**
+     * The reason is the same for every one of them, so it is said once at
+     * the top and not repeated down the list.
+     */
+    public function test_the_reason_is_not_repeated_on_every_line(): void
+    {
+        $report = $this->render([
+            ParsedClassFixture::create('App\A', extends: ['Vendor\Gone'], filePath: 'src/A.php'),
+            ParsedClassFixture::create('App\B', extends: ['Vendor\Gone'], filePath: 'src/B.php'),
+        ], [
+            Rule::allClasses()->should(new Constraint\IsA('App\Contract'))->because('reasons'),
+        ]);
+
+        self::assertStringContainsString('! could not check 2 classes', $report);
+        // a fragment the head's own line break cannot split, so the count
+        // means what it says and not where the wrapping happens to fall
+        self::assertSame(1, substr_count($report, 'the files read'));
+        self::assertStringContainsString('src/A.php', $report);
+        self::assertStringContainsString('src/B.php', $report);
     }
 
     public function test_a_rule_that_selected_nothing_is_called_out(): void

@@ -20,6 +20,14 @@ use Arkitect\Parser\ParsedClass;
  */
 final class UnresolvedClass
 {
+    /**
+     * Why there is ever one of these, which is the same answer every time:
+     * it is what the type means, not something an instance carries. Each
+     * report places it where that report needs it — once in a header for a
+     * reader, on every entry for a tool that shows one at a time.
+     */
+    public const REASON = 'a class it inherits from was not among the files read';
+
     private function __construct(
         public readonly string $fqcn,
         public readonly string $filePath,

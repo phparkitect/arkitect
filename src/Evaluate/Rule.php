@@ -63,10 +63,7 @@ final class Rule
             if (Selection::Unresolved === $selection) {
                 // not checked and not skipped: we couldn't tell whether this
                 // rule is even about it, and either guess would be silent
-                $unresolved[] = UnresolvedClass::create(
-                    $class,
-                    'cannot be matched against this rule: some ancestors were never parsed'
-                );
+                $unresolved[] = UnresolvedClass::create($class, 'cannot be matched against this rule');
 
                 continue;
             }

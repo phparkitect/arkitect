@@ -91,7 +91,7 @@ final class ImplementTest extends TestCase
         self::assertCount(0, $outcome->violations);
         self::assertCount(1, $outcome->unresolved);
         self::assertSame(
-            'cannot be checked against App\Contract: some ancestors were never parsed',
+            'cannot be checked against App\Contract',
             iterator_to_array($outcome->unresolved)[0]->detail
         );
     }
