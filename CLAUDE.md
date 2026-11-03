@@ -24,10 +24,50 @@ enforced.
 - Plain names beat borrowed jargon. `ClassGraph`, not `Symbols`;
   `InternalClasses`, not `PhpCoreClasses` — and the second one is also
   named for what it actually tests, `ReflectionClass::isInternal()`.
+- A name must not promise more than it does. `ResideInPath` took a path
+  and meant a directory, so a file path looked like a valid argument and
+  silently selected nothing; `json` would have promised a
+  machine-readable format and delivered one only GitLab reads. When a
+  name cannot be made honest, that is the signal the thing behind it is
+  wrong.
 - `-er` names are avoided, with one settled exception: the `Parser` family
   (`ClassParser`, `RepositoryParser`, `ProjectParser`).
 - v1's names carry over only when they still fit. `Expression` became
   `Constraint`; `ResideInOneOfTheseNamespaces` stayed.
+
+## Messages name nothing the user cannot see
+
+The system is the arkitect executable. The configuration and the analysed
+code are outside it — the user wrote both, so naming them is not a leak.
+The rest is a box nobody has opened, and a message naming its inside asks
+the reader to picture something they have no picture of.
+
+The line is not where it first looks: `add withBaseline() to say where it
+goes` names a method in this source and is right, because the
+configuration language is the user's, while *judged* belongs to
+`RuleResult` and nobody writes it.
+
+Two ways it breaks, both caught in review rather than in the writing:
+
+- Saying how the tool found out instead of what it found. "3 baseline
+  entries matched nothing" is the mechanism; "3 violations in the baseline
+  look fixed" is what there is to act on.
+- Reaching for the tool's own verb when a message has to name a mechanism
+  at all. The fix is not a plainer synonym but the part of the config the
+  reader wrote: a rule that could judge none of its classes is a
+  `should()` that cannot mean anything for them.
+
+## Clearer beats shorter
+
+Nobody should have to learn this tool to use it, and explicit beats
+implicit, so where a shorter message and a clearer one disagree the
+clearer one wins. A suggested command is printed whole, as the reader
+would type it — `argv[0]` and the options this run needed — not as a
+subcommand they have to reassemble.
+
+Not a licence to pad. The words have to buy comprehension: a message made
+longer for symmetry with another one, or to mention what the reader did
+not ask about, is only longer.
 
 ## Types over annotations
 
