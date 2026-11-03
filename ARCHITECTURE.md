@@ -1046,17 +1046,23 @@ than expanding into "the whole 2.0".
 The design above is settled; what is left is surface. Nothing in this list is
 a design question — those are under `## Open`.
 
-**Documentation is the merge blocker.** There is no `README.md` on this
-branch, so the link `main`'s README has to `docs/philosophy.md` is dead here,
-and there is no `docs/rules.md`. `except()`, `ResideInDirectory` and
-`--format=gitlab` all work and are written down nowhere a user looks. A
-migration guide from 1.x belongs with them.
+**Documentation is the merge blocker.** `README.md` is the branch's, for
+whoever opens it, and it carries the CLI, the config and the rule surface
+— `except()`, `ResideInDirectory` and `--format=gitlab` among them. None of
+that is yet where a user of 2.0 would look: `docs/rules.md` as a reference,
+a migration guide from 1.x, and a `README.md` that is the tool's.
 
 **Surface still to build**: the negated twin of each constraint, one at a
 time by request rather than in a sweep (`#### Negation is a class, not a
-decorator`); the phar build; `init`; `debug-expression`; a `Progress` for
-long runs; Psalm back in the pipeline; the E2E fixtures recovered from
-`main`; and a measurement of performance, deferred but not dropped.
+decorator`); the phar build; `init`; a `Progress` for long runs; Psalm back
+in the pipeline; the E2E fixtures recovered from `main`; and a measurement
+of performance, deferred but not dropped.
+
+`debug:expression` is not among them. It took a constraint's class name and
+its constructor arguments as strings, so running it meant knowing the inside
+of the tool; and what it printed — the classes a constraint does not flag —
+is what a selector answers in 2.0. It waits for someone to ask for it, and
+for a shape that is not that one.
 
 **Seen and left alone**, each small enough to pick up in passing:
 
