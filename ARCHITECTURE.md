@@ -1040,3 +1040,34 @@ than expanding into "the whole 2.0".
    review: no mutable shared state standing in for return values, clear
    separation between components. Qualitative, and the primary bar given
    that performance is deferred.
+
+## Left before 2.0
+
+The design above is settled; what is left is surface. Nothing in this list is
+a design question — those are under `## Open`.
+
+**Documentation is the merge blocker.** There is no `README.md` on this
+branch, so the link `main`'s README has to `docs/philosophy.md` is dead here,
+and there is no `docs/rules.md`. `except()`, `ResideInDirectory` and
+`--format=gitlab` all work and are written down nowhere a user looks. A
+migration guide from 1.x belongs with them.
+
+**Surface still to build**: the negated twin of each constraint, one at a
+time by request rather than in a sweep (`#### Negation is a class, not a
+decorator`); the phar build; `init`; `debug-expression`; a `Progress` for
+long runs; Psalm back in the pipeline; the E2E fixtures recovered from
+`main`; and a measurement of performance, deferred but not dropped.
+
+**Seen and left alone**, each small enough to pick up in passing:
+
+- `Cli\Console` does not inflect plurals: "dropped 1 entries", "accepted 1
+  violations". `TextReport::plural()` already does it, but is private to the
+  report.
+- The GitLab artifact can carry byte-identical entries when a type is
+  referenced twice on one line (`function load(Db $db): Db`). GitLab groups
+  by fingerprint, and the two reports have to agree on the count, so they
+  are not deduplicated.
+- Making the dependency-directory default *find* a nested `vendor/` — the
+  open question above — is blocked mechanically as well: it needs
+  `composer.json`, which `FileRepository::files()` cannot reach, because it
+  filters to `.php`. Widening that port is a hexagon change.
