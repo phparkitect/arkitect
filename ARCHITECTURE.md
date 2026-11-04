@@ -993,17 +993,43 @@ explained where it belongs.
 - **Multi-root / monorepo**: `ResideInDirectory` is built and covers selecting
   per package, and `Config::$dependencies` takes `packages/*/vendor` for the
   per-package dependencies. Still parked: whether anything needs more than
-  one root for the scan itself, and whether the default should find a nested
-  vendor rather than wait to be told about it. Not to be answered by
-  reintroducing `ClassSet`-like roots.
+  one root for the scan itself; finding a nested vendor rather than waiting
+  to be told about it is one of the project-structure port's questions. Not
+  to be answered by reintroducing `ClassSet`-like roots.
 - **Default exclusions for the root scan** (`.git`, build and cache
-  directories, deliberately broken parse-error fixtures): deferred by
-  product decision, not a blocker. Revisit when it is a real problem.
+  directories, deliberately broken parse-error fixtures): what rules may
+  judge is `DependencyDirectories`' answer, but everything under the root is
+  parsed whatever that answer is, so an excluded directory is still in the
+  graph. That makes this a question about what the graph holds rather than
+  about comfort, and duplicate FQCNs are what it costs. Configuration is
+  needed whatever a manifest turns out to say: a fixture that has to fail to
+  parse is an intention, and no project file states it.
+- **Duplicate FQCNs**: `ParsedClassGraph` indexes by name and the last one
+  parsed wins, which is an effect of an assignment in a loop rather than a
+  decision anyone took. A second composer project under the root is enough
+  to reach it: `tools/psalm/vendor` holds its own `nikic/php-parser` at a
+  different version from `vendor`'s, so two definitions of every `PhpParser`
+  name are parsed and one is dropped without a word, the survivor decided by
+  traversal order. Reporting it depends on neither entry around it — the set
+  handed to the graph already carries both — while deciding what a rule
+  should then answer does.
+- **A port for project structure**: three questions a project's own files
+  could answer are one port — where `vendor` is when `config.vendor-dir`
+  moves it, which nested directories are separate projects with their own,
+  and which hold code this project did not write — with
+  `DependencyDirectories` as what it returns. Composer is an adapter and not
+  the port itself, because a tree laid out by hand asks the same question.
+  `withDependencies()` is then the explicit adapter, which leaves configured
+  and deduced as one feature with a precedence instead of two features.
+  Not to be answered by widening `FileRepository`: its `.php` filter is what
+  makes it mean the source to parse, and every consumer would have to filter
+  again. It buys no less work either, since nested manifests are still found
+  by walking — only the walk behind the boundary that owns it.
 - **Cache storage and invalidation**: project-local directory versus system
   cache dir; whether `vendor`'s cache invalidates as a block on
   `composer.lock` rather than per file.
-- **Graph edge cases**: duplicate FQCNs, inheritance cycles, trait
-  conflicts, diamond interfaces.
+- **Graph edge cases**: inheritance cycles, trait conflicts, diamond
+  interfaces.
 
 ## Working on this branch
 
@@ -1069,10 +1095,6 @@ for a shape that is not that one.
 - `Cli\Console` does not inflect plurals: "dropped 1 entries", "accepted 1
   violations". `TextReport::plural()` already does it, but is private to the
   report.
-- `tools/psalm/vendor` makes the deferred root-scan exclusions concrete:
-  `DependencyDirectories` keeps those 2,600 classes from being judged, but
-  everything under the root is still parsed, so `run.php` needs a raised
-  memory limit to check 126 of its own.
 - The GitLab artifact can carry byte-identical entries when a type is
   referenced twice on one line (`function load(Db $db): Db`). GitLab groups
   by fingerprint, and the two reports have to agree on the count, so they
