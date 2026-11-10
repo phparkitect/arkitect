@@ -1,4 +1,11 @@
 build:
     environment:
         php: 8.0
-
+    nodes:
+        analysis:
+            tests:
+                # No phpcs-run: code style is enforced by php-cs-fixer in CI, and
+                # phpcs-run installs a pinned PHP_CodeSniffer that recent Composer
+                # refuses because of security advisories.
+                override:
+                    - php-scrutinizer-run
