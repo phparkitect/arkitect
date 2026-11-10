@@ -41,7 +41,6 @@ jobs:
       with:
         php-version: ${{ matrix.php-versions }}
         coverage: pcov
-        # `composer audit` needs Composer >= 2.4
         tools: composer:v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -75,13 +74,6 @@ jobs:
       if: ${{ matrix.dependencies == 'lowest' }}
       run: composer update --prefer-dist --prefer-lowest --prefer-stable
 
-    # Checks the resolved dependencies against the known security advisories
-    # (Packagist, i.e. FriendsOfPHP and GitHub). It looks at installed packages
-    # only, not at the PHP runtime: roave/security-advisories also declared a
-    # conflict with every unpatched PHP release, so it could not be installed
-    # at all on the EOL versions this matrix has to keep testing. An advisory
-    # that does not apply can be skipped with `config.audit.ignore` in
-    # composer.json, with the reason next to it.
     - name: Security audit of dependencies
       run: composer audit --abandoned=report
 
