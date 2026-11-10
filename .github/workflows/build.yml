@@ -41,7 +41,7 @@ jobs:
       with:
         php-version: ${{ matrix.php-versions }}
         coverage: pcov
-        tools: composer:v2.2
+        tools: composer:v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -73,6 +73,9 @@ jobs:
     - name: Install lowest allowed dependencies
       if: ${{ matrix.dependencies == 'lowest' }}
       run: composer update --prefer-dist --prefer-lowest --prefer-stable
+
+    - name: Security audit of dependencies
+      run: composer audit --abandoned=report
 
     # Psalm 6 needs PHP >= 8.1 to run; the analysis target stays 8.0 (phpVersion in psalm.xml)
     - name: Static Analysis
